@@ -28,6 +28,11 @@ Le portail est alors disponible sur `http://localhost:8080`.
 
 Le JAR exécutable est produit dans `build/libs`.
 
+## Déploiement OpenShift
+
+Le pipeline GitHub Actions et les manifestes OpenShift sont décrits dans
+[`docs/DEPLOIEMENT-OPENSHIFT.md`](docs/DEPLOIEMENT-OPENSHIFT.md).
+
 ## Santé de l’application
 
 - `/actuator/health`

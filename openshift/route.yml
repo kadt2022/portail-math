@@ -1,0 +1,20 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: portail
+  labels:
+    app: portail-math
+    app.kubernetes.io/name: portail-math
+    app.kubernetes.io/part-of: mbuyamba-maths-rdc
+spec:
+  host: ${OPENSHIFT_ROUTE_HOST}
+  to:
+    kind: Service
+    name: portail-math
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
