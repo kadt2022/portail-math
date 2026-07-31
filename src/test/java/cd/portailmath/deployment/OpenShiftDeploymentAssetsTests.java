@@ -26,13 +26,19 @@ class OpenShiftDeploymentAssetsTests {
         var jobs = map(workflow.get("jobs"));
         var permissions = map(workflow.get("permissions"));
         var deployment = map(jobs.get("deploy-openshift"));
+        var deploymentCondition = deployment.get("if").toString()
+                .replaceAll("\\s+", " ")
+                .trim();
 
         assertTrue(jobs.containsKey("ci"));
         assertTrue(jobs.containsKey("deploy-openshift"));
         assertEquals("read", permissions.get("contents"));
         assertEquals("openshift-dev", deployment.get("environment"));
-        assertTrue(deployment.get("if").toString().contains("workflow_dispatch"));
-        assertTrue(deployment.get("if").toString().contains("refs/heads/main"));
+        assertEquals(
+                "github.ref == 'refs/heads/main' && "
+                        + "(github.event_name == 'workflow_dispatch' || github.event_name == 'push')",
+                deploymentCondition
+        );
         assertFalse(workflowText.contains("pull_request_target"));
         assertFalse(workflowText.contains("write-all"));
     }
