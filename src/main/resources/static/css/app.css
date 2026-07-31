@@ -302,11 +302,15 @@ a {
 
 .topbar {
     display: flex;
-    height: 82px;
-    padding: 16px clamp(22px, 3.3vw, 50px);
+    height: 70px;
+    margin: 12px clamp(22px, 3.3vw, 50px) 0;
+    padding: 10px 14px;
     align-items: center;
     justify-content: flex-end;
-    background: rgba(246, 247, 251, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
 }
 
 .menu-button,
@@ -1334,10 +1338,14 @@ a {
         z-index: 30;
         top: 0;
         height: 70px;
+        margin: 0;
         padding: 10px 20px;
         justify-content: space-between;
+        border: 0;
         border-bottom: 1px solid rgba(225, 227, 238, 0.9);
-        background: rgba(246, 247, 251, 0.95);
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: none;
         backdrop-filter: blur(12px);
     }
 
