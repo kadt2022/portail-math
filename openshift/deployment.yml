@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portail-math
+  labels:
+    app: portail-math
+    app.kubernetes.io/name: portail-math
+    app.kubernetes.io/part-of: mbuyamba-maths-rdc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portail-math
+  template:
+    metadata:
+      labels:
+        app: portail-math
+        app.kubernetes.io/name: portail-math
+        app.kubernetes.io/part-of: mbuyamba-maths-rdc
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: portail-math
+          image: image-registry.openshift-image-registry.svc:5000/${OPENSHIFT_NAMESPACE}/portail-math:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            failureThreshold: 6
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            failureThreshold: 3
+            periodSeconds: 15
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: java-tmp
+              mountPath: /tmp
+      volumes:
+        - name: java-tmp
+          emptyDir: {}

@@ -1,0 +1,29 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: portail-math
+  labels:
+    app: portail-math
+    app.kubernetes.io/name: portail-math
+    app.kubernetes.io/part-of: mbuyamba-maths-rdc
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Binary
+    binary: {}
+    dockerfile: |-
+      FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:latest
+
+      COPY app.jar /deployments/app.jar
+
+      EXPOSE 8080
+
+      ENTRYPOINT ["java", "-jar", "/deployments/app.jar"]
+  strategy:
+    type: Docker
+    dockerStrategy: {}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: portail-math:latest
+  triggers: []

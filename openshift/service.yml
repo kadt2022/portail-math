@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: portail-math
+  labels:
+    app: portail-math
+    app.kubernetes.io/name: portail-math
+    app.kubernetes.io/part-of: mbuyamba-maths-rdc
+spec:
+  type: ClusterIP
+  selector:
+    app: portail-math
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

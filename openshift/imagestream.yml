@@ -1,0 +1,11 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: portail-math
+  labels:
+    app: portail-math
+    app.kubernetes.io/name: portail-math
+    app.kubernetes.io/part-of: mbuyamba-maths-rdc
+spec:
+  lookupPolicy:
+    local: true
