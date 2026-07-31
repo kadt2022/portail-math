@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content result-page">
+            <section class="result-card"
+                     th:if="${resultAvailable}"
+                     data-quiz-result
+                     th:attr="data-result-quiz-id=${result.quizId},
+                              data-result-mode=${result.mode},
+                              data-result-subject-id=${result.subjectId},
+                              data-result-subject-name=${result.subjectName},
+                              data-result-score=${result.score},
+                              data-result-total=${result.totalQuestions},
+                              data-result-correct=${result.correctAnswers},
+                              data-result-incorrect=${result.incorrectAnswers},
+                              data-result-completed-at=${result.completedAt}">
+                <div class="result-confetti" aria-hidden="true">✦ · ✧ · ✦</div>
+                <p class="eyebrow"
+                   th:text="${result.mode.name() == 'REVIEW' ? 'Révision terminée' : 'Quiz terminé'}">
+                    Quiz terminé
+                </p>
+                <h1 th:text="${result.mode.name() == 'REVIEW' ? 'Révision terminée' : result.appreciation}">
+                    Très bien
+                </h1>
+                <p class="result-subject">
+                    <span th:text="${result.mode.name() == 'REVIEW' ? 'Tes corrections pour ' : 'Tes résultats pour '}">
+                        Tes résultats pour
+                    </span>
+                    <strong th:text="${result.subjectName}">Le cercle</strong>
+                </p>
+
+                <div class="result-overview">
+                    <div class="result-ring"
+                         th:style="'--result-percent: ' + ${result.percentage} + '%'"
+                         th:attr="aria-label=${result.percentage + ' pour cent'}">
+                        <div>
+                            <strong th:text="${result.percentage + '%'}">80%</strong>
+                            <span>de réussite</span>
+                        </div>
+                    </div>
+
+                    <div class="result-score-copy">
+                        <span th:text="${result.mode.name() == 'REVIEW' ? 'Questions corrigées' : 'Score obtenu'}">
+                            Score obtenu
+                        </span>
+                        <strong>
+                            <span th:text="${result.score}">4</span>
+                            <small>/ <span th:text="${result.totalQuestions}">5</span></small>
+                        </strong>
+                        <p th:text="${result.mode.name() == 'REVIEW'
+                            ? 'Ce score de révision reste distinct de ton quiz normal.'
+                            : 'Chaque question vaut un point.'}">
+                            Chaque question vaut un point.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="result-stats">
+                    <div class="result-stat result-stat--correct">
+                        <span aria-hidden="true">✓</span>
+                        <div>
+                            <strong th:text="${result.correctAnswers}">4</strong>
+                            <small th:text="${result.mode.name() == 'REVIEW'
+                                ? 'erreurs corrigées'
+                                : 'bonnes réponses'}">bonnes réponses</small>
+                        </div>
+                    </div>
+                    <div class="result-stat result-stat--incorrect">
+                        <span aria-hidden="true">×</span>
+                        <div>
+                            <strong th:text="${result.incorrectAnswers}">1</strong>
+                            <small th:text="${result.mode.name() == 'REVIEW'
+                                ? 'questions encore à revoir'
+                                : 'réponses à revoir'}">réponses à revoir</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button class="button button--success"
+                            type="button"
+                            data-review-errors
+                            th:if="${!result.failedQuestionIds.isEmpty()}"
+                            th:text="${result.mode.name() == 'REVIEW'
+                                ? 'Revoir les erreurs restantes'
+                                : 'Revoir mes erreurs'}">
+                        Revoir mes erreurs
+                    </button>
+                    <a class="button button--primary"
+                       th:if="${result.mode.name() == 'STANDARD'}"
+                       th:href="@{/exetat/matieres/{subjectId}/quiz(subjectId=${result.subjectId})}">
+                        Recommencer ce quiz
+                    </a>
+                    <a class="button button--primary"
+                       th:if="${result.mode.name() == 'REVIEW'}"
+                       th:href="@{/exetat/matieres/{subjectId}(subjectId=${result.subjectId})}">
+                        Retour à la matière
+                    </a>
+                    <a class="button button--outline" th:href="@{/progression}">Ma progression</a>
+                    <a class="button button--outline" th:href="@{/exetat}">Choisir une autre matière</a>
+                    <a class="button button--quiet" th:href="@{/}">Retour au tableau de bord</a>
+                </div>
+                <div hidden aria-hidden="true">
+                    <span th:each="questionId : ${result.failedQuestionIds}"
+                          th:attr="data-failed-question-id=${questionId}"></span>
+                    <span th:each="questionId : ${result.correctedQuestionIds}"
+                          th:attr="data-corrected-question-id=${questionId}"></span>
+                </div>
+                <p class="progress-card-message" data-review-message role="status"></p>
+            </section>
+
+            <section class="result-card result-card--unavailable" th:unless="${resultAvailable}">
+                <span class="result-unavailable-icon" aria-hidden="true">⌛</span>
+                <p class="eyebrow">Résultats indisponibles</p>
+                <h1>Le quiz n’est pas encore terminé</h1>
+                <p th:text="${resultMessage}">Réponds aux cinq questions avant de consulter ton score.</p>
+                <a class="button button--primary" th:href="@{/exetat}">Retour aux matières</a>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/progress-store.js}"></script>
+<script th:src="@{/js/quiz-result.js}"></script>
+</body>
+</html>

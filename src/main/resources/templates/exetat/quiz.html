@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu"
+              class="page-content quiz-page"
+              data-quiz-root
+              th:attr="data-subject-id=${subject.id},data-subject-name=${subject.name}">
+            <a class="back-link back-link--purple"
+               th:href="@{/exetat/matieres/{subjectId}/entrainement(subjectId=${subject.id})}">
+                <span aria-hidden="true">←</span> Revoir les consignes
+            </a>
+
+            <section class="quiz-loading" data-quiz-loading aria-live="polite">
+                <span class="quiz-loader" aria-hidden="true"></span>
+                <strong>Préparation de ton quiz…</strong>
+            </section>
+
+            <section class="quiz-error" data-quiz-error hidden role="alert">
+                <span aria-hidden="true">!</span>
+                <div>
+                    <strong>Le quiz ne peut pas continuer.</strong>
+                    <p data-error-message>Une erreur inattendue s’est produite.</p>
+                </div>
+                <a class="button button--primary"
+                   th:href="@{/exetat/matieres/{subjectId}/quiz(subjectId=${subject.id})}">
+                    Recommencer
+                </a>
+            </section>
+
+            <div class="quiz-workspace" data-quiz-panel hidden>
+                <section class="quiz-toolbar" aria-label="Progression du quiz">
+                    <div>
+                        <p class="eyebrow" data-quiz-heading th:text="${subject.name}">Le cercle</p>
+                        <strong>Question <span data-question-number>1</span> sur <span data-total-questions>5</span></strong>
+                    </div>
+                    <div class="quiz-score">
+                        <span>Score</span>
+                        <strong><span data-score>0</span> / <span data-score-total>5</span></strong>
+                    </div>
+                    <div class="quiz-progress" aria-label="Progression">
+                        <span data-progress-bar></span>
+                    </div>
+                </section>
+
+                <section class="quiz-question-card" aria-labelledby="question-title">
+                    <p class="review-notice" data-review-notice hidden>
+                        Cette question avait été manquée lors de ta dernière tentative.
+                    </p>
+                    <div class="quiz-question-meta">
+                        <span data-question-topic>Notion</span>
+                        <span class="difficulty-badge" data-question-difficulty>Facile</span>
+                    </div>
+                    <h1 id="question-title" data-question-statement>Question</h1>
+                    <p class="choice-instruction">Choisis une seule réponse, puis valide ton choix.</p>
+
+                    <div class="quiz-choices" data-choice-list role="radiogroup" aria-label="Réponses proposées"></div>
+
+                    <div class="quiz-actions">
+                        <button class="button button--primary" type="button" data-validate-answer disabled>
+                            Valider ma réponse
+                        </button>
+                        <button class="button button--success" type="button" data-next-question hidden>
+                            Question suivante <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="answer-feedback" data-answer-feedback hidden
+                         aria-live="polite" aria-atomic="true">
+                    <header>
+                        <span class="answer-feedback__icon" data-feedback-icon aria-hidden="true">✓</span>
+                        <div>
+                            <p class="eyebrow" data-feedback-kicker>Correction immédiate</p>
+                            <h2 data-feedback-title>Bonne réponse !</h2>
+                        </div>
+                    </header>
+                    <div class="answer-feedback__summary">
+                        <p><strong>Ta réponse :</strong> <span data-selected-answer></span></p>
+                        <p><strong>Bonne réponse :</strong> <span data-correct-answer></span></p>
+                    </div>
+                    <div class="solution-card">
+                        <p class="eyebrow">Solution expliquée</p>
+                        <h3 data-solution-summary>Explication</h3>
+                        <p class="solution-formula" data-solution-formula></p>
+                        <ol data-solution-steps></ol>
+                        <p class="solution-advice"><strong>Conseil :</strong> <span data-solution-advice></span></p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/exetat-quiz.js}"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Mbuyamba Maths RDC, portail éducatif de mathématiques pour les élèves de la RDC.">
+    <title th:text="${pageTitle + ' · Mbuyamba Maths RDC'}">Mbuyamba Maths RDC</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+</html>

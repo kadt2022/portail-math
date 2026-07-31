@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Action indisponible')}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar('exetat')}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="not-found-card error-page-card">
+                <span class="not-found-card__code" aria-hidden="true">409</span>
+                <span class="not-found-card__icon" aria-hidden="true">!</span>
+                <p class="eyebrow">Action indisponible</p>
+                <h1>Cette action n’est plus disponible</h1>
+                <p>Le quiz a peut-être déjà été terminé ou la question a déjà reçu une réponse.</p>
+                <a class="button button--primary" th:href="@{/exetat}">Retour aux matières</a>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

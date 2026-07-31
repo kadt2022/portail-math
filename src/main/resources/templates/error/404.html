@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Page introuvable')}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="not-found-card error-page-card">
+                <span class="not-found-card__code" aria-hidden="true">404</span>
+                <span class="not-found-card__icon" aria-hidden="true">?</span>
+                <p class="eyebrow">Erreur 404</p>
+                <h1>Page introuvable</h1>
+                <p>La page demandée n’existe pas ou a été déplacée.</p>
+                <a class="button button--primary" th:href="@{/}">Retour au dashboard</a>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

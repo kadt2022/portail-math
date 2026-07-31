@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="about-layout">
+                <div class="about-card">
+                    <a class="back-link" th:href="@{/}"><span aria-hidden="true">←</span> Retour au dashboard</a>
+                    <p class="eyebrow">Notre mission</p>
+                    <h1>À propos de Mbuyamba Maths RDC</h1>
+                    <p class="about-lead">Rendre les mathématiques plus claires, plus proches et plus accessibles à chaque élève.</p>
+                    <div class="about-copy">
+                        <p>Mbuyamba Maths RDC est un portail éducatif indépendant destiné à aider les élèves à apprendre et à réviser les mathématiques.</p>
+                        <p>Il propose un parcours de préparation à l’EXETAT et un parcours d’apprentissage pour le primaire.</p>
+                    </div>
+                    <div class="independence-notice">
+                        <span aria-hidden="true">i</span>
+                        <p><strong>Information importante</strong><br>
+                            Ce portail n’est pas une plateforme officielle du ministère de l’Éducation.</p>
+                    </div>
+                </div>
+
+                <aside class="mission-card" aria-label="Valeurs du portail">
+                    <span class="mission-mark" aria-hidden="true">＋ ×</span>
+                    <h2>Apprendre. S’exercer. Réussir.</h2>
+                    <ul>
+                        <li><span aria-hidden="true">✓</span> Des explications simples</li>
+                        <li><span aria-hidden="true">✓</span> Deux parcours adaptés</li>
+                        <li><span aria-hidden="true">✓</span> Un accès gratuit</li>
+                    </ul>
+                    <a class="button button--light" th:href="@{/}">Découvrir le portail</a>
+                </aside>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+server:
+  port: ${PORT:8080}
+  error:
+    include-exception: false
+    include-message: never
+    include-stacktrace: never
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: portail-math
+  thymeleaf:
+    cache: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+info:
+  app:
+    technical-name: portail-math
+    display-name: Mbuyamba Maths RDC
+    description: Portail éducatif de mathématiques pour les élèves de la RDC
+    version: 0.0.1
+
+portail-math:
+  exetat:
+    content-location: classpath:/content/exetat/
+    expected-questions-per-subject: 5

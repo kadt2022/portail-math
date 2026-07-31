@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="welcome-heading" aria-labelledby="welcome-title">
+                <div>
+                    <p class="eyebrow">Ton espace d’apprentissage</p>
+                    <h1 id="welcome-title">Bonjour <span aria-hidden="true">👋</span></h1>
+                    <p>Prêt à progresser en mathématiques&nbsp;?</p>
+                </div>
+                <div class="welcome-badge">
+                    <span aria-hidden="true">🇨🇩</span>
+                    <span>Conçu pour les élèves de la RDC</span>
+                </div>
+            </section>
+
+            <section class="hero-card" aria-labelledby="hero-title">
+                <div class="hero-copy">
+                    <span class="hero-kicker">Bienvenue sur Mbuyamba Maths RDC</span>
+                    <h2 id="hero-title">Les mathématiques, pas à pas,<br>pour chaque élève de la RDC.</h2>
+                    <p>Choisis ton parcours et découvre une façon simple, claire et motivante d’apprendre.</p>
+                    <div class="hero-actions">
+                        <a class="button button--light" th:href="@{/exetat}">
+                            Commencer l’EXETAT <span aria-hidden="true">→</span>
+                        </a>
+                        <a class="button button--ghost" th:href="@{/primaire}">
+                            Découvrir le primaire
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual hero-visual--image">
+                    <img class="hero-children"
+                         th:src="@{/images/enfants-revision.webp}"
+                         src="/images/enfants-revision.webp"
+                         width="1200"
+                         height="800"
+                         alt="Trois élèves noirs révisent les mathématiques ensemble autour d’un cahier"
+                         fetchpriority="high">
+                </div>
+            </section>
+
+            <section class="section-block" aria-labelledby="paths-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Deux chemins, un même objectif</p>
+                        <h2 id="paths-title">Choisis ton parcours</h2>
+                    </div>
+                    <p>Commence par ce qui correspond à ton niveau aujourd’hui.</p>
+                </div>
+
+                <div class="path-grid">
+                    <article class="path-card path-card--exetat">
+                        <div class="path-card__body">
+                            <span class="path-icon path-icon--violet" aria-hidden="true">🎓</span>
+                            <span class="path-label">Secondaire</span>
+                            <h3>Je prépare l’EXETAT</h3>
+                            <p>Révise les principales notions de mathématiques et entraîne-toi avec des questions à choix multiple.</p>
+                            <ul class="topic-list" aria-label="Notions prévues">
+                                <li>Cercle</li>
+                                <li>Droite</li>
+                                <li>Dérivées</li>
+                                <li>Intégrales</li>
+                            </ul>
+                            <a class="button button--primary" th:href="@{/exetat}">
+                                Commencer <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                        <div class="path-decoration" aria-hidden="true">∫</div>
+                    </article>
+
+                    <article class="path-card path-card--primary">
+                        <div class="path-card__body">
+                            <span class="path-icon path-icon--green" aria-hidden="true">✏️</span>
+                            <span class="path-label path-label--green">Primaire</span>
+                            <h3>J’apprends les maths au primaire</h3>
+                            <p>Apprends à ton rythme avec des exercices simples, des explications et des activités adaptées à ton niveau.</p>
+                            <ul class="topic-list" aria-label="Notions prévues">
+                                <li>Nombres</li>
+                                <li>Calcul</li>
+                                <li>Mesures</li>
+                                <li>Géométrie</li>
+                            </ul>
+                            <a class="button button--success" th:href="@{/primaire}">
+                                Découvrir <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                        <div class="path-decoration" aria-hidden="true">123</div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section-block" id="progression" aria-labelledby="overview-title"
+                     data-dashboard-progress>
+                <div class="section-heading section-heading--compact">
+                    <div>
+                        <p class="eyebrow">Tes résultats locaux</p>
+                        <h2 id="overview-title">Ma progression</h2>
+                    </div>
+                    <a class="button button--quiet" th:href="@{/progression}">Voir le détail</a>
+                </div>
+                <div class="stats-grid">
+                    <article class="stat-card">
+                        <span class="stat-icon stat-icon--purple" aria-hidden="true">◆</span>
+                        <div><strong data-dashboard-started>0/4</strong><span>matières commencées</span></div>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon stat-icon--green" aria-hidden="true">★</span>
+                        <div><strong data-dashboard-best>0/5</strong><span>meilleur résultat</span></div>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon stat-icon--yellow" aria-hidden="true">✓</span>
+                        <div><strong data-dashboard-correct>0</strong><span>questions réussies</span></div>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon stat-icon--blue" aria-hidden="true">↺</span>
+                        <div><strong data-dashboard-review>0</strong><span>questions à revoir</span></div>
+                    </article>
+                </div>
+                <div class="dashboard-progress-message" data-dashboard-empty>
+                    <span aria-hidden="true">🎯</span>
+                    <div>
+                        <strong>Commence ton premier quiz pour voir ta progression ici.</strong>
+                        <p>Tes résultats resteront disponibles dans ce navigateur.</p>
+                    </div>
+                    <a class="button button--primary" th:href="@{/exetat}">Choisir une matière</a>
+                </div>
+                <div class="dashboard-progress-message dashboard-progress-message--active"
+                     data-dashboard-active hidden>
+                    <span aria-hidden="true">📈</span>
+                    <div>
+                        <strong>Ta progression est à jour.</strong>
+                        <p>Consulte le détail par matière ou poursuis ton entraînement.</p>
+                    </div>
+                    <a class="button button--primary" th:href="@{/progression}">Ma progression</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/progress-store.js}"></script>
+<script th:src="@{/js/progress-widgets.js}"></script>
+</body>
+</html>

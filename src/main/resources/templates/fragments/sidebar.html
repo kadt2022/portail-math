@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="sidebar" id="site-navigation" th:fragment="sidebar(activePage)" aria-label="Navigation principale">
+    <a class="brand" th:href="@{/}" aria-label="Mbuyamba Maths RDC — Accueil">
+        <span class="brand-mark" aria-hidden="true">
+            <span>＋</span>
+            <span>×</span>
+        </span>
+        <span class="brand-copy">
+            <strong>Mbuyamba</strong>
+            <strong>Maths RDC</strong>
+        </span>
+    </a>
+    <p class="brand-tagline">Apprendre • S’exercer • Réussir</p>
+
+    <nav class="sidebar-nav" aria-label="Pages du portail">
+        <a class="nav-link"
+           th:classappend="${activePage == 'dashboard'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'dashboard' ? 'page' : null}"
+           th:href="@{/}">
+            <span class="nav-icon" aria-hidden="true">⌂</span>
+            <span>Accueil</span>
+        </a>
+
+        <p class="nav-label">Parcours</p>
+
+        <a class="nav-link"
+           th:classappend="${activePage == 'exetat'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'exetat' ? 'page' : null}"
+           th:href="@{/exetat}">
+            <span class="nav-icon" aria-hidden="true">◆</span>
+            <span>Préparer l’EXETAT</span>
+        </a>
+        <a class="nav-link"
+           th:classappend="${activePage == 'primaire'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'primaire' ? 'page' : null}"
+           th:href="@{/primaire}">
+            <span class="nav-icon" aria-hidden="true">●</span>
+            <span>Maths du primaire</span>
+        </a>
+        <a class="nav-link"
+           th:classappend="${activePage == 'progress'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'progress' ? 'page' : null}"
+           th:href="@{/progression}">
+            <span class="nav-icon" aria-hidden="true">↗</span>
+            <span>Ma progression</span>
+        </a>
+
+        <div class="nav-divider" aria-hidden="true"></div>
+
+        <a class="nav-link"
+           th:classappend="${activePage == 'about'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'about' ? 'page' : null}"
+           th:href="@{/a-propos}">
+            <span class="nav-icon" aria-hidden="true">i</span>
+            <span>À propos</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-tip">
+        <span class="tip-sparkle" aria-hidden="true">✦</span>
+        <strong>La pratique rend parfait !</strong>
+        <p>Avance à ton rythme. Chaque notion comprise est une victoire.</p>
+        <span class="tip-illustration" aria-hidden="true">🧠</span>
+    </div>
+</aside>
+<button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+</body>
+</html>

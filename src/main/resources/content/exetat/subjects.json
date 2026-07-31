@@ -1,0 +1,89 @@
+[
+  {
+    "id": "cercle",
+    "name": "Le cercle",
+    "category": "Géométrie analytique",
+    "description": "Apprends à reconnaître et utiliser les équations d’un cercle, son centre, son rayon et ses tangentes.",
+    "icon": "circle",
+    "questionCount": 0,
+    "estimatedMinutes": 10,
+    "topics": [
+      "Équation canonique",
+      "Centre d’un cercle",
+      "Rayon",
+      "Appartenance d’un point",
+      "Diamètre",
+      "Tangente",
+      "Intersection cercle-droite",
+      "Cercle défini par trois points"
+    ],
+    "difficulties": ["EASY", "INTERMEDIATE", "HARD"],
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "droite",
+    "name": "La droite",
+    "category": "Géométrie analytique",
+    "description": "Révise les équations de droite, les pentes, le parallélisme et la perpendicularité.",
+    "icon": "line",
+    "questionCount": 0,
+    "estimatedMinutes": 10,
+    "topics": [
+      "Coefficient directeur",
+      "Équation réduite",
+      "Équation cartésienne",
+      "Droite passant par deux points",
+      "Droites parallèles",
+      "Droites perpendiculaires",
+      "Intersection de deux droites",
+      "Distance d’un point à une droite"
+    ],
+    "difficulties": ["EASY", "INTERMEDIATE", "HARD"],
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "derivees",
+    "name": "Les dérivées",
+    "category": "Analyse",
+    "description": "Maîtrise les règles de dérivation et l’étude des variations d’une fonction.",
+    "icon": "derivative",
+    "questionCount": 0,
+    "estimatedMinutes": 10,
+    "topics": [
+      "Dérivée d’une constante",
+      "Dérivée de xⁿ",
+      "Somme de fonctions",
+      "Produit de fonctions",
+      "Quotient de fonctions",
+      "Fonction composée",
+      "Tangente à une courbe",
+      "Signe de la dérivée",
+      "Tableau de variation",
+      "Extrema"
+    ],
+    "difficulties": ["EASY", "INTERMEDIATE", "HARD"],
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "integrales",
+    "name": "Les intégrales",
+    "category": "Analyse",
+    "description": "Découvre les primitives, les intégrales définies et le calcul d’aires simples.",
+    "icon": "integral",
+    "questionCount": 0,
+    "estimatedMinutes": 10,
+    "topics": [
+      "Primitive d’une fonction",
+      "Constante d’intégration",
+      "Primitive de xⁿ",
+      "Linéarité",
+      "Intégrale définie",
+      "Bornes d’intégration",
+      "Aire sous une courbe",
+      "Calcul d’une intégrale simple"
+    ],
+    "difficulties": ["EASY", "INTERMEDIATE", "HARD"],
+    "status": "AVAILABLE"
+  }
+]
+

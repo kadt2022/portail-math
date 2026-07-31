@@ -1,0 +1,182 @@
+[
+    {
+        "id":  "integrales-001",
+        "subjectId":  "integrales",
+        "topic":  "Primitive d’une fonction",
+        "difficulty":  "EASY",
+        "statement":  "Quelle fonction est une primitive de f(x) = 2x ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "F(x) = x²"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "F(x) = 2"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "F(x) = 2x²"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "F(x) = x"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "Une primitive F vérifie F′ = f.",
+                         "steps":  [
+                                       "La dérivée de x² est 2x.",
+                                       "Donc x² est une primitive de 2x."
+                                   ],
+                         "formula":  "(x²)′ = 2x",
+                         "advice":  "Vérifie une primitive en la dérivant."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "integrales-002",
+        "subjectId":  "integrales",
+        "topic":  "Primitive d’une fonction",
+        "difficulty":  "EASY",
+        "statement":  "Quelle est la forme générale des primitives de la constante 5 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "5 + C"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "5x + C"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "x⁵ + C"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "5x² + C"
+                        }
+                    ],
+        "correctChoiceId":  "B",
+        "solution":  {
+                         "summary":  "Une primitive d’une constante k est kx + C.",
+                         "steps":  [
+                                       "La dérivée de 5x est 5.",
+                                       "On ajoute une constante arbitraire C."
+                                   ],
+                         "formula":  "∫5 dx = 5x + C",
+                         "advice":  "La constante d’intégration est indispensable pour une primitive générale."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "integrales-004",
+        "subjectId":  "integrales",
+        "topic":  "Primitive de xⁿ",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Quelle est la forme générale des primitives de x³ ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "3x² + C"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "x⁴ + C"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "x⁴/4 + C"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "x²/2 + C"
+                        }
+                    ],
+        "correctChoiceId":  "C",
+        "solution":  {
+                         "summary":  "La règle des puissances s’applique pour n ≠ -1.",
+                         "steps":  [
+                                       "On augmente 3 de 1 pour obtenir 4.",
+                                       "On divise par 4 : x⁴/4 + C."
+                                   ],
+                         "formula":  "∫xⁿ dx = xⁿ⁺¹/(n+1) + C",
+                         "advice":  "Le nouvel exposant apparaît aussi au dénominateur."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "integrales-005",
+        "subjectId":  "integrales",
+        "topic":  "Constante d’intégration",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Pourquoi ajoute-t-on une constante C à une primitive ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "Parce que la dérivée d’une constante est nulle"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "Parce que C remplace toujours x"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "Pour rendre la primitive positive"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "Pour changer le degré du polynôme"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "Toutes les fonctions qui diffèrent d’une constante ont la même dérivée.",
+                         "steps":  [
+                                       "La dérivée de C vaut 0.",
+                                       "F(x) et F(x) + C ont donc la même dérivée."
+                                   ],
+                         "formula":  "(F + C)′ = F′",
+                         "advice":  "Une primitive indéfinie représente une famille de fonctions."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "integrales-008",
+        "subjectId":  "integrales",
+        "topic":  "Bornes d’intégration",
+        "difficulty":  "HARD",
+        "statement":  "Quelle est la valeur de l’intégrale de 2x entre 1 et 3 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "4"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "6"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "8"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "9"
+                        }
+                    ],
+        "correctChoiceId":  "C",
+        "solution":  {
+                         "summary":  "Une primitive de 2x est x².",
+                         "steps":  [
+                                       "F(3) = 9 et F(1) = 1.",
+                                       "L’intégrale vaut 9 - 1 = 8."
+                                   ],
+                         "formula":  "∫₁³ 2x dx = [x²]₁³ = 8",
+                         "advice":  "Garde les bornes dans le bon ordre."
+                     },
+        "points":  1
+    }
+]

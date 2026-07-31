@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content" data-progress-catalog>
+            <section class="catalog-hero" aria-labelledby="catalog-title">
+                <div class="catalog-hero__copy">
+                    <a class="back-link" th:href="@{/}"><span aria-hidden="true">←</span> Retour au dashboard</a>
+                    <p class="eyebrow">Parcours EXETAT</p>
+                    <h1 id="catalog-title">Préparer l’EXETAT</h1>
+                    <p>Choisis une matière et entraîne-toi avec des questions à choix multiple.</p>
+                    <div class="catalog-hero__note">
+                        <span aria-hidden="true">💡</span>
+                        <span>Chaque réponse sera expliquée dans le quiz.</span>
+                    </div>
+                </div>
+                <div class="catalog-hero__summary" aria-label="Résumé du catalogue">
+                    <strong th:text="${subjects.size()}">4</strong>
+                    <span>matières disponibles</span>
+                    <div></div>
+                    <strong th:text="${totalQuestionCount}">20</strong>
+                    <span>questions de révision</span>
+                </div>
+            </section>
+
+            <section class="section-block" aria-labelledby="subjects-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Catalogue pédagogique</p>
+                        <h2 id="subjects-title">Choisis ta matière</h2>
+                    </div>
+                    <p>Quatre matières, trois niveaux et des notions organisées pour progresser pas à pas.</p>
+                </div>
+
+                <div class="catalog-toolbar" aria-label="Filtrer les matières">
+                    <span>Afficher :</span>
+                    <div class="filter-buttons" role="group" aria-label="Catégories">
+                        <button class="filter-button filter-button--active" type="button"
+                                data-subject-filter="all" aria-pressed="true">Toutes</button>
+                        <button class="filter-button" type="button"
+                                data-subject-filter="Géométrie analytique" aria-pressed="false">Géométrie analytique</button>
+                        <button class="filter-button" type="button"
+                                data-subject-filter="Analyse" aria-pressed="false">Analyse</button>
+                    </div>
+                    <span class="filter-result" data-filter-result aria-live="polite">4 matières affichées</span>
+                </div>
+
+                <div class="catalog-grid">
+                    <article class="catalog-card"
+                             th:each="subject : ${subjects}"
+                             th:classappend="'catalog-card--' + ${subject.id}"
+                             th:attr="data-category=${subject.category},data-catalog-subject=${subject.id}">
+                        <div class="catalog-card__top">
+                            <span class="catalog-card__icon" th:switch="${subject.icon}" aria-hidden="true">
+                                <span th:case="'circle'">○</span>
+                                <span th:case="'line'">↗</span>
+                                <span th:case="'derivative'">f′</span>
+                                <span th:case="'integral'">∫</span>
+                                <span th:case="*">◆</span>
+                            </span>
+                            <div class="catalog-card__statuses">
+                                <span class="status-badge status-badge--available"
+                                      th:text="${subject.status.label}">Disponible</span>
+                                <span class="local-progress-badge local-progress-badge--not-started"
+                                      data-local-status>Non commencé</span>
+                            </div>
+                        </div>
+
+                        <p class="catalog-card__category" th:text="${subject.category}">Analyse</p>
+                        <h3 th:text="${subject.name}">Le cercle</h3>
+                        <p class="catalog-card__description" th:text="${subject.description}">Description</p>
+
+                        <div class="catalog-card__metrics">
+                            <span><strong th:text="${subject.questionCount}">10</strong> questions</span>
+                            <span><strong th:text="${subject.topics.size()}">8</strong> notions</span>
+                            <span><strong th:text="${subject.estimatedMinutes}">10</strong> min</span>
+                        </div>
+
+                        <div class="difficulty-badges" aria-label="Niveaux disponibles">
+                            <span th:each="difficulty : ${subject.difficulties}"
+                                  th:classappend="'difficulty-badge--' + ${difficulty.name().toLowerCase()}"
+                                  class="difficulty-badge"
+                                  th:text="${difficulty.label}">Facile</span>
+                        </div>
+
+                        <div class="catalog-card__footer">
+                            <span class="initial-state" data-local-best hidden>Meilleur score : 0/5</span>
+                            <a class="button button--catalog"
+                               th:href="@{/exetat/matieres/{subjectId}(subjectId=${subject.id})}">
+                                Voir la matière <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/progress-store.js}"></script>
+<script th:src="@{/js/progress-widgets.js}"></script>
+</body>
+</html>

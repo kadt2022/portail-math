@@ -1,0 +1,182 @@
+[
+    {
+        "id":  "derivees-001",
+        "subjectId":  "derivees",
+        "topic":  "Dérivée d’une constante",
+        "difficulty":  "EASY",
+        "statement":  "Quelle est la dérivée de la fonction f(x) = 7 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "0"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "1"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "7"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "7x"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "La dérivée de toute fonction constante est nulle.",
+                         "steps":  [
+                                       "La valeur de f ne varie pas lorsque x change.",
+                                       "Sa dérivée vaut donc 0."
+                                   ],
+                         "formula":  "(k)′ = 0",
+                         "advice":  "Une droite horizontale a une pente nulle."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "derivees-002",
+        "subjectId":  "derivees",
+        "topic":  "Dérivée de xⁿ",
+        "difficulty":  "EASY",
+        "statement":  "Quelle est la dérivée de f(x) = x⁵ ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "x⁴"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "5x⁴"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "4x⁵"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "5x⁵"
+                        }
+                    ],
+        "correctChoiceId":  "B",
+        "solution":  {
+                         "summary":  "On multiplie par l’exposant puis on diminue celui-ci de 1.",
+                         "steps":  [
+                                       "L’exposant 5 devient le coefficient.",
+                                       "Le nouvel exposant est 4."
+                                   ],
+                         "formula":  "(xⁿ)′ = nxⁿ⁻¹",
+                         "advice":  "Diminue l’exposant seulement après l’avoir placé devant."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "derivees-004",
+        "subjectId":  "derivees",
+        "topic":  "Produit de fonctions",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Quelle est la dérivée de f(x) = x²(x + 1) ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "2x(x + 1)"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "3x² + 2x"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "x² + 1"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "2x² + x"
+                        }
+                    ],
+        "correctChoiceId":  "B",
+        "solution":  {
+                         "summary":  "On peut développer ou appliquer la règle du produit.",
+                         "steps":  [
+                                       "f(x) = x³ + x².",
+                                       "Donc f′(x) = 3x² + 2x."
+                                   ],
+                         "formula":  "(uv)′ = u′v + uv′",
+                         "advice":  "Développer est souvent plus rapide pour un produit polynomial simple."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "derivees-005",
+        "subjectId":  "derivees",
+        "topic":  "Quotient de fonctions",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Pour x ≠ 0, quelle est la dérivée de f(x) = (x² + 1)/x ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "1 + 1/x²"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "1 - 1/x²"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "2x"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "(x² - 1)/x"
+                        }
+                    ],
+        "correctChoiceId":  "B",
+        "solution":  {
+                         "summary":  "On simplifie f(x) en x + 1/x avant de dériver.",
+                         "steps":  [
+                                       "f(x) = x + x⁻¹.",
+                                       "f′(x) = 1 - x⁻² = 1 - 1/x²."
+                                   ],
+                         "formula":  "f′(x) = 1 - 1/x²",
+                         "advice":  "Simplifie une fraction algébrique lorsque c’est possible."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "derivees-008",
+        "subjectId":  "derivees",
+        "topic":  "Signe de la dérivée",
+        "difficulty":  "HARD",
+        "statement":  "Où la dérivée de f(x) = x³ - 3x est-elle positive ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "Seulement entre -1 et 1"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "Pour x \u003c -1 ou x \u003e 1"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "Pour tout x réel"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "Pour x \u003e 0 seulement"
+                        }
+                    ],
+        "correctChoiceId":  "B",
+        "solution":  {
+                         "summary":  "On étudie le signe de f′(x) = 3(x² - 1).",
+                         "steps":  [
+                                       "f′(x) = 3(x - 1)(x + 1).",
+                                       "Ce produit est positif à l’extérieur de l’intervalle [-1,1]."
+                                   ],
+                         "formula":  "f′(x) \u003e 0 si x \u003c -1 ou x \u003e 1",
+                         "advice":  "Place les racines de la dérivée sur une droite graduée."
+                     },
+        "points":  1
+    }
+]

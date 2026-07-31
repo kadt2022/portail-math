@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="subject-detail-hero" th:classappend="'subject-detail-hero--' + ${subject.id}">
+                <div class="subject-detail-hero__copy">
+                    <a class="back-link" th:href="@{/exetat}">
+                        <span aria-hidden="true">←</span> Retour aux matières
+                    </a>
+                    <p class="eyebrow" th:text="${subject.category}">Géométrie analytique</p>
+                    <h1 th:text="${subject.name}">Le cercle</h1>
+                    <p th:text="${subject.description}">Description de la matière.</p>
+                    <div class="subject-facts">
+                        <span><strong th:text="${subject.questionCount}">10</strong> questions</span>
+                        <span><strong th:text="${subject.estimatedMinutes}">10</strong> minutes estimées</span>
+                        <span><strong th:text="${subject.topics.size()}">8</strong> notions</span>
+                    </div>
+                </div>
+                <div class="subject-detail-hero__symbol" th:switch="${subject.icon}" aria-hidden="true">
+                    <span th:case="'circle'">○</span>
+                    <span th:case="'line'">↗</span>
+                    <span th:case="'derivative'">f′</span>
+                    <span th:case="'integral'">∫</span>
+                    <span th:case="*">◆</span>
+                </div>
+            </section>
+
+            <div class="subject-detail-layout">
+                <section class="content-card" aria-labelledby="topics-title">
+                    <div class="content-card__heading">
+                        <span class="content-card__number">01</span>
+                        <div>
+                            <p class="eyebrow">Programme</p>
+                            <h2 id="topics-title">Notions couvertes</h2>
+                        </div>
+                    </div>
+                    <ul class="covered-topics">
+                        <li th:each="topic : ${subject.topics}">
+                            <span aria-hidden="true">✓</span>
+                            <span th:text="${topic}">Notion</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <aside class="training-summary">
+                    <p class="eyebrow">Ton entraînement</p>
+                    <h2>Prêt à réviser&nbsp;?</h2>
+                    <p>Une série courte pour vérifier tes connaissances sur cette matière.</p>
+
+                    <div class="difficulty-badges difficulty-badges--large" aria-label="Niveaux disponibles">
+                        <span th:each="difficulty : ${subject.difficulties}"
+                              th:classappend="'difficulty-badge--' + ${difficulty.name().toLowerCase()}"
+                              class="difficulty-badge"
+                              th:text="${difficulty.label}">Facile</span>
+                    </div>
+
+                    <ul class="training-benefits">
+                        <li><span aria-hidden="true">✓</span> Une seule bonne réponse</li>
+                        <li><span aria-hidden="true">✓</span> Correction immédiate</li>
+                        <li><span aria-hidden="true">✓</span> Solution détaillée</li>
+                    </ul>
+
+                    <a class="button button--primary button--wide"
+                       th:href="@{/exetat/matieres/{subjectId}/quiz(subjectId=${subject.id})}">
+                        Commencer l’entraînement <span aria-hidden="true">→</span>
+                    </a>
+                </aside>
+            </div>
+
+            <section class="example-topics" aria-labelledby="examples-title">
+                <div>
+                    <p class="eyebrow">Aperçu</p>
+                    <h2 id="examples-title">Exemples de thèmes</h2>
+                </div>
+                <div class="example-topic-list">
+                    <span th:each="topic : ${sampleTopics}" th:text="${topic}">Thème</span>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+[
+    {
+        "id":  "cercle-001",
+        "subjectId":  "cercle",
+        "topic":  "Équation canonique",
+        "difficulty":  "EASY",
+        "statement":  "Quelle est l’équation d’un cercle de centre O(0,0) et de rayon 4 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "x + y = 4"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "x² + y² = 4"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "x² + y² = 16"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "x² - y² = 16"
+                        }
+                    ],
+        "correctChoiceId":  "C",
+        "solution":  {
+                         "summary":  "Un cercle centré à l’origine vérifie x² + y² = r².",
+                         "steps":  [
+                                       "Le rayon vaut 4.",
+                                       "Son carré vaut 16, donc x² + y² = 16."
+                                   ],
+                         "formula":  "x² + y² = r²",
+                         "advice":  "Pense toujours à élever le rayon au carré."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "cercle-002",
+        "subjectId":  "cercle",
+        "topic":  "Rayon",
+        "difficulty":  "EASY",
+        "statement":  "Quel est le rayon du cercle d’équation x² + y² = 25 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "5"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "10"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "12,5"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "25"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "Le membre de droite représente le carré du rayon.",
+                         "steps":  [
+                                       "On lit r² = 25.",
+                                       "La racine positive de 25 est 5."
+                                   ],
+                         "formula":  "r = √25 = 5",
+                         "advice":  "Un rayon est une longueur positive."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "cercle-004",
+        "subjectId":  "cercle",
+        "topic":  "Appartenance d’un point",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Le point P(3,4) appartient-il au cercle x² + y² = 25 ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "Oui, car 3² + 4² = 25"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "Oui, car 3 + 4 = 7"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "Non, car 3² + 4² = 12"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "Non, car le rayon vaut 25"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "On vérifie les coordonnées du point dans l’équation.",
+                         "steps":  [
+                                       "3² + 4² = 9 + 16.",
+                                       "La somme vaut 25 : P appartient au cercle."
+                                   ],
+                         "formula":  "3² + 4² = 25",
+                         "advice":  "Remplace x et y avant de conclure."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "cercle-005",
+        "subjectId":  "cercle",
+        "topic":  "Diamètre",
+        "difficulty":  "INTERMEDIATE",
+        "statement":  "Quel est le diamètre d’un cercle de rayon 7 cm ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "3,5 cm"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "7 cm"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "14 cm"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "49 cm"
+                        }
+                    ],
+        "correctChoiceId":  "C",
+        "solution":  {
+                         "summary":  "Le diamètre est deux fois le rayon.",
+                         "steps":  [
+                                       "Le rayon vaut 7 cm.",
+                                       "d = 2 × 7 = 14 cm."
+                                   ],
+                         "formula":  "d = 2r",
+                         "advice":  "Ne confonds pas diamètre et aire."
+                     },
+        "points":  1
+    },
+    {
+        "id":  "cercle-008",
+        "subjectId":  "cercle",
+        "topic":  "Tangente",
+        "difficulty":  "HARD",
+        "statement":  "Quelle est la tangente au cercle x² + y² = 25 au point A(3,4) ?",
+        "choices":  [
+                        {
+                            "id":  "A",
+                            "label":  "3x + 4y = 25"
+                        },
+                        {
+                            "id":  "B",
+                            "label":  "4x + 3y = 25"
+                        },
+                        {
+                            "id":  "C",
+                            "label":  "3x - 4y = 25"
+                        },
+                        {
+                            "id":  "D",
+                            "label":  "x + y = 7"
+                        }
+                    ],
+        "correctChoiceId":  "A",
+        "solution":  {
+                         "summary":  "Au point (x₀,y₀), la tangente à x² + y² = r² est x₀x + y₀y = r².",
+                         "steps":  [
+                                       "Ici x₀ = 3, y₀ = 4 et r² = 25.",
+                                       "La tangente est 3x + 4y = 25."
+                                   ],
+                         "formula":  "x₀x + y₀y = r²",
+                         "advice":  "Vérifie que le point appartient d’abord au cercle."
+                     },
+        "points":  1
+    }
+]

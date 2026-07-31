@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Erreur du portail')}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content">
+            <section class="not-found-card error-page-card">
+                <span class="not-found-card__code" aria-hidden="true">500</span>
+                <span class="not-found-card__icon" aria-hidden="true">!</span>
+                <p class="eyebrow">Erreur temporaire</p>
+                <h1>Une erreur est survenue</h1>
+                <p>Le portail n’a pas pu terminer cette action. Réessaie dans quelques instants.</p>
+                <a class="button button--primary" th:href="@{/}">Retour au dashboard</a>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>
