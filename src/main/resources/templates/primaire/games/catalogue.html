@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content games-page-content">
+            <section class="games-intro" aria-labelledby="games-title">
+                <div>
+                    <a class="back-link" th:href="@{/primaire}">
+                        <span aria-hidden="true">←</span> Retour au primaire
+                    </a>
+                    <p class="eyebrow">Apprendre en s’amusant</p>
+                    <h1 id="games-title">Jeux éducatifs</h1>
+                    <p>De petites aventures pour comprendre les mathématiques, progresser et prendre confiance.</p>
+                </div>
+                <div class="games-intro__art" aria-hidden="true">
+                    <span>⭐</span>
+                    <span>🚂</span>
+                </div>
+            </section>
+
+            <section class="games-catalogue" aria-labelledby="available-games-title">
+                <div class="games-section-heading">
+                    <div>
+                        <p class="eyebrow">Choisis ton aventure</p>
+                        <h2 id="available-games-title">Les jeux du primaire</h2>
+                    </div>
+                    <p>Un premier voyage est prêt. D’autres aventures arriveront bientôt.</p>
+                </div>
+
+                <div class="educational-games-grid">
+                    <article class="educational-game-card educational-game-card--active">
+                        <div class="educational-game-card__scene" aria-hidden="true">
+                            <span class="mini-cloud mini-cloud--one"></span>
+                            <span class="mini-cloud mini-cloud--two"></span>
+                            <span class="mini-train">🚂</span>
+                            <span class="mini-track"></span>
+                        </div>
+                        <div class="educational-game-card__body">
+                            <span class="game-availability game-availability--ready">Prêt à jouer</span>
+                            <h3>Le Train des multiplications</h3>
+                            <p>Apprends les tables de 2 et 5 en faisant avancer ton train jusqu’à la gare finale.</p>
+                            <ul class="game-features" aria-label="Caractéristiques du jeu">
+                                <li>5 petites étapes</li>
+                                <li>Explications immédiates</li>
+                                <li>Progression sauvegardée</li>
+                            </ul>
+                            <a class="game-play-link" th:href="@{/primaire/jeux/train-multiplications}">
+                                Jouer maintenant <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="educational-game-card educational-game-card--soon">
+                        <div class="future-game-icon" aria-hidden="true">🛒</div>
+                        <span class="game-availability">Bientôt disponible</span>
+                        <h3>Le Marché des nombres</h3>
+                        <p>Choisis les bonnes quantités et rends la monnaie.</p>
+                    </article>
+
+                    <article class="educational-game-card educational-game-card--soon">
+                        <div class="future-game-icon" aria-hidden="true">🏞️</div>
+                        <span class="game-availability">Bientôt disponible</span>
+                        <h3>La Rivière des fractions</h3>
+                        <p>Traverse la rivière en reconnaissant les fractions.</p>
+                    </article>
+
+                    <article class="educational-game-card educational-game-card--soon">
+                        <div class="future-game-icon" aria-hidden="true">🏗️</div>
+                        <span class="game-availability">Bientôt disponible</span>
+                        <h3>Le Constructeur de formes</h3>
+                        <p>Assemble des formes pour bâtir de nouvelles structures.</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

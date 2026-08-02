@@ -30,7 +30,12 @@ tasks.register('testProgressStore', Exec) {
     commandLine 'node', 'src/test/js/progress-store.test.js'
 }
 
+tasks.register('testMultiplicationTrain', Exec) {
+    commandLine 'node', 'src/test/js/multiplication-train.test.js'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     dependsOn tasks.named('testProgressStore')
+    dependsOn tasks.named('testMultiplicationTrain')
 }

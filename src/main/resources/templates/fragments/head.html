@@ -7,6 +7,7 @@
           content="Mbuyamba Maths RDC, portail éducatif de mathématiques pour les élèves de la RDC.">
     <title th:text="${pageTitle + ' · Mbuyamba Maths RDC'}">Mbuyamba Maths RDC</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link th:if="${pageStylesheet != null}" rel="stylesheet" th:href="${pageStylesheet}">
     <script th:src="@{/js/app.js}" defer></script>
 </head>
 </html>
