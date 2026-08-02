@@ -570,6 +570,7 @@ button.journey-level {
     position: relative;
     height: clamp(280px, 34vw, 420px);
     min-height: 280px;
+    scroll-margin-top: 86px;
     overflow: hidden;
     background: linear-gradient(180deg, #83d9ff 0 61%, #a4df78 62% 78%, #65ae58 79% 100%);
     isolation: isolate;
@@ -895,6 +896,7 @@ button.journey-level {
 
 .game-question {
     padding: clamp(22px, 3.5vw, 38px);
+    scroll-margin-top: 86px;
     border: 1px solid #e4e3f3;
     border-radius: 21px;
     background: #fff;
@@ -920,6 +922,10 @@ button.journey-level {
 .game-question h2:focus-visible,
 .game-result h2:focus-visible {
     outline: none;
+}
+
+.game-result {
+    scroll-margin-top: 86px;
 }
 
 .answer-options {
