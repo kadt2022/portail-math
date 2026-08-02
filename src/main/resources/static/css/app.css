@@ -599,6 +599,56 @@ a {
     margin-top: 34px;
 }
 
+.primary-games-callout {
+    display: grid;
+    margin-top: 26px;
+    padding: 22px 24px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(84, 72, 229, 0.18);
+    border-radius: 19px;
+    background:
+        radial-gradient(circle at 86% 18%, rgba(255, 184, 20, 0.17), transparent 20%),
+        linear-gradient(135deg, #ffffff, #f2f0ff);
+    box-shadow: var(--shadow-sm);
+}
+
+.primary-games-callout__icon {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    border-radius: 18px;
+    background: var(--purple-soft);
+    font-size: 38px;
+}
+
+.primary-games-callout h2 {
+    margin: 0;
+    font-size: 23px;
+    letter-spacing: -0.02em;
+}
+
+.primary-games-callout p:last-child {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media (max-width: 720px) {
+    .primary-games-callout {
+        padding: 21px;
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .primary-games-callout .button {
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+}
+
 .section-heading {
     display: flex;
     margin-bottom: 17px;

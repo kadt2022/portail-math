@@ -39,6 +39,13 @@
             <span class="nav-icon" aria-hidden="true">●</span>
             <span>Maths du primaire</span>
         </a>
+        <a class="nav-link nav-link--games"
+           th:classappend="${activePage == 'games'} ? 'nav-link--active'"
+           th:attr="aria-current=${activePage == 'games' ? 'page' : null}"
+           th:href="@{/primaire/jeux}">
+            <span class="nav-icon" aria-hidden="true">🚂</span>
+            <span>Jeux éducatifs</span>
+        </a>
         <a class="nav-link"
            th:classappend="${activePage == 'progress'} ? 'nav-link--active'"
            th:attr="aria-current=${activePage == 'progress' ? 'page' : null}"
