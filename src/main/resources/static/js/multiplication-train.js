@@ -4,7 +4,8 @@
     const QUESTION_COUNT = 5;
     const ALLOWED_TABLES = [2, 5];
     const MOBILE_JOURNEY_QUERY = "(max-width: 620px)";
-    const MOBILE_SCENE_PAUSE_MS = 1500;
+    const MOBILE_INITIAL_SCENE_PAUSE_MS = 1500;
+    const MOBILE_CORRECTION_PAUSE_MS = 3000;
 
     function shuffle(values, random = Math.random) {
         const items = [...values];
@@ -211,13 +212,13 @@
             }
         }
 
-        function pauseOnTrainThen(callback) {
+        function showCorrectionJourneyThen(callback) {
             clearMobileJourneyTimer();
             root.requestAnimationFrame(scrollToScene);
             mobileJourneyTimer = root.setTimeout(() => {
                 mobileJourneyTimer = null;
                 callback();
-            }, MOBILE_SCENE_PAUSE_MS);
+            }, MOBILE_CORRECTION_PAUSE_MS);
         }
 
         function updateSavedProgress() {
@@ -341,7 +342,7 @@
                     playTone("correct");
                     if (isMobileJourney()) {
                         nextButton.hidden = true;
-                        pauseOnTrainThen(() => continueJourney(true));
+                        showCorrectionJourneyThen(() => continueJourney(true));
                     } else {
                         nextButton.hidden = false;
                         nextButton.focus();
@@ -434,7 +435,7 @@
                     mobileJourneyTimer = root.setTimeout(() => {
                         mobileJourneyTimer = null;
                         scrollToQuestion();
-                    }, MOBILE_SCENE_PAUSE_MS);
+                    }, MOBILE_INITIAL_SCENE_PAUSE_MS);
                 }
             });
         }
