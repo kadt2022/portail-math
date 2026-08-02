@@ -1,0 +1,973 @@
+/* La Rivière des fractions — décor original (HTML, CSS et SVG maison). */
+
+.river-page-content {
+    --river-deep: #1b6ea8;
+    --river-light: #4aa8dd;
+    --river-foam: #bfe6fa;
+    --river-bank: #c9a227;
+    --river-leaf: #1f8a58;
+    --fraction-fill: var(--purple);
+    --fraction-empty: #f2f3fa;
+    /* Ligne de flottaison : le ciel s'arrête ici et tout ce qui flotte s'y accroche.
+       Une seule valeur pour éviter que la barque ne navigue au fond de l'eau. */
+    --waterline: 52%;
+    /* Durée de la traversée d'une pierre à l'autre. Le JavaScript lit cette même
+       valeur : un seul chiffre à modifier pour régler le rythme. */
+    --boat-travel: 20000ms;
+}
+
+/* ---------- Écran de lancement ---------- */
+
+.river-launch-panel {
+    display: grid;
+    gap: 28px;
+}
+
+.river-launch-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    padding: 28px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #eaf6ff 0%, #f7fbff 60%, #fffaf0 100%);
+    border: 1px solid var(--line);
+}
+
+.river-launch-copy h1 {
+    margin: 6px 0 12px;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+}
+
+.launch-river-art {
+    position: relative;
+    min-height: 170px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: linear-gradient(180deg, #d9f0ff 0%, #eaf7ff 55%, var(--river-light) 55%, var(--river-deep) 100%);
+}
+
+.launch-river-art .launch-sun {
+    position: absolute;
+    top: 16px;
+    right: 22px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 0 10px rgba(255, 184, 20, 0.22);
+}
+
+.launch-palm {
+    position: absolute;
+    bottom: 42%;
+    width: 14px;
+    height: 46px;
+    border-radius: 6px;
+    background: #8a5a2b;
+}
+
+.launch-palm::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    width: 46px;
+    height: 26px;
+    border-radius: 50% 50% 40% 40%;
+    background: var(--river-leaf);
+}
+
+.launch-palm--one {
+    left: 12%;
+}
+
+.launch-palm--two {
+    left: 78%;
+    height: 34px;
+}
+
+.launch-water {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 45%;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.18) 0 12px,
+        transparent 12px 30px
+    );
+    animation: fr-current 8s linear infinite;
+}
+
+.launch-explorer {
+    position: absolute;
+    left: 44%;
+    bottom: 38%;
+    font-size: 2rem;
+    animation: fr-boat-bob 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .launch-water,
+    .launch-explorer {
+        animation: none;
+    }
+}
+
+/* ---------- Scène de traversée ---------- */
+
+.river-scene {
+    position: relative;
+    min-height: 210px;
+    margin: 18px 0 24px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: linear-gradient(180deg, #d6efff 0%, #eef8ff 48%, var(--river-light) 48%, var(--river-deep) 100%);
+    border: 1px solid var(--line);
+}
+
+.river-sky {
+    position: absolute;
+    inset: 0 0 var(--waterline) 0;
+}
+
+.river-sun {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 0 9px rgba(255, 184, 20, 0.2);
+}
+
+.river-cloud {
+    position: absolute;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.river-cloud--one {
+    top: 20px;
+    right: 26%;
+    width: 62px;
+}
+
+.river-cloud--two {
+    top: 44px;
+    right: 12%;
+    width: 44px;
+}
+
+.river-hill {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 0 0;
+    background: var(--river-leaf);
+    opacity: 0.75;
+}
+
+.river-hill--far {
+    left: 8%;
+    width: 140px;
+    height: 54px;
+}
+
+.river-hill--near {
+    right: 10%;
+    width: 180px;
+    height: 44px;
+    opacity: 0.55;
+}
+
+.river-bank {
+    position: absolute;
+    bottom: 0;
+    width: 68px;
+    /* Les rives dépassent la surface, sinon elles semblent noyées elles aussi. */
+    height: calc(var(--waterline) + 5%);
+    background: var(--river-bank);
+}
+
+.river-bank__label {
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.68rem;
+    color: #4a3a05;
+}
+
+/* ---------- Végétation : arbres, feuillage, roseaux ---------- */
+
+.river-vegetation {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.river-tree,
+.river-palm {
+    position: absolute;
+    bottom: calc(var(--waterline) - 1%);
+}
+
+.river-tree {
+    left: 4px;
+    width: 58px;
+    height: 78px;
+}
+
+.river-tree__trunk {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 9px;
+    height: 34px;
+    margin-left: -4px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #6b4423 0%, #96662f 60%, #6b4423 100%);
+}
+
+.river-tree__crown {
+    position: absolute;
+    left: 50%;
+    border-radius: 50%;
+    background: var(--river-leaf);
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+    animation: fr-crown-sway 5.4s ease-in-out infinite;
+}
+
+.river-tree__crown--low {
+    bottom: 26px;
+    width: 58px;
+    height: 30px;
+    background: #17734a;
+}
+
+.river-tree__crown--mid {
+    bottom: 42px;
+    width: 46px;
+    height: 28px;
+    animation-delay: 0.4s;
+}
+
+.river-tree__crown--top {
+    bottom: 58px;
+    width: 30px;
+    height: 22px;
+    background: #2aa46a;
+    animation-delay: 0.8s;
+}
+
+/* C'est le palmier entier qui ondule : animer chaque palme écraserait
+   la rotation qui lui donne sa forme. */
+.river-palm {
+    right: 6px;
+    width: 54px;
+    height: 72px;
+    transform-origin: bottom center;
+    animation: fr-sway 6.2s ease-in-out infinite;
+}
+
+.river-palm__trunk {
+    position: absolute;
+    right: 22px;
+    bottom: 0;
+    width: 8px;
+    height: 48px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #7a5326 0%, #a37538 60%, #7a5326 100%);
+    transform: rotate(4deg);
+    transform-origin: bottom center;
+}
+
+.river-palm__frond {
+    position: absolute;
+    right: 24px;
+    bottom: 44px;
+    width: 34px;
+    height: 12px;
+    border-radius: 0 999px 999px 0;
+    background: #17734a;
+    transform-origin: left center;
+}
+
+.river-palm__frond--one {
+    transform: rotate(-38deg);
+}
+
+.river-palm__frond--two {
+    transform: rotate(-8deg);
+}
+
+.river-palm__frond--three {
+    transform: rotate(18deg);
+    background: #2aa46a;
+}
+
+.river-palm__frond--four {
+    right: 26px;
+    width: 30px;
+    transform: rotate(202deg);
+    background: #146842;
+}
+
+/* Feuillage en surplomb, comme vu depuis la berge sous les arbres. */
+.river-canopy {
+    position: absolute;
+    top: -14px;
+    width: 130px;
+    height: 46px;
+    border-radius: 0 0 60% 60%;
+    background: radial-gradient(circle at 30% 20%, #2aa46a 0 40%, #17734a 41% 100%);
+    opacity: 0.92;
+    transform-origin: top center;
+    animation: fr-sway 7.5s ease-in-out infinite;
+}
+
+.river-canopy--left {
+    left: -22px;
+}
+
+.river-canopy--right {
+    right: -26px;
+    width: 110px;
+    height: 38px;
+    animation-delay: 1.2s;
+}
+
+/* Les roseaux poussent au bord de l'eau : leur base affleure la ligne. */
+.river-reeds {
+    position: absolute;
+    bottom: 82%;
+    left: 4px;
+    right: 4px;
+    height: 22px;
+    background:
+        linear-gradient(#1f8a58, #1f8a58) 6px 100% / 3px 18px no-repeat,
+        linear-gradient(#2aa46a, #2aa46a) 16px 100% / 3px 22px no-repeat,
+        linear-gradient(#17734a, #17734a) 26px 100% / 3px 14px no-repeat,
+        linear-gradient(#2aa46a, #2aa46a) 36px 100% / 3px 20px no-repeat;
+    transform-origin: bottom center;
+    animation: fr-sway 4.6s ease-in-out infinite;
+}
+
+/* Deux balancements : l'un conserve le centrage des houppiers, l'autre non. */
+@keyframes fr-crown-sway {
+    0%, 100% {
+        transform: translateX(-50%) rotate(-1.6deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(1.6deg);
+    }
+}
+
+@keyframes fr-sway {
+    0%, 100% {
+        transform: rotate(-1.8deg);
+    }
+    50% {
+        transform: rotate(1.8deg);
+    }
+}
+
+/* ---------- Feuilles à la dérive ---------- */
+
+.river-leaves {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--waterline);
+    pointer-events: none;
+}
+
+.river-leaf {
+    position: absolute;
+    left: -24px;
+    width: 18px;
+    height: 9px;
+    border-radius: 100% 0 100% 0;
+    background: #2aa46a;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    animation: fr-leaf-drift 17s linear infinite;
+}
+
+.river-leaf--one {
+    bottom: 72%;
+    animation-duration: 19s;
+}
+
+.river-leaf--two {
+    bottom: 46%;
+    width: 14px;
+    height: 7px;
+    background: #17734a;
+    animation-duration: 24s;
+    animation-delay: 6s;
+}
+
+.river-leaf--three {
+    bottom: 22%;
+    width: 22px;
+    height: 10px;
+    background: #3cb87c;
+    opacity: 0.85;
+    animation-duration: 31s;
+    animation-delay: 12s;
+}
+
+/* On anime `left` plutôt que `translateX` : le pourcentage se rapporte alors à
+   la largeur de la scène, et non à celle de la feuille. */
+@keyframes fr-leaf-drift {
+    from {
+        left: -24px;
+        transform: rotate(0deg);
+    }
+    to {
+        left: calc(100% + 24px);
+        transform: rotate(220deg);
+    }
+}
+
+.river-bank--left {
+    left: 0;
+    border-radius: 0 18px 0 0;
+}
+
+.river-bank--right {
+    right: 0;
+    border-radius: 18px 0 0 0;
+}
+
+.river-stones {
+    position: absolute;
+    left: 74px;
+    right: 74px;
+    /* Les pierres affleurent : elles coupent la surface au lieu de gésir au fond. */
+    bottom: calc(var(--waterline) - 4%);
+    display: flex;
+    justify-content: space-between;
+}
+
+.river-stone {
+    width: 26px;
+    height: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px dashed rgba(255, 255, 255, 0.55);
+    transition: background 240ms ease, transform 240ms ease;
+}
+
+.river-stone.is-placed {
+    background: #7d7466;
+    border: 2px solid #5d5548;
+    transform: translateY(-2px);
+}
+
+/* ---------- La pirogue ---------- */
+
+.river-explorer {
+    position: absolute;
+    left: 8px;
+    /* La coque effleure la ligne de flottaison : la barque flotte, elle ne coule pas. */
+    bottom: calc(var(--waterline) - 5%);
+    width: 66px;
+    height: 54px;
+    /* La translation horizontale est pilotée par le jeu ; le tangage vit sur
+       l'élément interne pour que les deux transformations ne se marchent pas dessus.
+       Départ et arrivée lents : une pirogue prend son élan, elle ne téléporte pas. */
+    transition: transform var(--boat-travel) cubic-bezier(0.33, 0, 0.22, 1);
+}
+
+/* Pendant la traversée, l'enfant pagaie pour de bon — sans s'agiter :
+   des coups amples, accordés à la lenteur de la glisse. */
+.river-explorer.is-rowing .river-boat {
+    animation-duration: 3.6s;
+}
+
+.river-explorer.is-rowing .river-boat__paddle {
+    animation-duration: 2.4s;
+}
+
+.river-explorer.is-rowing .river-boat__wake {
+    animation-duration: 2.4s;
+    width: 24px;
+}
+
+.river-boat {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    animation: fr-boat-bob 3.2s ease-in-out infinite;
+}
+
+.river-boat__passenger {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.river-boat__hull {
+    position: absolute;
+    left: 0;
+    bottom: 6px;
+    width: 66px;
+    height: 20px;
+    background: linear-gradient(180deg, #c98a4b 0%, #8a5a2b 100%);
+    border-radius: 4px 4px 30px 30px / 4px 4px 22px 22px;
+    box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.28);
+}
+
+.river-boat__hull::before {
+    content: "";
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    top: -4px;
+    height: 6px;
+    border-radius: 999px;
+    background: #6b4423;
+}
+
+.river-boat__paddle {
+    position: absolute;
+    right: -10px;
+    bottom: 22px;
+    width: 24px;
+    height: 4px;
+    border-radius: 2px;
+    background: #6b4423;
+    transform-origin: left center;
+    animation: fr-boat-paddle 2.4s ease-in-out infinite;
+}
+
+.river-boat__wake {
+    position: absolute;
+    left: -16px;
+    bottom: 8px;
+    width: 18px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    animation: fr-boat-wake 2.4s ease-out infinite;
+}
+
+@keyframes fr-boat-bob {
+    0%, 100% {
+        transform: translateY(0) rotate(-1.2deg);
+    }
+    50% {
+        transform: translateY(-4px) rotate(1.6deg);
+    }
+}
+
+@keyframes fr-boat-paddle {
+    0%, 100% {
+        transform: rotate(-14deg);
+    }
+    50% {
+        transform: rotate(16deg);
+    }
+}
+
+@keyframes fr-boat-wake {
+    0% {
+        opacity: 0.65;
+        transform: translateX(0) scaleX(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-16px) scaleX(1.7);
+    }
+}
+
+/* ---------- Le courant ---------- */
+
+.river-water {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Le haut de ce bloc EST la surface : l'écume doit tomber pile sur la ligne. */
+    height: var(--waterline);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.river-surface {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 8px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.55) 0 18px,
+        rgba(255, 255, 255, 0.1) 18px 42px
+    );
+    animation: fr-current 7s linear infinite;
+}
+
+.river-current {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 999px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.45) 0 26px,
+        transparent 26px 68px
+    );
+}
+
+.river-current--one {
+    bottom: 62%;
+    animation: fr-current 6s linear infinite;
+}
+
+.river-current--two {
+    bottom: 38%;
+    opacity: 0.75;
+    animation: fr-current 9s linear infinite reverse;
+}
+
+.river-current--three {
+    bottom: 15%;
+    opacity: 0.55;
+    animation: fr-current 12s linear infinite;
+}
+
+@keyframes fr-current {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 68px 0;
+    }
+}
+
+/* ---------- Visuels de fractions ---------- */
+
+.fr-visual-holder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 14px 0 18px;
+}
+
+.fr-visual {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+}
+
+.fr-visual--disc {
+    max-width: 168px;
+}
+
+.fr-part {
+    fill: var(--fraction-empty);
+    stroke: var(--navy-800);
+    stroke-width: 2;
+}
+
+.fr-part--filled {
+    stroke: var(--purple-dark);
+}
+
+/* Les parts coloriées cumulent un fond violet (via l'attribut fill du motif)
+   et une trame hachurée : l'information ne dépend jamais de la seule couleur. */
+.fr-hatch-background {
+    fill: var(--purple-soft);
+}
+
+.fr-hatch-line {
+    stroke: var(--purple-dark);
+    stroke-width: 4;
+}
+
+.fr-visual-outline {
+    fill: none;
+    stroke: var(--navy-800);
+    stroke-width: 3;
+}
+
+/* ---------- Options de réponse ---------- */
+
+.fr-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.fr-option {
+    min-width: 84px;
+    min-height: 56px;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 1.35rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.fr-option:hover:not(:disabled) {
+    border-color: var(--purple);
+    transform: translateY(-2px);
+}
+
+.fr-option.is-correct {
+    border-color: var(--green);
+    background: var(--green-soft);
+}
+
+.fr-option.is-wrong {
+    border-color: #d8536a;
+    background: #fdecef;
+}
+
+.fr-option:disabled {
+    cursor: default;
+}
+
+.fr-options--visual .fr-option--visual {
+    min-width: 132px;
+    padding: 10px;
+}
+
+.fr-option--visual .fr-visual {
+    max-width: 120px;
+}
+
+/* ---------- Sélection de parts ---------- */
+
+.fr-selectable {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.fr-selectable-part {
+    min-width: 56px;
+    min-height: 56px;
+    border-radius: var(--radius-sm);
+    border: 3px solid var(--navy-800);
+    background: var(--fraction-empty);
+    cursor: pointer;
+}
+
+.fr-selectable--basket .fr-selectable-part {
+    border-radius: 50%;
+}
+
+.fr-selectable-part.is-selected {
+    background: var(--purple-soft);
+    border-color: var(--purple-dark);
+}
+
+/* La sélection est signalée par une coche, pas seulement par la couleur. */
+.fr-selectable-part.is-selected .fr-selectable-part__mark::before {
+    content: "✓";
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--purple-dark);
+}
+
+.fr-validate {
+    flex-basis: 100%;
+    margin-top: 6px;
+}
+
+/* ---------- Passerelle ---------- */
+
+.fr-bridge-progress {
+    margin: 0 0 8px;
+    color: var(--muted);
+}
+
+.fr-slabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.fr-slab {
+    width: 54px;
+    height: 16px;
+    border-radius: 6px;
+    border: 2px dashed var(--line);
+    background: transparent;
+}
+
+.fr-slab.is-placed {
+    border: 2px solid #8a5a2b;
+    background: #b9793d;
+}
+
+/* ---------- Badges ---------- */
+
+.fr-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fr-badge {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--yellow-soft);
+    border: 1px solid var(--yellow);
+    font-weight: 600;
+}
+
+/* ---------- Adaptations ---------- */
+
+@media (max-width: 720px) {
+    .river-launch-hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 420px) {
+    .river-scene {
+        min-height: 176px;
+    }
+
+    .river-bank {
+        width: 46px;
+    }
+
+    .river-stones {
+        left: 52px;
+        right: 52px;
+    }
+
+    /* Sur petit écran, la végétation se réduit pour ne pas déborder sur l'eau. */
+    .river-tree {
+        width: 44px;
+        height: 62px;
+    }
+
+    .river-tree__trunk {
+        height: 26px;
+    }
+
+    .river-tree__crown--low {
+        bottom: 20px;
+        width: 44px;
+        height: 24px;
+    }
+
+    .river-tree__crown--mid {
+        bottom: 32px;
+        width: 34px;
+        height: 22px;
+    }
+
+    .river-tree__crown--top {
+        bottom: 44px;
+        width: 24px;
+        height: 18px;
+    }
+
+    .river-palm {
+        width: 42px;
+        height: 58px;
+    }
+
+    .river-palm__trunk {
+        right: 18px;
+        height: 38px;
+    }
+
+    .river-palm__frond {
+        right: 20px;
+        bottom: 34px;
+        width: 26px;
+        height: 10px;
+    }
+
+    .river-palm__frond--four {
+        right: 21px;
+        width: 23px;
+    }
+
+    .river-canopy {
+        width: 92px;
+        height: 34px;
+    }
+
+    .river-canopy--right {
+        width: 80px;
+        height: 30px;
+    }
+
+    .fr-option {
+        min-width: 72px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Mouvement réduit : la rivière s'apaise, rien ne bouge plus, mais tout reste lisible. */
+@media (prefers-reduced-motion: reduce) {
+    .river-explorer,
+    .river-stone,
+    .fr-option {
+        transition: none;
+    }
+
+    .river-boat,
+    .river-boat__paddle,
+    .river-boat__wake,
+    .river-surface,
+    .river-current,
+    .river-tree__crown,
+    .river-palm,
+    .river-canopy,
+    .river-reeds,
+    .river-leaf {
+        animation: none;
+    }
+
+    /* Sans animation, les feuilles resteraient hors champ : on les pose sur l'eau. */
+    .river-leaf--one {
+        left: 22%;
+    }
+
+    .river-leaf--two {
+        left: 54%;
+    }
+
+    .river-leaf--three {
+        left: 78%;
+    }
+
+    .river-boat__wake {
+        opacity: 0.5;
+    }
+}

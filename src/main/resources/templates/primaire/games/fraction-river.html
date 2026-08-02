@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content river-page-content" data-fraction-river>
+            <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
+                <a th:href="@{/primaire}">Primaire</a>
+                <span aria-hidden="true">›</span>
+                <a th:href="@{/primaire/jeux}">Jeux éducatifs</a>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">La Rivière des fractions</span>
+            </nav>
+
+            <section class="river-launch-panel" data-game-setup aria-labelledby="river-title">
+                <div class="river-launch-hero">
+                    <div class="river-launch-copy">
+                        <p class="eyebrow">Une traversée en cinq pierres</p>
+                        <h1 id="river-title">La Rivière des fractions</h1>
+                        <p>Reconnais les parts d’un tout, fais apparaître les pierres et rejoins l’autre rive.</p>
+                        <div class="saved-progress" aria-label="Progression sauvegardée">
+                            <span>⭐ Réussites au premier essai : <strong data-best-first-try>0/5</strong></span>
+                            <span>🛶 Traversées terminées : <strong data-games-played>0</strong></span>
+                        </div>
+                    </div>
+                    <div class="launch-river-art" aria-hidden="true">
+                        <span class="launch-sun"></span>
+                        <span class="launch-palm launch-palm--one"></span>
+                        <span class="launch-palm launch-palm--two"></span>
+                        <span class="launch-water"></span>
+                        <span class="launch-explorer">🧒🏿</span>
+                    </div>
+                </div>
+
+                <div class="journey-picker" aria-labelledby="river-picker-title">
+                    <div class="journey-picker__heading">
+                        <p class="eyebrow">Choisis ta traversée</p>
+                        <h2 id="river-picker-title">Quel passage veux-tu emprunter ?</h2>
+                    </div>
+                    <div class="journey-levels">
+                        <button class="journey-level journey-level--active" type="button" data-start-game>
+                            <span class="journey-level__number">Niveau 1</span>
+                            <strong>Le Gué des parts</strong>
+                            <span>5 pierres · reconnaître les fractions</span>
+                            <span class="journey-level__action">Traverser la rivière →</span>
+                        </button>
+                        <div class="journey-level journey-level--locked" aria-disabled="true">
+                            <span class="journey-level__number">Niveau 2</span>
+                            <strong>Les Nénuphars équivalents</strong>
+                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
+                        </div>
+                        <div class="journey-level journey-level--locked" aria-disabled="true">
+                            <span class="journey-level__number">Niveau 3</span>
+                            <strong>Les Rapides du calcul</strong>
+                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="river-game" data-game-panel hidden aria-label="Plateau de La Rivière des fractions">
+                <header class="game-toolbar">
+                    <button class="game-quiet-button" type="button" data-change-level>
+                        <span aria-hidden="true">←</span> Niveaux
+                    </button>
+                    <div class="game-status" aria-label="Progression de la traversée">
+                        <span class="game-status__step">Pierre <strong data-step-progress>1/5</strong></span>
+                        <span class="game-status__stars" aria-label="Pierres posées">🪨 <strong data-stone-count>0</strong></span>
+                    </div>
+                    <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
+                        🔊 Son activé
+                    </button>
+                </header>
+
+                <div class="river-scene" data-river-scene
+                     aria-label="Un explorateur traverse la rivière de pierre en pierre">
+                    <div class="river-sky" aria-hidden="true">
+                        <span class="river-sun"></span>
+                        <span class="river-cloud river-cloud--one"></span>
+                        <span class="river-cloud river-cloud--two"></span>
+                        <span class="river-hill river-hill--far"></span>
+                        <span class="river-hill river-hill--near"></span>
+                    </div>
+                    <div class="river-vegetation" aria-hidden="true">
+                        <span class="river-tree river-tree--left">
+                            <span class="river-tree__trunk"></span>
+                            <span class="river-tree__crown river-tree__crown--low"></span>
+                            <span class="river-tree__crown river-tree__crown--mid"></span>
+                            <span class="river-tree__crown river-tree__crown--top"></span>
+                        </span>
+                        <span class="river-palm river-palm--right">
+                            <span class="river-palm__trunk"></span>
+                            <span class="river-palm__frond river-palm__frond--one"></span>
+                            <span class="river-palm__frond river-palm__frond--two"></span>
+                            <span class="river-palm__frond river-palm__frond--three"></span>
+                            <span class="river-palm__frond river-palm__frond--four"></span>
+                        </span>
+                        <span class="river-canopy river-canopy--left"></span>
+                        <span class="river-canopy river-canopy--right"></span>
+                    </div>
+                    <div class="river-bank river-bank--left" aria-hidden="true">
+                        <span class="river-reeds"></span>
+                        <span class="river-bank__label">Rive de départ</span>
+                    </div>
+                    <div class="river-bank river-bank--right" aria-hidden="true">
+                        <span class="river-reeds"></span>
+                        <span class="river-bank__label">Village</span>
+                    </div>
+                    <div class="river-stones" aria-hidden="true">
+                        <span class="river-stone" data-stone></span>
+                        <span class="river-stone" data-stone></span>
+                        <span class="river-stone" data-stone></span>
+                        <span class="river-stone" data-stone></span>
+                        <span class="river-stone" data-stone></span>
+                    </div>
+                    <div class="river-explorer" data-explorer aria-hidden="true">
+                        <div class="river-boat">
+                            <span class="river-boat__passenger">🧒🏿</span>
+                            <span class="river-boat__paddle"></span>
+                            <span class="river-boat__hull"></span>
+                            <span class="river-boat__wake"></span>
+                        </div>
+                    </div>
+                    <div class="river-water" aria-hidden="true">
+                        <span class="river-surface"></span>
+                        <span class="river-current river-current--one"></span>
+                        <span class="river-current river-current--two"></span>
+                        <span class="river-current river-current--three"></span>
+                    </div>
+                    <div class="river-leaves" aria-hidden="true">
+                        <span class="river-leaf river-leaf--one"></span>
+                        <span class="river-leaf river-leaf--two"></span>
+                        <span class="river-leaf river-leaf--three"></span>
+                    </div>
+                </div>
+
+                <div class="game-learning-area" data-learning-area>
+                    <section class="game-question" data-step-panel>
+                        <p class="question-kicker">Pour faire apparaître la pierre suivante :</p>
+                        <h2 id="river-step-title" data-step-title tabindex="-1">Étape 1</h2>
+                        <div class="fr-visual-holder" data-step-visual></div>
+                        <div class="fr-options" data-step-options aria-label="Choisis une réponse"></div>
+                        <div class="answer-feedback" data-step-feedback aria-live="polite" aria-atomic="true"></div>
+                        <button class="game-next-button" type="button" data-next-step hidden>
+                            Continuer vers la pierre suivante →
+                        </button>
+                    </section>
+
+                    <section class="game-question fr-bridge" data-bridge-panel hidden
+                             aria-labelledby="river-bridge-title">
+                        <p class="question-kicker">La passerelle des représentations</p>
+                        <h2 id="river-bridge-title" data-bridge-title tabindex="-1">
+                            Quelle fraction correspond à ce dessin ?
+                        </h2>
+                        <p class="fr-bridge-progress">Dalles posées : <strong data-bridge-progress>0/3</strong></p>
+                        <div class="fr-visual-holder" data-bridge-visual></div>
+                        <div class="fr-options" data-bridge-fractions aria-label="Choisis la fraction"></div>
+                        <div class="answer-feedback" data-bridge-feedback aria-live="polite" aria-atomic="true"></div>
+                        <div class="fr-slabs" aria-hidden="true">
+                            <span class="fr-slab" data-slab></span>
+                            <span class="fr-slab" data-slab></span>
+                            <span class="fr-slab" data-slab></span>
+                        </div>
+                    </section>
+
+                    <aside class="journey-encouragement" aria-label="Conseil de traversée">
+                        <span aria-hidden="true">🌟</span>
+                        <strong data-encouragement>Prends ton temps, il n’y a pas de chronomètre.</strong>
+                        <p>Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.</p>
+                    </aside>
+                </div>
+
+                <section class="game-result" data-game-result hidden aria-labelledby="river-result-title">
+                    <div class="arrival-badge" aria-hidden="true">🧭</div>
+                    <p class="eyebrow">Autre rive atteinte</p>
+                    <h2 id="river-result-title" data-result-title tabindex="-1">Traversée terminée !</h2>
+                    <p>Tu as ouvert le coffre du village.</p>
+                    <dl class="result-summary">
+                        <div><dt>Étapes terminées</dt><dd data-final-steps>0/5</dd></div>
+                        <div><dt>Réussites au premier essai</dt><dd data-final-first-try>0/5</dd></div>
+                        <div><dt>Erreurs corrigées</dt><dd data-final-corrected>0</dd></div>
+                    </dl>
+                    <ul class="fr-badges" data-final-badges aria-label="Badges obtenus"></ul>
+                    <p class="result-message" data-result-message></p>
+                    <div class="result-actions">
+                        <button class="game-primary-button" type="button" data-replay>Retraverser</button>
+                        <button class="game-secondary-button" type="button" data-result-change-level>Changer de niveau</button>
+                        <a class="game-secondary-button" th:href="@{/primaire/jeux}">Retour aux jeux</a>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/fraction-river-visuals.js}"></script>
+<script th:src="@{/js/fraction-river-questions.js}"></script>
+<script th:src="@{/js/fraction-river-store.js}"></script>
+<script th:src="@{/js/fraction-river.js}"></script>
+</body>
+</html>

@@ -64,11 +64,26 @@
                         <p>Choisis les bonnes quantités et rends la monnaie.</p>
                     </article>
 
-                    <article class="educational-game-card educational-game-card--soon">
-                        <div class="future-game-icon" aria-hidden="true">🏞️</div>
-                        <span class="game-availability">Bientôt disponible</span>
-                        <h3>La Rivière des fractions</h3>
-                        <p>Traverse la rivière en reconnaissant les fractions.</p>
+                    <article class="educational-game-card educational-game-card--active">
+                        <div class="educational-game-card__scene" aria-hidden="true">
+                            <span class="mini-cloud mini-cloud--one"></span>
+                            <span class="mini-cloud mini-cloud--two"></span>
+                            <span class="mini-train">🏞️</span>
+                            <span class="mini-track"></span>
+                        </div>
+                        <div class="educational-game-card__body">
+                            <span class="game-availability game-availability--ready">Prêt à jouer</span>
+                            <h3>La Rivière des fractions</h3>
+                            <p>Traverse le fleuve en choisissant les bonnes fractions.</p>
+                            <ul class="game-features" aria-label="Caractéristiques du jeu">
+                                <li>5 pierres à poser</li>
+                                <li>Indices adaptés à chaque erreur</li>
+                                <li>Progression sauvegardée</li>
+                            </ul>
+                            <a class="game-play-link" th:href="@{/primaire/jeux/riviere-des-fractions}">
+                                Jouer <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
                     </article>
 
                     <article class="educational-game-card educational-game-card--soon">
