@@ -48,6 +48,31 @@ class FractionRiverPageTests {
     }
 
     @Test
+    void phaserIsServedLocallyAndPinnedByVersion() throws Exception {
+        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/js/vendor/phaser-3.90.0.min.js")))
+                .andExpect(content().string(containsString("fraction-river-game.js")))
+                // Aucun script ni style ne doit provenir d'un tiers : le mode hors
+                // connexion et le déploiement OpenShift n'en dépendent jamais.
+                .andExpect(content().string(not(containsString("cdn."))))
+                .andExpect(content().string(not(containsString("unpkg."))))
+                .andExpect(content().string(not(containsString("//cdnjs"))));
+    }
+
+    @Test
+    void questionsStayInAccessibleHtmlOutsideTheCanvas() throws Exception {
+        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+                .andExpect(status().isOk())
+                // La scène Phaser est décorative et masquée aux lecteurs d'écran.
+                .andExpect(content().string(containsString("id=\"fraction-river-game\"")))
+                // Question, réponses et correction restent du HTML annoncé.
+                .andExpect(content().string(containsString("data-step-options")))
+                .andExpect(content().string(containsString("data-step-feedback")))
+                .andExpect(content().string(containsString("aria-live=\"polite\"")));
+    }
+
+    @Test
     void unknownFractionRiverSubPathUsesClean404Page() throws Exception {
         mockMvc.perform(get("/primaire/jeux/riviere-des-fractions/inconnu"))
                 .andExpect(status().isNotFound())

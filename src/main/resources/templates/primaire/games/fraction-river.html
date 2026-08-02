@@ -78,67 +78,8 @@
                     </button>
                 </header>
 
-                <div class="river-scene" data-river-scene
-                     aria-label="Un explorateur traverse la rivière de pierre en pierre">
-                    <div class="river-sky" aria-hidden="true">
-                        <span class="river-sun"></span>
-                        <span class="river-cloud river-cloud--one"></span>
-                        <span class="river-cloud river-cloud--two"></span>
-                        <span class="river-hill river-hill--far"></span>
-                        <span class="river-hill river-hill--near"></span>
-                    </div>
-                    <div class="river-vegetation" aria-hidden="true">
-                        <span class="river-tree river-tree--left">
-                            <span class="river-tree__trunk"></span>
-                            <span class="river-tree__crown river-tree__crown--low"></span>
-                            <span class="river-tree__crown river-tree__crown--mid"></span>
-                            <span class="river-tree__crown river-tree__crown--top"></span>
-                        </span>
-                        <span class="river-palm river-palm--right">
-                            <span class="river-palm__trunk"></span>
-                            <span class="river-palm__frond river-palm__frond--one"></span>
-                            <span class="river-palm__frond river-palm__frond--two"></span>
-                            <span class="river-palm__frond river-palm__frond--three"></span>
-                            <span class="river-palm__frond river-palm__frond--four"></span>
-                        </span>
-                        <span class="river-canopy river-canopy--left"></span>
-                        <span class="river-canopy river-canopy--right"></span>
-                    </div>
-                    <div class="river-bank river-bank--left" aria-hidden="true">
-                        <span class="river-reeds"></span>
-                        <span class="river-bank__label">Rive de départ</span>
-                    </div>
-                    <div class="river-bank river-bank--right" aria-hidden="true">
-                        <span class="river-reeds"></span>
-                        <span class="river-bank__label">Village</span>
-                    </div>
-                    <div class="river-stones" aria-hidden="true">
-                        <span class="river-stone" data-stone></span>
-                        <span class="river-stone" data-stone></span>
-                        <span class="river-stone" data-stone></span>
-                        <span class="river-stone" data-stone></span>
-                        <span class="river-stone" data-stone></span>
-                    </div>
-                    <div class="river-explorer" data-explorer aria-hidden="true">
-                        <div class="river-boat">
-                            <span class="river-boat__passenger">🧒🏿</span>
-                            <span class="river-boat__paddle"></span>
-                            <span class="river-boat__hull"></span>
-                            <span class="river-boat__wake"></span>
-                        </div>
-                    </div>
-                    <div class="river-water" aria-hidden="true">
-                        <span class="river-surface"></span>
-                        <span class="river-current river-current--one"></span>
-                        <span class="river-current river-current--two"></span>
-                        <span class="river-current river-current--three"></span>
-                    </div>
-                    <div class="river-leaves" aria-hidden="true">
-                        <span class="river-leaf river-leaf--one"></span>
-                        <span class="river-leaf river-leaf--two"></span>
-                        <span class="river-leaf river-leaf--three"></span>
-                    </div>
-                </div>
+                <div class="river-stage" id="fraction-river-game" data-river-stage aria-hidden="true"></div>
+                <p class="visually-hidden" data-scene-summary aria-live="polite"></p>
 
                 <div class="game-learning-area" data-learning-area>
                     <section class="game-question" data-step-panel>
@@ -198,6 +139,16 @@
         </main>
     </div>
 </div>
+<!-- Phaser est servi localement et épinglé par version : voir docs/DEPENDANCES-FRONTEND.md -->
+<script th:src="@{/js/vendor/phaser-3.90.0.min.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/FractionStone.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/Explorer.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/Frog.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/BootScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/RiverScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/ResultScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/fraction-river-game.js}"></script>
+<script th:src="@{/js/fraction-river-events.js}"></script>
 <script th:src="@{/js/fraction-river-visuals.js}"></script>
 <script th:src="@{/js/fraction-river-questions.js}"></script>
 <script th:src="@{/js/fraction-river-store.js}"></script>

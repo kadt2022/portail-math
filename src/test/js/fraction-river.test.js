@@ -25,9 +25,10 @@ const {
     evaluateSelection,
     advanceStep,
     createBridgeState,
-    evaluateBridgeAssociation,
-    calculateExplorerOffset
+    evaluateBridgeAssociation
 } = game;
+
+const {createEventBus, EVENTS} = require("../../main/resources/static/js/fraction-river-events.js");
 
 const {createStore, STORAGE_KEY, MAX_RECENT_QUESTIONS} = store;
 
@@ -202,28 +203,48 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
     assert.equal(evaluateBridgeAssociation(bridge, bridge.visualOrder[0]).outcome, "LOCKED");
 }
 
-// --- Progression de l'explorateur ---------------------------------------------
+// --- Bus d'événements entre la pédagogie et la scène Phaser -------------------
 {
-    assert.equal(calculateExplorerOffset(0, 5, 400), 0);
-    assert.equal(calculateExplorerOffset(2, 5, 400), 160);
-    assert.equal(calculateExplorerOffset(5, 5, 400), 400);
-    assert.equal(calculateExplorerOffset(9, 5, 400), 400);
-    assert.equal(calculateExplorerOffset(3, 5, 0), 0);
-}
+    const bus = createEventBus();
+    const recus = [];
 
-// --- Durée de traversée lue depuis la variable CSS ----------------------------
-{
-    const {parseDuration, DEFAULT_BOAT_TRAVEL_MS} = game;
-    assert.equal(parseDuration("4500ms", 1), 4500);
-    assert.equal(parseDuration(" 4500ms ", 1), 4500);
-    assert.equal(parseDuration("4.5s", 1), 4500);
-    assert.equal(parseDuration("2s", 1), 2000);
-    // Une variable absente ou aberrante ne doit jamais figer la barque.
-    assert.equal(parseDuration("", DEFAULT_BOAT_TRAVEL_MS), DEFAULT_BOAT_TRAVEL_MS);
-    assert.equal(parseDuration(undefined, DEFAULT_BOAT_TRAVEL_MS), DEFAULT_BOAT_TRAVEL_MS);
-    assert.equal(parseDuration("0ms", DEFAULT_BOAT_TRAVEL_MS), DEFAULT_BOAT_TRAVEL_MS);
-    assert.equal(parseDuration("-3s", DEFAULT_BOAT_TRAVEL_MS), DEFAULT_BOAT_TRAVEL_MS);
-    assert.equal(parseDuration("beaucoup", DEFAULT_BOAT_TRAVEL_MS), DEFAULT_BOAT_TRAVEL_MS);
+    const off = bus.on("step:completed", (payload) => recus.push(payload.completedSteps));
+    bus.on("step:completed", () => recus.push("second"));
+
+    assert.equal(bus.emit("step:completed", {completedSteps: 1}), 2);
+    assert.deepEqual(recus, [1, "second"]);
+
+    off();
+    recus.length = 0;
+    assert.equal(bus.emit("step:completed", {completedSteps: 2}), 1);
+    assert.deepEqual(recus, ["second"]);
+
+    // Émettre vers un événement sans écouteur ne coûte rien et ne casse rien.
+    assert.equal(bus.emit("journey:completed", {}), 0);
+
+    // Un écouteur en échec ne doit pas empêcher les suivants de recevoir.
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    const survivants = [];
+    const busRobuste = createEventBus();
+    busRobuste.on("answer:incorrect", () => {
+        throw new Error("scène cassée");
+    });
+    busRobuste.on("answer:incorrect", (payload) => survivants.push(payload.hint));
+    assert.equal(busRobuste.emit("answer:incorrect", {hint: "Recompte les parts."}), 1);
+    assert.deepEqual(survivants, ["Recompte les parts."]);
+    console.warn = originalWarn;
+
+    // Un handler invalide est ignoré sans lever.
+    assert.equal(typeof createEventBus().on("step:rendered", null), "function");
+
+    bus.clear();
+    assert.equal(bus.emit("step:completed", {completedSteps: 3}), 0);
+
+    // Les événements émis par le jeu sont bien ceux annoncés par le module.
+    ["journey:started", "answer:correct", "answer:incorrect", "step:completed",
+        "bridge:started", "bridge:slab", "journey:completed", "step:rendered"]
+        .forEach((name) => assert.equal(EVENTS.includes(name), true));
 }
 
 // --- Indices ciblés ------------------------------------------------------------

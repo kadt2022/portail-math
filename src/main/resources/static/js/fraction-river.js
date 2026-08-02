@@ -11,18 +11,6 @@
     const STEP_COUNT = questions.STEP_COUNT;
     const LEVEL = 1;
     const MOBILE_JOURNEY_QUERY = "(max-width: 620px)";
-    const DEFAULT_BOAT_TRAVEL_MS = 20000;
-
-    // La durée de traversée est définie une seule fois, dans la variable CSS
-    // --boat-travel ; on la relit ici plutôt que de la recopier.
-    function parseDuration(value, fallback) {
-        const text = String(value || "").trim();
-        const amount = parseFloat(text);
-        if (!Number.isFinite(amount) || amount <= 0) {
-            return fallback;
-        }
-        return text.endsWith("ms") ? amount : amount * 1000;
-    }
 
     function createTraversalState() {
         return {
@@ -129,14 +117,6 @@
         };
     }
 
-    function calculateExplorerOffset(completedSteps, totalSteps, availableDistance) {
-        if (!Number.isFinite(availableDistance) || availableDistance <= 0) {
-            return 0;
-        }
-        const progress = Math.max(0, Math.min(totalSteps, completedSteps));
-        return Math.round((progress / totalSteps) * availableDistance);
-    }
-
     function resultMessage(firstTryCorrect) {
         if (firstTryCorrect >= 5) {
             return "Traversée parfaite ! Tu lis les fractions comme un explorateur chevronné.";
@@ -170,8 +150,7 @@
         const optionsContainer = query("[data-step-options]");
         const feedback = query("[data-step-feedback]");
         const nextButton = query("[data-next-step]");
-        const scene = query("[data-river-scene]");
-        const explorer = query("[data-explorer]");
+        const bus = root.FractionRiverEvents;
 
         let steps = [];
         let bridge = null;
@@ -180,21 +159,10 @@
         let selection = new Set();
         let soundEnabled = store ? store.load().soundEnabled : true;
         let audioContext = null;
-        let rowingTimer = null;
 
         function isMobileJourney() {
             return typeof root.matchMedia === "function"
                 && root.matchMedia(MOBILE_JOURNEY_QUERY).matches;
-        }
-
-        function boatTravelMs() {
-            if (typeof root.getComputedStyle !== "function") {
-                return DEFAULT_BOAT_TRAVEL_MS;
-            }
-            return parseDuration(
-                root.getComputedStyle(rootElement).getPropertyValue("--boat-travel"),
-                DEFAULT_BOAT_TRAVEL_MS
-            );
         }
 
         function prefersReducedMotion() {
@@ -257,29 +225,6 @@
             target.className = "answer-feedback";
         }
 
-        function updateExplorerPosition(animate = false) {
-            if (!scene || !explorer) {
-                return;
-            }
-            const explorerWidth = explorer.getBoundingClientRect().width;
-            const availableDistance = Math.max(0, scene.clientWidth - explorerWidth - 24);
-            const offset = calculateExplorerOffset(state.completedSteps, STEP_COUNT, availableDistance);
-            explorer.style.transform = `translateX(${offset}px)`;
-            const stones = rootElement.querySelectorAll("[data-stone]");
-            stones.forEach((stone, index) => {
-                stone.classList.toggle("is-placed", index < state.completedSteps);
-            });
-
-            if (!animate || prefersReducedMotion()) {
-                return;
-            }
-            explorer.classList.add("is-rowing");
-            root.clearTimeout(rowingTimer);
-            rowingTimer = root.setTimeout(() => {
-                explorer.classList.remove("is-rowing");
-            }, boatTravelMs());
-        }
-
         function updateStatus() {
             query("[data-step-progress]").textContent = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
             query("[data-stone-count]").textContent = String(state.completedSteps);
@@ -323,7 +268,12 @@
                 ? "Ton effort t’a fait traverser cette étape."
                 : "Tu avances de pierre en pierre.";
             updateStatus();
-            updateExplorerPosition(true);
+            bus.emit("answer:correct", {step, hadMistake: state.hadMistake});
+            bus.emit("step:completed", {
+                step,
+                completedSteps: state.completedSteps,
+                totalSteps: STEP_COUNT
+            });
             playTone("correct");
             showNextButton(state.completedSteps === STEP_COUNT
                 ? "Rejoindre la passerelle →"
@@ -331,13 +281,12 @@
         }
 
         function handleIncorrectStep(step) {
-            renderFeedback(
-                feedback,
-                "wrong",
-                "Pas encore — regarde bien le dessin.",
-                questions.hintFor(state.lastDistractor)
-            );
+            const hint = questions.hintFor(state.lastDistractor);
+            renderFeedback(feedback, "wrong", "Pas encore — regarde bien le dessin.", hint);
             query("[data-encouragement]").textContent = "Tu peux essayer autant de fois que tu veux.";
+            // La grenouille répète l'indice dans la scène ; le texte HTML reste
+            // la source lisible par un lecteur d'écran.
+            bus.emit("answer:incorrect", {step, hint, distractor: state.lastDistractor});
             playTone("incorrect");
         }
 
@@ -437,6 +386,7 @@
             nextButton.hidden = true;
             query("[data-encouragement]").textContent = "Prends ton temps, il n’y a pas de chronomètre.";
             updateStatus();
+            bus.emit("step:rendered", {step, stepIndex: state.stepIndex});
             if (focus) {
                 stepTitle.focus();
             }
@@ -472,6 +422,7 @@
                     slabs.forEach((slab, index) => {
                         slab.classList.toggle("is-placed", index < bridge.associated.length);
                     });
+                    bus.emit("bridge:slab", {placed: bridge.associated.length, key});
                     playTone("correct");
                     if (bridge.completed) {
                         finishGame();
@@ -495,6 +446,7 @@
             bridgePairs = questions.createBridgePairs();
             bridge = createBridgeState(bridgePairs);
             clearFeedback(query("[data-bridge-feedback]"));
+            bus.emit("bridge:started", {slabs: bridgePairs.slabs.length});
             renderBridge();
             query("[data-bridge-title]").focus();
             scrollToElement(bridgePanel);
@@ -531,6 +483,11 @@
             });
 
             updateSavedProgress();
+            bus.emit("journey:completed", {
+                completedSteps: state.completedSteps,
+                firstTryCorrect: state.firstTryCorrect,
+                correctedErrors: state.correctedErrors
+            });
             playTone("arrival");
             resultTitle.focus();
             scrollToElement(resultPanel);
@@ -559,14 +516,8 @@
             stepPanel.hidden = false;
             bridgePanel.hidden = true;
             resultPanel.hidden = true;
+            bus.emit("journey:started", {level: LEVEL, totalSteps: STEP_COUNT});
             renderStep();
-            // Remise à la rive de départ tout de suite, puis recalcul une fois la
-            // scène mesurable : la barque ne dépend pas de rAF pour être replacée.
-            updateExplorerPosition();
-            if (typeof root.requestAnimationFrame === "function") {
-                // Sans l'enveloppe, l'horodatage passé par rAF vaudrait « animer ».
-                root.requestAnimationFrame(() => updateExplorerPosition());
-            }
         }
 
         function showLevels() {
@@ -591,27 +542,24 @@
                 playTone("correct");
             }
         });
-        root.addEventListener("resize", () => {
-            if (!gamePanel.hidden) {
-                updateExplorerPosition();
-            }
-        });
-
         updateSavedProgress();
         updateSoundButton();
+
+        // La scène Phaser est un enrichissement : si elle ne démarre pas, la
+        // page reste entièrement jouable.
+        if (typeof root.startFractionRiverGame === "function") {
+            root.startFractionRiverGame({bus, reducedMotion: prefersReducedMotion()});
+        }
     }
 
     const api = {
         STEP_COUNT,
-        DEFAULT_BOAT_TRAVEL_MS,
-        parseDuration,
         createTraversalState,
         evaluateChoice,
         evaluateSelection,
         advanceStep,
         createBridgeState,
         evaluateBridgeAssociation,
-        calculateExplorerOffset,
         resultMessage,
         mountGame
     };
