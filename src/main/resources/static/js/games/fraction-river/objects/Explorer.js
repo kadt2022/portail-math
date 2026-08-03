@@ -2,11 +2,9 @@
     "use strict";
 
     const WALK_DURATION_MS = 2600;
-    // Distance entre l'ancre du conteneur et la plante des pieds : l'ombre et
-    // la poussière doivent se poser là, pas sous le nombril du personnage.
-    // L'origine du sprite (0,92) coïncide avec le bas du dessin (0,919) ;
-    // il ne reste donc que la position du sprite dans le conteneur.
-    const FOOT_OFFSET = 8;
+    // Ratio du bas du dessin dans l'image, mesuré au pixel sur explorer-boy.png
+    // (1024x1536, contenu jusqu'à la ligne 1412). En dessous, l'image est vide.
+    const CONTENT_BOTTOM_RATIO = 0.919;
 
     // Le héros illustré reste dans la pirogue pendant la traversée, puis en
     // descend pour marcher vers le village lors de la scène finale.
@@ -35,9 +33,16 @@
         container.add([paddlingHero, hero, hull, gunwale, paddle]);
         container.setSize(68, 82);
 
+        // Écart entre l'ancre du conteneur et les semelles dessinées, déduit du
+        // sprite au lieu d'être supposé : sa position dans le conteneur, plus
+        // le décalage éventuel entre son origine et le bas du dessin.
+        function feetOffset() {
+            return hero.y + (CONTENT_BOTTOM_RATIO - hero.originY) * hero.displayHeight;
+        }
+
         // L'ombre reste collée au sol pendant que le héros monte et descend :
         // c'est elle qui dit à l'œil qu'il marche au lieu de flotter.
-        const shadow = scene.add.ellipse(x, y + FOOT_OFFSET, 44, 10, 0x14301f, 0.3);
+        const shadow = scene.add.ellipse(x, y + feetOffset(), 44, 10, 0x14301f, 0.3);
         shadow.setDepth(30);
         shadow.setVisible(false);
 
@@ -140,9 +145,12 @@
             });
         }
 
-        function walkTo(targetX, targetY, duration = WALK_DURATION_MS) {
+        // groundY est la hauteur de la SURFACE sur laquelle marcher, pas celle
+        // du conteneur : la conversion se fait ici, une fois le sprite de marche
+        // en place, sinon l'écart serait mesuré sur le mauvais sprite.
+        function walkTo(targetX, groundY, duration = WALK_DURATION_MS) {
             const startX = container.x;
-            const baseY = targetY !== undefined ? targetY : y;
+            const startY = container.y;
 
             if (bobTween) {
                 bobTween.pause();
@@ -154,15 +162,15 @@
             paddlingHero.setVisible(false);
             hero.setVisible(true);
             container.setRotation(0);
-            container.setY(baseY);
             hero.setY(0);
             hero.setAngle(0);
 
-            const startY = container.y;
+            const offset = feetOffset();
+            const baseY = groundY !== undefined ? groundY - offset : startY;
 
             if (reducedMotion) {
                 container.setPosition(targetX, baseY);
-                shadow.setPosition(targetX, baseY + FOOT_OFFSET);
+                shadow.setPosition(targetX, baseY + offset);
                 shadow.setVisible(true);
                 return Promise.resolve();
             }
@@ -187,28 +195,28 @@
                         const t = progress.t;
                         const phase = t * Math.PI * steps;
                         const lift = Math.abs(Math.sin(phase));
-                        const groundY = startY + (baseY - startY) * t;
+                        const surfaceY = startY + (baseY - startY) * t;
 
                         container.x = startX + (targetX - startX) * t;
-                        container.y = groundY - lift * 2.2;
+                        container.y = surfaceY - lift * 2.2;
                         // Léger déhanchement, et non un balancement de pendule.
                         hero.setAngle(Math.sin(phase * 0.5) * 1.2);
 
-                        shadow.setPosition(container.x, groundY + FOOT_OFFSET);
+                        shadow.setPosition(container.x, surfaceY + offset);
                         shadow.setScale(1 - lift * 0.16, 1);
                         shadow.setAlpha(0.3 - lift * 0.1);
 
                         const foot = Math.floor(phase / Math.PI);
                         if (foot !== lastFoot) {
                             lastFoot = foot;
-                            raiseDust(container.x, groundY + FOOT_OFFSET);
+                            raiseDust(container.x, surfaceY + offset);
                         }
                     },
                     onComplete: () => {
                         walkTween = null;
                         container.setPosition(targetX, baseY);
                         hero.setAngle(0);
-                        shadow.setPosition(targetX, baseY + FOOT_OFFSET);
+                        shadow.setPosition(targetX, baseY + offset);
                         shadow.setScale(1, 1);
                         shadow.setAlpha(0.3);
                         resolve();
@@ -265,7 +273,17 @@
 
         startIdle();
 
-        return {container, shadow, jumpTo, walkTo, cheer, resetTo, paddleFaster, setBoatVisible};
+        return {
+            container,
+            shadow,
+            feetOffset,
+            jumpTo,
+            walkTo,
+            cheer,
+            resetTo,
+            paddleFaster,
+            setBoatVisible
+        };
     }
 
     root.createExplorer = createExplorer;

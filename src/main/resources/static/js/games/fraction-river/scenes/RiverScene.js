@@ -7,14 +7,12 @@
     const WATERLINE = 176;
     const BANK_WIDTH = 150;
     const STEP_COUNT = 5;
-    // Distance entre l'ancre du conteneur du héros et la plante de ses pieds.
-    // Mesurée sur le PNG : le contenu s'arrête au ratio 0,919 et l'origine du
-    // sprite vaut 0,92, donc l'ancre tombe déjà sur les semelles. Il ne reste
-    // que le décalage du sprite dans son conteneur.
-    const FOOT_OFFSET = 8;
-    // Hauteur à laquelle le héros se tient debout sur une pierre. Le tablier du
-    // pont s'aligne dessus pour que la marche finale soit parfaitement plate.
+    // Hauteur à laquelle le héros se tient debout sur une pierre.
     const STAND_Y = WATERLINE - 12;
+    // Surface du tablier du pont. C'est une hauteur de SOL : la conversion vers
+    // la position du conteneur est faite par l'explorateur, qui seul connaît
+    // l'écart entre son ancre et ses semelles.
+    const DECK_SURFACE_Y = WATERLINE - 4;
 
     function createRiverScene(Phaser) {
         return class RiverScene extends Phaser.Scene {
@@ -245,7 +243,7 @@
                     ? this.stones[this.stones.length - 1]
                     : {x: WORLD_WIDTH / 2, y: WATERLINE + 10};
 
-                this.deckSurfaceY = STAND_Y + FOOT_OFFSET;
+                this.deckSurfaceY = DECK_SURFACE_Y;
                 const deckStart = lastStone.x - 6;
                 const deckEnd = WORLD_WIDTH - BANK_WIDTH + 40;
                 const deckWidth = deckEnd - deckStart;
@@ -347,7 +345,7 @@
             // Marche plate sur le tablier, du dernier appui jusqu'au coffre.
             walkToVillage() {
                 const finalX = this.chest.x - 56;
-                this.explorer.walkTo(finalX, this.deckSurfaceY - FOOT_OFFSET).then(() => {
+                this.explorer.walkTo(finalX, this.deckSurfaceY).then(() => {
                     if (this.reducedMotion) {
                         this.chestLid.setAngle(-24);
                         return;
