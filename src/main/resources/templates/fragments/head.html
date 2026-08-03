@@ -8,6 +8,7 @@
     <title th:text="${pageTitle + ' · Mbuyamba Maths RDC'}">Mbuyamba Maths RDC</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
     <link th:if="${pageStylesheet != null}" rel="stylesheet" th:href="${pageStylesheet}">
+    <link th:each="stylesheet : ${pageStylesheets}" rel="stylesheet" th:href="${stylesheet}">
     <script th:src="@{/js/app.js}" defer></script>
 </head>
 </html>

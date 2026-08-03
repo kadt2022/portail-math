@@ -3,9 +3,10 @@
 
     const QUESTION_COUNT = 5;
     const ALLOWED_TABLES = [2, 5];
-    const MOBILE_JOURNEY_QUERY = "(max-width: 620px)";
-    const MOBILE_INITIAL_SCENE_PAUSE_MS = 1500;
-    const MOBILE_CORRECTION_PAUSE_MS = 3000;
+    const GUIDED_INITIAL_SCENE_PAUSE_MS = 1500;
+    const GUIDED_CORRECTION_PAUSE_MS = 4500;
+    const TRAIN_TRAVEL_DURATION_MS = 3600;
+    const TRAIN_WHEEL_DIAMETER_PX = 40;
 
     function shuffle(values, random = Math.random) {
         const items = [...values];
@@ -124,6 +125,21 @@
         return Math.round((progress / totalQuestions) * availableDistance);
     }
 
+    function calculateTrainTravelDistance(trainFrontRight, finishTargetX, currentOffset = 0) {
+        if (![trainFrontRight, finishTargetX, currentOffset].every(Number.isFinite)) {
+            return 0;
+        }
+        const trainStartFrontRight = trainFrontRight - currentOffset;
+        return Math.max(0, Math.round(finishTargetX - trainStartFrontRight));
+    }
+
+    function calculateWheelRotation(distance, wheelDiameter = TRAIN_WHEEL_DIAMETER_PX) {
+        if (![distance, wheelDiameter].every(Number.isFinite) || wheelDiameter <= 0) {
+            return 0;
+        }
+        return (distance / (Math.PI * wheelDiameter)) * 360;
+    }
+
     function multiplicationExplanation(question) {
         const groups = Array.from(
             {length: question.table},
@@ -150,22 +166,23 @@
         const nextButton = rootElement.querySelector("[data-next-question]");
         const scene = rootElement.querySelector("[data-game-scene]");
         const train = rootElement.querySelector("[data-train]");
+        const trainFront = train.querySelector(".train-front");
+        const finishMarker = scene.querySelector(".station-marker--finish i");
         const store = root.MultiplicationTrainStore;
+
+        rootElement.style.setProperty("--train-travel-duration", `${TRAIN_TRAVEL_DURATION_MS}ms`);
 
         let questions = [];
         let state = createRoundState();
         let soundEnabled = store ? store.load().soundEnabled : true;
         let audioContext = null;
         let travelTimer = null;
-        let mobileJourneyTimer = null;
+        let guidedJourneyTimer = null;
+        let appliedTrainOffset = 0;
+        let appliedWheelRotation = 0;
 
         function query(selector) {
             return rootElement.querySelector(selector);
-        }
-
-        function isMobileJourney() {
-            return typeof root.matchMedia === "function"
-                && root.matchMedia(MOBILE_JOURNEY_QUERY).matches;
         }
 
         function preferredScrollBehavior() {
@@ -205,20 +222,20 @@
             focusWithoutScrolling(resultTitle);
         }
 
-        function clearMobileJourneyTimer() {
-            if (mobileJourneyTimer !== null) {
-                root.clearTimeout(mobileJourneyTimer);
-                mobileJourneyTimer = null;
+        function clearGuidedJourneyTimer() {
+            if (guidedJourneyTimer !== null) {
+                root.clearTimeout(guidedJourneyTimer);
+                guidedJourneyTimer = null;
             }
         }
 
-        function showCorrectionJourneyThen(callback) {
-            clearMobileJourneyTimer();
+        function showCorrectionSceneThen(callback) {
+            clearGuidedJourneyTimer();
             root.requestAnimationFrame(scrollToScene);
-            mobileJourneyTimer = root.setTimeout(() => {
-                mobileJourneyTimer = null;
+            guidedJourneyTimer = root.setTimeout(() => {
+                guidedJourneyTimer = null;
                 callback();
-            }, MOBILE_CORRECTION_PAUSE_MS);
+            }, GUIDED_CORRECTION_PAUSE_MS);
         }
 
         function updateSavedProgress() {
@@ -275,20 +292,33 @@
         }
 
         function updateTrainPosition(animate = false) {
-            const trainWidth = train.getBoundingClientRect().width;
-            const availableDistance = Math.max(0, scene.clientWidth - trainWidth - 28);
+            const trainFrontRect = trainFront.getBoundingClientRect();
+            const finishMarkerRect = finishMarker.getBoundingClientRect();
+            const availableDistance = calculateTrainTravelDistance(
+                trainFrontRect.right,
+                finishMarkerRect.right,
+                appliedTrainOffset
+            );
             const offset = calculateTrainOffset(
                 state.completedQuestions,
                 QUESTION_COUNT,
                 availableDistance
             );
-            train.style.transform = `translateX(${offset}px)`;
+            const travelledDistance = offset - appliedTrainOffset;
             if (animate) {
                 scene.classList.add("is-travelling");
+            } else {
+                scene.classList.remove("is-travelling");
+            }
+            appliedWheelRotation += calculateWheelRotation(travelledDistance);
+            appliedTrainOffset = offset;
+            rootElement.style.setProperty("--wheel-rotation", `${appliedWheelRotation}deg`);
+            train.style.transform = `translateX(${offset}px)`;
+            if (animate) {
                 root.clearTimeout(travelTimer);
                 travelTimer = root.setTimeout(() => {
                     scene.classList.remove("is-travelling");
-                }, 980);
+                }, TRAIN_TRAVEL_DURATION_MS + 100);
             }
         }
 
@@ -340,13 +370,8 @@
                     updateStatus();
                     updateTrainPosition(true);
                     playTone("correct");
-                    if (isMobileJourney()) {
-                        nextButton.hidden = true;
-                        showCorrectionJourneyThen(() => continueJourney(true));
-                    } else {
-                        nextButton.hidden = false;
-                        nextButton.focus();
-                    }
+                    nextButton.hidden = true;
+                    showCorrectionSceneThen(() => continueJourney(true));
                 }
             });
             return button;
@@ -402,7 +427,7 @@
         }
 
         function continueJourney(automatic = false) {
-            clearMobileJourneyTimer();
+            clearGuidedJourneyTimer();
             if (state.completedQuestions === QUESTION_COUNT) {
                 finishGame({focus: !automatic});
                 if (automatic) {
@@ -418,30 +443,30 @@
         }
 
         function startGame() {
-            clearMobileJourneyTimer();
+            clearGuidedJourneyTimer();
             questions = createGameQuestions();
             state = createRoundState();
+            appliedTrainOffset = 0;
+            appliedWheelRotation = 0;
+            rootElement.style.setProperty("--wheel-rotation", "0deg");
             setupPanel.hidden = true;
             gamePanel.hidden = false;
             learningArea.hidden = false;
             questionPanel.hidden = false;
             resultPanel.hidden = true;
-            const mobileJourney = isMobileJourney();
-            renderQuestion({focus: !mobileJourney});
+            renderQuestion({focus: false});
             root.requestAnimationFrame(() => {
                 updateTrainPosition(false);
-                if (mobileJourney) {
-                    scrollToScene();
-                    mobileJourneyTimer = root.setTimeout(() => {
-                        mobileJourneyTimer = null;
-                        scrollToQuestion();
-                    }, MOBILE_INITIAL_SCENE_PAUSE_MS);
-                }
+                scrollToScene();
+                guidedJourneyTimer = root.setTimeout(() => {
+                    guidedJourneyTimer = null;
+                    scrollToQuestion();
+                }, GUIDED_INITIAL_SCENE_PAUSE_MS);
             });
         }
 
         function showLevels() {
-            clearMobileJourneyTimer();
+            clearGuidedJourneyTimer();
             gamePanel.hidden = true;
             setupPanel.hidden = false;
             updateSavedProgress();
@@ -476,6 +501,10 @@
     const api = {
         ALLOWED_TABLES,
         QUESTION_COUNT,
+        GUIDED_INITIAL_SCENE_PAUSE_MS,
+        GUIDED_CORRECTION_PAUSE_MS,
+        TRAIN_TRAVEL_DURATION_MS,
+        TRAIN_WHEEL_DIAMETER_PX,
         shuffle,
         createAnswerOptions,
         createGameQuestions,
@@ -484,6 +513,8 @@
         advanceRound,
         scoreToLargeStars,
         calculateTrainOffset,
+        calculateTrainTravelDistance,
+        calculateWheelRotation,
         multiplicationExplanation,
         mountGame
     };

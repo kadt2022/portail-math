@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell">
+    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
+    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
+
+    <div class="page-shell">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main id="contenu" class="page-content river-page-content" data-fraction-river>
+            <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
+                <a th:href="@{/primaire}">Primaire</a>
+                <span aria-hidden="true">›</span>
+                <a th:href="@{/primaire/jeux}">Jeux éducatifs</a>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">La Rivière des fractions</span>
+            </nav>
+
+            <section class="river-launch-panel" data-game-setup aria-labelledby="river-title">
+                <div class="river-launch-hero">
+                    <div class="river-launch-copy">
+                        <p class="eyebrow">Une traversée en cinq pierres</p>
+                        <h1 id="river-title">La Rivière des fractions</h1>
+                        <p>Reconnais les parts d’un tout, fais apparaître les pierres et rejoins l’autre rive.</p>
+                        <div class="saved-progress" aria-label="Progression sauvegardée">
+                            <span>⭐ Réussites au premier essai : <strong data-best-first-try>0/5</strong></span>
+                            <span>🛶 Traversées terminées : <strong data-games-played>0</strong></span>
+                        </div>
+                    </div>
+                    <div class="launch-river-art" aria-hidden="true">
+                        <span class="launch-sun"></span>
+                        <span class="launch-palm launch-palm--one"></span>
+                        <span class="launch-palm launch-palm--two"></span>
+                        <span class="launch-water"></span>
+                        <span class="launch-explorer">🧒🏿</span>
+                    </div>
+                </div>
+
+                <div class="journey-picker" aria-labelledby="river-picker-title">
+                    <div class="journey-picker__heading">
+                        <p class="eyebrow">Choisis ta traversée</p>
+                        <h2 id="river-picker-title">Quel passage veux-tu emprunter ?</h2>
+                    </div>
+                    <div class="journey-levels">
+                        <button class="journey-level journey-level--active" type="button" data-start-game>
+                            <span class="journey-level__number">Niveau 1</span>
+                            <strong>Le Gué des parts</strong>
+                            <span>5 pierres · reconnaître les fractions</span>
+                            <span class="journey-level__action">Traverser la rivière →</span>
+                        </button>
+                        <div class="journey-level journey-level--locked" aria-disabled="true">
+                            <span class="journey-level__number">Niveau 2</span>
+                            <strong>Les Nénuphars équivalents</strong>
+                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
+                        </div>
+                        <div class="journey-level journey-level--locked" aria-disabled="true">
+                            <span class="journey-level__number">Niveau 3</span>
+                            <strong>Les Rapides du calcul</strong>
+                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="river-game" data-game-panel hidden aria-label="Plateau de La Rivière des fractions">
+                <header class="game-toolbar">
+                    <button class="game-quiet-button" type="button" data-change-level>
+                        <span aria-hidden="true">←</span> Niveaux
+                    </button>
+                    <div class="game-status" aria-label="Progression de la traversée">
+                        <span class="game-status__step">Pierre <strong data-step-progress>1/5</strong></span>
+                        <span class="game-status__stars" aria-label="Pierres posées">🪨 <strong data-stone-count>0</strong></span>
+                    </div>
+                    <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
+                        🔊 Son activé
+                    </button>
+                </header>
+
+                <div class="river-stage" id="fraction-river-game" data-river-stage aria-hidden="true"></div>
+                <p class="visually-hidden" data-scene-summary aria-live="polite"></p>
+
+                <div class="game-learning-area" data-learning-area>
+                    <section class="game-question" data-step-panel>
+                        <p class="question-kicker" data-step-kicker>Étape 1 sur 5</p>
+                        <h2 id="river-step-title" data-step-title tabindex="-1">Quelle fraction est représentée ?</h2>
+                        <div class="fr-visual-holder" data-step-visual></div>
+                        <div class="answer-options" data-step-options aria-label="Choisis une réponse"></div>
+                        <div class="answer-feedback" data-step-feedback aria-live="polite" aria-atomic="true"></div>
+                        <button class="game-next-button" type="button" data-next-step hidden>
+                            Continuer vers la pierre suivante →
+                        </button>
+                    </section>
+
+                    <aside class="journey-encouragement" aria-label="Conseil de traversée">
+                        <span aria-hidden="true">🌟</span>
+                        <strong data-encouragement>Prends ton temps, il n’y a pas de chronomètre.</strong>
+                        <p>Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.</p>
+                    </aside>
+                </div>
+
+                <section class="game-result" data-game-result hidden aria-labelledby="river-result-title">
+                    <div class="arrival-badge" aria-hidden="true">🧭</div>
+                    <p class="eyebrow">Autre rive atteinte</p>
+                    <h2 id="river-result-title" data-result-title tabindex="-1">Traversée terminée !</h2>
+                    <p>Tu as ouvert le coffre du village.</p>
+                    <dl class="result-summary">
+                        <div><dt>Étapes terminées</dt><dd data-final-steps>0/5</dd></div>
+                        <div><dt>Réussites au premier essai</dt><dd data-final-first-try>0/5</dd></div>
+                        <div><dt>Erreurs corrigées</dt><dd data-final-corrected>0</dd></div>
+                    </dl>
+                    <ul class="fr-badges" data-final-badges aria-label="Badges obtenus"></ul>
+                    <p class="result-message" data-result-message></p>
+                    <div class="result-actions">
+                        <button class="game-primary-button" type="button" data-replay>Retraverser</button>
+                        <button class="game-secondary-button" type="button" data-result-change-level>Changer de niveau</button>
+                        <a class="game-secondary-button" th:href="@{/primaire/jeux}">Retour aux jeux</a>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+</div>
+<!-- Phaser est servi localement et épinglé par version : voir docs/DEPENDANCES-FRONTEND.md -->
+<script th:src="@{/js/vendor/phaser-3.90.0.min.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/FractionStone.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/Explorer.js}"></script>
+<script th:src="@{/js/games/fraction-river/objects/Frog.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/BootScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/RiverScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/scenes/ResultScene.js}"></script>
+<script th:src="@{/js/games/fraction-river/fraction-river-game.js}"></script>
+<script th:src="@{/js/fraction-river-events.js}"></script>
+<script th:src="@{/js/fraction-river-visuals.js}"></script>
+<script th:src="@{/js/fraction-river-questions.js}"></script>
+<script th:src="@{/js/fraction-river-store.js}"></script>
+<script th:src="@{/js/fraction-river.js}"></script>
+</body>
+</html>

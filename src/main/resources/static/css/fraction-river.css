@@ -1,0 +1,335 @@
+/* La Rivière des fractions.
+   Le décor animé est rendu par Phaser dans #fraction-river-game.
+   Cette feuille ne style plus que la page : accueil, questions, réponses,
+   passerelle et badges — tout ce qui doit rester lisible et navigable au
+   clavier, canvas ou pas. */
+
+.river-page-content {
+    --river-deep: #1b6ea8;
+    --river-light: #4aa8dd;
+    --river-leaf: #1f8a58;
+    --fraction-empty: #f2f3fa;
+}
+
+/* ---------- Écran de lancement ---------- */
+
+.river-launch-panel {
+    display: grid;
+    gap: 28px;
+}
+
+.river-launch-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    padding: 28px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #eaf6ff 0%, #f7fbff 60%, #fffaf0 100%);
+    border: 1px solid var(--line);
+}
+
+.river-launch-copy h1 {
+    margin: 6px 0 12px;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+}
+
+.launch-river-art {
+    position: relative;
+    min-height: 170px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: linear-gradient(180deg, #d9f0ff 0%, #eaf7ff 55%, var(--river-light) 55%, var(--river-deep) 100%);
+}
+
+.launch-river-art .launch-sun {
+    position: absolute;
+    top: 16px;
+    right: 22px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 0 10px rgba(255, 184, 20, 0.22);
+}
+
+.launch-palm {
+    position: absolute;
+    bottom: 42%;
+    width: 14px;
+    height: 46px;
+    border-radius: 6px;
+    background: #8a5a2b;
+}
+
+.launch-palm::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    width: 46px;
+    height: 26px;
+    border-radius: 50% 50% 40% 40%;
+    background: var(--river-leaf);
+}
+
+.launch-palm--one {
+    left: 12%;
+}
+
+.launch-palm--two {
+    left: 78%;
+    height: 34px;
+}
+
+.launch-water {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 45%;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.18) 0 12px,
+        transparent 12px 30px
+    );
+    animation: fr-launch-current 8s linear infinite;
+}
+
+.launch-explorer {
+    position: absolute;
+    left: 44%;
+    bottom: 38%;
+    font-size: 2rem;
+    animation: fr-launch-bob 3.6s ease-in-out infinite;
+}
+
+@keyframes fr-launch-current {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 30px 0;
+    }
+}
+
+@keyframes fr-launch-bob {
+    0%, 100% {
+        transform: translateY(0) rotate(-1.2deg);
+    }
+    50% {
+        transform: translateY(-4px) rotate(1.6deg);
+    }
+}
+
+/* ---------- Scène Phaser ---------- */
+
+.river-stage {
+    position: relative;
+    width: 100%;
+    margin: 18px 0 24px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #d6efff 0%, #eef8ff 55%, var(--river-light) 55%, var(--river-deep) 100%);
+    /* Réserve la place avant le premier rendu : la page ne sursaute pas
+       quand le canvas apparaît. */
+    aspect-ratio: 840 / 320;
+    min-height: 180px;
+}
+
+.river-stage canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ---------- Visuels de fractions ---------- */
+
+.fr-visual-holder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 14px 0 18px;
+}
+
+.fr-visual {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+}
+
+.fr-visual--disc {
+    max-width: 168px;
+}
+
+.fr-part {
+    fill: var(--fraction-empty);
+    stroke: var(--navy-800);
+    stroke-width: 2;
+}
+
+.fr-part--filled {
+    stroke: var(--purple-dark);
+}
+
+/* Les parts coloriées cumulent un fond violet et une trame hachurée :
+   l'information ne dépend jamais de la seule couleur. */
+.fr-hatch-background {
+    fill: var(--purple-soft);
+}
+
+.fr-hatch-line {
+    stroke: var(--purple-dark);
+    stroke-width: 4;
+}
+
+.fr-visual-outline {
+    fill: none;
+    stroke: var(--navy-800);
+    stroke-width: 3;
+}
+
+/* ---------- Options de réponse ---------- */
+
+/* Le format des réponses est celui du Train : la Rivière réutilise
+   .answer-options et .answer-option, donc grille, taille, bordures, états
+   correct/incorrect et point de rupture mobile sont rigoureusement les mêmes.
+   Seul écart assumé : le titre. Celui du Train affiche « 2 × 5 = ? » et monte
+   jusqu'à 68 px ; ici il porte une phrase, qui à cette taille déborderait. */
+.river-page-content .game-question h2 {
+    font-size: clamp(22px, 3.2vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+/* Les réponses illustrées gardent la même case, avec le visuel centré. */
+.answer-option--visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.answer-option--visual .fr-visual {
+    max-width: 100%;
+}
+
+/* ---------- Sélection de parts ---------- */
+
+.fr-selectable {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+/* Mêmes bordures, mêmes rayons et même hauteur que les boutons de réponse. */
+.fr-selectable-part {
+    min-width: 70px;
+    min-height: 70px;
+    border-radius: 15px;
+    border: 2px solid #dedcf4;
+    background: #f8f7ff;
+    cursor: pointer;
+    transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
+}
+
+.fr-selectable--basket .fr-selectable-part {
+    border-radius: 50%;
+}
+
+.fr-selectable-part.is-selected {
+    background: var(--purple-soft);
+    border-color: var(--purple-dark);
+}
+
+/* La sélection est signalée par une coche, pas seulement par la couleur. */
+.fr-selectable-part.is-selected .fr-selectable-part__mark::before {
+    content: "✓";
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--purple-dark);
+}
+
+.fr-validate {
+    flex-basis: 100%;
+    margin-top: 6px;
+}
+
+/* ---------- Passerelle ---------- */
+
+.fr-bridge-progress {
+    margin: 0 0 8px;
+    color: var(--muted);
+}
+
+.fr-slabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.fr-slab {
+    width: 54px;
+    height: 16px;
+    border-radius: 6px;
+    border: 2px dashed var(--line);
+    background: transparent;
+}
+
+.fr-slab.is-placed {
+    border: 2px solid #8a5a2b;
+    background: #b9793d;
+}
+
+/* ---------- Badges ---------- */
+
+.fr-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fr-badge {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--yellow-soft);
+    border: 1px solid var(--yellow);
+    font-weight: 600;
+}
+
+/* ---------- Adaptations ---------- */
+
+@media (max-width: 720px) {
+    .river-launch-hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 420px) {
+    .fr-selectable-part {
+        min-width: 58px;
+        min-height: 58px;
+    }
+}
+
+/* Mouvement réduit : la page s'apaise. Phaser reçoit la même préférence et
+   coupe ses propres tweens et particules. */
+@media (prefers-reduced-motion: reduce) {
+    .fr-selectable-part {
+        transition: none;
+    }
+
+    .launch-water,
+    .launch-explorer {
+        animation: none;
+    }
+}
