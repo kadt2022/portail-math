@@ -1,30 +1,50 @@
 (function initializeExplorer(root) {
     "use strict";
 
-    // L'explorateur et sa pirogue. Le saut suit une vraie parabole : c'est
-    // précisément ce qu'une transition CSS ne savait pas faire.
+    const WALK_DURATION_MS = 2600;
+
+    // Le héros illustré reste dans la pirogue pendant la traversée, puis en
+    // descend pour marcher vers le village lors de la scène finale.
     function createExplorer(scene, x, y, options = {}) {
         const reducedMotion = Boolean(options.reducedMotion);
 
         const container = scene.add.container(x, y);
 
+        const paddlingHero = scene.add.image(0, 8, "fr-explorer-boy-paddling");
+        paddlingHero.setDisplaySize(54, 81);
+        paddlingHero.setOrigin(0.5, 0.92);
+
+        const hero = scene.add.image(0, 8, "fr-explorer-boy");
+        hero.setDisplaySize(52, 78);
+        hero.setOrigin(0.5, 0.92);
+        hero.setVisible(false);
+
         const hull = scene.add.ellipse(0, 16, 62, 18, 0x8a5a2b);
         const gunwale = scene.add.rectangle(0, 8, 64, 6, 0x6b4423);
         gunwale.setOrigin(0.5);
-        const body = scene.add.ellipse(0, -4, 20, 24, 0x2f5fb5);
-        const head = scene.add.circle(0, -22, 11, 0x6b4226);
-        const hair = scene.add.ellipse(0, -29, 22, 12, 0x2a1a10);
-        const eyeLeft = scene.add.circle(-4, -23, 2, 0xffffff);
-        const eyeRight = scene.add.circle(4, -23, 2, 0xffffff);
 
-        const paddle = scene.add.rectangle(16, -2, 34, 4, 0x6b4423);
+        const paddle = scene.add.rectangle(12, -31, 42, 4, 0x6b4423);
         paddle.setOrigin(0, 0.5);
+        paddle.setAngle(24);
 
-        container.add([hull, gunwale, body, head, hair, eyeLeft, eyeRight, paddle]);
-        container.setSize(64, 60);
+        container.add([paddlingHero, hero, hull, gunwale, paddle]);
+        container.setSize(68, 82);
+
+        // L'ombre reste collée au sol pendant que le héros monte et descend :
+        // c'est elle qui dit à l'œil qu'il marche au lieu de flotter.
+        const shadow = scene.add.ellipse(x, y + 10, 44, 10, 0x14301f, 0.3);
+        shadow.setDepth(30);
+        shadow.setVisible(false);
 
         let bobTween = null;
         let paddleTween = null;
+        let walkTween = null;
+
+        function setBoatVisible(visible) {
+            hull.setVisible(visible);
+            gunwale.setVisible(visible);
+            paddle.setVisible(visible);
+        }
 
         function startIdle() {
             if (reducedMotion) {
@@ -40,7 +60,7 @@
             });
             paddleTween = scene.tweens.add({
                 targets: paddle,
-                angle: {from: -14, to: 16},
+                angle: {from: 12, to: 38},
                 duration: 1200,
                 yoyo: true,
                 repeat: -1,
@@ -115,16 +135,134 @@
             });
         }
 
+        function walkTo(targetX, targetY, duration = WALK_DURATION_MS) {
+            const startX = container.x;
+            const baseY = targetY !== undefined ? targetY : y;
+
+            if (bobTween) {
+                bobTween.pause();
+            }
+            if (paddleTween) {
+                paddleTween.pause();
+            }
+            setBoatVisible(false);
+            paddlingHero.setVisible(false);
+            hero.setVisible(true);
+            container.setRotation(0);
+            container.setY(baseY);
+            hero.setY(0);
+            hero.setAngle(0);
+
+            const startY = container.y;
+
+            if (reducedMotion) {
+                container.setPosition(targetX, baseY);
+                shadow.setPosition(targetX, baseY + 10);
+                shadow.setVisible(true);
+                return Promise.resolve();
+            }
+
+            const distance = Math.abs(targetX - startX);
+            // Une foulée tous les ~46 px : la cadence suit la distance réelle,
+            // elle n'est plus un nombre d'oscillations arbitraire.
+            const steps = Math.max(4, Math.round(distance / 46));
+            const progress = {t: 0};
+            let lastFoot = -1;
+
+            shadow.setVisible(true);
+
+            return new Promise((resolve) => {
+                walkTween = scene.tweens.add({
+                    targets: progress,
+                    t: 1,
+                    duration,
+                    // Vitesse constante : un marcheur ne décélère pas comme un planeur.
+                    ease: "Linear",
+                    onUpdate: () => {
+                        const t = progress.t;
+                        const phase = t * Math.PI * steps;
+                        const lift = Math.abs(Math.sin(phase));
+                        const groundY = startY + (baseY - startY) * t;
+
+                        container.x = startX + (targetX - startX) * t;
+                        container.y = groundY - lift * 2.2;
+                        // Léger déhanchement, et non un balancement de pendule.
+                        hero.setAngle(Math.sin(phase * 0.5) * 1.2);
+
+                        shadow.setPosition(container.x, groundY + 10);
+                        shadow.setScale(1 - lift * 0.16, 1);
+                        shadow.setAlpha(0.3 - lift * 0.1);
+
+                        const foot = Math.floor(phase / Math.PI);
+                        if (foot !== lastFoot) {
+                            lastFoot = foot;
+                            raiseDust(container.x, groundY + 8);
+                        }
+                    },
+                    onComplete: () => {
+                        walkTween = null;
+                        container.setPosition(targetX, baseY);
+                        hero.setAngle(0);
+                        shadow.setPosition(targetX, baseY + 10);
+                        shadow.setScale(1, 1);
+                        shadow.setAlpha(0.3);
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        // Un petit nuage de poussière à chaque appui : le pied touche le sol.
+        function raiseDust(dustX, dustY) {
+            if (reducedMotion) {
+                return;
+            }
+            const puff = scene.add.ellipse(dustX - 6, dustY, 12, 5, 0xd8c9a8, 0.65);
+            puff.setDepth(31);
+            scene.tweens.add({
+                targets: puff,
+                x: dustX - 22,
+                scaleX: 1.9,
+                scaleY: 1.4,
+                alpha: 0,
+                duration: 520,
+                ease: "Sine.easeOut",
+                onComplete: () => puff.destroy()
+            });
+        }
+
         function resetTo(originX, originY) {
+            if (walkTween) {
+                walkTween.stop();
+                walkTween = null;
+            }
             container.setPosition(originX, originY);
             container.setRotation(0);
             container.setScale(1);
+            shadow.setVisible(false);
+            shadow.setScale(1, 1);
+            shadow.setAlpha(0.3);
+            hero.setPosition(0, 8);
+            hero.setAngle(0);
+            hero.setVisible(false);
+            paddlingHero.setPosition(0, 8);
+            paddlingHero.setAngle(0);
+            paddlingHero.setVisible(true);
+            setBoatVisible(true);
+            if (bobTween) {
+                bobTween.updateTo("y", originY - 4, true);
+                bobTween.resume();
+            }
+            if (paddleTween) {
+                paddleTween.resume();
+            }
         }
 
         startIdle();
 
-        return {container, jumpTo, cheer, resetTo, paddleFaster};
+        return {container, shadow, jumpTo, walkTo, cheer, resetTo, paddleFaster, setBoatVisible};
     }
 
     root.createExplorer = createExplorer;
+    root.FRACTION_RIVER_WALK_DURATION_MS = WALK_DURATION_MS;
 })(typeof globalThis !== "undefined" ? globalThis : window);

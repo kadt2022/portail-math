@@ -4,12 +4,18 @@ const assert = require("node:assert/strict");
 const {
     ALLOWED_TABLES,
     QUESTION_COUNT,
+    GUIDED_INITIAL_SCENE_PAUSE_MS,
+    GUIDED_CORRECTION_PAUSE_MS,
+    TRAIN_TRAVEL_DURATION_MS,
+    TRAIN_WHEEL_DIAMETER_PX,
     createAnswerOptions,
     createGameQuestions,
     createRoundState,
     evaluateAnswer,
     scoreToLargeStars,
-    calculateTrainOffset
+    calculateTrainOffset,
+    calculateTrainTravelDistance,
+    calculateWheelRotation
 } = require("../../main/resources/static/js/multiplication-train.js");
 const {
     createStore,
@@ -86,6 +92,11 @@ function memoryStorage(initial = {}) {
 }
 
 {
+    assert.equal(GUIDED_INITIAL_SCENE_PAUSE_MS, 1500);
+    assert.equal(GUIDED_CORRECTION_PAUSE_MS, 4500);
+    assert.equal(TRAIN_TRAVEL_DURATION_MS, 3600);
+    assert.equal(TRAIN_WHEEL_DIAMETER_PX, 40);
+    assert.ok(GUIDED_CORRECTION_PAUSE_MS >= TRAIN_TRAVEL_DURATION_MS + 800);
     assert.equal(scoreToLargeStars(5), 3);
     assert.equal(scoreToLargeStars(4), 2);
     assert.equal(scoreToLargeStars(3), 1);
@@ -95,6 +106,13 @@ function memoryStorage(initial = {}) {
     assert.equal(calculateTrainOffset(3, 5, 500), 300);
     assert.equal(calculateTrainOffset(5, 5, 500), 500);
     assert.equal(calculateTrainOffset(8, 5, 500), 500);
+    assert.equal(calculateTrainTravelDistance(120, 280), 160);
+    assert.equal(calculateTrainTravelDistance(280, 280, 160), 160);
+    assert.equal(calculateTrainTravelDistance(320, 280), 0);
+    assert.equal(calculateTrainTravelDistance(Number.NaN, 280), 0);
+    assert.ok(Math.abs(calculateWheelRotation(Math.PI * 40) - 360) < 0.0001);
+    assert.equal(calculateWheelRotation(20, 0), 0);
+    assert.equal(calculateWheelRotation(Number.NaN, 40), 0);
 }
 
 {

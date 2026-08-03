@@ -12,6 +12,7 @@
         "step:completed",
         "bridge:started",
         "bridge:slab",
+        "journey:finale-started",
         "journey:completed"
     ];
 

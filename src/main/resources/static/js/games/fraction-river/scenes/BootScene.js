@@ -1,12 +1,18 @@
 (function initializeBootScene(root) {
     "use strict";
 
-    // Aucune image n'est téléchargée : les textures sont dessinées à la volée.
-    // C'est ce qui permet d'ajouter Phaser sans faire exploser le poids du jeu.
+    const EXPLORER_ASSET_PATH = "/images/games/fraction-river/explorer-boy.png";
+    const EXPLORER_PADDLING_ASSET_PATH = "/images/games/fraction-river/explorer-boy-paddling.png";
+
     function createBootScene(Phaser) {
         return class BootScene extends Phaser.Scene {
             constructor() {
                 super({key: "BootScene"});
+            }
+
+            preload() {
+                this.load.image("fr-explorer-boy", EXPLORER_ASSET_PATH);
+                this.load.image("fr-explorer-boy-paddling", EXPLORER_PADDLING_ASSET_PATH);
             }
 
             create() {
@@ -50,4 +56,6 @@
     }
 
     root.createBootScene = createBootScene;
+    root.FRACTION_RIVER_EXPLORER_ASSET_PATH = EXPLORER_ASSET_PATH;
+    root.FRACTION_RIVER_EXPLORER_PADDLING_ASSET_PATH = EXPLORER_PADDLING_ASSET_PATH;
 })(typeof globalThis !== "undefined" ? globalThis : window);

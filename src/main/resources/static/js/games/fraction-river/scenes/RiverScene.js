@@ -222,22 +222,44 @@
                 }
             }
 
+            // Un escalier de sortie en bois, posé là depuis le début : l'enfant
+            // voit d'emblée par où il quittera la rivière.
             buildBridgeAndChest() {
-                const chestX = WORLD_WIDTH - BANK_WIDTH - 20;
-                this.bridgeStart = this.stones.length
-                    ? this.stones[this.stones.length - 1].x
-                    : WORLD_WIDTH / 2;
+                const chestX = WORLD_WIDTH - 78;
+                const lastStone = this.stones.length
+                    ? this.stones[this.stones.length - 1]
+                    : {x: WORLD_WIDTH / 2, y: WATERLINE + 10};
 
-                for (let index = 0; index < 3; index += 1) {
-                    const x = this.bridgeStart + 40 + index * 44;
-                    const plank = this.add.rectangle(x, WATERLINE + 4, 40, 10, 0xb9793d);
-                    plank.setStrokeStyle(2, 0x6b4423);
-                    plank.setAlpha(0);
-                    plank.setDepth(22);
-                    this.planks.push(plank);
+                const stepCount = 4;
+                const stepWidth = 30;
+                const stepGap = 4;
+                const rise = 7;
+                const firstX = lastStone.x + 46;
+
+                this.stairTop = WATERLINE + 8;
+                for (let index = 0; index < stepCount; index += 1) {
+                    const x = firstX + index * (stepWidth + stepGap);
+                    const top = WATERLINE + 8 - index * rise;
+
+                    // Deux pilotis plantés dans l'eau sous chaque marche.
+                    [-9, 9].forEach((offset) => {
+                        const post = this.add.rectangle(x + offset, top + 22, 5, 40, 0x6b4423);
+                        post.setDepth(21);
+                    });
+
+                    const tread = this.add.rectangle(x, top, stepWidth, 9, 0xc98a4b);
+                    tread.setStrokeStyle(2, 0x6b4423);
+                    tread.setDepth(23);
+
+                    const edge = this.add.rectangle(x, top + 5, stepWidth, 3, 0x8a5a2b);
+                    edge.setDepth(23);
+
+                    this.planks.push(tread);
+                    this.stairTop = top;
                 }
+                this.stairExitX = firstX + (stepCount - 1) * (stepWidth + stepGap);
 
-                this.chest = this.add.container(chestX, WATERLINE - 22);
+                this.chest = this.add.container(chestX, WATERLINE - 26);
                 const base = this.add.rectangle(0, 8, 46, 30, 0x8a5a2b);
                 base.setStrokeStyle(2, 0x5d3d1c);
                 this.chestLid = this.add.rectangle(0, -12, 50, 18, 0xa9702f);
@@ -245,7 +267,6 @@
                 const lock = this.add.rectangle(0, 4, 10, 12, 0xffc93c);
                 this.chest.add([base, this.chestLid, lock]);
                 this.chest.setDepth(24);
-                this.chest.setAlpha(0);
             }
 
             // ---------- réactions aux événements pédagogiques ----------
@@ -264,9 +285,7 @@
                     this.explorer.cheer();
                 });
                 on("step:completed", (payload) => this.advanceTo(payload));
-                on("bridge:started", () => this.frog.say("Pose les dalles pour finir le pont."));
-                on("bridge:slab", (payload) => this.raisePlank(payload));
-                on("journey:completed", () => this.openChest());
+                on("journey:finale-started", () => this.walkToVillage());
             }
 
             unwireEvents() {
@@ -276,8 +295,7 @@
 
             resetJourney() {
                 this.stones.forEach((stone) => stone.reset());
-                this.planks.forEach((plank) => plank.setAlpha(0));
-                this.chest.setAlpha(0);
+                // L'escalier de sortie fait partie du décor : il reste en place.
                 this.chestLid.setAngle(0);
                 this.chestLid.setY(-12);
                 this.explorer.resetTo(this.explorerHome.x, this.explorerHome.y);
@@ -300,32 +318,10 @@
                 });
             }
 
-            raisePlank(payload) {
-                const placed = payload && Number.isInteger(payload.placed) ? payload.placed : 0;
-                const plank = this.planks[placed - 1];
-                if (!plank) {
-                    return;
-                }
-                if (this.reducedMotion) {
-                    plank.setAlpha(1);
-                    return;
-                }
-                plank.setAlpha(0);
-                plank.setY(WATERLINE - 16);
-                this.tweens.add({
-                    targets: plank,
-                    alpha: 1,
-                    y: WATERLINE + 4,
-                    duration: 420,
-                    ease: "Back.easeOut"
-                });
-                this.burst(plank.x, WATERLINE - 6, 8);
-            }
-
-            openChest() {
-                this.chest.setAlpha(1);
-                const finalX = this.chest.x - 40;
-                this.explorer.jumpTo(finalX, WATERLINE - 12).then(() => {
+            // Montée de l'escalier puis marche jusqu'au coffre, d'un seul trait.
+            walkToVillage() {
+                const finalX = this.chest.x - 56;
+                this.explorer.walkTo(finalX, this.stairTop - 20).then(() => {
                     if (this.reducedMotion) {
                         this.chestLid.setAngle(-24);
                         return;

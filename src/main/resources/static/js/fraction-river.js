@@ -10,7 +10,9 @@
 
     const STEP_COUNT = questions.STEP_COUNT;
     const LEVEL = 1;
-    const MOBILE_JOURNEY_QUERY = "(max-width: 620px)";
+    const GUIDED_INITIAL_SCENE_PAUSE_MS = 1500;
+    const GUIDED_CORRECTION_SCENE_PAUSE_MS = 3000;
+    const GUIDED_FINALE_SCENE_PAUSE_MS = 4200;
 
     function createTraversalState() {
         return {
@@ -143,27 +145,21 @@
         const gamePanel = query("[data-game-panel]");
         const learningArea = query("[data-learning-area]");
         const stepPanel = query("[data-step-panel]");
-        const bridgePanel = query("[data-bridge-panel]");
         const resultPanel = query("[data-game-result]");
         const stepTitle = query("[data-step-title]");
         const resultTitle = query("[data-result-title]");
         const optionsContainer = query("[data-step-options]");
         const feedback = query("[data-step-feedback]");
         const nextButton = query("[data-next-step]");
+        const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
 
         let steps = [];
-        let bridge = null;
-        let bridgePairs = null;
         let state = createTraversalState();
         let selection = new Set();
         let soundEnabled = store ? store.load().soundEnabled : true;
         let audioContext = null;
-
-        function isMobileJourney() {
-            return typeof root.matchMedia === "function"
-                && root.matchMedia(MOBILE_JOURNEY_QUERY).matches;
-        }
+        let guidedJourneyTimer = null;
 
         function prefersReducedMotion() {
             return typeof root.matchMedia === "function"
@@ -177,6 +173,36 @@
                     block: "start"
                 });
             }
+        }
+
+        function focusWithoutScrolling(element) {
+            try {
+                element.focus({preventScroll: true});
+            } catch (error) {
+                element.focus();
+            }
+        }
+
+        function scrollToStep() {
+            scrollToElement(stepPanel);
+            focusWithoutScrolling(stepTitle);
+        }
+
+
+        function clearGuidedJourneyTimer() {
+            if (guidedJourneyTimer !== null) {
+                root.clearTimeout(guidedJourneyTimer);
+                guidedJourneyTimer = null;
+            }
+        }
+
+        function showRiverSceneThen(callback, duration = GUIDED_CORRECTION_SCENE_PAUSE_MS) {
+            clearGuidedJourneyTimer();
+            scrollToElement(riverStage);
+            guidedJourneyTimer = root.setTimeout(() => {
+                guidedJourneyTimer = null;
+                callback();
+            }, duration);
         }
 
         function playTone(kind) {
@@ -252,9 +278,6 @@
         function showNextButton(label) {
             nextButton.textContent = label;
             nextButton.hidden = false;
-            if (!isMobileJourney()) {
-                nextButton.focus();
-            }
         }
 
         function handleCorrectStep(step) {
@@ -276,8 +299,10 @@
             });
             playTone("correct");
             showNextButton(state.completedSteps === STEP_COUNT
-                ? "Rejoindre la passerelle →"
+                ? "Monter l’escalier et rejoindre le village →"
                 : "Continuer vers la pierre suivante →");
+            nextButton.hidden = true;
+            showRiverSceneThen(() => continueTraversal({automatic: true}));
         }
 
         function handleIncorrectStep(step) {
@@ -392,66 +417,6 @@
             }
         }
 
-        function renderBridge() {
-            const currentKey = bridge.visualOrder[bridge.currentIndex];
-            const pair = bridgePairs.slabs.find((slab) => slab.key === currentKey);
-            renderVisualInto(query("[data-bridge-visual]"), pair.visual, `bridge-${bridge.currentIndex}`);
-            query("[data-bridge-progress]").textContent = `${bridge.associated.length}/3`;
-
-            const container = query("[data-bridge-fractions]");
-            container.textContent = "";
-            bridgePairs.fractionOrder.forEach((key) => {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.className = "fr-option";
-                button.textContent = key;
-                button.disabled = bridge.associated.includes(key);
-                button.addEventListener("click", () => {
-                    bridge = evaluateBridgeAssociation(bridge, key);
-                    if (bridge.outcome === "INCORRECT") {
-                        renderFeedback(
-                            query("[data-bridge-feedback]"),
-                            "wrong",
-                            "Ce n’est pas ce dessin.",
-                            "Compte les parts coloriées, puis toutes les parts du tout."
-                        );
-                        playTone("incorrect");
-                        return;
-                    }
-                    const slabs = rootElement.querySelectorAll("[data-slab]");
-                    slabs.forEach((slab, index) => {
-                        slab.classList.toggle("is-placed", index < bridge.associated.length);
-                    });
-                    bus.emit("bridge:slab", {placed: bridge.associated.length, key});
-                    playTone("correct");
-                    if (bridge.completed) {
-                        finishGame();
-                        return;
-                    }
-                    renderFeedback(
-                        query("[data-bridge-feedback]"),
-                        "correct",
-                        "Dalle posée !",
-                        "La passerelle s’allonge. Continue."
-                    );
-                    renderBridge();
-                });
-                container.appendChild(button);
-            });
-        }
-
-        function startBridge() {
-            stepPanel.hidden = true;
-            bridgePanel.hidden = false;
-            bridgePairs = questions.createBridgePairs();
-            bridge = createBridgeState(bridgePairs);
-            clearFeedback(query("[data-bridge-feedback]"));
-            bus.emit("bridge:started", {slabs: bridgePairs.slabs.length});
-            renderBridge();
-            query("[data-bridge-title]").focus();
-            scrollToElement(bridgePanel);
-        }
-
         function finishGame() {
             const progress = store
                 ? store.recordTraversal({
@@ -493,34 +458,50 @@
             scrollToElement(resultPanel);
         }
 
-        function continueTraversal() {
+        function startFinale() {
+            bus.emit("journey:finale-started", {
+                completedSteps: state.completedSteps,
+                firstTryCorrect: state.firstTryCorrect,
+                correctedErrors: state.correctedErrors
+            });
+            showRiverSceneThen(finishGame, GUIDED_FINALE_SCENE_PAUSE_MS);
+        }
+
+        function continueTraversal({automatic = false} = {}) {
+            clearGuidedJourneyTimer();
             if (state.completedSteps >= STEP_COUNT) {
-                startBridge();
+                // Plus de questions pour la passerelle : l’escalier est déjà là,
+                // le héros le gravit et quitte la rivière.
+                startFinale();
                 return;
             }
             state = advanceStep(state);
-            renderStep();
-            if (isMobileJourney()) {
-                scrollToElement(stepPanel);
-            }
+            renderStep({focus: !automatic});
+            root.requestAnimationFrame(scrollToStep);
         }
 
         function startGame() {
+            clearGuidedJourneyTimer();
             const saved = store ? store.load() : {recentQuestionIds: []};
             steps = questions.createLevel1Steps(Math.random, saved.recentQuestionIds || []);
             state = createTraversalState();
-            bridge = null;
             setupPanel.hidden = true;
             gamePanel.hidden = false;
             learningArea.hidden = false;
             stepPanel.hidden = false;
-            bridgePanel.hidden = true;
             resultPanel.hidden = true;
             bus.emit("journey:started", {level: LEVEL, totalSteps: STEP_COUNT});
-            renderStep();
+            renderStep({focus: false});
+            root.requestAnimationFrame(() => {
+                showRiverSceneThen(
+                    scrollToStep,
+                    GUIDED_INITIAL_SCENE_PAUSE_MS
+                );
+            });
         }
 
         function showLevels() {
+            clearGuidedJourneyTimer();
             gamePanel.hidden = true;
             setupPanel.hidden = false;
             updateSavedProgress();
@@ -554,6 +535,9 @@
 
     const api = {
         STEP_COUNT,
+        GUIDED_INITIAL_SCENE_PAUSE_MS,
+        GUIDED_CORRECTION_SCENE_PAUSE_MS,
+        GUIDED_FINALE_SCENE_PAUSE_MS,
         createTraversalState,
         evaluateChoice,
         evaluateSelection,

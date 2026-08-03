@@ -593,7 +593,7 @@ button.journey-level {
 }
 
 .scene-cloud {
-    transition: transform 900ms ease-in-out;
+    transition: transform var(--train-travel-duration, 3600ms) ease-in-out;
 }
 
 .scene-cloud--one {
@@ -616,7 +616,7 @@ button.journey-level {
 .scene-hill {
     position: absolute;
     border-radius: 50% 50% 0 0;
-    transition: transform 900ms ease-in-out;
+    transition: transform var(--train-travel-duration, 3600ms) ease-in-out;
 }
 
 .scene-hill--far {
@@ -726,7 +726,6 @@ button.journey-level {
     width: 182px;
     height: 108px;
     transform: translateX(0);
-    transition: transform 900ms cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .train-engine {
@@ -818,8 +817,21 @@ button.journey-level {
     height: 28px;
     border: 6px solid #2c2d55;
     border-radius: 50%;
-    background: #cbd0da;
+    background:
+        linear-gradient(35deg, transparent 44%, #737b91 45% 55%, transparent 56%),
+        linear-gradient(125deg, transparent 44%, #737b91 45% 55%, transparent 56%),
+        #cbd0da;
     box-shadow: inset 0 0 0 3px #fff;
+    transform: rotate(var(--wheel-rotation, 0deg));
+}
+
+.train-wheel::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #525a70;
 }
 
 .train-wheel--one {
@@ -861,24 +873,13 @@ button.journey-level {
     transform: scale(1.45);
 }
 
-.game-scene.is-travelling .train-vehicle {
-    animation: train-bounce 260ms ease-in-out 3;
-}
-
+.game-scene.is-travelling .train-vehicle,
 .game-scene.is-travelling .train-wheel {
-    animation: wheel-spin 300ms linear 3;
+    transition: transform var(--train-travel-duration, 3600ms) cubic-bezier(0.37, 0, 0.63, 1);
 }
 
 .game-scene.is-travelling .train-smoke span {
-    animation: smoke-puff 700ms ease-out;
-}
-
-@keyframes train-bounce {
-    50% { margin-bottom: 3px; }
-}
-
-@keyframes wheel-spin {
-    to { rotate: 360deg; }
+    animation: smoke-puff 2400ms ease-out;
 }
 
 @keyframes smoke-puff {
@@ -1317,6 +1318,26 @@ button.journey-level {
         height: 285px;
     }
 
+    /* Sur téléphone, le décor reste fixe : seul le train parcourt la voie. */
+    .scene-cloud,
+    .scene-hill {
+        transition: none;
+    }
+
+    .game-scene.is-travelling .scene-cloud--one,
+    .game-scene.is-travelling .scene-hill--far,
+    .game-scene.is-travelling .scene-hill--near {
+        transform: none;
+    }
+
+    .game-scene.is-travelling .scene-cloud--two {
+        transform: scale(0.74);
+    }
+
+    .game-scene.is-travelling .scene-cloud--three {
+        transform: scale(0.56);
+    }
+
     .station-line {
         right: 4%;
         left: 4%;
@@ -1399,6 +1420,7 @@ button.journey-level {
 
 @media (prefers-reduced-motion: reduce) {
     .train-vehicle,
+    .train-wheel,
     .scene-cloud,
     .scene-hill,
     .journey-level--active {

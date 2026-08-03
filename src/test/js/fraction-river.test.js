@@ -1,6 +1,8 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const questions = require("../../main/resources/static/js/fraction-river-questions.js");
 const visuals = require("../../main/resources/static/js/fraction-river-visuals.js");
 const game = require("../../main/resources/static/js/fraction-river.js");
@@ -20,6 +22,9 @@ const {
 } = questions;
 
 const {
+    GUIDED_INITIAL_SCENE_PAUSE_MS,
+    GUIDED_CORRECTION_SCENE_PAUSE_MS,
+    GUIDED_FINALE_SCENE_PAUSE_MS,
     createTraversalState,
     evaluateChoice,
     evaluateSelection,
@@ -27,6 +32,26 @@ const {
     createBridgeState,
     evaluateBridgeAssociation
 } = game;
+
+// --- Rythme guidé universel : scène, animation, puis question suivante -------
+{
+    assert.equal(GUIDED_INITIAL_SCENE_PAUSE_MS, 1500);
+    assert.equal(GUIDED_CORRECTION_SCENE_PAUSE_MS, 3000);
+    assert.equal(GUIDED_FINALE_SCENE_PAUSE_MS, 4200);
+    assert.ok(GUIDED_CORRECTION_SCENE_PAUSE_MS >= 2000);
+    assert.ok(GUIDED_FINALE_SCENE_PAUSE_MS >= 3600);
+}
+
+// --- Le héros illustré est livré avec le jeu ---------------------------------
+{
+    const explorerAsset = path.join(
+        __dirname,
+        "../../main/resources/static/images/games/fraction-river/explorer-boy.png"
+    );
+    const png = fs.readFileSync(explorerAsset);
+    assert.equal(png.subarray(1, 4).toString("ascii"), "PNG");
+    assert.ok(png.length > 100_000);
+}
 
 const {createEventBus, EVENTS} = require("../../main/resources/static/js/fraction-river-events.js");
 
@@ -243,7 +268,8 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
 
     // Les événements émis par le jeu sont bien ceux annoncés par le module.
     ["journey:started", "answer:correct", "answer:incorrect", "step:completed",
-        "bridge:started", "bridge:slab", "journey:completed", "step:rendered"]
+        "bridge:started", "bridge:slab", "journey:finale-started",
+        "journey:completed", "step:rendered"]
         .forEach((name) => assert.equal(EVENTS.includes(name), true));
 }
 
