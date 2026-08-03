@@ -1,11 +1,13 @@
 (function initializeRiverScene(root) {
     "use strict";
 
-    const WORLD_WIDTH = 1680;
     const VIEW_WIDTH = 840;
     const VIEW_HEIGHT = 320;
+    // Le monde tient tout entier dans la vue : l'enfant voit la rivière
+    // complète, les cinq pierres et le pont, sans caméra qui se déplace.
+    const WORLD_WIDTH = VIEW_WIDTH;
     const WATERLINE = 176;
-    const BANK_WIDTH = 150;
+    const BANK_WIDTH = 78;
     const STEP_COUNT = 5;
     // Hauteur à laquelle le héros se tient debout sur une pierre.
     const STAND_Y = WATERLINE - 12;
@@ -40,7 +42,7 @@
                 this.buildStones();
                 this.buildBridgeAndChest();
 
-                this.explorerHome = {x: 96, y: WATERLINE - 12};
+                this.explorerHome = {x: 40, y: WATERLINE - 12};
                 this.explorer = root.createExplorer(
                     this,
                     this.explorerHome.x,
@@ -49,12 +51,11 @@
                 );
                 this.explorer.container.setDepth(40);
 
-                this.frog = root.createFrog(this, 250, WATERLINE - 26, {
+                this.frog = root.createFrog(this, 196, WATERLINE - 26, {
                     reducedMotion: this.reducedMotion
                 });
 
-                this.cameras.main.startFollow(this.explorer.container, true, 0.04, 0.04);
-                this.cameras.main.setFollowOffset(-120, 0);
+                // Caméra fixe : toute la traversée reste à l'écran de bout en bout.
 
                 this.sparks = this.add.particles(0, 0, "fr-spark", {
                     speed: {min: 40, max: 130},
@@ -85,11 +86,11 @@
                 const halo = this.add.circle(120, 46, 38, 0xffc93c, 0.25);
                 halo.setScrollFactor(0.2);
 
-                for (let index = 0; index < 6; index += 1) {
+                for (let index = 0; index < 4; index += 1) {
                     const hill = this.add.ellipse(
-                        180 + index * 300,
+                        90 + index * 230,
                         WATERLINE,
-                        260 + (index % 3) * 70,
+                        200 + (index % 3) * 60,
                         90,
                         index % 2 ? 0x2f8a5c : 0x25764c,
                         0.85
@@ -114,7 +115,7 @@
                     sand.setDepth(BANK_DEPTH);
                 });
 
-                const village = this.add.container(WORLD_WIDTH - 96, WATERLINE - 46);
+                const village = this.add.container(WORLD_WIDTH - 30, WATERLINE - 46);
                 village.setDepth(BANK_DEPTH + 1);
                 const wall = this.add.rectangle(0, 12, 62, 46, 0xe8dcc0);
                 const roof = this.add.triangle(0, -18, -40, 18, 40, 18, 0, -18, 0x9c4722);
@@ -144,10 +145,10 @@
                     return tree;
                 };
 
-                plantTree(58, 1);
-                plantTree(WORLD_WIDTH - 58, 0.95);
+                plantTree(38, 0.8);
+                plantTree(WORLD_WIDTH - 34, 0.75);
 
-                [420, 900, 1320].forEach((x, index) => {
+                [300, 640].forEach((x, index) => {
                     const palm = this.add.container(x, WATERLINE - 2);
                     const trunk = this.add.rectangle(0, 0, 9, 54, 0x8a5f2c);
                     trunk.setOrigin(0.5, 1);
@@ -188,10 +189,10 @@
             buildFish() {
                 this.fish = [];
                 const positions = [
-                    {x: 320, y: WATERLINE + 46},
-                    {x: 760, y: WATERLINE + 88},
-                    {x: 1180, y: WATERLINE + 58},
-                    {x: 1460, y: WATERLINE + 96}
+                    {x: 190, y: WATERLINE + 46},
+                    {x: 400, y: WATERLINE + 92},
+                    {x: 610, y: WATERLINE + 60},
+                    {x: 300, y: WATERLINE + 118}
                 ];
                 positions.forEach((position, index) => {
                     const fish = this.add.container(position.x, position.y);
@@ -208,7 +209,7 @@
                     }
                     this.tweens.add({
                         targets: fish,
-                        x: position.x + 150,
+                        x: position.x + 90,
                         duration: 6000 + index * 900,
                         yoyo: true,
                         repeat: -1,
@@ -220,8 +221,8 @@
             }
 
             buildStones() {
-                const first = BANK_WIDTH + 90;
-                const last = WORLD_WIDTH - BANK_WIDTH - 120;
+                const first = BANK_WIDTH + 46;
+                const last = WORLD_WIDTH - BANK_WIDTH - 200;
                 const gap = (last - first) / (STEP_COUNT - 1);
                 for (let index = 0; index < STEP_COUNT; index += 1) {
                     const x = Math.round(first + gap * index);
@@ -238,14 +239,14 @@
             // sur les pierres : la marche finale est plate et continue, et les
             // pieds portent sur le tablier au lieu de flotter au-dessus.
             buildBridgeAndChest() {
-                const chestX = WORLD_WIDTH - 78;
+                const chestX = WORLD_WIDTH - 58;
                 const lastStone = this.stones.length
                     ? this.stones[this.stones.length - 1]
                     : {x: WORLD_WIDTH / 2, y: WATERLINE + 10};
 
                 this.deckSurfaceY = DECK_SURFACE_Y;
                 const deckStart = lastStone.x - 6;
-                const deckEnd = WORLD_WIDTH - BANK_WIDTH + 40;
+                const deckEnd = WORLD_WIDTH - BANK_WIDTH + 28;
                 const deckWidth = deckEnd - deckStart;
                 const deckCentre = deckStart + deckWidth / 2;
 
@@ -344,7 +345,7 @@
 
             // Marche plate sur le tablier, du dernier appui jusqu'au coffre.
             walkToVillage() {
-                const finalX = this.chest.x - 56;
+                const finalX = this.chest.x - 48;
                 this.explorer.walkTo(finalX, this.deckSurfaceY).then(() => {
                     if (this.reducedMotion) {
                         this.chestLid.setAngle(-24);

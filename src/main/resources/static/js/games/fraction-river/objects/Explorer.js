@@ -167,6 +167,12 @@
 
             const offset = feetOffset();
             const baseY = groundY !== undefined ? groundY - offset : startY;
+            const groundLine = baseY + offset;
+
+            // Il descend d'abord sur le plancher, puis marche. Interpoler la
+            // hauteur pendant le trajet le faisait flotter tout du long et ne
+            // toucher le bois qu'au dernier instant.
+            container.setY(baseY);
 
             if (reducedMotion) {
                 container.setPosition(targetX, baseY);
@@ -194,22 +200,21 @@
                     onUpdate: () => {
                         const t = progress.t;
                         const phase = t * Math.PI * steps;
-                        const lift = Math.abs(Math.sin(phase));
-                        const surfaceY = startY + (baseY - startY) * t;
 
+                        // Ligne droite : la hauteur ne bouge plus d'un pixel,
+                        // les semelles restent sur le plancher tout du long.
                         container.x = startX + (targetX - startX) * t;
-                        container.y = surfaceY - lift * 2.2;
-                        // Léger déhanchement, et non un balancement de pendule.
-                        hero.setAngle(Math.sin(phase * 0.5) * 1.2);
+                        container.y = baseY;
+                        // Le pas se lit au léger déhanchement et à la poussière,
+                        // plus à un rebond vertical qui décollerait les pieds.
+                        hero.setAngle(Math.sin(phase * 0.5) * 1.4);
 
-                        shadow.setPosition(container.x, surfaceY + offset);
-                        shadow.setScale(1 - lift * 0.16, 1);
-                        shadow.setAlpha(0.3 - lift * 0.1);
+                        shadow.setPosition(container.x, groundLine);
 
                         const foot = Math.floor(phase / Math.PI);
                         if (foot !== lastFoot) {
                             lastFoot = foot;
-                            raiseDust(container.x, surfaceY + offset);
+                            raiseDust(container.x, groundLine);
                         }
                     },
                     onComplete: () => {
