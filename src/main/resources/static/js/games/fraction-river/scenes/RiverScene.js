@@ -8,8 +8,10 @@
     const BANK_WIDTH = 150;
     const STEP_COUNT = 5;
     // Distance entre l'ancre du conteneur du héros et la plante de ses pieds.
-    // C'est elle qui décide si le personnage marche sur le pont ou au-dessus.
-    const FOOT_OFFSET = 14;
+    // Mesurée sur le PNG : le contenu s'arrête au ratio 0,919 et l'origine du
+    // sprite vaut 0,92, donc l'ancre tombe déjà sur les semelles. Il ne reste
+    // que le décalage du sprite dans son conteneur.
+    const FOOT_OFFSET = 8;
     // Hauteur à laquelle le héros se tient debout sur une pierre. Le tablier du
     // pont s'aligne dessus pour que la marche finale soit parfaitement plate.
     const STAND_Y = WATERLINE - 12;
@@ -99,18 +101,23 @@
             }
 
             buildBanks() {
-                this.add.rectangle(BANK_WIDTH / 2, WATERLINE + 72, BANK_WIDTH, 150, 0xc9a227);
-                this.add.rectangle(
-                    WORLD_WIDTH - BANK_WIDTH / 2,
-                    WATERLINE + 72,
-                    BANK_WIDTH,
-                    150,
-                    0xc9a227
-                );
-                this.add.ellipse(BANK_WIDTH, WATERLINE + 6, 120, 26, 0xd8b23a);
-                this.add.ellipse(WORLD_WIDTH - BANK_WIDTH, WATERLINE + 6, 120, 26, 0xd8b23a);
+                // Les berges passent DEVANT l'eau : sans profondeur explicite,
+                // le tableau d'eau les recouvrait et le pont semblait déboucher
+                // dans la rivière.
+                const BANK_DEPTH = 15;
+
+                [BANK_WIDTH / 2, WORLD_WIDTH - BANK_WIDTH / 2].forEach((x) => {
+                    const bank = this.add.rectangle(x, WATERLINE + 72, BANK_WIDTH, 150, 0xc9a227);
+                    bank.setDepth(BANK_DEPTH);
+                });
+
+                [BANK_WIDTH, WORLD_WIDTH - BANK_WIDTH].forEach((x) => {
+                    const sand = this.add.ellipse(x, WATERLINE + 6, 120, 26, 0xd8b23a);
+                    sand.setDepth(BANK_DEPTH);
+                });
 
                 const village = this.add.container(WORLD_WIDTH - 96, WATERLINE - 46);
+                village.setDepth(BANK_DEPTH + 1);
                 const wall = this.add.rectangle(0, 12, 62, 46, 0xe8dcc0);
                 const roof = this.add.triangle(0, -18, -40, 18, 40, 18, 0, -18, 0x9c4722);
                 const door = this.add.rectangle(0, 22, 16, 24, 0x6b4423);

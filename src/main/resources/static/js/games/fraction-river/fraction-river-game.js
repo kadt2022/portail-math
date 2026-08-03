@@ -57,6 +57,9 @@
         });
 
         parent.setAttribute("aria-hidden", "true");
+        // Exposée pour permettre d'inspecter ou de piloter la scène depuis
+        // l'extérieur (réglages, vérifications de position).
+        root.fractionRiverGame = game;
         return game;
     }
 

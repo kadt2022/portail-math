@@ -4,7 +4,9 @@
     const WALK_DURATION_MS = 2600;
     // Distance entre l'ancre du conteneur et la plante des pieds : l'ombre et
     // la poussière doivent se poser là, pas sous le nombril du personnage.
-    const FOOT_OFFSET = 14;
+    // L'origine du sprite (0,92) coïncide avec le bas du dessin (0,919) ;
+    // il ne reste donc que la position du sprite dans le conteneur.
+    const FOOT_OFFSET = 8;
 
     // Le héros illustré reste dans la pirogue pendant la traversée, puis en
     // descend pour marcher vers le village lors de la scène finale.
