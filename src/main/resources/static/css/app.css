@@ -22,6 +22,9 @@
     --radius-sm: 14px;
     --radius-md: 20px;
     --radius-lg: 28px;
+    /* Hauteur de la barre supérieure. Les pages qui doivent dégager de la
+       place sous elle s'y réfèrent, pour qu'aucune valeur ne dérive. */
+    --topbar-height: 66px;
 }
 
 * {
@@ -311,9 +314,9 @@ a {
     z-index: 30;
     top: 0;
     display: flex;
-    height: 76px;
+    height: var(--topbar-height);
     margin: 0 0 14px;
-    padding: 10px clamp(22px, 3.3vw, 50px);
+    padding: 8px clamp(22px, 3.3vw, 50px);
     align-items: center;
     justify-content: flex-end;
     border: 0;
@@ -332,7 +335,7 @@ a {
 .guest-card {
     display: flex;
     min-width: 158px;
-    padding: 9px 13px;
+    padding: 7px 12px;
     align-items: center;
     gap: 10px;
     border: 1px solid var(--line);
@@ -343,13 +346,13 @@ a {
 
 .guest-avatar {
     display: grid;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     flex: 0 0 auto;
     place-items: center;
     border-radius: 12px;
     background: var(--yellow-soft);
-    font-size: 24px;
+    font-size: 21px;
 }
 
 .guest-card strong,
@@ -1404,9 +1407,10 @@ a {
     }
 
     .topbar {
-        height: 70px;
+        /* Même hauteur qu'en grand écran : une seule valeur pour la barre. */
+        height: var(--topbar-height);
         margin: 0 0 8px;
-        padding: 10px 20px;
+        padding: 8px 20px;
         justify-content: space-between;
         border-radius: 0;
         box-shadow: 0 8px 22px rgba(28, 32, 68, 0.06);
