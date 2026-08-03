@@ -318,7 +318,9 @@
         function createOptionButton(step, option) {
             const button = document.createElement("button");
             button.type = "button";
-            button.className = option.visual ? "fr-option fr-option--visual" : "fr-option";
+            button.className = option.visual
+                ? "answer-option answer-option--visual"
+                : "answer-option";
             if (option.visual) {
                 button.innerHTML = visuals.renderStaticVisual({...option.visual, id: `opt-${option.key}`});
             } else {
@@ -392,12 +394,15 @@
 
         function renderStep({focus = true} = {}) {
             const step = steps[state.stepIndex];
-            stepTitle.textContent = `Étape ${state.stepIndex + 1} — ${step.prompt}`;
+            // Même découpage que le Train : un intitulé court en capitales,
+            // puis la question seule dans le titre.
+            query("[data-step-kicker]").textContent = `Étape ${state.stepIndex + 1} sur ${STEP_COUNT}`;
+            stepTitle.textContent = step.prompt;
             renderVisualInto(query("[data-step-visual]"), step.visual, `step-${state.stepIndex}`);
             optionsContainer.textContent = "";
             optionsContainer.className = step.type === "MATCH_VISUAL"
-                ? "fr-options fr-options--visual"
-                : "fr-options";
+                ? "answer-options answer-options--visual"
+                : "answer-options";
 
             if (step.type === "SELECT_PARTS") {
                 renderSelectionStep(step);

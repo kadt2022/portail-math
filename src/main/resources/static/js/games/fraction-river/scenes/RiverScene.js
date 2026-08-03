@@ -7,6 +7,12 @@
     const WATERLINE = 176;
     const BANK_WIDTH = 150;
     const STEP_COUNT = 5;
+    // Distance entre l'ancre du conteneur du héros et la plante de ses pieds.
+    // C'est elle qui décide si le personnage marche sur le pont ou au-dessus.
+    const FOOT_OFFSET = 14;
+    // Hauteur à laquelle le héros se tient debout sur une pierre. Le tablier du
+    // pont s'aligne dessus pour que la marche finale soit parfaitement plate.
+    const STAND_Y = WATERLINE - 12;
 
     function createRiverScene(Phaser) {
         return class RiverScene extends Phaser.Scene {
@@ -222,44 +228,57 @@
                 }
             }
 
-            // Un escalier de sortie en bois, posé là depuis le début : l'enfant
-            // voit d'emblée par où il quittera la rivière.
+            // Un petit pont de bois d'un seul tenant, posé là depuis le début.
+            // Sa surface est alignée sur la hauteur où le héros se tient déjà
+            // sur les pierres : la marche finale est plate et continue, et les
+            // pieds portent sur le tablier au lieu de flotter au-dessus.
             buildBridgeAndChest() {
                 const chestX = WORLD_WIDTH - 78;
                 const lastStone = this.stones.length
                     ? this.stones[this.stones.length - 1]
                     : {x: WORLD_WIDTH / 2, y: WATERLINE + 10};
 
-                const stepCount = 4;
-                const stepWidth = 30;
-                const stepGap = 4;
-                const rise = 7;
-                const firstX = lastStone.x + 46;
+                this.deckSurfaceY = STAND_Y + FOOT_OFFSET;
+                const deckStart = lastStone.x - 6;
+                const deckEnd = WORLD_WIDTH - BANK_WIDTH + 40;
+                const deckWidth = deckEnd - deckStart;
+                const deckCentre = deckStart + deckWidth / 2;
 
-                this.stairTop = WATERLINE + 8;
-                for (let index = 0; index < stepCount; index += 1) {
-                    const x = firstX + index * (stepWidth + stepGap);
-                    const top = WATERLINE + 8 - index * rise;
-
-                    // Deux pilotis plantés dans l'eau sous chaque marche.
-                    [-9, 9].forEach((offset) => {
-                        const post = this.add.rectangle(x + offset, top + 22, 5, 40, 0x6b4423);
-                        post.setDepth(21);
-                    });
-
-                    const tread = this.add.rectangle(x, top, stepWidth, 9, 0xc98a4b);
-                    tread.setStrokeStyle(2, 0x6b4423);
-                    tread.setDepth(23);
-
-                    const edge = this.add.rectangle(x, top + 5, stepWidth, 3, 0x8a5a2b);
-                    edge.setDepth(23);
-
-                    this.planks.push(tread);
-                    this.stairTop = top;
+                // Pilotis régulièrement espacés, plantés sous le tablier.
+                for (let x = deckStart + 16; x < deckEnd; x += 34) {
+                    const post = this.add.rectangle(x, this.deckSurfaceY + 30, 6, 52, 0x6b4423);
+                    post.setDepth(21);
                 }
-                this.stairExitX = firstX + (stepCount - 1) * (stepWidth + stepGap);
 
-                this.chest = this.add.container(chestX, WATERLINE - 26);
+                const deck = this.add.rectangle(
+                    deckCentre,
+                    this.deckSurfaceY + 5,
+                    deckWidth,
+                    10,
+                    0xc98a4b
+                );
+                deck.setStrokeStyle(2, 0x6b4423);
+                deck.setDepth(23);
+                this.planks.push(deck);
+
+                // Les joints entre planches, dessinés sur un tablier continu :
+                // l'aspect des lattes sans les trous où l'on trébucherait.
+                for (let x = deckStart + 22; x < deckEnd - 6; x += 22) {
+                    const seam = this.add.rectangle(x, this.deckSurfaceY + 5, 2, 10, 0x8a5a2b);
+                    seam.setDepth(24);
+                }
+
+                // Garde-corps côté amont, pour que ça se lise comme un pont.
+                const rail = this.add.rectangle(deckCentre, this.deckSurfaceY - 20, deckWidth, 4, 0x8a5a2b);
+                rail.setDepth(19);
+                for (let x = deckStart + 10; x <= deckEnd - 10; x += 46) {
+                    const baluster = this.add.rectangle(x, this.deckSurfaceY - 10, 4, 22, 0x8a5a2b);
+                    baluster.setDepth(19);
+                }
+
+                this.bridgeEntryX = deckStart + 24;
+
+                this.chest = this.add.container(chestX, this.deckSurfaceY - 25);
                 const base = this.add.rectangle(0, 8, 46, 30, 0x8a5a2b);
                 base.setStrokeStyle(2, 0x5d3d1c);
                 this.chestLid = this.add.rectangle(0, -12, 50, 18, 0xa9702f);
@@ -312,16 +331,16 @@
                     return;
                 }
                 stone.reveal().then(() => {
-                    this.explorer.jumpTo(stone.x, stone.y - 22).then(() => {
+                    this.explorer.jumpTo(stone.x, STAND_Y).then(() => {
                         this.burst(stone.x, stone.y - 30, 12);
                     });
                 });
             }
 
-            // Montée de l'escalier puis marche jusqu'au coffre, d'un seul trait.
+            // Marche plate sur le tablier, du dernier appui jusqu'au coffre.
             walkToVillage() {
                 const finalX = this.chest.x - 56;
-                this.explorer.walkTo(finalX, this.stairTop - 20).then(() => {
+                this.explorer.walkTo(finalX, this.deckSurfaceY - FOOT_OFFSET).then(() => {
                     if (this.reducedMotion) {
                         this.chestLid.setAngle(-24);
                         return;

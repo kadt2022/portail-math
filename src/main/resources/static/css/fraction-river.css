@@ -193,54 +193,27 @@
 
 /* ---------- Options de réponse ---------- */
 
-.fr-options {
+/* Le format des réponses est celui du Train : la Rivière réutilise
+   .answer-options et .answer-option, donc grille, taille, bordures, états
+   correct/incorrect et point de rupture mobile sont rigoureusement les mêmes.
+   Seul écart assumé : le titre. Celui du Train affiche « 2 × 5 = ? » et monte
+   jusqu'à 68 px ; ici il porte une phrase, qui à cette taille déborderait. */
+.river-page-content .game-question h2 {
+    font-size: clamp(22px, 3.2vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+/* Les réponses illustrées gardent la même case, avec le visuel centré. */
+.answer-option--visual {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 14px;
-}
-
-.fr-option {
-    min-width: 84px;
-    min-height: 56px;
-    padding: 12px 18px;
-    border-radius: var(--radius-sm);
-    border: 2px solid var(--line);
-    background: var(--surface);
-    color: var(--ink);
-    font-size: 1.35rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: border-color 160ms ease, transform 160ms ease;
-}
-
-.fr-option:hover:not(:disabled) {
-    border-color: var(--purple);
-    transform: translateY(-2px);
-}
-
-.fr-option.is-correct {
-    border-color: var(--green);
-    background: var(--green-soft);
-}
-
-.fr-option.is-wrong {
-    border-color: #d8536a;
-    background: #fdecef;
-}
-
-.fr-option:disabled {
-    cursor: default;
-}
-
-.fr-options--visual .fr-option--visual {
-    min-width: 132px;
     padding: 10px;
 }
 
-.fr-option--visual .fr-visual {
-    max-width: 120px;
+.answer-option--visual .fr-visual {
+    max-width: 100%;
 }
 
 /* ---------- Sélection de parts ---------- */
@@ -253,13 +226,15 @@
     width: 100%;
 }
 
+/* Mêmes bordures, mêmes rayons et même hauteur que les boutons de réponse. */
 .fr-selectable-part {
-    min-width: 56px;
-    min-height: 56px;
-    border-radius: var(--radius-sm);
-    border: 3px solid var(--navy-800);
-    background: var(--fraction-empty);
+    min-width: 70px;
+    min-height: 70px;
+    border-radius: 15px;
+    border: 2px solid #dedcf4;
+    background: #f8f7ff;
     cursor: pointer;
+    transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }
 
 .fr-selectable--basket .fr-selectable-part {
@@ -340,16 +315,16 @@
 }
 
 @media (max-width: 420px) {
-    .fr-option {
-        min-width: 72px;
-        font-size: 1.2rem;
+    .fr-selectable-part {
+        min-width: 58px;
+        min-height: 58px;
     }
 }
 
 /* Mouvement réduit : la page s'apaise. Phaser reçoit la même préférence et
    coupe ses propres tweens et particules. */
 @media (prefers-reduced-motion: reduce) {
-    .fr-option {
+    .fr-selectable-part {
         transition: none;
     }
 

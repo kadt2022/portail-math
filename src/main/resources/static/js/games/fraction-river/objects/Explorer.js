@@ -2,6 +2,9 @@
     "use strict";
 
     const WALK_DURATION_MS = 2600;
+    // Distance entre l'ancre du conteneur et la plante des pieds : l'ombre et
+    // la poussière doivent se poser là, pas sous le nombril du personnage.
+    const FOOT_OFFSET = 14;
 
     // Le héros illustré reste dans la pirogue pendant la traversée, puis en
     // descend pour marcher vers le village lors de la scène finale.
@@ -32,7 +35,7 @@
 
         // L'ombre reste collée au sol pendant que le héros monte et descend :
         // c'est elle qui dit à l'œil qu'il marche au lieu de flotter.
-        const shadow = scene.add.ellipse(x, y + 10, 44, 10, 0x14301f, 0.3);
+        const shadow = scene.add.ellipse(x, y + FOOT_OFFSET, 44, 10, 0x14301f, 0.3);
         shadow.setDepth(30);
         shadow.setVisible(false);
 
@@ -157,7 +160,7 @@
 
             if (reducedMotion) {
                 container.setPosition(targetX, baseY);
-                shadow.setPosition(targetX, baseY + 10);
+                shadow.setPosition(targetX, baseY + FOOT_OFFSET);
                 shadow.setVisible(true);
                 return Promise.resolve();
             }
@@ -189,21 +192,21 @@
                         // Léger déhanchement, et non un balancement de pendule.
                         hero.setAngle(Math.sin(phase * 0.5) * 1.2);
 
-                        shadow.setPosition(container.x, groundY + 10);
+                        shadow.setPosition(container.x, groundY + FOOT_OFFSET);
                         shadow.setScale(1 - lift * 0.16, 1);
                         shadow.setAlpha(0.3 - lift * 0.1);
 
                         const foot = Math.floor(phase / Math.PI);
                         if (foot !== lastFoot) {
                             lastFoot = foot;
-                            raiseDust(container.x, groundY + 8);
+                            raiseDust(container.x, groundY + FOOT_OFFSET);
                         }
                     },
                     onComplete: () => {
                         walkTween = null;
                         container.setPosition(targetX, baseY);
                         hero.setAngle(0);
-                        shadow.setPosition(targetX, baseY + 10);
+                        shadow.setPosition(targetX, baseY + FOOT_OFFSET);
                         shadow.setScale(1, 1);
                         shadow.setAlpha(0.3);
                         resolve();
