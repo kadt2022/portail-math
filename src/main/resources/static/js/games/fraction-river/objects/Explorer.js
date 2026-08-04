@@ -14,27 +14,27 @@
         const container = scene.add.container(x, y);
 
         const paddlingHero = scene.add.image(0, 8, "fr-explorer-boy-paddling");
-        paddlingHero.setDisplaySize(54, 81);
+        paddlingHero.setDisplaySize(40, 60);
         paddlingHero.setOrigin(0.5, 0.92);
 
         const hero = scene.add.image(0, 8, "fr-explorer-boy");
-        hero.setDisplaySize(52, 78);
+        hero.setDisplaySize(38, 57);
         hero.setOrigin(0.5, 0.92);
         hero.setVisible(false);
         // Échelle de repos, pour pouvoir écraser puis restituer le personnage
         // sans perdre la taille fixée par setDisplaySize.
         const heroScale = {x: hero.scaleX, y: hero.scaleY};
 
-        const hull = scene.add.ellipse(0, 16, 62, 18, 0x8a5a2b);
-        const gunwale = scene.add.rectangle(0, 8, 64, 6, 0x6b4423);
+        const hull = scene.add.ellipse(0, 12, 46, 14, 0x8a5a2b);
+        const gunwale = scene.add.rectangle(0, 6, 48, 5, 0x6b4423);
         gunwale.setOrigin(0.5);
 
-        const paddle = scene.add.rectangle(12, -31, 42, 4, 0x6b4423);
+        const paddle = scene.add.rectangle(9, -23, 32, 3, 0x6b4423);
         paddle.setOrigin(0, 0.5);
         paddle.setAngle(24);
 
         container.add([paddlingHero, hero, hull, gunwale, paddle]);
-        container.setSize(68, 82);
+        container.setSize(50, 62);
 
         // Écart entre l'ancre du conteneur et les semelles dessinées, déduit du
         // sprite au lieu d'être supposé : sa position dans le conteneur, plus
@@ -45,7 +45,7 @@
 
         // L'ombre reste collée au sol pendant que le héros monte et descend :
         // c'est elle qui dit à l'œil qu'il marche au lieu de flotter.
-        const shadow = scene.add.ellipse(x, y + feetOffset(), 44, 10, 0x14301f, 0.3);
+        const shadow = scene.add.ellipse(x, y + feetOffset(), 32, 8, 0x14301f, 0.3);
         shadow.setDepth(30);
         shadow.setVisible(false);
 
@@ -98,8 +98,8 @@
             }
 
             const distance = Math.abs(targetX - startX);
-            const duration = Math.max(700, Math.min(1500, distance * 4));
-            const arcHeight = Math.min(60, 24 + distance * 0.18);
+            const duration = Math.max(950, Math.min(1900, distance * 9));
+            const arcHeight = Math.min(78, 30 + distance * 0.34);
             const progress = {t: 0};
 
             paddleFaster(true);

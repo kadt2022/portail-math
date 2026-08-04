@@ -48,7 +48,7 @@
                 this.buildStones();
                 this.buildBridgeAndChest();
 
-                this.explorerHome = {x: 40, y: WATERLINE - 12};
+                this.explorerHome = {x: 34, y: WATERLINE - 12};
                 this.explorer = root.createExplorer(
                     this,
                     this.explorerHome.x,
@@ -227,8 +227,8 @@
             }
 
             buildStones() {
-                const first = BANK_WIDTH + 46;
-                const last = WORLD_WIDTH - BANK_WIDTH - 200;
+                const first = BANK_WIDTH + 28;
+                const last = WORLD_WIDTH - BANK_WIDTH - 168;
                 const gap = (last - first) / (STEP_COUNT - 1);
                 for (let index = 0; index < STEP_COUNT; index += 1) {
                     const x = Math.round(first + gap * index);
@@ -331,7 +331,11 @@
                 this.chestLid.setY(-12);
                 this.explorer.resetTo(this.explorerHome.x, this.explorerHome.y);
                 this.frog.hide();
-                this.cameras.main.scrollX = 0;
+                // Recentrer, surtout pas scrollX = 0 : avec le zoom, le défilement
+                // se compte depuis le milieu de la caméra, et remettre zéro
+                // envoyait la vue sur la moitié droite du monde — le héros
+                // sautait alors hors champ.
+                this.cameras.main.centerOn(WORLD_WIDTH / 2, VIEW_HEIGHT / 2);
             }
 
             advanceTo(payload) {
