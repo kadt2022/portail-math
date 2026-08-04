@@ -26,6 +26,60 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
 
+// ---------------------------------------------------------------------------
+// Portail React (frontend/). Il est construit par le même build Gradle et
+// empaqueté dans le même JAR : un seul artefact, un seul déploiement OpenShift.
+// ---------------------------------------------------------------------------
+
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def npmExecutable = isWindows ? 'npm.cmd' : 'npm'
+def frontendDir = file('frontend')
+
+tasks.register('frontendInstall', Exec) {
+    description = 'Installe les dépendances du portail React à partir du verrou.'
+    workingDir frontendDir
+    // npm ci et non npm install : l'installation doit être reproductible et
+    // refuser toute dérive par rapport à package-lock.json.
+    commandLine npmExecutable, 'ci'
+    inputs.file(new File(frontendDir, 'package.json'))
+    inputs.file(new File(frontendDir, 'package-lock.json'))
+    outputs.dir(new File(frontendDir, 'node_modules'))
+}
+
+tasks.register('frontendLint', Exec) {
+    description = 'Analyse statique du portail React.'
+    dependsOn 'frontendInstall'
+    workingDir frontendDir
+    commandLine npmExecutable, 'run', 'lint'
+}
+
+tasks.register('frontendTest', Exec) {
+    description = 'Tests du portail React.'
+    dependsOn 'frontendInstall'
+    workingDir frontendDir
+    commandLine npmExecutable, 'run', 'test'
+}
+
+tasks.register('frontendBuild', Exec) {
+    description = 'Construit le portail React vers frontend/dist.'
+    dependsOn 'frontendInstall'
+    workingDir frontendDir
+    commandLine npmExecutable, 'run', 'build'
+    inputs.dir(new File(frontendDir, 'src'))
+    inputs.file(new File(frontendDir, 'index.html'))
+    inputs.file(new File(frontendDir, 'vite.config.ts'))
+    inputs.file(new File(frontendDir, 'tsconfig.json'))
+    outputs.dir(new File(frontendDir, 'dist'))
+}
+
+tasks.named('processResources') {
+    dependsOn 'frontendBuild'
+    // Les fichiers produits par Vite deviennent des ressources statiques du JAR.
+    from(new File(frontendDir, 'dist')) {
+        into 'static/app'
+    }
+}
+
 tasks.register('testProgressStore', Exec) {
     commandLine 'node', 'src/test/js/progress-store.test.js'
 }
@@ -43,4 +97,6 @@ tasks.named('test') {
     dependsOn tasks.named('testProgressStore')
     dependsOn tasks.named('testMultiplicationTrain')
     dependsOn tasks.named('testFractionRiver')
+    dependsOn tasks.named('frontendLint')
+    dependsOn tasks.named('frontendTest')
 }

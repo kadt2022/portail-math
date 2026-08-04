@@ -91,15 +91,29 @@ Règle de partage des responsabilités :
 
 ```text
 Framework graphique autorisé : Phaser
-React et Vue restent interdits
+Framework d’interface autorisé : React
+Vue et Angular restent interdits
 Phaser ne gère que la scène interactive du jeu
-Thymeleaf reste responsable de la page
+React ne remplace pas Phaser dans les scènes de jeu
+Thymeleaf reste responsable des pages non encore migrées
 ```
+
+> **Amendement du 3 août 2026 — MIG-REACT-00.** React était interdit dans la
+> version 2.1 de ce document. Le portail migre désormais vers React selon une
+> stratégie progressive dite de l’étrangleur : React prend en charge le portail
+> et les interfaces, Phaser demeure le moteur graphique des jeux, et Thymeleaf
+> reste en service tant que toutes les pages n’ont pas leur équivalent React.
+>
+> Les magasins de progression (`fraction-river-store.js`,
+> `multiplication-train-store.js`, `progress-store.js`) ne seront jamais
+> réécrits. Leur portage vers des modules ES sera mécanique et conservera
+> exactement les mêmes clés de stockage local, sous peine d’effacer la
+> progression déjà enregistrée sur l’appareil de chaque élève. Un test
+> verrouille ces trois clés.
 
 Sont hors périmètre :
 
 ```text
-React
 Vue
 Angular
 Unity
