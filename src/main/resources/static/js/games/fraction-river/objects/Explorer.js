@@ -14,24 +14,41 @@
         const container = scene.add.container(x, y);
 
         const paddlingHero = scene.add.image(0, 8, "fr-explorer-boy-paddling");
-        paddlingHero.setDisplaySize(54, 81);
+        paddlingHero.setDisplaySize(40, 60);
         paddlingHero.setOrigin(0.5, 0.92);
 
         const hero = scene.add.image(0, 8, "fr-explorer-boy");
-        hero.setDisplaySize(52, 78);
+        hero.setDisplaySize(38, 57);
         hero.setOrigin(0.5, 0.92);
         hero.setVisible(false);
+        // Échelle de repos, pour pouvoir écraser puis restituer le personnage
+        // sans perdre la taille fixée par setDisplaySize.
+        const heroScale = {x: hero.scaleX, y: hero.scaleY};
 
-        const hull = scene.add.ellipse(0, 16, 62, 18, 0x8a5a2b);
-        const gunwale = scene.add.rectangle(0, 8, 64, 6, 0x6b4423);
+        // Seconde image du cycle : même dessin, foulée inversée. C'est elle qui
+        // permet aux jambes d'alterner au lieu de bouger ensemble.
+        const heroStep = scene.add.image(0, 8, "fr-explorer-boy-step");
+        heroStep.setDisplaySize(38, 57);
+        heroStep.setOrigin(0.5, 0.92);
+        heroStep.setVisible(false);
+
+        const marcheurs = [hero, heroStep];
+
+        function poserFoulee(index) {
+            hero.setVisible(index % 2 === 0);
+            heroStep.setVisible(index % 2 === 1);
+        }
+
+        const hull = scene.add.ellipse(0, 12, 46, 14, 0x8a5a2b);
+        const gunwale = scene.add.rectangle(0, 6, 48, 5, 0x6b4423);
         gunwale.setOrigin(0.5);
 
-        const paddle = scene.add.rectangle(12, -31, 42, 4, 0x6b4423);
+        const paddle = scene.add.rectangle(9, -23, 32, 3, 0x6b4423);
         paddle.setOrigin(0, 0.5);
         paddle.setAngle(24);
 
-        container.add([paddlingHero, hero, hull, gunwale, paddle]);
-        container.setSize(68, 82);
+        container.add([paddlingHero, hero, heroStep, hull, gunwale, paddle]);
+        container.setSize(50, 62);
 
         // Écart entre l'ancre du conteneur et les semelles dessinées, déduit du
         // sprite au lieu d'être supposé : sa position dans le conteneur, plus
@@ -42,7 +59,7 @@
 
         // L'ombre reste collée au sol pendant que le héros monte et descend :
         // c'est elle qui dit à l'œil qu'il marche au lieu de flotter.
-        const shadow = scene.add.ellipse(x, y + feetOffset(), 44, 10, 0x14301f, 0.3);
+        const shadow = scene.add.ellipse(x, y + feetOffset(), 32, 8, 0x14301f, 0.3);
         shadow.setDepth(30);
         shadow.setVisible(false);
 
@@ -95,8 +112,8 @@
             }
 
             const distance = Math.abs(targetX - startX);
-            const duration = Math.max(700, Math.min(1500, distance * 4));
-            const arcHeight = Math.min(60, 24 + distance * 0.18);
+            const duration = Math.max(950, Math.min(1900, distance * 9));
+            const arcHeight = Math.min(78, 30 + distance * 0.34);
             const progress = {t: 0};
 
             paddleFaster(true);
@@ -160,13 +177,22 @@
             }
             setBoatVisible(false);
             paddlingHero.setVisible(false);
-            hero.setVisible(true);
             container.setRotation(0);
-            hero.setY(0);
-            hero.setAngle(0);
+            marcheurs.forEach((sprite) => {
+                sprite.setY(0);
+                sprite.setAngle(0);
+                sprite.setScale(heroScale.x, heroScale.y);
+            });
+            poserFoulee(0);
 
             const offset = feetOffset();
             const baseY = groundY !== undefined ? groundY - offset : startY;
+            const groundLine = baseY + offset;
+
+            // Il descend d'abord sur le plancher, puis marche. Interpoler la
+            // hauteur pendant le trajet le faisait flotter tout du long et ne
+            // toucher le bois qu'au dernier instant.
+            container.setY(baseY);
 
             if (reducedMotion) {
                 container.setPosition(targetX, baseY);
@@ -176,9 +202,11 @@
             }
 
             const distance = Math.abs(targetX - startX);
-            // Une foulée tous les ~46 px : la cadence suit la distance réelle,
-            // elle n'est plus un nombre d'oscillations arbitraire.
-            const steps = Math.max(4, Math.round(distance / 46));
+            // Une foulée tous les 38 px, et environ une demi-seconde par pas :
+            // la cadence est celle d'un enfant qui marche, quelle que soit la
+            // distance à parcourir.
+            const steps = Math.max(3, Math.round(distance / 38));
+            const marche = Math.max(duration, steps * 520);
             const progress = {t: 0};
             let lastFoot = -1;
 
@@ -188,34 +216,56 @@
                 walkTween = scene.tweens.add({
                     targets: progress,
                     t: 1,
-                    duration,
-                    // Vitesse constante : un marcheur ne décélère pas comme un planeur.
+                    duration: marche,
                     ease: "Linear",
                     onUpdate: () => {
                         const t = progress.t;
+                        // Une demi-période par pas : la phase vaut 0 à chaque
+                        // pose du pied, π/2 au milieu de l'enjambée.
                         const phase = t * Math.PI * steps;
-                        const lift = Math.abs(Math.sin(phase));
-                        const surfaceY = startY + (baseY - startY) * t;
+                        const leve = Math.abs(Math.sin(phase));
 
-                        container.x = startX + (targetX - startX) * t;
-                        container.y = surfaceY - lift * 2.2;
-                        // Léger déhanchement, et non un balancement de pendule.
-                        hero.setAngle(Math.sin(phase * 0.5) * 1.2);
+                        // Avance par à-coups. Un marcheur est propulsé à chaque
+                        // poussée puis ralentit : c'est cette irrégularité, et
+                        // non la vitesse moyenne, qui se lit comme des pas.
+                        const poussee = Math.sin(2 * phase) / (2 * Math.PI * steps);
+                        const avance = Math.min(1, Math.max(0, t + poussee * 0.6));
+                        container.x = startX + (targetX - startX) * avance;
 
-                        shadow.setPosition(container.x, surfaceY + offset);
-                        shadow.setScale(1 - lift * 0.16, 1);
-                        shadow.setAlpha(0.3 - lift * 0.1);
+                        // Le corps se soulève entre deux appuis et revient
+                        // exactement sur le plancher au moment du contact.
+                        container.y = baseY - leve * 2.6;
+
+                        // Écrasement à la pose, étirement en l'air. L'origine du
+                        // sprite étant aux pieds, la compression part du sol.
+                        marcheurs.forEach((sprite) => {
+                            sprite.setScale(
+                                heroScale.x * (1 + (1 - leve) * 0.02),
+                                heroScale.y * (1 - (1 - leve) * 0.03)
+                            );
+                            sprite.setAngle(Math.sin(phase) * 2.4);
+                        });
+
+                        shadow.setPosition(container.x, groundLine);
+                        shadow.setScale(1 - leve * 0.18, 1);
+                        shadow.setAlpha(0.32 - leve * 0.12);
 
                         const foot = Math.floor(phase / Math.PI);
                         if (foot !== lastFoot) {
                             lastFoot = foot;
-                            raiseDust(container.x, surfaceY + offset);
+                            // Un pied, puis l'autre : c'est ici que la jambe change.
+                            poserFoulee(foot);
+                            raiseDust(container.x, groundLine);
                         }
                     },
                     onComplete: () => {
                         walkTween = null;
                         container.setPosition(targetX, baseY);
-                        hero.setAngle(0);
+                        marcheurs.forEach((sprite) => {
+                            sprite.setAngle(0);
+                            sprite.setScale(heroScale.x, heroScale.y);
+                        });
+                        poserFoulee(0);
                         shadow.setPosition(targetX, baseY + offset);
                         shadow.setScale(1, 1);
                         shadow.setAlpha(0.3);
@@ -255,9 +305,12 @@
             shadow.setVisible(false);
             shadow.setScale(1, 1);
             shadow.setAlpha(0.3);
-            hero.setPosition(0, 8);
-            hero.setAngle(0);
-            hero.setVisible(false);
+            marcheurs.forEach((sprite) => {
+                sprite.setPosition(0, 8);
+                sprite.setAngle(0);
+                sprite.setScale(heroScale.x, heroScale.y);
+                sprite.setVisible(false);
+            });
             paddlingHero.setPosition(0, 8);
             paddlingHero.setAngle(0);
             paddlingHero.setVisible(true);

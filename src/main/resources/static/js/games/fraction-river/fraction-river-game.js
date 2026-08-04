@@ -22,7 +22,8 @@
             ? Boolean(options.reducedMotion)
             : prefersReducedMotion();
 
-        const view = root.FRACTION_RIVER_VIEW || {VIEW_WIDTH: 840, VIEW_HEIGHT: 320};
+        const view = root.FRACTION_RIVER_VIEW || {VIEW_WIDTH: 840, VIEW_HEIGHT: 320, RENDER_SCALE: 2};
+        const echelle = view.RENDER_SCALE || 1;
         const sceneData = {bus, reducedMotion};
 
         let game;
@@ -30,8 +31,8 @@
             game = new Phaser.Game({
                 type: Phaser.AUTO,
                 parent,
-                width: view.VIEW_WIDTH,
-                height: view.VIEW_HEIGHT,
+                width: view.VIEW_WIDTH * echelle,
+                height: view.VIEW_HEIGHT * echelle,
                 transparent: true,
                 banner: false,
                 scale: {
@@ -39,10 +40,12 @@
                     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
                 },
                 fps: {target: 60},
+                // Plus de bandeau de texte dessiné dans le canvas : le message
+                // de fin vit dans le panneau HTML, net à tous les zooms et
+                // lisible par un lecteur d'écran.
                 scene: [
                     root.createBootScene(Phaser),
-                    root.createRiverScene(Phaser),
-                    root.createResultScene(Phaser)
+                    root.createRiverScene(Phaser)
                 ]
             });
         } catch (error) {
@@ -53,7 +56,6 @@
         game.scene.start("BootScene", sceneData);
         game.events.once("ready", () => {
             game.scene.start("RiverScene", sceneData);
-            game.scene.run("ResultScene", sceneData);
         });
 
         parent.setAttribute("aria-hidden", "true");

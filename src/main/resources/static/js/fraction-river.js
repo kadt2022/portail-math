@@ -196,13 +196,63 @@
             }
         }
 
+        // La scène doit être ENTIÈREMENT à l'écran avant que quoi que ce soit
+        // ne s'y anime, sur téléphone comme sur ordinateur.
+        function sceneFullyVisible() {
+            const rect = riverStage.getBoundingClientRect();
+            const hauteur = root.innerHeight || document.documentElement.clientHeight;
+            return rect.top >= -1 && rect.bottom <= hauteur + 1;
+        }
+
+        function scrollToRiverScene() {
+            if (typeof riverStage.scrollIntoView === "function") {
+                riverStage.scrollIntoView({
+                    behavior: prefersReducedMotion() ? "auto" : "smooth",
+                    block: "center"
+                });
+            }
+        }
+
+        // On amène la scène à l'écran, on attend qu'elle y soit vraiment, et
+        // seulement ensuite on déclenche l'animation. Sans cette attente, la
+        // pierre apparaissait pendant que la page défilait encore et l'enfant
+        // manquait le saut.
+        function whenSceneVisible(action, timeout = 1600) {
+            scrollToRiverScene();
+            if (prefersReducedMotion() || typeof root.requestAnimationFrame !== "function") {
+                action();
+                return;
+            }
+            const debut = Date.now();
+            const verifier = () => {
+                if (sceneFullyVisible() || Date.now() - debut > timeout) {
+                    action();
+                    return;
+                }
+                root.requestAnimationFrame(verifier);
+            };
+            root.requestAnimationFrame(verifier);
+        }
+
         function showRiverSceneThen(callback, duration = GUIDED_CORRECTION_SCENE_PAUSE_MS) {
             clearGuidedJourneyTimer();
-            scrollToElement(riverStage);
+            scrollToRiverScene();
             guidedJourneyTimer = root.setTimeout(() => {
                 guidedJourneyTimer = null;
                 callback();
             }, duration);
+        }
+
+        // Défilement, puis animation, puis pause, puis suite.
+        function playSceneThen(emitAnimation, callback, duration = GUIDED_CORRECTION_SCENE_PAUSE_MS) {
+            clearGuidedJourneyTimer();
+            whenSceneVisible(() => {
+                emitAnimation();
+                guidedJourneyTimer = root.setTimeout(() => {
+                    guidedJourneyTimer = null;
+                    callback();
+                }, duration);
+            });
         }
 
         function playTone(kind) {
@@ -292,17 +342,20 @@
                 : "Tu avances de pierre en pierre.";
             updateStatus();
             bus.emit("answer:correct", {step, hadMistake: state.hadMistake});
-            bus.emit("step:completed", {
-                step,
-                completedSteps: state.completedSteps,
-                totalSteps: STEP_COUNT
-            });
             playTone("correct");
             showNextButton(state.completedSteps === STEP_COUNT
                 ? "Monter l’escalier et rejoindre le village →"
                 : "Continuer vers la pierre suivante →");
             nextButton.hidden = true;
-            showRiverSceneThen(() => continueTraversal({automatic: true}));
+            // La pierre n'apparaît qu'une fois la scène sous les yeux de l'enfant.
+            playSceneThen(
+                () => bus.emit("step:completed", {
+                    step,
+                    completedSteps: state.completedSteps,
+                    totalSteps: STEP_COUNT
+                }),
+                () => continueTraversal({automatic: true})
+            );
         }
 
         function handleIncorrectStep(step) {
@@ -464,12 +517,17 @@
         }
 
         function startFinale() {
-            bus.emit("journey:finale-started", {
-                completedSteps: state.completedSteps,
-                firstTryCorrect: state.firstTryCorrect,
-                correctedErrors: state.correctedErrors
-            });
-            showRiverSceneThen(finishGame, GUIDED_FINALE_SCENE_PAUSE_MS);
+            // Même règle pour la marche finale : la scène d'abord, l'animation
+            // ensuite, sinon l'enfant rate la traversée du pont.
+            playSceneThen(
+                () => bus.emit("journey:finale-started", {
+                    completedSteps: state.completedSteps,
+                    firstTryCorrect: state.firstTryCorrect,
+                    correctedErrors: state.correctedErrors
+                }),
+                finishGame,
+                GUIDED_FINALE_SCENE_PAUSE_MS
+            );
         }
 
         function continueTraversal({automatic = false} = {}) {

@@ -53,8 +53,12 @@
         return isFilled ? "fr-part fr-part--filled" : "fr-part";
     }
 
+    // Le motif doit être posé en style en ligne, pas en attribut de présentation :
+    // en SVG, la moindre règle de feuille de style l'emporte sur l'attribut, et
+    // `.fr-part { fill: ... }` rendait alors les parts coloriées indiscernables
+    // des parts vides.
     function partFill(isFilled, patternId) {
-        return isFilled ? ` fill="url(#${patternId})"` : "";
+        return isFilled ? ` style="fill:url(#${patternId})"` : "";
     }
 
     function renderDisc(total, filled, patternId) {
