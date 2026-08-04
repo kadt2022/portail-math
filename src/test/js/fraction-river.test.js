@@ -289,7 +289,10 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
     assert.equal((bar.match(/fr-part fr-part--filled/g) || []).length, 3);
     assert.equal(bar.includes('role="img"'), true);
     assert.equal(bar.includes("3 parts sur 4"), true);
-    assert.equal(bar.includes("url(#t1-hatch)"), true);
+    // Le motif doit être en style en ligne : en attribut, la feuille de style
+    // reprend la main et les parts coloriées redeviennent invisibles.
+    assert.equal(bar.includes('style="fill:url(#t1-hatch)"'), true);
+    assert.equal(bar.includes('fill="url(#t1-hatch)"'), false);
 
     const disc = visuals.renderStaticVisual({kind: "DISC", total: 3, filled: 1, id: "t2"});
     assert.equal((disc.match(/<path/g) || []).length, 3);

@@ -3,6 +3,11 @@
 
     const VIEW_WIDTH = 840;
     const VIEW_HEIGHT = 320;
+    // Le canvas est créé deux fois plus grand que le monde, et la caméra
+    // compense par un zoom. Les coordonnées restent inchangées, mais chaque
+    // trait et chaque texte sont tracés sur deux fois plus de pixels : c'est ce
+    // qui enlève le flou quand la scène est étirée sur un grand écran.
+    const RENDER_SCALE = 2;
     // Le monde tient tout entier dans la vue : l'enfant voit la rivière
     // complète, les cinq pierres et le pont, sans caméra qui se déplace.
     const WORLD_WIDTH = VIEW_WIDTH;
@@ -31,7 +36,8 @@
             }
 
             create() {
-                this.cameras.main.setBounds(0, 0, WORLD_WIDTH, VIEW_HEIGHT);
+                this.cameras.main.setZoom(RENDER_SCALE);
+                this.cameras.main.centerOn(WORLD_WIDTH / 2, VIEW_HEIGHT / 2);
                 this.physics = null;
 
                 this.buildSky();
@@ -386,5 +392,5 @@
     }
 
     root.createRiverScene = createRiverScene;
-    root.FRACTION_RIVER_VIEW = {WORLD_WIDTH, VIEW_WIDTH, VIEW_HEIGHT, WATERLINE};
+    root.FRACTION_RIVER_VIEW = {WORLD_WIDTH, VIEW_WIDTH, VIEW_HEIGHT, WATERLINE, RENDER_SCALE};
 })(typeof globalThis !== "undefined" ? globalThis : window);

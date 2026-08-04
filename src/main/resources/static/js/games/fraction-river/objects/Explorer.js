@@ -21,6 +21,9 @@
         hero.setDisplaySize(52, 78);
         hero.setOrigin(0.5, 0.92);
         hero.setVisible(false);
+        // Échelle de repos, pour pouvoir écraser puis restituer le personnage
+        // sans perdre la taille fixée par setDisplaySize.
+        const heroScale = {x: hero.scaleX, y: hero.scaleY};
 
         const hull = scene.add.ellipse(0, 16, 62, 18, 0x8a5a2b);
         const gunwale = scene.add.rectangle(0, 8, 64, 6, 0x6b4423);
@@ -182,9 +185,11 @@
             }
 
             const distance = Math.abs(targetX - startX);
-            // Une foulée tous les ~46 px : la cadence suit la distance réelle,
-            // elle n'est plus un nombre d'oscillations arbitraire.
-            const steps = Math.max(4, Math.round(distance / 46));
+            // Une foulée tous les 38 px, et environ une demi-seconde par pas :
+            // la cadence est celle d'un enfant qui marche, quelle que soit la
+            // distance à parcourir.
+            const steps = Math.max(3, Math.round(distance / 38));
+            const marche = Math.max(duration, steps * 520);
             const progress = {t: 0};
             let lastFoot = -1;
 
@@ -194,22 +199,37 @@
                 walkTween = scene.tweens.add({
                     targets: progress,
                     t: 1,
-                    duration,
-                    // Vitesse constante : un marcheur ne décélère pas comme un planeur.
+                    duration: marche,
                     ease: "Linear",
                     onUpdate: () => {
                         const t = progress.t;
+                        // Une demi-période par pas : la phase vaut 0 à chaque
+                        // pose du pied, π/2 au milieu de l'enjambée.
                         const phase = t * Math.PI * steps;
+                        const leve = Math.abs(Math.sin(phase));
 
-                        // Ligne droite : la hauteur ne bouge plus d'un pixel,
-                        // les semelles restent sur le plancher tout du long.
-                        container.x = startX + (targetX - startX) * t;
-                        container.y = baseY;
-                        // Le pas se lit au léger déhanchement et à la poussière,
-                        // plus à un rebond vertical qui décollerait les pieds.
-                        hero.setAngle(Math.sin(phase * 0.5) * 1.4);
+                        // Avance par à-coups. Un marcheur est propulsé à chaque
+                        // poussée puis ralentit : c'est cette irrégularité, et
+                        // non la vitesse moyenne, qui se lit comme des pas.
+                        const poussee = Math.sin(2 * phase) / (2 * Math.PI * steps);
+                        const avance = Math.min(1, Math.max(0, t + poussee * 0.6));
+                        container.x = startX + (targetX - startX) * avance;
+
+                        // Le corps se soulève entre deux appuis et revient
+                        // exactement sur le plancher au moment du contact.
+                        container.y = baseY - leve * 2.6;
+
+                        // Écrasement à la pose, étirement en l'air. L'origine du
+                        // sprite étant aux pieds, la compression part du sol.
+                        hero.setScale(
+                            heroScale.x * (1 + (1 - leve) * 0.02),
+                            heroScale.y * (1 - (1 - leve) * 0.03)
+                        );
+                        hero.setAngle(Math.sin(phase) * 2.4);
 
                         shadow.setPosition(container.x, groundLine);
+                        shadow.setScale(1 - leve * 0.18, 1);
+                        shadow.setAlpha(0.32 - leve * 0.12);
 
                         const foot = Math.floor(phase / Math.PI);
                         if (foot !== lastFoot) {
@@ -221,6 +241,7 @@
                         walkTween = null;
                         container.setPosition(targetX, baseY);
                         hero.setAngle(0);
+                        hero.setScale(heroScale.x, heroScale.y);
                         shadow.setPosition(targetX, baseY + offset);
                         shadow.setScale(1, 1);
                         shadow.setAlpha(0.3);
@@ -262,6 +283,7 @@
             shadow.setAlpha(0.3);
             hero.setPosition(0, 8);
             hero.setAngle(0);
+            hero.setScale(heroScale.x, heroScale.y);
             hero.setVisible(false);
             paddlingHero.setPosition(0, 8);
             paddlingHero.setAngle(0);
