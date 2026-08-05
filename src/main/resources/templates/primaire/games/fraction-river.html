@@ -73,6 +73,9 @@
                         <span class="game-status__step">Pierre <strong data-step-progress>1/5</strong></span>
                         <span class="game-status__stars" aria-label="Pierres posées">🪨 <strong data-stone-count>0</strong></span>
                     </div>
+                    <button class="game-primary-button game-console-launch" type="button" data-console-launch>
+                        Jouer en grand
+                    </button>
                     <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
                         🔊 Son activé
                     </button>
@@ -98,6 +101,27 @@
                         <strong data-encouragement>Prends ton temps, il n’y a pas de chronomètre.</strong>
                         <p>Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.</p>
                     </aside>
+                </div>
+
+                <!-- Console immersive. Elle accueille la scène et le panneau de
+                     questions le temps du mode, puis les rend à leur place. -->
+                <div class="game-console" data-game-console hidden
+                     role="dialog" aria-modal="true" aria-label="Mode jeu de La Rivière des fractions">
+                    <header class="game-console__bar">
+                        <p class="game-console__step">Pierre <strong data-console-step>1/5</strong></p>
+                        <p class="game-console__calm">Prends ton temps, il n’y a pas de chronomètre.</p>
+                        <button class="game-console__quit" type="button" data-console-quit>
+                            <span aria-hidden="true">✕</span> Quitter le jeu
+                        </button>
+                    </header>
+                    <div class="game-console__body">
+                        <div class="game-console__stage" data-console-stage></div>
+                        <div class="game-console__panel" data-console-panel></div>
+                    </div>
+                    <p class="game-console__rotate" data-console-rotate>
+                        <strong>Tourne ton téléphone</strong>
+                        <span>Ce jeu se joue à l’horizontale, pour que la rivière soit bien visible.</span>
+                    </p>
                 </div>
 
                 <section class="game-result" data-game-result hidden aria-labelledby="river-result-title">
@@ -130,6 +154,7 @@
 <script th:src="@{/js/games/fraction-river/scenes/BootScene.js}"></script>
 <script th:src="@{/js/games/fraction-river/scenes/RiverScene.js}"></script>
 <script th:src="@{/js/games/fraction-river/fraction-river-game.js}"></script>
+<script th:src="@{/js/game-console.js}"></script>
 <script th:src="@{/js/fraction-river-events.js}"></script>
 <script th:src="@{/js/fraction-river-visuals.js}"></script>
 <script th:src="@{/js/fraction-river-questions.js}"></script>

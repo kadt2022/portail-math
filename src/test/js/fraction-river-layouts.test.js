@@ -5,9 +5,11 @@ const layouts = require("../../main/resources/static/js/games/fraction-river/lay
 
 const {STEP_COUNT, createLayout, heroScreenSize, heightUsage, fitFactor} = layouts;
 
-// Panneau de jeu sur un téléphone tenu en paysage, mode immersif :
-// 740 x 360 au total, dont 62 % pour la scène.
-const TELEPHONE_PAYSAGE = {largeur: Math.round(740 * 0.62), hauteur: 360};
+// Panneau de jeu MESURÉ dans la console immersive sur un téléphone de
+// 740 x 360 tenu en paysage. Ce ne sont pas 62 % de 740 x 360 : la barre
+// supérieure et les marges de sécurité retirent près de 80 px de hauteur.
+// Se fier au calcul théorique donnait un héros de 31 px au lieu de 36.
+const TELEPHONE_PAYSAGE = {largeur: 430, hauteur: 281};
 // Ce que l'enfant voit aujourd'hui, téléphone tenu debout.
 const TELEPHONE_PORTRAIT = {largeur: 332, hauteur: 180};
 

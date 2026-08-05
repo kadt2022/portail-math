@@ -65,13 +65,15 @@
     // occupée et le héros peut être affiché près de sa taille nominale.
     function immersiveLayout() {
         const width = 480;
-        const height = 360;
+        // Hauteur calée sur la place réellement disponible : la barre et les
+        // marges de la console retirent près de 80 px au panneau de jeu.
+        const height = 300;
         const bankWidth = 52;
-        const leftWaterY = 300;
+        const leftWaterY = 250;
 
         const xs = evenlySpaced(88, 372, STEP_COUNT);
         // Les paliers montent régulièrement de la rive de départ vers le village.
-        const ys = evenlySpaced(292, 160, STEP_COUNT);
+        const ys = evenlySpaced(244, 122, STEP_COUNT);
         const stones = xs.map((x, index) => ({
             x,
             y: ys[index],
@@ -94,13 +96,13 @@
             chest: {x: width - 40},
             village: {x: width - 20, y: dernierPalier.standY - 62},
             explorerHome: {x: 26, y: leftWaterY - 12},
-            frog: {x: 128, y: 268},
+            frog: {x: 128, y: 222},
             trees: [{x: 24, scale: 0.62}, {x: width - 22, scale: 0.58}],
             palms: [206, 330],
             fish: [
-                {x: 130, y: 330},
-                {x: 250, y: 300},
-                {x: 330, y: 262}
+                {x: 130, y: 278},
+                {x: 250, y: 250},
+                {x: 330, y: 218}
             ]
         };
     }

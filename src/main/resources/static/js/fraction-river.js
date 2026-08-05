@@ -154,6 +154,36 @@
         const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
 
+        // Console immersive. Tant qu'elle est active, la scène et les questions
+        // sont côte à côte : plus rien ne doit défiler ni attendre.
+        const gameConsole = root.GameConsole
+            ? root.GameConsole.createGameConsole({
+                document,
+                console: query("[data-game-console]"),
+                stageSlot: query("[data-console-stage]"),
+                panelSlot: query("[data-console-panel]"),
+                stage: riverStage,
+                panel: stepPanel,
+                launchButton: query("[data-console-launch]"),
+                quitButton: query("[data-console-quit]"),
+                focusOnEnter: stepTitle,
+                onEnter: () => refreshScene(),
+                onExit: () => refreshScene()
+            })
+            : null;
+
+        function consoleActive() {
+            return Boolean(gameConsole && gameConsole.isActive);
+        }
+
+        // La scène doit remesurer son conteneur quand la console la déplace.
+        function refreshScene() {
+            const jeu = root.fractionRiverGame;
+            if (jeu && jeu.scale && typeof jeu.scale.refresh === "function") {
+                root.setTimeout(() => jeu.scale.refresh(), 60);
+            }
+        }
+
         let steps = [];
         let state = createTraversalState();
         let selection = new Set();
@@ -167,6 +197,10 @@
         }
 
         function scrollToElement(element) {
+            // Aucun déplacement automatique de la page pendant le mode immersif.
+            if (consoleActive()) {
+                return;
+            }
             if (element && typeof element.scrollIntoView === "function") {
                 element.scrollIntoView({
                     behavior: prefersReducedMotion() ? "auto" : "smooth",
@@ -218,6 +252,12 @@
         // pierre apparaissait pendant que la page défilait encore et l'enfant
         // manquait le saut.
         function whenSceneVisible(action, timeout = 1600) {
+            // En mode immersif, la scène et la question sont déjà visibles
+            // ensemble : aucun défilement, aucune attente, l'animation part.
+            if (consoleActive()) {
+                action();
+                return;
+            }
             scrollToRiverScene();
             if (prefersReducedMotion() || typeof root.requestAnimationFrame !== "function") {
                 action();
@@ -302,8 +342,15 @@
         }
 
         function updateStatus() {
-            query("[data-step-progress]").textContent = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
+            const avancement = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
+            query("[data-step-progress]").textContent = avancement;
             query("[data-stone-count]").textContent = String(state.completedSteps);
+            // La barre de la console porte le même compteur : elle reste dehors
+            // quand le panneau de questions est déplacé à l'intérieur.
+            const compteurConsole = query("[data-console-step]");
+            if (compteurConsole) {
+                compteurConsole.textContent = avancement;
+            }
         }
 
         function updateSavedProgress() {
