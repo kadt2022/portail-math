@@ -167,8 +167,8 @@
                 launchButton: query("[data-console-launch]"),
                 quitButton: query("[data-console-quit]"),
                 focusOnEnter: stepTitle,
-                onEnter: () => refreshScene(),
-                onExit: () => refreshScene()
+                onEnter: () => setLayoutMode("immersive"),
+                onExit: () => setLayoutMode("panoramic")
             })
             : null;
 
@@ -176,11 +176,11 @@
             return Boolean(gameConsole && gameConsole.isActive);
         }
 
-        // La scène doit remesurer son conteneur quand la console la déplace.
-        function refreshScene() {
-            const jeu = root.fractionRiverGame;
-            if (jeu && jeu.scale && typeof jeu.scale.refresh === "function") {
-                root.setTimeout(() => jeu.scale.refresh(), 60);
+        // Unique contrat avec le moteur : un nom de profil géométrique.
+        function setLayoutMode(nom) {
+            const controleur = root.fractionRiverGameController;
+            if (controleur && typeof controleur.setLayoutMode === "function") {
+                controleur.setLayoutMode(nom);
             }
         }
 
