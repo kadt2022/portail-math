@@ -38,9 +38,14 @@ tasks.register('testFractionRiver', Exec) {
     commandLine 'node', 'src/test/js/fraction-river.test.js'
 }
 
+tasks.register('testFractionRiverLayouts', Exec) {
+    commandLine 'node', 'src/test/js/fraction-river-layouts.test.js'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     dependsOn tasks.named('testProgressStore')
     dependsOn tasks.named('testMultiplicationTrain')
     dependsOn tasks.named('testFractionRiver')
+    dependsOn tasks.named('testFractionRiverLayouts')
 }
