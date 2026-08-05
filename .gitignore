@@ -6,3 +6,7 @@ out/
 .vscode/
 .openshift-build/
 .rendered-openshift/
+
+# Portail React : dépendances et sortie de build, jamais versionnées.
+frontend/node_modules/
+frontend/dist/

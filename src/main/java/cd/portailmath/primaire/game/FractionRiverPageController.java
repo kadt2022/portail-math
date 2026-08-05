@@ -25,6 +25,7 @@ public class FractionRiverPageController {
         // en attendant son extraction vers un games-shell.css.
         model.addAttribute("pageStylesheets", java.util.List.of(
                 "/css/multiplication-train.css",
+                "/css/game-console.css",
                 "/css/fraction-river.css"
         ));
         return "primaire/games/fraction-river";
