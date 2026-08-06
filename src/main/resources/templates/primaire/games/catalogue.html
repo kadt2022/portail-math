@@ -80,7 +80,12 @@
                                 <li>Indices adaptés à chaque erreur</li>
                                 <li>Progression sauvegardée</li>
                             </ul>
-                            <a class="game-play-link" th:href="@{/primaire/jeux/riviere-des-fractions}">
+                            <!-- mode=immersive : le jeu s'ouvre directement en
+                                 plein cadre, sans écran de présentation ni choix
+                                 de niveau. Un clic, et la première question. -->
+                            <a class="game-play-link"
+                               data-fraction-river-direct-launch
+                               th:href="@{/primaire/jeux/riviere-des-fractions(mode='immersive')}">
                                 Jouer <span aria-hidden="true">→</span>
                             </a>
                         </div>
@@ -97,5 +102,6 @@
         </main>
     </div>
 </div>
+<script th:src="@{/js/fraction-river-launch.js}"></script>
 </body>
 </html>

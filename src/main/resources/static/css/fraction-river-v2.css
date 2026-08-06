@@ -1,0 +1,248 @@
+/* Prototype de calibrage des trois couches — La Rivière des fractions v2.
+ *
+ * Toute la feuille repose sur une seule règle : le cadre et l'illustration ont
+ * exactement la même proportion, 16/9. C'est ce qui autorise object-fit: fill
+ * sans déformation, et c'est ce qui fait que les pourcentages du canvas Phaser
+ * tombent sur ce qui est peint. Casser cette proportion casse l'alignement.
+ */
+
+.fraction-river-v2 {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0b2a3a;
+}
+
+.fraction-river-v2__background,
+.fraction-river-v2__phaser {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Couche 1 — l'illustration. Aucun clic ne doit s'y arrêter. */
+.fraction-river-v2__background {
+    /* `fill` est légitime ici, et seulement ici : l'image et le cadre sont tous
+       deux en 16/9, donc l'étirement est nul. `cover` recadrerait à la moindre
+       dérive de proportion, et les ancrages glisseraient sans prévenir. */
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Couche 2 — le canvas Phaser, transparent. Il ne reçoit encore aucune
+   interaction : les réponses sont en HTML, et laisser le canvas capter les
+   clics enlèverait le focus au clavier. */
+.fraction-river-v2__phaser {
+    z-index: 2;
+    pointer-events: none;
+}
+
+.fraction-river-v2__phaser canvas {
+    display: block;
+}
+
+/* Couche 3 — la question. Sa position vient des mêmes pourcentages que la
+   grille d'ancrage : voir questionPanel dans anchors.js. Les deux doivent
+   rester d'accord, sinon la question flotte à côté de son cadre peint. */
+/* Couche 3 — la question, posée à l'INTÉRIEUR du parchemin peint. Ces quatre
+   valeurs sont la mesure du parchemin sur l'illustration, pas un réglage à
+   l'œil : voir questionPanel dans anchors.js, relevé par analyse de pixels.
+   Les deux doivent rester d'accord.
+
+   Plus aucun fond opaque : le parchemin est vraiment vide dans l'image, donc
+   c'est lui qu'on voit. C'est tout l'intérêt de l'architecture. */
+.fraction-river-v2__question {
+    position: absolute;
+    z-index: 3;
+    top: 26.5%;
+    left: 79.7%;
+    width: 18.9%;
+    height: 50.8%;
+    padding: clamp(4px, 0.8vw, 12px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(4px, 0.8vw, 10px);
+    overflow: hidden;
+    background: none;
+    border: 0;
+    text-align: center;
+}
+
+.fraction-river-v2__step {
+    align-self: center;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #a9702f;
+    color: #fff4d7;
+    font-size: clamp(0.5rem, 0.85vw, 0.72rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.fraction-river-v2__question h2 {
+    margin: 0;
+    color: #4a2b0a;
+    font-size: clamp(0.62rem, 1.25vw, 1.05rem);
+    line-height: 1.15;
+    text-wrap: balance;
+}
+
+.fraction-river-v2__visual {
+    display: flex;
+    justify-content: center;
+}
+
+.fraction-river-v2__visual svg {
+    width: clamp(40px, 6.5vw, 96px);
+    height: auto;
+}
+
+.fraction-river-v2__answers {
+    display: flex;
+    gap: clamp(3px, 0.5vw, 7px);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.fraction-river-v2__answers button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: clamp(3px, 0.6vw, 9px) clamp(1px, 0.4vw, 6px);
+    border: 2px solid #a9702f;
+    border-radius: 9px;
+    background: #ffe9b0;
+    color: #4a2b0a;
+    font-size: clamp(0.62rem, 1.15vw, 1.05rem);
+    font-weight: 800;
+    line-height: 1.1;
+    cursor: pointer;
+}
+
+.fraction-river-v2__answers button:hover,
+.fraction-river-v2__answers button:focus-visible {
+    background: #ffd97a;
+    outline: 3px solid #1971c2;
+    outline-offset: 2px;
+}
+
+/* MATCH_VISUAL : la réponse est un dessin, pas un mot. Le bouton s'efface pour
+   laisser le disque parler. */
+.fraction-river-v2__answers button.est-visuel {
+    padding: clamp(2px, 0.5vw, 8px);
+    background: #fffaf0;
+}
+
+.fraction-river-v2__answers button.est-visuel svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.fraction-river-v2__answers button.est-juste {
+    background: #b2f2bb;
+    border-color: #2f9e44;
+}
+
+.fraction-river-v2__answers button.est-fausse {
+    background: #ffc9c9;
+    border-color: #c92a2a;
+    opacity: 0.7;
+}
+
+.fraction-river-v2__validate,
+.fraction-river-v2__replay {
+    align-self: stretch;
+    padding: clamp(4px, 0.9vw, 10px);
+    border: 2px solid #2f9e44;
+    border-radius: 10px;
+    background: #2f9e44;
+    color: #ffffff;
+    font-size: clamp(0.7rem, 1.4vw, 1rem);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.fraction-river-v2__validate:hover,
+.fraction-river-v2__replay:hover {
+    background: #2b8a3e;
+}
+
+/* SELECT_PARTS : les parts cliquables viennent de FractionRiverVisuals. */
+.fraction-river-v2__visual .fr-selectable {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.fraction-river-v2__visual .fr-selectable-part {
+    width: clamp(22px, 3.2vw, 44px);
+    height: clamp(22px, 3.2vw, 44px);
+    border: 2px solid #1d3557;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.fraction-river-v2__visual .fr-selectable-part.est-choisie {
+    background: #4c6ef5;
+    border-color: #1d3557;
+}
+
+.fraction-river-v2__feedback {
+    margin: 0;
+    min-height: 1.2em;
+    color: #4a2b0a;
+    font-size: clamp(0.65rem, 1.2vw, 0.95rem);
+    font-weight: 600;
+}
+
+.fraction-river-v2__feedback[data-tone="erreur"] {
+    color: #c92a2a;
+}
+
+.fraction-river-v2__feedback[data-tone="reussite"] {
+    color: #2b8a3e;
+}
+
+/* Relevé de calibrage. Hors du cadre 16/9 : il ne doit rien recouvrir. */
+.fraction-river-v2-readout {
+    margin: 10px 0 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #171932;
+    color: #d9e6ff;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.fraction-river-v2-note {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    border-left: 4px solid #f08c00;
+    background: #fff8e6;
+    border-radius: 0 10px 10px 0;
+    color: #4a2b0a;
+    font-size: 0.9rem;
+}
+
+.fraction-river-v2-note code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    background: #ffe9b0;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+/* Le mode immersif à une seule zone est décrit dans game-console.css : il sert
+   à tous les jeux dont le décor est une illustration, pas seulement à celui-ci.
+   Y compris la règle qui rend sa hauteur au bloc de scène. */

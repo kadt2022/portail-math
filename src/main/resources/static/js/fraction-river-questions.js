@@ -13,13 +13,30 @@
         {numerator: 3, denominator: 4}
     ];
 
+    // Les cinq étapes du niveau 1, dans l'ordre où l'enfant les rencontre.
+    //
+    // SELECT_PARTS a été retiré. Non pas masqué : retiré du générateur, donc il
+    // ne peut plus sortir. Il demandait une grille de parts cliquables et un
+    // bouton « Valider », et la question vit désormais sur le parchemin peint de
+    // l'illustration — une bande de 18 % de la largeur de la scène, soit 115 px
+    // sur un téléphone en paysage. Une grille et un gros bouton n'y tiennent pas,
+    // et les rapetisser jusqu'à ce qu'ils tiennent aurait donné des cibles
+    // tactiles sous les 48 px exigés.
+    //
+    // Il est remplacé par une seconde reconnaissance de fraction, à une autre
+    // fraction et sur un autre type de dessin : cinq étapes, toutes jouables
+    // avec trois grandes réponses.
     const STEP_TYPES = [
         "IDENTIFY",
         "MATCH_VISUAL",
-        "SELECT_PARTS",
+        "IDENTIFY",
         "NUMERATOR",
         "DENOMINATOR"
     ];
+
+    // Type retiré du parcours. Conservé nommé pour que les tests puissent
+    // prouver son absence plutôt que de vérifier une liste de longueur cinq.
+    const RETIRED_STEP_TYPES = ["SELECT_PARTS"];
 
     // Chaque mauvaise réponse correspond à une erreur pédagogique plausible (§5.1).
     const HINTS = {
@@ -343,6 +360,7 @@
     const api = {
         STEP_COUNT,
         STEP_TYPES,
+        RETIRED_STEP_TYPES,
         SCENARIOS,
         ALLOWED_FRACTIONS,
         BRIDGE_FRACTIONS,

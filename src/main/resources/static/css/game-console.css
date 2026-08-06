@@ -12,6 +12,33 @@ body.is-game-console {
     height: 100%;
 }
 
+html.is-fraction-river-immersive,
+body.is-fraction-river-immersive {
+    overflow: hidden;
+    height: 100%;
+}
+
+body.is-fraction-river-immersive .sidebar,
+body.is-fraction-river-immersive .topbar,
+body.is-fraction-river-immersive .nav-backdrop,
+body.is-fraction-river-immersive .skip-link,
+body.is-fraction-river-immersive .game-breadcrumb,
+body.is-fraction-river-immersive [data-game-setup],
+body.is-fraction-river-immersive .game-toolbar {
+    display: none !important;
+}
+
+body.is-fraction-river-immersive .page-shell {
+    min-height: 100vh;
+    margin-left: 0;
+}
+
+body.is-fraction-river-immersive .river-page-content {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+}
+
 .game-console[hidden] {
     display: none !important;
 }
@@ -129,6 +156,86 @@ body.is-game-console {
     box-shadow: none;
 }
 
+/* ---------- Mode à une seule zone ---------- */
+
+/* La console ci-dessus a été écrite pour deux zones : la scène à gauche, les
+ * questions à droite. Un jeu dont le décor est une illustration n'en a plus
+ * qu'une : la question se pose DANS l'image, sur le parchemin qu'elle réserve.
+ *
+ * Mesuré sur un téléphone de 740 x 360 : le créneau du panneau retenait 277 px
+ * de large pour n'afficher plus rien, la barre volait 57 px de haut, et la scène
+ * n'obtenait que 430 x 281 — soit 45 % de l'écran.
+ */
+.game-console--single .game-console__body {
+    padding: 0;
+    gap: 0;
+}
+
+.game-console--single .game-console__stage {
+    flex: 1 1 100%;
+    border-radius: 0;
+    background: #0b2a3a;
+}
+
+.game-console--single .game-console__panel {
+    display: none;
+}
+
+/* Le bloc de scène prend toute la hauteur offerte, et sa largeur en DÉCOULE.
+ * L'ordre compte : avec une largeur explicite à 100 %, c'est elle qui gagne, la
+ * hauteur se fait rogner et le rapport de l'image se casse — elle s'étire.
+ * Sur 740 x 360, cette règle donne 640 x 360 au lieu de 430 x 242. */
+.game-console--single .game-console__stage > * {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 0;
+}
+
+/* La règle générique ci-dessus impose `aspect-ratio: auto` à la scène de la
+ * Rivière, pour la laisser remplir un créneau de proportion quelconque. En mode
+ * à une seule zone c'est l'inverse qu'il faut : le 16/9 de l'illustration
+ * commande, sinon les ancrages du décor ne tombent plus sur ce qui est peint. */
+.game-console--single .game-console__stage .river-stage {
+    aspect-ratio: 16 / 9;
+}
+
+/* La barre ne prend plus de hauteur : elle se répartit en deux chips flottants,
+ * posés sur le feuillage du haut de l'illustration. Une barre pleine largeur
+ * aurait coupé les toits du village et le panneau ARRIVÉE, peints entre 3 et
+ * 18 % de la hauteur. */
+.game-console--single .game-console__bar {
+    position: absolute;
+    z-index: 40;
+    inset: 0 0 auto;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 6px 8px;
+    gap: 8px;
+    border: 0;
+    background: none;
+}
+
+.game-console--single .game-console__step,
+.game-console--single .game-console__calm {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 88%);
+    box-shadow: 0 2px 6px rgb(11 42 58 / 25%);
+}
+
+/* Sous 520 px de large, la réassurance cède la place : mieux vaut la perdre
+ * qu'écraser le bouton de sortie. */
+@media (max-width: 520px) {
+    .game-console--single .game-console__calm {
+        display: none;
+    }
+}
+
 .game-console__panel .game-question h2 {
     margin: 6px 0 12px;
     font-size: clamp(17px, 2.4vw, 24px);
@@ -197,6 +304,32 @@ body.is-game-console {
 
     .game-console__rotate {
         display: flex;
+    }
+}
+
+/* La Riviere force le lancement du jeu. Si le navigateur refuse de verrouiller
+   le paysage, on garde quand meme la console ouverte au lieu de remplacer le jeu
+   par une consigne. */
+@media (orientation: portrait) and (max-width: 899px) {
+    body.is-fraction-river-immersive .game-console--single {
+        inset: auto;
+        top: 0;
+        left: 0;
+        width: 100vh;
+        width: 100dvh;
+        height: 100vw;
+        height: 100dvw;
+        padding: 0;
+        transform: rotate(90deg) translateY(-100%);
+        transform-origin: top left;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__body {
+        display: flex;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__rotate {
+        display: none;
     }
 }
 
