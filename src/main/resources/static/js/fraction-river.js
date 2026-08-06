@@ -154,6 +154,70 @@
         const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
 
+        // Console immersive. Tant qu'elle est active, la scène et les questions
+        // sont côte à côte : plus rien ne doit défiler ni attendre.
+        const gameConsole = root.GameConsole
+            ? root.GameConsole.createGameConsole({
+                document,
+                console: query("[data-game-console]"),
+                stageSlot: query("[data-console-stage]"),
+                // Le panneau de questions n'est plus posé À CÔTÉ de la scène :
+                // il est posé DEDANS. Le décor peint réserve un parchemin sur sa
+                // droite, et c'est là que la question doit s'afficher — sinon
+                // deux interfaces se font concurrence, un parchemin vide dans
+                // l'image et un panneau blanc à côté.
+                panelSlot: riverStage,
+                stage: riverStage,
+                panel: stepPanel,
+                launchButton: query("[data-console-launch]"),
+                quitButton: query("[data-console-quit]"),
+                focusOnEnter: stepTitle,
+                keepImmersiveOnFullscreenExit: true,
+                // La bascule change la largeur disponible pour l'énoncé : sur le
+                // parchemin peint il n'y a que 114 px, contre toute la page en
+                // dehors. Sans ce rafraîchissement, la formulation longue restait
+                // affichée en immersif et débordait du parchemin.
+                onEnter: () => {
+                    setLayoutMode("immersive");
+                    rafraichirEnonce();
+                },
+                onExit: () => {
+                    setLayoutMode("panoramic");
+                    rafraichirEnonce();
+                    // Quand le jeu a été lancé depuis le catalogue dans sa
+                    // surface plein écran, le bouton Quitter rend la main au
+                    // catalogue au lieu d'afficher la page du jeu dans l'iframe.
+                    if (root.parent && root.parent !== root) {
+                        root.parent.postMessage(
+                            {type: "fraction-river:exit"},
+                            root.location.origin
+                        );
+                    }
+                }
+            })
+            : null;
+
+        function consoleActive() {
+            return Boolean(gameConsole && gameConsole.isActive);
+        }
+
+        // Réécrit le seul énoncé, sans toucher au reste de l'étape : ni options
+        // régénérées, ni progression, ni état de la traversée.
+        function rafraichirEnonce() {
+            const step = steps[state.stepIndex];
+            if (step && stepTitle) {
+                stepTitle.textContent = consoleActive() ? promptCourt(step) : step.prompt;
+            }
+        }
+
+        // Unique contrat avec le moteur : un nom de profil géométrique.
+        function setLayoutMode(nom) {
+            const controleur = root.fractionRiverGameController;
+            if (controleur && typeof controleur.setLayoutMode === "function") {
+                controleur.setLayoutMode(nom);
+            }
+        }
+
         let steps = [];
         let state = createTraversalState();
         let selection = new Set();
@@ -167,6 +231,10 @@
         }
 
         function scrollToElement(element) {
+            // Aucun déplacement automatique de la page pendant le mode immersif.
+            if (consoleActive()) {
+                return;
+            }
             if (element && typeof element.scrollIntoView === "function") {
                 element.scrollIntoView({
                     behavior: prefersReducedMotion() ? "auto" : "smooth",
@@ -218,6 +286,12 @@
         // pierre apparaissait pendant que la page défilait encore et l'enfant
         // manquait le saut.
         function whenSceneVisible(action, timeout = 1600) {
+            // En mode immersif, la scène et la question sont déjà visibles
+            // ensemble : aucun défilement, aucune attente, l'animation part.
+            if (consoleActive()) {
+                action();
+                return;
+            }
             scrollToRiverScene();
             if (prefersReducedMotion() || typeof root.requestAnimationFrame !== "function") {
                 action();
@@ -302,11 +376,21 @@
         }
 
         function updateStatus() {
-            query("[data-step-progress]").textContent = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
+            const avancement = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
+            query("[data-step-progress]").textContent = avancement;
             query("[data-stone-count]").textContent = String(state.completedSteps);
+            // La barre de la console porte le même compteur : elle reste dehors
+            // quand le panneau de questions est déplacé à l'intérieur.
+            const compteurConsole = query("[data-console-step]");
+            if (compteurConsole) {
+                compteurConsole.textContent = avancement;
+            }
         }
 
         function updateSavedProgress() {
+            if (!query("[data-best-first-try]") || !query("[data-games-played]")) {
+                return;
+            }
             const progress = store ? store.levelProgress(LEVEL) : null;
             const played = store ? store.load().gamesPlayed : 0;
             query("[data-best-first-try]").textContent = `${progress ? progress.firstTryCorrect : 0}/${STEP_COUNT}`;
@@ -445,12 +529,42 @@
             optionsContainer.appendChild(validate);
         }
 
+        // Énoncé court, pour le mode immersif seulement.
+        //
+        // La question s'affiche là sur le parchemin peint de l'illustration : une
+        // bande de 114 px de large sur un téléphone en paysage. Mesuré, « Quelle
+        // fraction est représentée ? » y occupe QUATRE lignes et 92 px de haut, et
+        // le contenu débordait de 53 px.
+        //
+        // Rien n'est retiré à la pédagogie : la formulation complète reste dans
+        // les données, et c'est elle qui s'affiche sur la page normale. Ce qui
+        // disparaît ici, c'est la reprise des nombres déjà lisibles sur le dessin
+        // juste en dessous.
+        function promptCourt(step) {
+            const fraction = step.fraction
+                ? `${step.fraction.numerator}/${step.fraction.denominator}`
+                : "";
+            if (step.type === "IDENTIFY") {
+                return "Quelle fraction ?";
+            }
+            if (step.type === "MATCH_VISUAL") {
+                return `Quel dessin montre ${fraction} ?`;
+            }
+            if (step.type === "NUMERATOR") {
+                return "Le nombre du haut ?";
+            }
+            if (step.type === "DENOMINATOR") {
+                return "Le nombre du bas ?";
+            }
+            return step.prompt;
+        }
+
         function renderStep({focus = true} = {}) {
             const step = steps[state.stepIndex];
             // Même découpage que le Train : un intitulé court en capitales,
             // puis la question seule dans le titre.
             query("[data-step-kicker]").textContent = `Étape ${state.stepIndex + 1} sur ${STEP_COUNT}`;
-            stepTitle.textContent = step.prompt;
+            stepTitle.textContent = consoleActive() ? promptCourt(step) : step.prompt;
             renderVisualInto(query("[data-step-visual]"), step.visual, `step-${state.stepIndex}`);
             optionsContainer.textContent = "";
             optionsContainer.className = step.type === "MATCH_VISUAL"
@@ -548,7 +662,9 @@
             const saved = store ? store.load() : {recentQuestionIds: []};
             steps = questions.createLevel1Steps(Math.random, saved.recentQuestionIds || []);
             state = createTraversalState();
-            setupPanel.hidden = true;
+            if (setupPanel) {
+                setupPanel.hidden = true;
+            }
             gamePanel.hidden = false;
             learningArea.hidden = false;
             stepPanel.hidden = false;
@@ -563,18 +679,7 @@
             });
         }
 
-        function showLevels() {
-            clearGuidedJourneyTimer();
-            gamePanel.hidden = true;
-            setupPanel.hidden = false;
-            updateSavedProgress();
-            query("[data-start-game]").focus();
-        }
-
-        query("[data-start-game]").addEventListener("click", startGame);
         query("[data-replay]").addEventListener("click", startGame);
-        query("[data-change-level]").addEventListener("click", showLevels);
-        query("[data-result-change-level]").addEventListener("click", showLevels);
         nextButton.addEventListener("click", continueTraversal);
         query("[data-sound-toggle]").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
@@ -589,11 +694,48 @@
         updateSavedProgress();
         updateSoundButton();
 
+        // Lancement direct depuis le catalogue.
+        //
+        // /riviere-des-fractions?mode=immersive ouvre le jeu sans aucun écran
+        // intermédiaire : ni présentation, ni choix de niveau, ni confirmation.
+        // La première question s'affiche tout de suite.
+        //
+        // Le plein écran et le verrouillage paysage sont TENTÉS par la console,
+        // jamais exigés : un navigateur qui les refuse (Safari iOS, Chrome après
+        // une navigation sans geste) laisse simplement la disposition immersive
+        // en place. Le message « Tourne ton téléphone » est géré par CSS en
+        // portrait et disparaît seul en paysage — aucun bouton n'est demandé.
+        function autoLaunchImmersive() {
+            document.documentElement.classList.add("is-fraction-river-immersive");
+            document.body.classList.add("is-fraction-river-immersive");
+            // La traversée démarre : première question rendue immédiatement. Un
+            // nouvel enfant part au niveau 1 ; un enfant déjà venu retrouve sa
+            // progression via les questions récemment vues (createLevel1Steps).
+            startGame();
+            if (!gameConsole) {
+                return;
+            }
+            // L'entrée déplace la scène dans la console. On la diffère d'un tour
+            // de boucle pour que Phaser ait amorcé son canvas dans le conteneur
+            // avant qu'il ne change de parent.
+            //
+            // setTimeout et non requestAnimationFrame : rAF ne se déclenche pas
+            // dans un onglet qui ne peint pas (arrière-plan au moment de la
+            // navigation), et l'entrée immersive ne partait alors jamais.
+            root.setTimeout(() => {
+                if (!gameConsole.isActive) {
+                    gameConsole.enter();
+                }
+            }, 0);
+        }
+
         // La scène Phaser est un enrichissement : si elle ne démarre pas, la
         // page reste entièrement jouable.
         if (typeof root.startFractionRiverGame === "function") {
             root.startFractionRiverGame({bus, reducedMotion: prefersReducedMotion()});
         }
+
+        autoLaunchImmersive();
     }
 
     const api = {

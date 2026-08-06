@@ -27,8 +27,8 @@ dependencies {
 }
 
 // ---------------------------------------------------------------------------
-// Portail React (frontend/). Il est construit par le mÃªme build Gradle et
-// empaquetÃ© dans le mÃªme JAR : un seul artefact, un seul dÃ©ploiement OpenShift.
+// Portail React (frontend/). Il est construit par le même build Gradle et
+// empaqueté dans le même JAR : un seul artefact, un seul déploiement OpenShift.
 // ---------------------------------------------------------------------------
 
 def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
@@ -36,10 +36,10 @@ def npmExecutable = isWindows ? 'npm.cmd' : 'npm'
 def frontendDir = file('frontend')
 
 tasks.register('frontendInstall', Exec) {
-    description = 'Installe les dÃ©pendances du portail React Ã  partir du verrou.'
+    description = 'Installe les dépendances du portail React à partir du verrou.'
     workingDir frontendDir
-    // npm ci et non npm install : l'installation doit Ãªtre reproductible et
-    // refuser toute dÃ©rive par rapport Ã  package-lock.json.
+    // npm ci et non npm install : l'installation doit être reproductible et
+    // refuser toute dérive par rapport à package-lock.json.
     commandLine npmExecutable, 'ci'
     inputs.file(new File(frontendDir, 'package.json'))
     inputs.file(new File(frontendDir, 'package-lock.json'))
@@ -92,6 +92,10 @@ tasks.register('testFractionRiver', Exec) {
     commandLine 'node', 'src/test/js/fraction-river.test.js'
 }
 
+tasks.register('testFractionRiverAnchors', Exec) {
+    commandLine 'node', 'src/test/js/fraction-river-anchors.test.js'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     dependsOn tasks.named('testProgressStore')
@@ -99,4 +103,5 @@ tasks.named('test') {
     dependsOn tasks.named('testFractionRiver')
     dependsOn tasks.named('frontendLint')
     dependsOn tasks.named('frontendTest')
+    dependsOn tasks.named('testFractionRiverAnchors')
 }
