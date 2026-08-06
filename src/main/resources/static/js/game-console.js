@@ -19,6 +19,7 @@
         const panel = options.panel;
         const launchButton = options.launchButton;
         const quitButton = options.quitButton;
+        const keepImmersiveOnFullscreenExit = options.keepImmersiveOnFullscreenExit === true;
 
         if (!consoleElement || !stageSlot || !panelSlot || !stage || !panel) {
             return null;
@@ -135,11 +136,14 @@
             // Le plein écran et l'orientation sont demandés après coup : même
             // refusés, la disposition immersive est déjà en place.
             demanderPleinEcran()
+                .catch(() => false)
                 .then(() => verrouillerPaysage())
                 .catch(() => false);
 
-            ecouter(doc, "fullscreenchange", surChangementPleinEcran);
-            ecouter(doc, "webkitfullscreenchange", surChangementPleinEcran);
+            if (!keepImmersiveOnFullscreenExit) {
+                ecouter(doc, "fullscreenchange", surChangementPleinEcran);
+                ecouter(doc, "webkitfullscreenchange", surChangementPleinEcran);
+            }
             ecouter(doc, "keydown", surTouche);
             ecouter(doc, "visibilitychange", surVisibilite);
 

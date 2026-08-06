@@ -38,8 +38,8 @@ tasks.register('testFractionRiver', Exec) {
     commandLine 'node', 'src/test/js/fraction-river.test.js'
 }
 
-tasks.register('testFractionRiverLayouts', Exec) {
-    commandLine 'node', 'src/test/js/fraction-river-layouts.test.js'
+tasks.register('testFractionRiverAnchors', Exec) {
+    commandLine 'node', 'src/test/js/fraction-river-anchors.test.js'
 }
 
 tasks.named('test') {
@@ -47,5 +47,5 @@ tasks.named('test') {
     dependsOn tasks.named('testProgressStore')
     dependsOn tasks.named('testMultiplicationTrain')
     dependsOn tasks.named('testFractionRiver')
-    dependsOn tasks.named('testFractionRiverLayouts')
+    dependsOn tasks.named('testFractionRiverAnchors')
 }

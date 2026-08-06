@@ -131,17 +131,177 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--line);
-    background: linear-gradient(180deg, #d6efff 0%, #eef8ff 55%, var(--river-light) 55%, var(--river-deep) 100%);
+    background: #0b2a3a;
     /* Réserve la place avant le premier rendu : la page ne sursaute pas
-       quand le canvas apparaît. */
-    aspect-ratio: 840 / 320;
+       quand l'illustration apparaît. Le 16/9 n'est pas un choix esthétique —
+       c'est la proportion de l'illustration, et la condition pour que les
+       ancrages en pourcentage tombent sur ce qui est peint. */
+    aspect-ratio: 16 / 9;
     min-height: 180px;
 }
 
+/* Couche 1 : l'illustration peinte, insérée par fraction-river-game.js. */
+.fraction-river-illustrated__background,
+.fraction-river-illustrated__phaser {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.fraction-river-illustrated__background {
+    /* `fill` est légitime ici, et seulement ici : le cadre et l'image sont tous
+       deux en 16/9, donc l'étirement est nul. `cover` recadrerait à la moindre
+       dérive de proportion, et les ancrages glisseraient sans prévenir. */
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Couche 2 : le canvas Phaser, transparent. Aucun clic ne s'y arrête : les
+   réponses sont en HTML, et capter les clics ici volerait le focus au clavier. */
+.fraction-river-illustrated__phaser {
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Pas de !important, et pas de width/height à 100% : c'est Phaser qui
+   dimensionne son canvas, en mode FIT, pour qu'il coïncide au pixel avec
+   l'illustration. Forcer la taille ici l'étirerait et décalerait le chien. */
 .river-stage canvas {
     display: block;
-    width: 100% !important;
-    height: 100% !important;
+}
+
+/* ---------- Couche 3 : la question, posée DANS l'illustration ---------- */
+
+/* En mode immersif, la console déplace le panneau de questions à l'intérieur de
+   la scène. Il se pose alors sur le parchemin peint, à droite.
+   La largeur est de 36 % et non 18,9 % : le parchemin dessiné est trop étroit
+   pour un énoncé, il donnait 121 px sur un téléphone. Le panneau HTML reprend
+   donc son style et le PROLONGE vers la gauche — le dessin sert de socle, pas
+   de cadre rigide. Ces valeurs et questionPanel dans v2/anchors.js doivent
+   rester d'accord. */
+.river-stage > .game-question {
+    position: absolute;
+    z-index: 30;
+    box-sizing: border-box;
+
+    /* Le parchemin peint ne fait que 18 % de large : trop étroit, la question y
+       était minuscule. Le panneau déborde donc vers la GAUCHE, jusqu'à 62 %,
+       par-dessus l'illustration. Le bord droit reste calé sur le parchemin
+       (98 %).
+
+       Haut à 18 %, bas à 10 % : le panneau gagne aussi de la hauteur, mais
+       reste sous la barre de commandes et ne touche jamais Quitter. */
+    top: 18%;
+    left: 62%;
+    width: 36%;
+    bottom: 10%;
+
+    display: flex;
+    flex-direction: column;
+    /* Trois zones : énoncé en haut, dessin et réponses au centre, correction en
+       bas. C'est la répartition qui supprime le vide, pas l'agrandissement du
+       texte. */
+    justify-content: space-between;
+    align-items: stretch;
+    gap: clamp(2px, 0.8vh, 10px);
+    margin: 0;
+    padding: clamp(8px, 1.8vh, 18px) clamp(10px, 1.6vw, 20px);
+    overflow: hidden;
+    text-align: center;
+
+    /* En débordant du parchemin peint, le texte de gauche se poserait sur la
+       rivière et le pont, illisible. Un fond parchemin léger PROLONGE le dessin :
+       teinte chaude translucide, coins très arrondis et ombre douce vers
+       l'illustration — une extension du rouleau, pas une fenêtre Web posée
+       dessus. */
+    background: linear-gradient(180deg, rgb(251 238 203 / 94%) 0%, rgb(242 221 170 / 94%) 100%);
+    border: 2px solid rgb(140 96 46 / 55%);
+    border-radius: 18px;
+    box-shadow: 0 6px 22px rgb(11 42 58 / 32%);
+}
+
+/* La zone centrale prend la place restante et centre son contenu. */
+.river-stage > .game-question .fr-visual-holder {
+    flex: 1 1 auto;
+    align-content: center;
+    align-items: center;
+}
+
+/* Une seule indication de progression en mode immersif : celle de la barre. */
+.river-stage > .game-question .question-kicker {
+    display: none;
+}
+
+/* Tailles plancher, non négociables sur téléphone en paysage : un énoncé
+   rapetissé jusqu'à tenir n'est plus un énoncé. */
+.river-stage > .game-question [data-step-title] {
+    margin: 0;
+    color: #4a2b0a;
+    font-size: max(23px, 4vh);
+    line-height: 1.15;
+    text-wrap: balance;
+}
+
+.river-stage > .game-question .fr-visual-holder {
+    margin: 0;
+    gap: 8px;
+}
+
+/* Le dessin est plafonné en HAUTEUR autant qu'en largeur. Sans plafond de
+   hauteur il prenait 79 px des 173 disponibles, et poussait les réponses hors du
+   parchemin. */
+.river-stage > .game-question .fr-visual {
+    max-width: min(100%, 29vh);
+    max-height: 38%;
+}
+
+.river-stage > .game-question .answer-options {
+    display: flex;
+    gap: clamp(4px, 1vh, 10px);
+    justify-content: center;
+}
+
+.river-stage > .game-question .answer-option {
+    flex: 1 1 0;
+    min-width: 0;
+    /* 48 px : la cible tactile minimale, jamais rognée pour gagner de la place. */
+    min-height: 48px;
+    padding: 4px 6px;
+    font-size: max(24px, 4.2vh);
+}
+
+/* Pour « Quel dessin montre 1/2 ? », trois miniatures sur une seule ligne
+   étaient illisibles. Deux cartes occupent la première ligne et la troisième
+   est centrée dessous : chaque dessin gagne plus de 50 % en largeur. */
+.river-stage > .game-question .answer-options--visual {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: clamp(5px, 1.2vh, 10px);
+}
+
+.river-stage > .game-question .answer-options--visual .answer-option--visual {
+    min-height: clamp(64px, 17vh, 82px);
+    padding: 4px 7px;
+}
+
+.river-stage > .game-question .answer-options--visual .answer-option--visual:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 4px);
+}
+
+.river-stage > .game-question .answer-options--visual .fr-visual {
+    width: 100%;
+    max-height: clamp(54px, 15vh, 74px);
+}
+
+.river-stage > .game-question [data-step-feedback] {
+    margin: 0;
+    font-size: max(13px, 2vh);
 }
 
 /* ---------- Visuels de fractions ---------- */

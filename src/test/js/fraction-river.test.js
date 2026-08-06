@@ -88,11 +88,57 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
     });
 }
 
+// --- Le type « sélection de parts » a quitté le parcours -----------------------
+{
+    const questions = require("../../main/resources/static/js/fraction-river-questions.js");
+
+    // Retiré du générateur, pas seulement masqué dans l'interface : sa grille de
+    // parts cliquables et son bouton « Valider » ne tenaient pas sur le parchemin
+    // peint, large de 18 % de la scène — 115 px sur un téléphone en paysage.
+    assert.equal(
+        questions.STEP_TYPES.includes("SELECT_PARTS"),
+        false,
+        "SELECT_PARTS est encore dans la liste des étapes"
+    );
+    assert.deepEqual(questions.RETIRED_STEP_TYPES, ["SELECT_PARTS"]);
+
+    // Et il ne ressort par aucun tirage.
+    for (let seed = 1; seed <= 120; seed += 1) {
+        const steps = createLevel1Steps(createSeededRandom(seed));
+        assert.equal(steps.length, 5, `tirage ${seed} : cinq étapes attendues`);
+        steps.forEach((step) => {
+            assert.equal(
+                step.type,
+                step.type === "SELECT_PARTS" ? null : step.type,
+                `tirage ${seed} : une étape de sélection est sortie`
+            );
+            // Chaque étape se joue avec trois grandes réponses, sans exception.
+            assert.equal(
+                step.options.length,
+                3,
+                `tirage ${seed} : étape ${step.type} sans trois réponses`
+            );
+            assert.equal(
+                step.requiredCount === undefined,
+                true,
+                `tirage ${seed} : étape ${step.type} attend encore une sélection`
+            );
+        });
+        // Cinq fractions distinctes : la seconde reconnaissance ne rejoue pas la
+        // première.
+        assert.equal(
+            new Set(steps.map((step) => step.id)).size,
+            5,
+            `tirage ${seed} : deux étapes identiques`
+        );
+    }
+}
+
 // --- Une seule bonne réponse, aucun doublon, distracteurs pédagogiques --------
 {
     for (let seed = 1; seed <= 40; seed += 1) {
         const steps = createLevel1Steps(createSeededRandom(seed));
-        steps.filter((step) => step.type !== "SELECT_PARTS").forEach((step) => {
+        steps.forEach((step) => {
             assert.equal(step.options.length, 3);
             assert.equal(step.options.filter((option) => option.correct).length, 1);
             assert.equal(new Set(step.options.map((option) => option.key)).size, 3);
