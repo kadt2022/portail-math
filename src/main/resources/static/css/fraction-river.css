@@ -178,9 +178,10 @@
    la scène. Il se pose alors sur le parchemin peint, à droite.
    La largeur est de 36 % et non 18,9 % : le parchemin dessiné est trop étroit
    pour un énoncé, il donnait 121 px sur un téléphone. Le panneau HTML reprend
-   donc son style et le PROLONGE vers la gauche — le dessin sert de socle, pas
-   de cadre rigide. Ces valeurs et questionPanel dans v2/anchors.js doivent
-   rester d'accord. */
+   donc ce socle et le PROLONGE vers la gauche — mais le socle lui-même reste
+   invisible : c'est le parchemin déjà peint dans l'illustration qui joue le
+   rôle de fond, pas une seconde fenêtre HTML posée dessus. Ces valeurs et
+   questionPanel dans v2/anchors.js doivent rester d'accord. */
 .river-stage > .game-question {
     position: absolute;
     z-index: 30;
@@ -207,19 +208,17 @@
     align-items: stretch;
     gap: clamp(2px, 0.8vh, 10px);
     margin: 0;
-    padding: clamp(8px, 1.8vh, 18px) clamp(10px, 1.6vw, 20px);
+    padding: clamp(6px, 1.4vh, 14px) clamp(4px, 1vw, 12px);
     overflow: hidden;
     text-align: center;
 
-    /* En débordant du parchemin peint, le texte de gauche se poserait sur la
-       rivière et le pont, illisible. Un fond parchemin léger PROLONGE le dessin :
-       teinte chaude translucide, coins très arrondis et ombre douce vers
-       l'illustration — une extension du rouleau, pas une fenêtre Web posée
-       dessus. */
-    background: linear-gradient(180deg, rgb(251 238 203 / 94%) 0%, rgb(242 221 170 / 94%) 100%);
-    border: 2px solid rgb(140 96 46 / 55%);
-    border-radius: 18px;
-    box-shadow: 0 6px 22px rgb(11 42 58 / 32%);
+    /* Plus de cadre : aucun fond, aucune bordure, aucune ombre sur le
+       conteneur. Le grand rectangle beige ressemblait à une fenêtre web posée
+       sur le décor et masquait la rivière. Chaque élément (titre, boutons)
+       porte désormais son propre petit habillage, voir plus bas. */
+    background: transparent;
+    border: 0;
+    box-shadow: none;
 }
 
 /* La zone centrale prend la place restante et centre son contenu. */
@@ -235,13 +234,21 @@
 }
 
 /* Tailles plancher, non négociables sur téléphone en paysage : un énoncé
-   rapetissé jusqu'à tenir n'est plus un énoncé. */
+   rapetissé jusqu'à tenir n'est plus un énoncé.
+   Pas de fond : le titre flotte sur le parchemin peint. La lisibilité vient
+   d'un blanc plein et gras, détouré d'une ombre brune sombre — un effet
+   gravé/peint, pas une pastille. */
 .river-stage > .game-question [data-step-title] {
     margin: 0;
-    color: #4a2b0a;
-    font-size: max(23px, 4vh);
+    color: #fffdf6;
+    font-weight: 800;
+    font-size: max(21px, 3.6vh);
     line-height: 1.15;
     text-wrap: balance;
+    text-shadow:
+        0 1px 2px rgb(46 26 6 / 85%),
+        0 0 6px rgb(31 16 3 / 70%),
+        0 2px 0 rgb(31 16 3 / 60%);
 }
 
 .river-stage > .game-question .fr-visual-holder {
@@ -263,13 +270,58 @@
     justify-content: center;
 }
 
+/* Chaque réponse est une petite planche de bois clair : c'est elle qui porte
+   le fond désormais, plus le grand cadre. Le grain (fines rayures brunes) et
+   le veinage évoquent le bois du pont et des pierres déjà peints dans le
+   décor, sans ajouter de nouvelle image. */
 .river-stage > .game-question .answer-option {
     flex: 1 1 0;
     min-width: 0;
     /* 48 px : la cible tactile minimale, jamais rognée pour gagner de la place. */
     min-height: 48px;
     padding: 4px 6px;
-    font-size: max(24px, 4.2vh);
+    font-size: max(22px, 3.8vh);
+    color: #3a2308;
+    background:
+        repeating-linear-gradient(100deg, rgb(140 96 46 / 10%) 0 2px, transparent 2px 12px),
+        linear-gradient(180deg, #f8ecc9 0%, #ecd39c 100%);
+    border: 2px solid #8c602e;
+    border-radius: 12px;
+    box-shadow:
+        0 3px 6px rgb(11 42 58 / 30%),
+        inset 0 1px 0 rgb(255 255 255 / 55%);
+    transition: transform 90ms ease, box-shadow 90ms ease, background 90ms ease;
+}
+
+.river-stage > .game-question .answer-option:hover:not(:disabled) {
+    border-color: #6f4a1f;
+    transform: translateY(-1px);
+}
+
+/* Contour bleu foncé net, bien visible sur le bois clair — pas de halo violet
+   hérité du thème par défaut. */
+.river-stage > .game-question .answer-option:focus-visible {
+    outline: 3px solid #1b3a6b;
+    outline-offset: 2px;
+}
+
+/* Légère compression au clic, comme une planche qu'on presse du doigt. */
+.river-stage > .game-question .answer-option:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+/* Vert feuille doux — jamais le violet ni le vert vif du thème par défaut. */
+.river-stage > .game-question .answer-option.is-correct {
+    color: #24401a;
+    background: linear-gradient(180deg, #dcefc3 0%, #bfe09a 100%);
+    border-color: #5f8c3f;
+}
+
+/* Ocre doux : une erreur reste chaleureuse, jamais un rouge d'alarme. */
+.river-stage > .game-question .answer-option.is-wrong {
+    color: #5c3d10;
+    background: linear-gradient(180deg, #f1dfae 0%, #e3c07f 100%);
+    border-color: #a97a35;
 }
 
 /* Pour « Quel dessin montre 1/2 ? », trois miniatures sur une seule ligne
@@ -301,7 +353,9 @@
 
 .river-stage > .game-question [data-step-feedback] {
     margin: 0;
+    color: #3a2308;
     font-size: max(13px, 2vh);
+    text-shadow: 0 0 5px rgb(255 250 230 / 85%);
 }
 
 /* ---------- Visuels de fractions ---------- */
