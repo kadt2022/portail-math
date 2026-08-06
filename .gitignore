@@ -19,3 +19,6 @@ src/main/resources/static/images/games/fraction-river/prototype/
 # La barre initiale est indispensable : sans elle, le motif exclurait TOUS les
 # dossiers « images » du dépôt, y compris les ressources de production.
 /images/
+
+# Script local de déploiement manuel OpenShift.
+/deploy-openshift.bat
