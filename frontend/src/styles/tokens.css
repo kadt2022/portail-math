@@ -1,0 +1,75 @@
+/* Jetons de la nouvelle identité visuelle du portail React.
+   Chargés une seule fois, globalement, par AppLayout. Aucune règle Thymeleaf
+   n'importe ce fichier et lui n'importe rien du CSS des pages historiques :
+   les deux univers visuels restent étanches pendant la migration. */
+
+:root {
+  /* Couleurs : chaude, lumineuse, calme — pas la palette violette/bleu nuit
+     des pages Thymeleaf, volontairement pour marquer la nouvelle identité. */
+  --pm-bg: #fbf7f0;
+  --pm-surface: #ffffff;
+  --pm-surface-warm: #fef3e6;
+  --pm-ink: #1f2a24;
+  --pm-ink-soft: #5b6660;
+  --pm-line: #ead9c4;
+
+  --pm-brand: #17493f;
+  --pm-brand-dark: #0f332b;
+  --pm-accent: #e2762b;
+  --pm-accent-dark: #b85c1c;
+  --pm-accent-soft: #fce3cd;
+
+  --pm-success: #0b9667;
+  --pm-success-soft: #e1f6ec;
+
+  --pm-focus: #123c8f;
+
+  --pm-radius-sm: 10px;
+  --pm-radius-md: 16px;
+  --pm-radius-lg: 24px;
+
+  --pm-shadow-sm: 0 1px 3px rgb(31 42 36 / 8%);
+  --pm-shadow-md: 0 8px 24px rgb(31 42 36 / 10%);
+  --pm-shadow-lg: 0 24px 60px rgb(15 51 43 / 22%);
+
+  /* Forme signature : coins asymétriques, utilisée sur les badges numérotés
+     de la nav et des cartes. Reconnaissable sans dépendre d'une couleur. */
+  --pm-radius-signature: 18px 6px 18px 6px;
+
+  --pm-max-width: 1560px;
+  --pm-sidebar: 264px;
+  --pm-topbar: 68px;
+}
+
+.pm-root {
+  min-height: 100%;
+  background: var(--pm-bg);
+  color: var(--pm-ink);
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.pm-root * {
+  box-sizing: border-box;
+}
+
+.pm-root :focus-visible {
+  outline: 3px solid var(--pm-focus);
+  outline-offset: 2px;
+}
+
+.pm-root h1,
+.pm-root h2,
+.pm-root h3 {
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-root * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

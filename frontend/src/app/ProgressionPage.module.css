@@ -1,0 +1,23 @@
+.page {
+  padding: 40px 0 64px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--pm-accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 8px 0 12px;
+  font-size: clamp(26px, 4vw, 36px);
+}
+
+.lead {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--pm-ink-soft);
+}

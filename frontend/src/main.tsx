@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { App } from "./App";
+import { AppRouter } from "./app/AppRouter";
+import "./styles/tokens.css";
 
 const container = document.getElementById("root");
 
@@ -11,6 +12,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <div className="pm-root">
+      <AppRouter />
+    </div>
   </StrictMode>,
 );

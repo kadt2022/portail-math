@@ -10,6 +10,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    // Sans cible explicite, esbuild minifie les media queries vers la
+    // syntaxe d'intervalle (`width<=899px`) : plus courte, mais muette sur
+    // les navigateurs plus anciens (Safari < 16.4) au lieu d'ignorer la
+    // règle proprement. Une cible large force la syntaxe classique
+    // (`max-width`), comprise partout, pour le même résultat.
+    cssTarget: ["chrome90", "safari14", "firefox90"],
   },
   server: {
     port: 5173,
