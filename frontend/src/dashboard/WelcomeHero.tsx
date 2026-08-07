@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import styles from "./WelcomeHero.module.css";
 
 // h1 unique de la page : le tableau de bord n'en porte pas d'autre.
@@ -5,18 +7,20 @@ import styles from "./WelcomeHero.module.css";
 // aucun doublon créé. Un voile dégradé assure la lisibilité du texte sans
 // couvrir les enfants à droite.
 export function WelcomeHero() {
+  const { t } = useTranslation("dashboard");
+
   return (
     <section className={styles.hero}>
       <img className={styles.photo} src="/images/enfants-revision.webp" alt="" />
       <div className={styles.scrim} aria-hidden="true" />
       <div className={styles.content}>
-        <p className={styles.eyebrow}>Portail-Math</p>
+        <p className={styles.eyebrow}>{t("welcome.eyebrow")}</p>
         <h1 className={styles.title}>
-          Bonjour, <span>explorateur !</span>
+          {t("welcome.titleLine1")} <span>{t("welcome.titleLine2")}</span>
         </h1>
-        <p className={styles.lead}>Choisis une aventure ou continue celle que tu as déjà commencée.</p>
+        <p className={styles.lead}>{t("welcome.description")}</p>
         <a className={styles.cta} href="#jeux-disponibles">
-          Voir les jeux <span aria-hidden="true">→</span>
+          {t("welcome.exploreGames")} <span aria-hidden="true">→</span>
         </a>
       </div>
     </section>

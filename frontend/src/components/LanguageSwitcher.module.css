@@ -1,0 +1,37 @@
+.switcher {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--pm-line);
+  border-radius: 999px;
+  background: var(--pm-surface);
+}
+
+.option {
+  min-width: 36px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pm-ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.option:hover {
+  color: var(--pm-brand);
+}
+
+.optionActive {
+  background: var(--pm-brand);
+  color: #fff;
+}
+
+.optionActive:hover {
+  color: #fff;
+}

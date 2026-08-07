@@ -1,0 +1,27 @@
+{
+  "welcome": {
+    "eyebrow": "Portail-Math",
+    "titleLine1": "Bonjour,",
+    "titleLine2": "explorateur !",
+    "description": "Choisis une aventure ou continue celle que tu as déjà commencée.",
+    "exploreGames": "Voir les jeux"
+  },
+  "continuePlaying": {
+    "heading": "Continuer à jouer",
+    "message": "Choisis ta première aventure parmi les jeux disponibles.",
+    "cta": "Choisir un jeu"
+  },
+  "progress": {
+    "heading": "Ta progression",
+    "gamesStarted": "Jeux commencés",
+    "challengesCompleted": "Défis terminés",
+    "firstTrySuccesses": "Réussites au premier essai",
+    "correctedErrors": "Erreurs corrigées"
+  },
+  "availableGames": {
+    "heading": "Jeux disponibles"
+  },
+  "upcomingGames": {
+    "heading": "À découvrir bientôt"
+  }
+}

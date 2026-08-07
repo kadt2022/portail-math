@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
 import styles from "./GameCard.module.css";
@@ -19,29 +20,32 @@ function CardVisual({ game }: GameCardProps) {
 }
 
 export function GameCard({ game }: GameCardProps) {
+  const { t } = useTranslation("games");
   const isComingSoon = game.availability === "coming-soon";
   const isInternal = game.availability === "react";
+  const name = t(game.nameKey);
+  const ctaLabel = t(game.ctaLabelKey);
 
   return (
     <article className={styles.card}>
       <div className={styles.illustration}>
         <CardVisual game={game} />
-        {isComingSoon ? <span className={styles.badge}>Nouveau</span> : null}
+        {isComingSoon ? <span className={styles.badge}>{t("badge.new")}</span> : null}
       </div>
       <div className={styles.body}>
-        <h3 className={styles.name}>{game.name}</h3>
-        <p className={styles.description}>{game.description}</p>
+        <h3 className={styles.name}>{name}</h3>
+        <p className={styles.description}>{t(game.descriptionKey)}</p>
         {isComingSoon ? (
           <span className={styles.ctaDisabled} aria-disabled="true">
-            {game.ctaLabel}
+            {ctaLabel}
           </span>
         ) : isInternal ? (
           <Link className={styles.cta} to={game.href}>
-            {game.ctaLabel}
+            {ctaLabel}
           </Link>
         ) : (
           <a className={styles.cta} href={game.href}>
-            {game.ctaLabel}
+            {ctaLabel}
           </a>
         )}
       </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { gameCatalogue } from "../games/game-catalogue";
 import { GameCard } from "../games/GameCard";
 import { ContinuePlaying } from "./ContinuePlaying";
@@ -7,6 +9,8 @@ import { UpcomingGames } from "./UpcomingGames";
 import { WelcomeHero } from "./WelcomeHero";
 
 export function DashboardPage() {
+  const { t } = useTranslation("dashboard");
+
   return (
     <div className={styles.page}>
       <WelcomeHero />
@@ -15,7 +19,7 @@ export function DashboardPage() {
 
       <section className={styles.gamesSection} id="jeux-disponibles" aria-labelledby="jeux-titre">
         <h2 id="jeux-titre" className={styles.heading}>
-          Jeux disponibles
+          {t("availableGames.heading")}
         </h2>
         <div className={styles.gamesGrid}>
           {gameCatalogue.map((game) => (

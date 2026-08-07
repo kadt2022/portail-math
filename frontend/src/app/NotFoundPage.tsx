@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import styles from "./NotFoundPage.module.css";
 
 export function NotFoundPage() {
+  const { t } = useTranslation("common");
+
   return (
     <div className={styles.page}>
-      <p className={styles.eyebrow}>Page introuvable</p>
-      <h1 className={styles.title}>Cette page n'existe pas</h1>
-      <p className={styles.lead}>
-        Le lien suivi n'aboutit à aucune page du portail. Retourne au tableau de bord pour
-        retrouver tes jeux et ta progression.
-      </p>
+      <p className={styles.eyebrow}>{t("notFound.eyebrow")}</p>
+      <h1 className={styles.title}>{t("notFound.title")}</h1>
+      <p className={styles.lead}>{t("notFound.description")}</p>
       <Link className={styles.back} to="/">
-        Retour au tableau de bord
+        {t("notFound.back")}
       </Link>
     </div>
   );
