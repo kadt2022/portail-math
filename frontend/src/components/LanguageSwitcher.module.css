@@ -1,6 +1,11 @@
 .switcher {
   display: flex;
   flex: 0 0 auto;
+  /* Pousse le sélecteur (et tout ce qui le suit, le bouton menu sur mobile)
+     vers le bord droit de la barre. Sur grand écran, le bouton menu est
+     masqué : c'est cette marge qui reste seule responsable de coller EN|FR
+     au coin droit, plutôt que de le laisser collé à la marque à gauche. */
+  margin-left: auto;
   gap: 2px;
   padding: 3px;
   border: 1px solid var(--pm-line);
