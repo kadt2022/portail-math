@@ -1,0 +1,40 @@
+{
+  "cataloguePage": {
+    "eyebrow": "Catalogue",
+    "title": "Les jeux"
+  },
+  "badge": {
+    "new": "Nouveau"
+  },
+  "multiplicationTrain": {
+    "name": "Le Train des multiplications",
+    "description": "Apprends les tables de 2 et 5 en faisant avancer ton train.",
+    "cta": "Jouer"
+  },
+  "fractionRiver": {
+    "name": "La Rivière des fractions",
+    "description": "Traverse la rivière en reconnaissant les bonnes fractions.",
+    "cta": "Jouer"
+  },
+  "newGame": {
+    "name": "Nouveau jeu éducatif",
+    "description": "Une nouvelle aventure mathématique arrive bientôt.",
+    "cta": "Bientôt disponible"
+  },
+  "comingSoonPage": {
+    "eyebrow": "Nouveau jeu éducatif",
+    "title": "Le jeu est en préparation",
+    "description": "Une nouvelle aventure mathématique arrive bientôt sur le portail. Reviens la retrouver dès qu'elle sera prête.",
+    "back": "Retour aux jeux"
+  },
+  "upcoming": {
+    "numberMarket": {
+      "name": "Le Marché des nombres",
+      "description": "Compte, compare et échange au marché."
+    },
+    "shapeBuilder": {
+      "name": "Le Constructeur de formes",
+      "description": "Assemble des formes pour découvrir la géométrie."
+    }
+  }
+}

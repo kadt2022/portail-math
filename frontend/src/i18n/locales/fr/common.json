@@ -1,0 +1,28 @@
+{
+  "appName": "Portail-Math",
+  "tagline": "Apprendre, jouer et progresser",
+  "documentTitle": "Portail-Math · Apprendre, jouer et progresser",
+  "skipToContent": "Aller au contenu",
+  "openMenu": "Ouvrir le menu",
+  "closeMenu": "Fermer le menu",
+  "mainNavigation": "Navigation principale",
+  "navSectionLabel": "Portail",
+  "legacyPortal": "Portail historique",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "games": "Jeux",
+    "progress": "Progression"
+  },
+  "language": {
+    "label": "Langue",
+    "french": "Français",
+    "english": "English",
+    "switchTo": "Passer en {{language}}"
+  },
+  "notFound": {
+    "eyebrow": "Page introuvable",
+    "title": "Cette page n'existe pas",
+    "description": "Le lien suivi n'aboutit à aucune page du portail. Retourne au tableau de bord pour retrouver tes jeux et ta progression.",
+    "back": "Retour au tableau de bord"
+  }
+}

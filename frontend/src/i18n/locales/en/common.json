@@ -1,0 +1,28 @@
+{
+  "appName": "Portail-Math",
+  "tagline": "Learn, play and grow",
+  "documentTitle": "Portail-Math · Learn, play and grow",
+  "skipToContent": "Skip to main content",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "mainNavigation": "Main navigation",
+  "navSectionLabel": "Portal",
+  "legacyPortal": "Legacy portal",
+  "nav": {
+    "dashboard": "Dashboard",
+    "games": "Games",
+    "progress": "Progress"
+  },
+  "language": {
+    "label": "Language",
+    "french": "Français",
+    "english": "English",
+    "switchTo": "Switch to {{language}}"
+  },
+  "notFound": {
+    "eyebrow": "Page not found",
+    "title": "This page does not exist",
+    "description": "The link you followed doesn't lead to any page on the portal. Go back to the dashboard to find your games and progress.",
+    "back": "Back to dashboard"
+  }
+}

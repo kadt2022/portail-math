@@ -1,28 +1,32 @@
+import { useTranslation } from "react-i18next";
+
 import styles from "./ProgressSummary.module.css";
 
-const PLACEHOLDER_STATS = [
-  { label: "Jeux commencés" },
-  { label: "Défis terminés" },
-  { label: "Réussites au premier essai" },
-  { label: "Erreurs corrigées" },
+const STAT_KEYS = [
+  "progress.gamesStarted",
+  "progress.challengesCompleted",
+  "progress.firstTrySuccesses",
+  "progress.correctedErrors",
 ];
 
 // Emplacement réservé : aucune donnée réelle n'est lue dans cette PR. Le
 // tiret évite d'afficher un faux zéro que l'enfant pourrait lire comme un
 // échec.
 export function ProgressSummary() {
+  const { t } = useTranslation("dashboard");
+
   return (
     <section className={styles.section} aria-labelledby="progression-titre">
       <h2 id="progression-titre" className={styles.heading}>
-        Ta progression
+        {t("progress.heading")}
       </h2>
       <div className={styles.grid}>
-        {PLACEHOLDER_STATS.map((stat) => (
-          <div className={styles.tile} key={stat.label}>
+        {STAT_KEYS.map((key) => (
+          <div className={styles.tile} key={key}>
             <p className={styles.value} aria-hidden="true">
               —
             </p>
-            <p className={styles.label}>{stat.label}</p>
+            <p className={styles.label}>{t(key)}</p>
           </div>
         ))}
       </div>

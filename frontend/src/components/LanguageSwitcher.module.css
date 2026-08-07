@@ -1,0 +1,42 @@
+.switcher {
+  display: flex;
+  flex: 0 0 auto;
+  /* Pousse le sélecteur (et tout ce qui le suit, le bouton menu sur mobile)
+     vers le bord droit de la barre. Sur grand écran, le bouton menu est
+     masqué : c'est cette marge qui reste seule responsable de coller EN|FR
+     au coin droit, plutôt que de le laisser collé à la marque à gauche. */
+  margin-left: auto;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--pm-line);
+  border-radius: 999px;
+  background: var(--pm-surface);
+}
+
+.option {
+  min-width: 36px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pm-ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.option:hover {
+  color: var(--pm-brand);
+}
+
+.optionActive {
+  background: var(--pm-brand);
+  color: #fff;
+}
+
+.optionActive:hover {
+  color: #fff;
+}

@@ -1,13 +1,19 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { useSyncDocumentLanguage } from "../i18n/useSyncDocumentLanguage";
 import { Sidebar } from "./Sidebar";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
+  const { t } = useTranslation("common");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useSyncDocumentLanguage();
 
   // La sidebar mobile se referme avec Échap et rend le focus au bouton qui
   // l'a ouverte : sans ça, un utilisateur au clavier perdrait sa position.
@@ -42,17 +48,19 @@ export function AppLayout() {
   return (
     <div className={styles.shell}>
       <a className={styles.skipLink} href="#contenu">
-        Aller au contenu
+        {t("skipToContent")}
       </a>
 
       <header className={styles.header}>
         <Link to="/" className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true" />
           <span className={styles.brandText}>
-            <span className={styles.brandName}>Portail-Math</span>
-            <span className={styles.brandTagline}>Apprendre, jouer et progresser</span>
+            <span className={styles.brandName}>{t("appName")}</span>
+            <span className={styles.brandTagline}>{t("tagline")}</span>
           </span>
         </Link>
+
+        <LanguageSwitcher />
 
         <button
           ref={menuButtonRef}
@@ -60,7 +68,7 @@ export function AppLayout() {
           className={styles.menuButton}
           aria-expanded={sidebarOpen}
           aria-controls={navId}
-          aria-label={sidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-label={sidebarOpen ? t("closeMenu") : t("openMenu")}
           onClick={() => setSidebarOpen((open) => !open)}
         >
           <span />

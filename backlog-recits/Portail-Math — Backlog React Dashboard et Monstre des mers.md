@@ -18,16 +18,19 @@ Ce n'est pas un monstre qui poursuit la pirogue. C'est le **gardien joyeux des p
 # Ordre officiel
 
 ```text
-1. REACT-DASHBOARD-01 — Coquille moderne
-2. REACT-DASHBOARD-02 — Progression réelle
-3. REACT-CATALOGUE-01 — Catalogue React
-4. GAME-RUNTIME-01 — Pont React–Phaser
-5. MONSTRE-MERS-01 — Le monstre pose sa première question
-6. MONSTRE-MERS-02 — Cinq énigmes et moteur pédagogique
-7. MONSTRE-MERS-03 — Parcours de la pirogue
-8. MONSTRE-MERS-04 — Sauvegarde et résultats
-9. MONSTRE-MERS-05 — Immersif et validation mobile
+1. REACT-DASHBOARD-01 — Coquille moderne (fusionné, PR #13)
+2. REACT-I18N-01 — Dashboard bilingue français–anglais
+3. REACT-DASHBOARD-02 — Progression réelle
+4. REACT-CATALOGUE-01 — Catalogue React
+5. GAME-RUNTIME-01 — Pont React–Phaser
+6. MONSTRE-MERS-01 — Le monstre pose sa première question
+7. MONSTRE-MERS-02 — Cinq énigmes et moteur pédagogique
+8. MONSTRE-MERS-03 — Parcours de la pirogue
+9. MONSTRE-MERS-04 — Sauvegarde et résultats
+10. MONSTRE-MERS-05 — Immersif et validation mobile
 ```
+
+`REACT-I18N-01` est intercalé avant la suite : le récit doit être en place avant que les textes des nouveaux écrans et jeux ne se multiplient dans les composants React.
 
 Chaque récit correspond à une branche et une PR distincte. Aucune ne doit mélanger la portée d'une autre : c'est précisément ce qui rendait l'ancien `REACT-DASHBOARD-01` trop gros pour une seule PR.
 
@@ -335,6 +338,422 @@ lecture de la progression réelle
 catalogue React fonctionnel (Train/Rivière restent liés vers Thymeleaf)
 runtime Phaser
 Monstre des mers jouable
+```
+
+---
+
+# REACT-I18N-01 — Rendre le Dashboard React bilingue français–anglais
+
+**Statut :** prêt pour développement
+**Base :** `main` après fusion de `REACT-DASHBOARD-01`
+
+## Branche proposée
+
+```text
+feature/react-i18n-01
+```
+
+## Intention
+
+En tant qu'élève francophone ou anglophone, je veux utiliser le même Dashboard React dans ma langue afin de comprendre la navigation, les activités et les messages sans changer d'application.
+
+En tant que mainteneur, je veux une infrastructure de traduction centralisée afin d'éviter de dupliquer les pages React et de disperser les textes directement dans les composants.
+
+## Décision d'architecture
+
+Portail-Math reste **une seule application React bilingue** :
+
+```text
+une base de code
+un Dashboard
+un catalogue
+une progression
+deux langues : français et anglais
+```
+
+Il ne faut pas créer :
+
+```text
+une application française
+une application anglaise
+deux builds Vite
+deux ensembles de composants
+deux arbres de routes
+```
+
+Les routes restent techniques et indépendantes de la langue :
+
+```text
+/app
+/app/games
+/app/progress
+/app/library
+/app/courses
+/app/settings
+```
+
+Aucune route `/fr/**` ou `/en/**` n'est créée dans ce récit.
+
+**Note d'implémentation :** les routes ci-dessus reprennent la nomenclature du récit original ; `REACT-DASHBOARD-01` a livré `/app`, `/app/jeux`, `/app/jeux/nouveau-jeu-react` et `/app/progression` (en français). Ce récit ne renomme aucune route existante — seuls les libellés affichés changent avec la langue.
+
+## Technologies
+
+Ajouter :
+
+```text
+i18next
+react-i18next
+```
+
+La détection et la persistance de la langue restent implémentées dans le projet, sans dépendance supplémentaire obligatoire.
+
+## Sélection de la langue
+
+Ordre de résolution :
+
+```text
+1. préférence déjà enregistrée
+2. langue préférée du navigateur
+3. français comme langue de repli
+```
+
+Règles :
+
+```text
+préférence enregistrée = fr
+→ français
+
+préférence enregistrée = en
+→ anglais
+
+aucune préférence et navigateur anglais
+→ anglais
+
+toute autre situation
+→ français
+```
+
+Clé de stockage :
+
+```text
+portailMath.preferences.language
+```
+
+Valeurs autorisées :
+
+```text
+fr
+en
+```
+
+Une valeur inconnue ou corrompue doit être ignorée. Ne jamais appeler `localStorage.clear()`.
+
+## Sélecteur de langue
+
+Ajouter un sélecteur visible dans la barre supérieure :
+
+```text
+FR | EN
+```
+
+Sur laptop et grand écran : sélecteur visible dans l'en-tête.
+Sur tablette et téléphone : sélecteur accessible dans le menu de navigation, ou conservé dans l'en-tête compact.
+
+Le changement de langue doit être immédiat :
+
+```text
+aucun rechargement complet
+aucune perte de progression
+aucun changement de route
+aucune recréation des données métier
+```
+
+Le bouton actif doit exposer son état aux technologies d'assistance.
+
+## Organisation proposée
+
+```text
+frontend/src/
+├── i18n/
+│   ├── i18n.ts
+│   ├── language-storage.ts
+│   ├── supported-languages.ts
+│   └── locales/
+│       ├── fr/
+│       │   ├── common.json
+│       │   ├── dashboard.json
+│       │   ├── games.json
+│       │   └── progress.json
+│       └── en/
+│           ├── common.json
+│           ├── dashboard.json
+│           ├── games.json
+│           └── progress.json
+└── components/
+    └── LanguageSwitcher.tsx
+```
+
+Langues supportées :
+
+```typescript
+export const SUPPORTED_LANGUAGES = ["fr", "en"] as const;
+export type SupportedLanguage =
+  (typeof SUPPORTED_LANGUAGES)[number];
+```
+
+## Textes à migrer dans ce récit
+
+### Identité
+
+| Français                       | Anglais              |
+| ------------------------------- | --------------------- |
+| Portail-Math                   | Portail-Math          |
+| Apprendre, jouer et progresser | Learn, play and grow  |
+
+### Navigation
+
+| Français           | Anglais       |
+| ------------------- | ------------- |
+| Tableau de bord    | Dashboard     |
+| Jeux               | Games         |
+| Progression        | Progress      |
+| Bibliothèque       | Library       |
+| Cours              | Courses       |
+| Récompenses        | Rewards       |
+| Paramètres         | Settings      |
+| Portail historique | Legacy portal |
+
+### Accueil
+
+| Français                                                 | Anglais                                           |
+| --------------------------------------------------------- | --------------------------------------------------- |
+| Bonjour, explorateur !                                   | Welcome, explorer!                                |
+| Continue ton parcours ou choisis une nouvelle aventure.  | Continue your journey or choose a new adventure.  |
+| Voir les jeux                                            | Explore games                                     |
+| Continuer                                                | Continue                                          |
+
+### Sections
+
+| Français              | Anglais                 |
+| ---------------------- | ------------------------ |
+| Continue ton aventure | Continue your adventure |
+| Choisis un jeu        | Choose a game           |
+| À découvrir bientôt   | Coming soon              |
+| Ma progression        | My progress             |
+| Ma prochaine étape    | My next step            |
+
+### Actions
+
+| Français                  | Anglais           |
+| --------------------------- | ------------------- |
+| Jouer                     | Play               |
+| Rejouer                   | Play again         |
+| Bientôt disponible        | Coming soon        |
+| Retour au tableau de bord | Back to dashboard  |
+| Retour aux jeux           | Back to games      |
+
+### Accessibilité
+
+| Français                   | Anglais              |
+| ---------------------------- | ---------------------- |
+| Aller au contenu principal | Skip to main content  |
+| Navigation principale      | Main navigation       |
+| Ouvrir le menu             | Open menu             |
+| Fermer le menu             | Close menu            |
+| Page actuelle              | Current page          |
+
+**Note d'implémentation :** cette table reprend les libellés du récit original. Certains ne correspondent pas encore à un composant livré par `REACT-DASHBOARD-01` (Bibliothèque, Cours, Récompenses, Paramètres) — les clés de traduction sont créées quand même, prêtes pour ces écrans futurs, mais aucun composant n'est ajouté dans ce récit pour les porter.
+
+## Utilisation dans les composants
+
+Les textes visibles ne doivent plus être codés directement :
+
+```tsx
+<h1>Bonjour, explorateur !</h1>
+```
+
+Utiliser les clés de traduction :
+
+```tsx
+const { t } = useTranslation("dashboard");
+<h1>{t("welcome.title")}</h1>
+<p>{t("welcome.description")}</p>
+```
+
+Exemple français :
+
+```json
+{
+  "welcome": {
+    "title": "Bonjour, explorateur !",
+    "description": "Continue ton parcours ou choisis une nouvelle aventure.",
+    "exploreGames": "Voir les jeux"
+  }
+}
+```
+
+Exemple anglais :
+
+```json
+{
+  "welcome": {
+    "title": "Welcome, explorer!",
+    "description": "Continue your journey or choose a new adventure.",
+    "exploreGames": "Explore games"
+  }
+}
+```
+
+## Données et progression
+
+Le changement de langue ne doit modifier aucune donnée métier. Les clés existantes restent identiques :
+
+```text
+portailMath.games.fractionRiver.v1
+portailMath.games.multiplicationTrain.v1
+portailMath.exetat.progress.v1
+```
+
+Les données suivantes restent indépendantes de la langue :
+
+```text
+identifiants de jeux
+identifiants de questions
+scores
+niveaux
+étapes
+codes de badges
+dates
+état de progression
+```
+
+Exemple :
+
+```text
+code interne : FRACTION_RIVER
+fr : La Rivière des fractions
+en : Fraction River
+```
+
+Le code interne ne change jamais lorsque la langue change.
+
+## Contraintes pour les futurs jeux
+
+Les questions pédagogiques doivent utiliser des phrases complètes traduisibles.
+
+À éviter :
+
+```typescript
+t("whatIs") + " " + a + " + " + b;
+```
+
+À utiliser :
+
+```typescript
+t("questions.addition.prompt", { a, b });
+```
+
+Français :
+
+```json
+{
+  "questions": {
+    "addition": {
+      "prompt": "Combien font {{a}} + {{b}} ?"
+    }
+  }
+}
+```
+
+Anglais :
+
+```json
+{
+  "questions": {
+    "addition": {
+      "prompt": "What is {{a}} + {{b}}?"
+    }
+  }
+}
+```
+
+Les illustrations et les scènes Phaser ne doivent contenir aucun texte peint.
+
+## Responsive
+
+Les deux langues doivent rester lisibles sur toutes les tailles prévues. Le CSS doit accepter :
+
+```text
+libellés sur deux lignes
+boutons de largeur variable
+titres anglais ou français plus longs
+menu vertical sans texte coupé
+menu mobile sans débordement
+```
+
+Interdictions :
+
+```text
+largeur fixe calculée pour une seule langue
+texte tronqué sans nécessité
+font-size réduit pour faire tenir une traduction
+position absolue dépendant de la longueur du texte
+```
+
+## Accessibilité
+
+Le sélecteur doit :
+
+```text
+indiquer la langue active
+être utilisable au clavier
+avoir un focus visible
+avoir un nom accessible
+annoncer clairement Français et English
+```
+
+L'attribut de langue du document doit être synchronisé : `<html lang="fr">` ou `<html lang="en">`.
+
+Le titre de la page doit également être traduit.
+
+## Critères d'acceptation
+
+```text
+[ ] une seule application React sert le français et l'anglais
+[ ] le sélecteur FR/EN est disponible
+[ ] le changement de langue est immédiat
+[ ] la préférence survit au rechargement
+[ ] le français est la langue de repli
+[ ] la langue du navigateur est prise en compte à la première visite
+[ ] toutes les chaînes du Dashboard viennent des fichiers de traduction
+[ ] aucun composant du Dashboard ne contient de texte métier codé en dur
+[ ] les routes sont identiques dans les deux langues
+[ ] les données de progression sont partagées
+[ ] les clés localStorage métier restent inchangées
+[ ] document.documentElement.lang reflète la langue active
+[ ] les deux langues fonctionnent dès 320 px
+[ ] les deux langues fonctionnent sur tablette, laptop et grand écran
+[ ] le bundle ne charge pas Phaser
+[ ] npm run lint réussit
+[ ] npm run test réussit
+[ ] npm run build réussit
+[ ] les tests Java réussissent
+[ ] les tests JavaScript historiques réussissent
+[ ] /api/** reste inchangé
+[ ] /actuator/** reste inchangé
+[ ] aucun appel à localStorage.clear()
+```
+
+## Hors périmètre
+
+```text
+traduction complète des pages Thymeleaf
+traduction des anciens jeux
+traduction du contenu Exetat
+ajout d'une troisième langue
+traduction automatique
+gestion des traductions depuis le backend
+routes localisées /fr/** et /en/**
 ```
 
 ---
