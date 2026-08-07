@@ -1,0 +1,42 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 520px;
+  padding: 64px 0;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--pm-accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 34px);
+}
+
+.lead {
+  margin: 0;
+  color: var(--pm-ink-soft);
+}
+
+.back {
+  padding: 12px 20px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--pm-line);
+  color: var(--pm-brand);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back:hover {
+  border-color: var(--pm-brand);
+  background: var(--pm-surface-warm);
+}
