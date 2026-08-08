@@ -3,10 +3,12 @@ import { initReactI18next } from "react-i18next";
 
 import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
+import exetatEn from "./locales/en/exetat.json";
 import gamesEn from "./locales/en/games.json";
 import progressEn from "./locales/en/progress.json";
 import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
+import exetatFr from "./locales/fr/exetat.json";
 import gamesFr from "./locales/fr/games.json";
 import progressFr from "./locales/fr/progress.json";
 import { resolveInitialLanguage } from "./language-storage";
@@ -21,14 +23,26 @@ void i18next
     lng: resolveInitialLanguage(),
     fallbackLng: FALLBACK_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,
-    ns: ["common", "dashboard", "games", "progress"],
+    ns: ["common", "dashboard", "exetat", "games", "progress"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,
     },
     resources: {
-      fr: { common: commonFr, dashboard: dashboardFr, games: gamesFr, progress: progressFr },
-      en: { common: commonEn, dashboard: dashboardEn, games: gamesEn, progress: progressEn },
+      fr: {
+        common: commonFr,
+        dashboard: dashboardFr,
+        exetat: exetatFr,
+        games: gamesFr,
+        progress: progressFr,
+      },
+      en: {
+        common: commonEn,
+        dashboard: dashboardEn,
+        exetat: exetatEn,
+        games: gamesEn,
+        progress: progressEn,
+      },
     },
   });
 

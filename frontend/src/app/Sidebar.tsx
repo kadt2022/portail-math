@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { legacyPortalUrl, navigationLinks } from "./navigation";
+import { navigationLinks } from "./navigation";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
@@ -36,9 +36,6 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
             </NavLink>
           ))}
         </nav>
-        <a className={styles.legacyLink} href={legacyPortalUrl}>
-          {t("legacyPortal")}
-        </a>
       </aside>
     </div>
   );

@@ -1,0 +1,86 @@
+.page {
+  padding: 36px 0 64px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--pm-accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page > h1 {
+  max-width: 760px;
+  margin: 8px 0 12px;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.08;
+}
+
+.lead {
+  max-width: 66ch;
+  margin: 0 0 28px;
+  color: var(--pm-ink-soft);
+  font-size: clamp(17px, 2.2vw, 20px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(250px, 0.8fr);
+  gap: 18px;
+}
+
+.card,
+.values {
+  min-width: 0;
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid var(--pm-line);
+  border-radius: 22px;
+  background: var(--pm-surface);
+}
+
+.notice {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--pm-surface-warm);
+}
+
+.notice p {
+  margin: 6px 0 0;
+}
+
+.values {
+  color: #fff;
+  background: var(--pm-ink);
+}
+
+.values h2 {
+  margin-top: 0;
+}
+
+.values ul {
+  display: grid;
+  padding-left: 20px;
+  gap: 10px;
+}
+
+.link {
+  display: inline-flex;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 10px 16px;
+  align-items: center;
+  border-radius: 12px;
+  color: var(--pm-ink);
+  background: #fff;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

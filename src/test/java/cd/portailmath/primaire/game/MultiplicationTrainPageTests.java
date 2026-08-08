@@ -10,8 +10,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -21,29 +21,33 @@ class MultiplicationTrainPageTests {
     private MockMvc mockMvc;
 
     @Test
-    void gamesCatalogueIsAvailable() throws Exception {
+    void legacyGamesCatalogueRedirectsToReact() throws Exception {
         mockMvc.perform(get("/primaire/jeux"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("primaire/games/catalogue"))
-                .andExpect(content().string(containsString("Le Train des multiplications")))
-                .andExpect(content().string(containsString("Jouer maintenant")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app/jeux"));
     }
 
     @Test
-    void multiplicationTrainIsAvailable() throws Exception {
+    void legacyMultiplicationTrainRedirectsToTheStaticShell() throws Exception {
         mockMvc.perform(get("/primaire/jeux/train-multiplications"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/games/multiplication-train.html"));
+    }
+
+    @Test
+    void multiplicationTrainStaticShellIsAvailable() throws Exception {
+        mockMvc.perform(get("/games/multiplication-train.html"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("primaire/games/multiplication-train"))
                 .andExpect(content().string(containsString("data-multiplication-train")))
                 .andExpect(content().string(containsString("Tables de 2 et 5")))
-                .andExpect(content().string(containsString("/js/multiplication-train.js")));
+                .andExpect(content().string(containsString("/js/multiplication-train.js")))
+                .andExpect(content().string(not(containsString("th:"))));
     }
 
     @Test
     void unknownGameUsesClean404Page() throws Exception {
         mockMvc.perform(get("/primaire/jeux/inconnu"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(containsString("Page introuvable")))
                 .andExpect(content().string(not(containsString("java.lang"))));
     }
 }

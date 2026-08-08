@@ -22,7 +22,7 @@ function CardVisual({ game }: GameCardProps) {
 export function GameCard({ game }: GameCardProps) {
   const { t } = useTranslation("games");
   const isComingSoon = game.availability === "coming-soon";
-  const isInternal = game.availability === "react";
+  const isReactRoute = game.availability === "react";
   const name = t(game.nameKey);
   const ctaLabel = t(game.ctaLabelKey);
 
@@ -39,7 +39,7 @@ export function GameCard({ game }: GameCardProps) {
           <span className={styles.ctaDisabled} aria-disabled="true">
             {ctaLabel}
           </span>
-        ) : isInternal ? (
+        ) : isReactRoute ? (
           <Link className={styles.cta} to={game.href}>
             {ctaLabel}
           </Link>

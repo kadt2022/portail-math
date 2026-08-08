@@ -2,6 +2,29 @@
   "page": {
     "eyebrow": "Progress",
     "title": "Your progress",
-    "description": "Your detailed progress will appear here soon. In the meantime, find your games from the dashboard."
+    "description": "Find your EXETAT results saved on this device."
+  },
+  "summary": {
+    "subjects": "Subjects started",
+    "average": "Best average",
+    "correct": "Correct answers",
+    "review": "Questions to review"
+  },
+  "subjects": {
+    "title": "Progress by subject",
+    "best": "Best score",
+    "attempts": "Attempts",
+    "continue": "Continue"
+  },
+  "status": {
+    "NOT_STARTED": "Not started",
+    "IN_PROGRESS": "In progress",
+    "MASTERED": "Mastered",
+    "TO_REVIEW": "To review"
+  },
+  "empty": {
+    "title": "No completed quiz yet",
+    "description": "Start an EXETAT subject and your results will appear here without creating an account.",
+    "cta": "Choose a subject"
   }
 }

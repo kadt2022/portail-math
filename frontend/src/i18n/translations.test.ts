@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
+import exetatEn from "./locales/en/exetat.json";
 import gamesEn from "./locales/en/games.json";
 import progressEn from "./locales/en/progress.json";
 import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
+import exetatFr from "./locales/fr/exetat.json";
 import gamesFr from "./locales/fr/games.json";
 import progressFr from "./locales/fr/progress.json";
 
@@ -24,6 +26,7 @@ function keyPaths(value: unknown, prefix = ""): string[] {
 const NAMESPACES = [
   { name: "common", fr: commonFr, en: commonEn },
   { name: "dashboard", fr: dashboardFr, en: dashboardEn },
+  { name: "exetat", fr: exetatFr, en: exetatEn },
   { name: "games", fr: gamesFr, en: gamesEn },
   { name: "progress", fr: progressFr, en: progressEn },
 ];

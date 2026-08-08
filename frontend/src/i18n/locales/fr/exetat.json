@@ -1,0 +1,58 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "errorTitle": "Impossible de charger ce contenu"
+  },
+  "catalogue": {
+    "eyebrow": "Préparation EXETAT",
+    "title": "Choisis une matière",
+    "description": "Révise les notions essentielles avec des quiz corrigés et conserve ta progression sur cet appareil.",
+    "questions": "Questions",
+    "minutes": "Minutes",
+    "discover": "Découvrir la matière"
+  },
+  "subject": {
+    "back": "Retour aux matières",
+    "topics": "Notions travaillées",
+    "prepare": "Voir les règles du quiz",
+    "start": "Commencer le quiz"
+  },
+  "training": {
+    "eyebrow": "Entraînement",
+    "description": "Prépare-toi avant de commencer : chaque réponse est suivie d'une correction détaillée.",
+    "rulesTitle": "Les règles du quiz",
+    "ruleQuestions_one": "{{count}} question",
+    "ruleQuestions_other": "{{count}} questions",
+    "ruleTime_one": "Environ {{count}} minute",
+    "ruleTime_other": "Environ {{count}} minutes",
+    "ruleFeedback": "Une correction expliquée après chaque réponse",
+    "ruleProgress": "Ta progression est enregistrée localement à la fin",
+    "start_one": "Commencer la question",
+    "start_other": "Commencer les {{count}} questions",
+    "back": "Retour à la matière"
+  },
+  "quiz": {
+    "eyebrow": "Quiz EXETAT",
+    "title": "À toi de jouer",
+    "reviewTitle": "Révision de tes erreurs",
+    "question": "Question {{current}} sur {{total}}",
+    "score": "Score {{score}}/{{total}}",
+    "validate": "Valider ma réponse",
+    "next": "Question suivante",
+    "results": "Voir mes résultats",
+    "correct": "Bravo, c'est la bonne réponse !",
+    "incorrect": "Ce n'est pas la bonne réponse."
+  },
+  "results": {
+    "eyebrow": "Résultats du quiz",
+    "reviewEyebrow": "Révision terminée",
+    "reviewTitle": "Tes erreurs corrigées",
+    "score": "Résultat",
+    "correct": "Bonnes réponses",
+    "corrected": "Erreurs corrigées",
+    "toReview": "À revoir",
+    "review": "Revoir mes erreurs",
+    "retry": "Recommencer le quiz",
+    "progress": "Voir ma progression"
+  }
+}

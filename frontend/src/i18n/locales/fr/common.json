@@ -7,11 +7,12 @@
   "closeMenu": "Fermer le menu",
   "mainNavigation": "Navigation principale",
   "navSectionLabel": "Portail",
-  "legacyPortal": "Portail historique",
   "nav": {
     "dashboard": "Tableau de bord",
+    "exetat": "Préparer l'EXETAT",
     "games": "Jeux",
-    "progress": "Progression"
+    "progress": "Progression",
+    "about": "À propos"
   },
   "language": {
     "label": "Langue",
@@ -24,5 +25,20 @@
     "title": "Cette page n'existe pas",
     "description": "Le lien suivi n'aboutit à aucune page du portail. Retourne au tableau de bord pour retrouver tes jeux et ta progression.",
     "back": "Retour au tableau de bord"
+  },
+  "about": {
+    "eyebrow": "Notre mission",
+    "title": "À propos de Mbuyamba Maths RDC",
+    "lead": "Rendre les mathématiques plus claires, plus proches et plus accessibles à chaque élève.",
+    "descriptionOne": "Mbuyamba Maths RDC est un portail éducatif indépendant destiné à aider les élèves à apprendre et à réviser les mathématiques.",
+    "descriptionTwo": "Il propose un parcours de préparation à l'EXETAT et des jeux d'apprentissage pour le primaire.",
+    "noticeTitle": "Information importante",
+    "notice": "Ce portail n'est pas une plateforme officielle du ministère de l'Éducation.",
+    "valuesLabel": "Valeurs du portail",
+    "valuesTitle": "Apprendre. S'exercer. Réussir.",
+    "valueSimple": "Des explications simples",
+    "valuePaths": "Deux parcours adaptés",
+    "valueFree": "Un accès gratuit",
+    "discover": "Découvrir le portail"
   }
 }

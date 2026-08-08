@@ -13,10 +13,8 @@ export interface NavigationLink {
 // pointerait vers "/app/app".
 export const navigationLinks: NavigationLink[] = [
   { to: "/", labelKey: "nav.dashboard" },
+  { to: "/exetat", labelKey: "nav.exetat" },
   { to: "/jeux", labelKey: "nav.games" },
   { to: "/progression", labelKey: "nav.progress" },
+  { to: "/a-propos", labelKey: "nav.about" },
 ];
-
-// Pendant la migration, certaines pages n'existent encore que sous Thymeleaf.
-// Ce lien reste une vraie URL serveur, jamais une route cliente.
-export const legacyPortalUrl = "/";

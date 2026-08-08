@@ -4,14 +4,10 @@ server:
     include-exception: false
     include-message: never
     include-stacktrace: never
-    whitelabel:
-      enabled: false
 
 spring:
   application:
     name: portail-math
-  thymeleaf:
-    cache: false
 
 management:
   endpoints:

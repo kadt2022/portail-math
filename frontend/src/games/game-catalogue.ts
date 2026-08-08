@@ -1,13 +1,13 @@
 // Source unique des jeux affichés à la fois par le tableau de bord et par le
-// catalogue React. Les jeux non migrés pointent vers de vraies URL serveur
-// (Thymeleaf) : ce ne sont jamais des routes clientes.
+// catalogue React. Les moteurs historiques restent servis dans des coquilles
+// HTML statiques : ce ne sont pas des routes clientes du SPA.
 //
 // `nameKey` / `descriptionKey` / `ctaLabelKey` pointent vers le namespace
 // "games" (voir frontend/src/i18n/locales/*/games.json) : jamais de texte
 // affiché figé ici, pour que le Dashboard reste bilingue sans dupliquer
 // cette liste.
 
-export type GameAvailability = "external" | "react" | "coming-soon";
+export type GameAvailability = "standalone" | "react" | "coming-soon";
 
 export type GameSceneId = "train" | "new-game";
 
@@ -30,8 +30,8 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     nameKey: "multiplicationTrain.name",
     descriptionKey: "multiplicationTrain.description",
     ctaLabelKey: "multiplicationTrain.cta",
-    href: "/primaire/jeux/train-multiplications",
-    availability: "external",
+    href: "/games/multiplication-train.html",
+    availability: "standalone",
     sceneId: "train",
   },
   {
@@ -39,8 +39,8 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     nameKey: "fractionRiver.name",
     descriptionKey: "fractionRiver.description",
     ctaLabelKey: "fractionRiver.cta",
-    href: "/primaire/jeux/riviere-des-fractions",
-    availability: "external",
+    href: "/games/fraction-river.html",
+    availability: "standalone",
     // Recadrée et compressée depuis l'illustration déjà utilisée par le jeu :
     // voir images/dashboard/riviere-carte.webp (75 Ko, contre 2,6 Mo pour
     // l'originale, qui inclut aussi le parchemin vide du jeu, inutile ici).

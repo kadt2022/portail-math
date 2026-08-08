@@ -10,8 +10,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -21,21 +21,23 @@ class FractionRiverPageTests {
     private MockMvc mockMvc;
 
     @Test
-    void gamesCatalogueAnnouncesFractionRiver() throws Exception {
+    void legacyGamesCatalogueRedirectsToReact() throws Exception {
         mockMvc.perform(get("/primaire/jeux"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("La Rivière des fractions")))
-                .andExpect(content().string(containsString("/primaire/jeux/riviere-des-fractions?mode=immersive")))
-                .andExpect(content().string(containsString("data-fraction-river-direct-launch")))
-                .andExpect(content().string(containsString("/js/fraction-river-launch.js")))
-                .andExpect(content().string(containsString("Jouer <span")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app/jeux"));
     }
 
     @Test
-    void fractionRiverPageIsAvailable() throws Exception {
+    void legacyFractionRiverRedirectsToTheStaticShell() throws Exception {
         mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/games/fraction-river.html"));
+    }
+
+    @Test
+    void fractionRiverStaticShellIsAvailable() throws Exception {
+        mockMvc.perform(get("/games/fraction-river.html"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("primaire/games/fraction-river"))
                 .andExpect(content().string(containsString("data-fraction-river")))
                 .andExpect(content().string(containsString("/js/fraction-river.js")))
                 .andExpect(content().string(containsString("is-fraction-river-immersive")))
@@ -45,12 +47,12 @@ class FractionRiverPageTests {
     }
 
     @Test
-    void fractionRiverImmersiveRouteKeepsDirectLaunchContract() throws Exception {
-        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions?mode=immersive"))
+    void fractionRiverStaticShellKeepsDirectLaunchContract() throws Exception {
+        mockMvc.perform(get("/games/fraction-river.html"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("data-game-console")))
                 .andExpect(content().string(containsString("is-fraction-river-immersive")))
-                .andExpect(content().string(containsString("Tourne ton téléphone pour jouer.")))
+                .andExpect(content().string(containsString("data-console-rotate")))
                 .andExpect(content().string(not(containsString("data-console-launch"))));
     }
 
@@ -94,7 +96,7 @@ class FractionRiverPageTests {
 
     @Test
     void fractionRiverLevelPickerDoesNotInterruptLaunch() throws Exception {
-        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+        mockMvc.perform(get("/games/fraction-river.html"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("Quel passage veux-tu emprunter ?"))))
                 .andExpect(content().string(not(containsString("Les Nénuphars équivalents"))))
@@ -104,7 +106,7 @@ class FractionRiverPageTests {
 
     @Test
     void phaserIsServedLocallyAndPinnedByVersion() throws Exception {
-        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+        mockMvc.perform(get("/games/fraction-river.html"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/js/vendor/phaser-3.90.0.min.js")))
                 .andExpect(content().string(containsString("fraction-river-game.js")))
@@ -117,7 +119,7 @@ class FractionRiverPageTests {
 
     @Test
     void questionsStayInAccessibleHtmlOutsideTheCanvas() throws Exception {
-        mockMvc.perform(get("/primaire/jeux/riviere-des-fractions"))
+        mockMvc.perform(get("/games/fraction-river.html"))
                 .andExpect(status().isOk())
                 // La scène Phaser est décorative et masquée aux lecteurs d'écran.
                 .andExpect(content().string(containsString("id=\"fraction-river-game\"")))
@@ -131,7 +133,6 @@ class FractionRiverPageTests {
     void unknownFractionRiverSubPathUsesClean404Page() throws Exception {
         mockMvc.perform(get("/primaire/jeux/riviere-des-fractions/inconnu"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(containsString("Page introuvable")))
                 .andExpect(content().string(not(containsString("java.lang"))));
     }
 }

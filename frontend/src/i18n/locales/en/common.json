@@ -7,11 +7,12 @@
   "closeMenu": "Close menu",
   "mainNavigation": "Main navigation",
   "navSectionLabel": "Portal",
-  "legacyPortal": "Legacy portal",
   "nav": {
     "dashboard": "Dashboard",
+    "exetat": "Prepare for EXETAT",
     "games": "Games",
-    "progress": "Progress"
+    "progress": "Progress",
+    "about": "About"
   },
   "language": {
     "label": "Language",
@@ -24,5 +25,20 @@
     "title": "This page does not exist",
     "description": "The link you followed doesn't lead to any page on the portal. Go back to the dashboard to find your games and progress.",
     "back": "Back to dashboard"
+  },
+  "about": {
+    "eyebrow": "Our mission",
+    "title": "About Mbuyamba Maths RDC",
+    "lead": "Make mathematics clearer, more relatable and more accessible to every student.",
+    "descriptionOne": "Mbuyamba Maths RDC is an independent educational portal designed to help students learn and review mathematics.",
+    "descriptionTwo": "It provides an EXETAT preparation path and primary-level learning games.",
+    "noticeTitle": "Important information",
+    "notice": "This portal is not an official platform of the Ministry of Education.",
+    "valuesLabel": "Portal values",
+    "valuesTitle": "Learn. Practice. Succeed.",
+    "valueSimple": "Simple explanations",
+    "valuePaths": "Two tailored learning paths",
+    "valueFree": "Free access",
+    "discover": "Explore the portal"
   }
 }

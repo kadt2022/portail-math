@@ -1,20 +1,28 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
-      th:classappend="${immersiveMode} ? 'is-fraction-river-immersive'">
-<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
-<body th:classappend="${immersiveMode} ? 'is-fraction-river-immersive'">
+<html lang="fr" class="is-fraction-river-immersive">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="La Rivière des fractions du Portail-Math.">
+    <title>La Rivière des fractions · Portail-Math</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/multiplication-train.css">
+    <link rel="stylesheet" href="/css/game-console.css">
+    <link rel="stylesheet" href="/css/fraction-river.css">
+</head>
+<body class="is-fraction-river-immersive">
 <a class="skip-link" href="#contenu">Aller au contenu</a>
-<div class="app-shell">
-    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
-    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
-
+<div class="app-shell standalone-game-shell">
     <div class="page-shell">
-        <header th:replace="~{fragments/header :: header}"></header>
+        <header class="topbar standalone-game-header">
+            <a class="standalone-game-brand" href="/app/" aria-label="Portail-Math — Accueil">✦ Portail-Math</a>
+            <a class="standalone-game-back" href="/app/jeux">Retour aux jeux</a>
+        </header>
         <main id="contenu" class="page-content river-page-content" data-fraction-river>
             <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
-                <a th:href="@{/primaire}">Primaire</a>
+                <a href="/app/">Portail</a>
                 <span aria-hidden="true">›</span>
-                <a th:href="@{/primaire/jeux}">Jeux éducatifs</a>
+                <a href="/app/jeux">Jeux éducatifs</a>
                 <span aria-hidden="true">›</span>
                 <span aria-current="page">La Rivière des fractions</span>
             </nav>
@@ -91,7 +99,7 @@
                     <p class="result-message" data-result-message></p>
                     <div class="result-actions">
                         <button class="game-primary-button" type="button" data-replay>Retraverser</button>
-                        <a class="game-secondary-button" th:href="@{/primaire/jeux}">Retour aux jeux</a>
+                        <a class="game-secondary-button" href="/app/jeux">Retour aux jeux</a>
                     </div>
                 </section>
             </section>
@@ -99,18 +107,18 @@
     </div>
 </div>
 <!-- Phaser est servi localement et épinglé par version : voir docs/DEPENDANCES-FRONTEND.md -->
-<script th:src="@{/js/vendor/phaser-3.90.0.min.js}"></script>
+<script src="/js/vendor/phaser-3.90.0.min.js"></script>
 <!-- Le décor est une illustration peinte, plus une construction de primitives.
      anchors.js déclare où le chien pose les pattes ; PlayScene n'anime que ce
      qui bouge. Voir docs/art-direction/fraction-river/README.md -->
-<script th:src="@{/js/games/fraction-river/v2/anchors.js}"></script>
-<script th:src="@{/js/games/fraction-river/v2/PlayScene.js}"></script>
-<script th:src="@{/js/games/fraction-river/fraction-river-game.js}"></script>
-<script th:src="@{/js/game-console.js}"></script>
-<script th:src="@{/js/fraction-river-events.js}"></script>
-<script th:src="@{/js/fraction-river-visuals.js}"></script>
-<script th:src="@{/js/fraction-river-questions.js}"></script>
-<script th:src="@{/js/fraction-river-store.js}"></script>
-<script th:src="@{/js/fraction-river.js}"></script>
+<script src="/js/games/fraction-river/v2/anchors.js"></script>
+<script src="/js/games/fraction-river/v2/PlayScene.js"></script>
+<script src="/js/games/fraction-river/fraction-river-game.js"></script>
+<script src="/js/game-console.js"></script>
+<script src="/js/fraction-river-events.js"></script>
+<script src="/js/fraction-river-visuals.js"></script>
+<script src="/js/fraction-river-questions.js"></script>
+<script src="/js/fraction-river-store.js"></script>
+<script src="/js/fraction-river.js"></script>
 </body>
 </html>

@@ -1,24 +1,34 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Prototype illustré de La Rivière des fractions.">
+    <title>Prototype illustré · La Rivière des fractions · Portail-Math</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/multiplication-train.css">
+    <link rel="stylesheet" href="/css/game-console.css">
+    <link rel="stylesheet" href="/css/fraction-river.css">
+    <link rel="stylesheet" href="/css/fraction-river-v2.css">
+</head>
 <body>
 <a class="skip-link" href="#contenu">Aller au contenu</a>
-<div class="app-shell">
-    <aside th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></aside>
-    <button class="nav-backdrop" type="button" data-nav-close aria-label="Fermer le menu"></button>
-
+<div class="app-shell standalone-game-shell">
     <div class="page-shell">
-        <header th:replace="~{fragments/header :: header}"></header>
+        <header class="topbar standalone-game-header">
+            <a class="standalone-game-brand" href="/app/" aria-label="Portail-Math — Accueil">✦ Portail-Math</a>
+            <a class="standalone-game-back" href="/app/jeux">Retour aux jeux</a>
+        </header>
         <!-- river-page-content n'est pas décoratif : c'est la portée où
              fraction-river.css déclare --fraction-empty. Sans cette classe, les
              parts vides des disques retombent sur le noir. -->
         <main id="contenu" class="page-content river-page-content">
             <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
-                <a th:href="@{/primaire}">Primaire</a>
+                <a href="/app/">Portail</a>
                 <span aria-hidden="true">›</span>
-                <a th:href="@{/primaire/jeux}">Jeux éducatifs</a>
+                <a href="/app/jeux">Jeux éducatifs</a>
                 <span aria-hidden="true">›</span>
-                <a th:href="@{/primaire/jeux/riviere-des-fractions}">La Rivière des fractions</a>
+                <a href="/games/fraction-river.html">La Rivière des fractions</a>
                 <span aria-hidden="true">›</span>
                 <span aria-current="page">Version illustrée</span>
             </nav>
@@ -48,7 +58,7 @@
                  dépend pas de l'endroit où le bloc est accroché. -->
             <div class="fraction-river-v2" data-river-v2>
                 <img class="fraction-river-v2__background"
-                     th:src="@{/images/games/fraction-river/prototype/river-scene.png}"
+                     src="/images/games/fraction-river/prototype/river-scene.png"
                      alt=""
                      aria-hidden="true">
 
@@ -108,17 +118,17 @@
     </div>
 </div>
 <!-- Phaser est servi localement et épinglé par version : voir docs/DEPENDANCES-FRONTEND.md -->
-<script th:src="@{/js/vendor/phaser-3.90.0.min.js}"></script>
-<script th:src="@{/js/game-console.js}"></script>
+<script src="/js/vendor/phaser-3.90.0.min.js"></script>
+<script src="/js/game-console.js"></script>
 <!-- Moteur pédagogique existant, réutilisé tel quel. -->
-<script th:src="@{/js/fraction-river-events.js}"></script>
-<script th:src="@{/js/fraction-river-visuals.js}"></script>
-<script th:src="@{/js/fraction-river-questions.js}"></script>
+<script src="/js/fraction-river-events.js"></script>
+<script src="/js/fraction-river-visuals.js"></script>
+<script src="/js/fraction-river-questions.js"></script>
 <!-- Couches de la version illustrée. -->
-<script th:src="@{/js/games/fraction-river/v2/anchors.js}"></script>
-<script th:src="@{/js/games/fraction-river/v2/CalibrationScene.js}"></script>
-<script th:src="@{/js/games/fraction-river/v2/PlayScene.js}"></script>
-<script th:src="@{/js/games/fraction-river/v2/prototype.js}"></script>
-<script th:src="@{/js/games/fraction-river/v2/play.js}"></script>
+<script src="/js/games/fraction-river/v2/anchors.js"></script>
+<script src="/js/games/fraction-river/v2/CalibrationScene.js"></script>
+<script src="/js/games/fraction-river/v2/PlayScene.js"></script>
+<script src="/js/games/fraction-river/v2/prototype.js"></script>
+<script src="/js/games/fraction-river/v2/play.js"></script>
 </body>
 </html>

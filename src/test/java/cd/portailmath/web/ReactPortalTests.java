@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -45,7 +46,15 @@ class ReactPortalTests {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("id=\"root\"")));
 
-        mockMvc.perform(get("/app/bibliotheque/rayon/3"))
+        mockMvc.perform(get("/app/jeux"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"root\"")));
+
+        mockMvc.perform(get("/app/progression"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"root\"")));
+
+        mockMvc.perform(get("/app/exetat/matieres/cercle"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("id=\"root\"")));
     }
@@ -54,6 +63,8 @@ class ReactPortalTests {
     void apiNeverFallsBackToTheReactShell() throws Exception {
         mockMvc.perform(get("/api/v1/inconnu"))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.path").value("/api/v1/inconnu"))
                 .andExpect(content().string(not(containsString("id=\"root\""))));
     }
 
@@ -66,13 +77,11 @@ class ReactPortalTests {
     }
 
     @Test
-    void existingThymeleafPagesAreUntouched() throws Exception {
+    void publicEntryPointsRedirectToReact() throws Exception {
         mockMvc.perform(get("/"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(not(containsString("id=\"root\""))));
+                .andExpect(status().is3xxRedirection());
 
         mockMvc.perform(get("/primaire/jeux"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Le Train des multiplications")));
+                .andExpect(status().is3xxRedirection());
     }
 }

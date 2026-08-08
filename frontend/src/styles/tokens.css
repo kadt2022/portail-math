@@ -1,11 +1,7 @@
-/* Jetons de la nouvelle identité visuelle du portail React.
-   Chargés une seule fois, globalement, par AppLayout. Aucune règle Thymeleaf
-   n'importe ce fichier et lui n'importe rien du CSS des pages historiques :
-   les deux univers visuels restent étanches pendant la migration. */
+/* Jetons de l'identité visuelle du portail React, chargés globalement par AppLayout. */
 
 :root {
-  /* Couleurs : chaude, lumineuse, calme — pas la palette violette/bleu nuit
-     des pages Thymeleaf, volontairement pour marquer la nouvelle identité. */
+  /* Couleurs chaudes, lumineuses et calmes. */
   --pm-bg: #fbf7f0;
   --pm-surface: #ffffff;
   --pm-surface-warm: #fef3e6;

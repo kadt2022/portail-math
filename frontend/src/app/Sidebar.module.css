@@ -76,20 +76,6 @@
   font-weight: 850;
 }
 
-.legacyLink {
-  margin-top: auto;
-  padding: 12px 10px;
-  border-top: 1px solid var(--pm-line);
-  color: var(--pm-ink-soft);
-  font-size: 13px;
-  font-weight: 650;
-  text-decoration: none;
-}
-
-.legacyLink:hover {
-  color: var(--pm-brand);
-}
-
 /* Mobile : la sidebar devient un tiroir plein hauteur, caché par défaut. */
 .backdrop {
   display: none;
