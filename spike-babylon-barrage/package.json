@@ -1,0 +1,18 @@
+{
+  "name": "spike-babylon-barrage",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Prototype exploratoire hors livraison : verifie que Babylon.js tient la route (perfs telephone) avant tout engagement. Voir backlog-recits, section 'Regle des moteurs de jeu'.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^9.20.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1"
+  }
+}
