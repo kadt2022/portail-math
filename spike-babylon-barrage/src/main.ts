@@ -15,6 +15,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 
 // Étape 3 du spike : l'eau ondule et les turbines tournent. Volontairement
 // sans texture ni matériau d'eau dédié (pas de @babylonjs/materials) : les
@@ -42,12 +43,13 @@ function createScene(): Scene {
   );
   camera.attachControl(canvas, true);
   camera.lowerRadiusLimit = 10;
-  camera.upperRadiusLimit = 50;
+  camera.upperRadiusLimit = 60;
 
   const light = new HemisphericLight("light", new Vector3(0, 1, 0.3), scene);
   light.intensity = 0.9;
 
-  const ground = MeshBuilder.CreateGround("ground", { width: 34, height: 24 }, scene);
+  const ground = MeshBuilder.CreateGround("ground", { width: 34, height: 46 }, scene);
+  ground.position.z = 10;
   const groundMaterial = new StandardMaterial("groundMaterial", scene);
   groundMaterial.diffuseColor = new Color3(0.36, 0.55, 0.32);
   ground.material = groundMaterial;
@@ -57,6 +59,16 @@ function createScene(): Scene {
   createControlBuilding(scene);
   const turbines = createTurbines(scene);
 
+  const glow = new GlowLayer("glow", scene);
+  glow.intensity = 0.9;
+
+  const wires = createPowerLine(scene);
+  const city = createCity(scene);
+
+  // Pas encore de vraie "ouverture des vannes" déclenchée par le joueur —
+  // ça viendra avec le moteur pédagogique. Pour ce spike, un cycle continu
+  // (0 → 1 → 0 sur ~7 s) suffit à répondre à la question posée : est-ce que
+  // l'énergie peut visuellement remonter du barrage jusqu'à la ville ?
   let elapsed = 0;
   scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -70,6 +82,11 @@ function createScene(): Scene {
       // appliquées ensuite à chaque image.
       turbine.mesh.rotate(turbine.axis, turbine.speed * deltaSeconds, Space.WORLD);
     }
+
+    const cycle = elapsed % 7;
+    const energyProgress = cycle < 5 ? cycle / 5 : 1 - (cycle - 5) / 2;
+    animatePowerLine(wires, energyProgress);
+    animateCity(city, energyProgress);
   });
 
   return scene;
@@ -177,6 +194,134 @@ function createControlBuilding(scene: Scene): void {
   const buildingMaterial = new StandardMaterial("controlBuildingMaterial", scene);
   buildingMaterial.diffuseColor = new Color3(0.82, 0.74, 0.58);
   building.material = buildingMaterial;
+}
+
+interface PowerLineWire {
+  mesh: Mesh;
+  material: StandardMaterial;
+  // Fenêtre [onAt, litAt] dans le cycle 0→1 : le fil commence à s'allumer à
+  // "onAt" et atteint son éclat maximal à "litAt" — donne l'impression que
+  // l'énergie progresse fil par fil plutôt que tout d'un coup.
+  onAt: number;
+  litAt: number;
+}
+
+// Trois pylônes en ligne depuis le bâtiment de contrôle jusqu'à l'entrée de
+// la ville, reliés par des fils (tubes fins) qui s'illuminent en séquence.
+function createPowerLine(scene: Scene): PowerLineWire[] {
+  const pylonMaterial = new StandardMaterial("pylonMaterial", scene);
+  pylonMaterial.diffuseColor = new Color3(0.4, 0.4, 0.42);
+
+  const pylonZs = [4, 8, 12];
+  const pylonTopHeight = 4.6;
+  const anchors: Vector3[] = [new Vector3(7, 7.4, -0.3)];
+
+  pylonZs.forEach((z, index) => {
+    const pole = MeshBuilder.CreateBox(`pylon-pole-${index}`, { width: 0.3, height: pylonTopHeight, depth: 0.3 }, scene);
+    pole.position.set(0, pylonTopHeight / 2, z);
+    pole.material = pylonMaterial;
+
+    const crossarm = MeshBuilder.CreateBox(`pylon-arm-${index}`, { width: 2.4, height: 0.16, depth: 0.16 }, scene);
+    crossarm.position.set(0, pylonTopHeight - 0.3, z);
+    crossarm.material = pylonMaterial;
+
+    anchors.push(new Vector3(0, pylonTopHeight - 0.3, z));
+  });
+
+  anchors.push(new Vector3(0, 3.2, 17));
+
+  const segmentCount = anchors.length - 1;
+  const wires: PowerLineWire[] = [];
+  for (let i = 0; i < segmentCount; i++) {
+    const wireMaterial = new StandardMaterial(`wireMaterial-${i}`, scene);
+    wireMaterial.diffuseColor = new Color3(0.15, 0.15, 0.18);
+    wireMaterial.emissiveColor = new Color3(0, 0, 0);
+
+    const wire = MeshBuilder.CreateTube(
+      `wire-${i}`,
+      { path: [anchors[i], anchors[i + 1]], radius: 0.05, tessellation: 6 },
+      scene,
+    );
+    wire.material = wireMaterial;
+
+    wires.push({
+      mesh: wire,
+      material: wireMaterial,
+      onAt: i / segmentCount,
+      litAt: (i + 1) / segmentCount,
+    });
+  }
+
+  return wires;
+}
+
+function animatePowerLine(wires: PowerLineWire[], progress: number): void {
+  const glowColor = new Color3(0.35, 0.75, 1);
+  for (const wire of wires) {
+    const local = remapClamped(progress, wire.onAt, wire.litAt);
+    wire.material.emissiveColor = glowColor.scale(local);
+  }
+}
+
+interface CityBuilding {
+  windowMaterial: StandardMaterial;
+  baseColor: Color3;
+}
+
+// Un petit groupe d'immeubles en bout de ligne : la vraie "récompense"
+// visuelle du cycle. Chaque immeuble porte une bande de fenêtres qui ne
+// s'allume qu'après que le dernier fil a atteint son éclat maximal.
+function createCity(scene: Scene): CityBuilding[] {
+  const wallMaterial = new StandardMaterial("cityWallMaterial", scene);
+  wallMaterial.diffuseColor = new Color3(0.55, 0.53, 0.5);
+
+  const layout = [
+    { x: -4, height: 3.4 },
+    { x: -1.6, height: 5.2 },
+    { x: 1, height: 4 },
+    { x: 3.4, height: 6.4 },
+  ];
+
+  return layout.map((entry, index) => {
+    const building = MeshBuilder.CreateBox(
+      `city-building-${index}`,
+      { width: 1.8, height: entry.height, depth: 1.8 },
+      scene,
+    );
+    building.position.set(entry.x, entry.height / 2, 17 + (index % 2) * 1.2);
+    building.material = wallMaterial;
+
+    const windowMaterial = new StandardMaterial(`city-windows-${index}`, scene);
+    windowMaterial.diffuseColor = new Color3(0.2, 0.2, 0.22);
+    windowMaterial.emissiveColor = new Color3(0, 0, 0);
+
+    const windows = MeshBuilder.CreateBox(
+      `city-window-strip-${index}`,
+      { width: 1.82, height: entry.height * 0.5, depth: 1.82 },
+      scene,
+    );
+    windows.parent = building;
+    windows.position.set(0, entry.height * 0.15, 0);
+    windows.material = windowMaterial;
+
+    return { windowMaterial, baseColor: new Color3(1, 0.82, 0.45) };
+  });
+}
+
+function animateCity(city: CityBuilding[], progress: number): void {
+  // La ville ne s'allume qu'à la toute fin du cycle (au-delà de 90 %) :
+  // l'énergie doit d'abord avoir traversé toute la ligne.
+  const local = remapClamped(progress, 0.9, 1);
+  for (const building of city) {
+    building.windowMaterial.emissiveColor = building.baseColor.scale(local);
+  }
+}
+
+function remapClamped(value: number, inMin: number, inMax: number): number {
+  if (inMax <= inMin) {
+    return value >= inMax ? 1 : 0;
+  }
+  return Math.min(1, Math.max(0, (value - inMin) / (inMax - inMin)));
 }
 
 const activeScene = createScene();
