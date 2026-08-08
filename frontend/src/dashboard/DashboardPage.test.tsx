@@ -18,12 +18,12 @@ describe("Tableau de bord", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 
-  it("les jeux existants pointent vers leurs vraies routes Thymeleaf", () => {
+  it("les jeux existants pointent vers leurs coquilles statiques", () => {
     renderDashboard();
     const links = screen.getAllByRole("link", { name: /jouer/i });
     const hrefs = links.map((link) => link.getAttribute("href"));
-    expect(hrefs).toContain("/primaire/jeux/train-multiplications");
-    expect(hrefs).toContain("/primaire/jeux/riviere-des-fractions");
+    expect(hrefs).toContain("/games/multiplication-train.html");
+    expect(hrefs).toContain("/games/fraction-river.html");
   });
 
   it("le nouveau jeu n'a pas de bouton actif tant qu'il n'est pas développé", () => {

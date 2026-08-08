@@ -1,8 +1,16 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { DashboardPage } from "../dashboard/DashboardPage";
+import {
+  ExetatCataloguePage,
+  ExetatQuizPage,
+  ExetatResultsPage,
+  ExetatSubjectPage,
+  ExetatTrainingPage,
+} from "../exetat/ExetatPages";
 import { GamesCataloguePage } from "../games/GamesCataloguePage";
 import { NewGameComingSoonPage } from "../games/new-game/NewGameComingSoonPage";
+import { AboutPage } from "./AboutPage";
 import { AppLayout } from "./AppLayout";
 import { NotFoundPage } from "./NotFoundPage";
 import { ProgressionPage } from "./ProgressionPage";
@@ -18,9 +26,18 @@ export function AppRouter() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
+          <Route path="exetat" element={<ExetatCataloguePage />} />
+          <Route path="exetat/matieres/:subjectId" element={<ExetatSubjectPage />} />
+          <Route
+            path="exetat/matieres/:subjectId/entrainement"
+            element={<ExetatTrainingPage />}
+          />
+          <Route path="exetat/matieres/:subjectId/quiz" element={<ExetatQuizPage />} />
+          <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
           <Route path="jeux" element={<GamesCataloguePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
+          <Route path="a-propos" element={<AboutPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

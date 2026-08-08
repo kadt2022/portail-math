@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,23 +33,33 @@ class QuizPageTests {
     private ExetatCatalogService catalogService;
 
     @Test
-    void rendersInteractiveQuizPage() throws Exception {
+    void legacyQuizRouteRedirectsAndApiStartsTheInteractiveQuiz() throws Exception {
         mockMvc.perform(get("/exetat/matieres/cercle/quiz"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("exetat/quiz"))
-                .andExpect(content().string(containsString("data-quiz-root")))
-                .andExpect(content().string(containsString("/js/exetat-quiz.js")))
-                .andExpect(content().string(containsString("Correction immédiate")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app/exetat/matieres/cercle/quiz"));
+
+        mockMvc.perform(post("/api/v1/exetat/quizzes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"subjectId":"cercle"}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.subjectId").value("cercle"))
+                .andExpect(jsonPath("$.totalQuestions").value(5))
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
     }
 
     @Test
     void resultPageIsUnavailableBeforeCompletion() throws Exception {
         QuizStarted started = quizService.startQuiz("cercle");
 
-        mockMvc.perform(get("/exetat/quizzes/{quizId}/resultats", started.quizId()))
+        mockMvc.perform(get("/api/v1/exetat/quizzes/{quizId}/result", started.quizId()))
                 .andExpect(status().isConflict())
-                .andExpect(view().name("exetat/resultats"))
-                .andExpect(content().string(containsString("Résultats indisponibles")));
+                .andExpect(jsonPath("$.code").value("QUIZ_NOT_COMPLETED"));
+
+        mockMvc.perform(get("/exetat/quizzes/{quizId}/resultats", started.quizId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/app/exetat/quizzes/" + started.quizId() + "/resultats"));
     }
 
     @Test
@@ -70,24 +80,22 @@ class QuizPageTests {
             }
         }
 
-        mockMvc.perform(get("/exetat/quizzes/{quizId}/resultats", started.quizId()))
+        mockMvc.perform(get("/api/v1/exetat/quizzes/{quizId}/result", started.quizId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("exetat/resultats"))
-                .andExpect(content().string(containsString("Excellent")))
-                .andExpect(content().string(containsString("100%")))
-                .andExpect(content().string(containsString("Recommencer ce quiz")))
-                .andExpect(content().string(not(containsString("Revoir mes erreurs"))));
+                .andExpect(jsonPath("$.appreciation").value("Excellent"))
+                .andExpect(jsonPath("$.percentage").value(100))
+                .andExpect(jsonPath("$.failedQuestionIds.length()").value(0));
     }
 
     @Test
     void rendersReviewActionWhenCompletedQuizHasErrors() throws Exception {
         QuizStarted started = completeQuizWithFirstAnswerWrong();
 
-        mockMvc.perform(get("/exetat/quizzes/{quizId}/resultats", started.quizId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("exetat/resultats"))
-                .andExpect(content().string(containsString("Revoir mes erreurs")))
-                .andExpect(content().string(containsString("/js/quiz-result.js")));
+        mockMvc.perform(post("/api/v1/exetat/quizzes/{quizId}/reviews", started.quizId()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.mode").value("REVIEW"))
+                .andExpect(jsonPath("$.sourceQuizId").value(started.quizId().toString()))
+                .andExpect(jsonPath("$.totalQuestions").value(1));
     }
 
     @Test
@@ -101,11 +109,12 @@ class QuizPageTests {
                 current.question().correctChoiceId()
         );
 
-        mockMvc.perform(get("/exetat/quizzes/{quizId}/resultats", review.quizId()))
+        mockMvc.perform(get("/api/v1/exetat/quizzes/{quizId}/result", review.quizId()))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Révision terminée")))
-                .andExpect(content().string(containsString("erreurs corrigées")))
-                .andExpect(content().string(containsString("Ma progression")));
+                .andExpect(jsonPath("$.mode").value("REVIEW"))
+                .andExpect(jsonPath("$.sourceQuizId").value(source.quizId().toString()))
+                .andExpect(jsonPath("$.correctedQuestionIds.length()").value(1))
+                .andExpect(jsonPath("$.failedQuestionIds.length()").value(0));
     }
 
     private QuizStarted completeQuizWithFirstAnswerWrong() {

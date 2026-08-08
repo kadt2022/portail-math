@@ -1,0 +1,58 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "errorTitle": "Unable to load this content"
+  },
+  "catalogue": {
+    "eyebrow": "EXETAT preparation",
+    "title": "Choose a subject",
+    "description": "Review essential topics with corrected quizzes and keep your progress on this device.",
+    "questions": "Questions",
+    "minutes": "Minutes",
+    "discover": "Explore this subject"
+  },
+  "subject": {
+    "back": "Back to subjects",
+    "topics": "Topics covered",
+    "prepare": "View quiz rules",
+    "start": "Start the quiz"
+  },
+  "training": {
+    "eyebrow": "Practice",
+    "description": "Get ready before you begin: every answer is followed by a detailed explanation.",
+    "rulesTitle": "Quiz rules",
+    "ruleQuestions_one": "{{count}} question",
+    "ruleQuestions_other": "{{count}} questions",
+    "ruleTime_one": "About {{count}} minute",
+    "ruleTime_other": "About {{count}} minutes",
+    "ruleFeedback": "An explained correction after every answer",
+    "ruleProgress": "Your progress is saved locally at the end",
+    "start_one": "Start the question",
+    "start_other": "Start the {{count}} questions",
+    "back": "Back to subject"
+  },
+  "quiz": {
+    "eyebrow": "EXETAT quiz",
+    "title": "Your turn",
+    "reviewTitle": "Review your mistakes",
+    "question": "Question {{current}} of {{total}}",
+    "score": "Score {{score}}/{{total}}",
+    "validate": "Submit my answer",
+    "next": "Next question",
+    "results": "View my results",
+    "correct": "Well done, that's the right answer!",
+    "incorrect": "That is not the right answer."
+  },
+  "results": {
+    "eyebrow": "Quiz results",
+    "reviewEyebrow": "Review completed",
+    "reviewTitle": "Your corrected mistakes",
+    "score": "Score",
+    "correct": "Correct answers",
+    "corrected": "Mistakes corrected",
+    "toReview": "To review",
+    "review": "Review my mistakes",
+    "retry": "Take the quiz again",
+    "progress": "View my progress"
+  }
+}

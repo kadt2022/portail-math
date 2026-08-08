@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Prototype illustré de La Rivière des fractions.">
+    <title>Prototype illustré · La Rivière des fractions · Portail-Math</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/multiplication-train.css">
+    <link rel="stylesheet" href="/css/game-console.css">
+    <link rel="stylesheet" href="/css/fraction-river.css">
+    <link rel="stylesheet" href="/css/fraction-river-v2.css">
+</head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app-shell standalone-game-shell">
+    <div class="page-shell">
+        <header class="topbar standalone-game-header">
+            <a class="standalone-game-brand" href="/app/" aria-label="Portail-Math — Accueil">✦ Portail-Math</a>
+            <a class="standalone-game-back" href="/app/jeux">Retour aux jeux</a>
+        </header>
+        <!-- river-page-content n'est pas décoratif : c'est la portée où
+             fraction-river.css déclare --fraction-empty. Sans cette classe, les
+             parts vides des disques retombent sur le noir. -->
+        <main id="contenu" class="page-content river-page-content">
+            <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
+                <a href="/app/">Portail</a>
+                <span aria-hidden="true">›</span>
+                <a href="/app/jeux">Jeux éducatifs</a>
+                <span aria-hidden="true">›</span>
+                <a href="/games/fraction-river.html">La Rivière des fractions</a>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Version illustrée</span>
+            </nav>
+
+            <h1>La Rivière des fractions — version illustrée</h1>
+
+            <p class="fraction-river-v2-note">
+                Trois couches : <strong>l’illustration</strong> porte le décor,
+                <strong>Phaser</strong> anime le chien, l’eau, les oiseaux et les poissons,
+                <strong>le HTML</strong> pose les questions. Le moteur pédagogique est celui du
+                jeu existant — mêmes défis, mêmes distracteurs, mêmes indices.
+                Les cinq pierres sont peintes : elles montrent le trajet dès la première seconde,
+                et un halo s’allume sur celle qui vient d’être gagnée.
+                Le chien est encore un <strong>dessin de remplacement fait au code</strong>, en
+                attendant sa vraie feuille d’animation.
+                Ajouter <code>?debugAnchors=true</code> à l’adresse affiche la grille de calibrage.
+            </p>
+
+            <p>
+                <button class="game-primary-button" type="button" data-console-launch>
+                    Passer en mode immersif
+                </button>
+            </p>
+
+            <!-- Le bloc entier est déplacé tel quel par la console immersive.
+                 Les trois couches voyagent donc ensemble, et leur alignement ne
+                 dépend pas de l'endroit où le bloc est accroché. -->
+            <div class="fraction-river-v2" data-river-v2>
+                <img class="fraction-river-v2__background"
+                     src="/images/games/fraction-river/prototype/river-scene.png"
+                     alt=""
+                     aria-hidden="true">
+
+                <div class="fraction-river-v2__phaser" data-river-v2-phaser aria-hidden="true"></div>
+
+                <section class="fraction-river-v2__question" aria-labelledby="v2-question-title">
+                    <span class="fraction-river-v2__step" data-v2-step>Étape 1 sur 5</span>
+                    <h2 id="v2-question-title" data-v2-prompt>Chargement…</h2>
+
+                    <div class="fraction-river-v2__visual" data-v2-visual></div>
+
+                    <div class="fraction-river-v2__answers" data-v2-answers></div>
+
+                    <button class="fraction-river-v2__validate" type="button" data-v2-validate hidden>
+                        Valider
+                    </button>
+
+                    <p class="fraction-river-v2__feedback" aria-live="polite" data-v2-feedback></p>
+
+                    <button class="fraction-river-v2__replay" type="button" data-v2-replay hidden>
+                        Retraverser
+                    </button>
+                </section>
+            </div>
+
+            <p class="fraction-river-v2-readout" data-river-v2-readout aria-live="off">
+                mesure en attente…
+            </p>
+
+            <p class="fraction-river-v2-note">
+                <strong>Ce qu’il faut regarder.</strong> Le héros saute-t-il sur les pierres
+                peintes, ou à côté ? S’il est décalé, les valeurs se relèvent avec
+                <code>?debugAnchors=true</code> et se recopient dans
+                <code>v2/anchors.js</code> — la procédure est dans
+                <code>docs/art-direction/fraction-river/README.md</code>.
+            </p>
+
+            <!-- Console immersive en mode à une seule zone : la question vit dans
+                 l'illustration, il n'y a plus de second panneau à disposer. Sans
+                 cette classe, le créneau vide retenait 277 px de large et la
+                 barre 57 px de haut sur un téléphone en paysage. -->
+            <div class="game-console game-console--single" data-game-console hidden
+                 role="dialog" aria-modal="true" aria-label="Mode jeu de La Rivière des fractions">
+                <header class="game-console__bar">
+                    <p class="game-console__step">La Rivière des fractions</p>
+                    <p class="game-console__calm">Prends ton temps, il n’y a pas de chronomètre.</p>
+                    <button class="game-console__quit" type="button" data-console-quit>
+                        <span aria-hidden="true">✕</span> Quitter le jeu
+                    </button>
+                </header>
+                <div class="game-console__body">
+                    <div class="game-console__stage" data-console-stage></div>
+                    <div class="game-console__panel" data-console-panel></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<!-- Phaser est servi localement et épinglé par version : voir docs/DEPENDANCES-FRONTEND.md -->
+<script src="/js/vendor/phaser-3.90.0.min.js"></script>
+<script src="/js/game-console.js"></script>
+<!-- Moteur pédagogique existant, réutilisé tel quel. -->
+<script src="/js/fraction-river-events.js"></script>
+<script src="/js/fraction-river-visuals.js"></script>
+<script src="/js/fraction-river-questions.js"></script>
+<!-- Couches de la version illustrée. -->
+<script src="/js/games/fraction-river/v2/anchors.js"></script>
+<script src="/js/games/fraction-river/v2/CalibrationScene.js"></script>
+<script src="/js/games/fraction-river/v2/PlayScene.js"></script>
+<script src="/js/games/fraction-river/v2/prototype.js"></script>
+<script src="/js/games/fraction-river/v2/play.js"></script>
+</body>
+</html>

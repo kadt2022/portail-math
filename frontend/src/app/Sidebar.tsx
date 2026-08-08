@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import { legacyPortalUrl, navigationLinks } from "./navigation";
+import { navigationLinks } from "./navigation";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
@@ -10,12 +11,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
+  const { t } = useTranslation("common");
+
   return (
     <div className={open ? `${styles.sidebarShell} ${styles.sidebarOpen}` : styles.sidebarShell}>
       <div className={styles.backdrop} />
       <aside id={navId} className={styles.sidebar}>
-        <p className={styles.navLabel}>Portail</p>
-        <nav className={styles.nav} aria-label="Navigation principale">
+        <p className={styles.navLabel}>{t("navSectionLabel")}</p>
+        <nav className={styles.nav} aria-label={t("mainNavigation")}>
           {navigationLinks.map((link, index) => (
             <NavLink
               key={link.to}
@@ -29,13 +32,10 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
               <span className={styles.num} aria-hidden="true">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              {link.label}
+              {t(link.labelKey)}
             </NavLink>
           ))}
         </nav>
-        <a className={styles.legacyLink} href={legacyPortalUrl}>
-          Portail historique
-        </a>
       </aside>
     </div>
   );

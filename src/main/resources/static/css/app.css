@@ -327,6 +327,41 @@ a {
     backdrop-filter: blur(12px);
 }
 
+/* Les moteurs de jeux historiques gardent leur DOM et leurs feuilles de style,
+   mais leur enveloppe est désormais une ressource HTML statique autonome. */
+.standalone-game-shell .page-shell {
+    margin-left: 0;
+}
+
+.standalone-game-header {
+    justify-content: space-between;
+}
+
+.standalone-game-brand {
+    color: var(--navy-950);
+    font-size: clamp(17px, 2vw, 21px);
+    font-weight: 850;
+}
+
+.standalone-game-back {
+    display: inline-flex;
+    min-height: 42px;
+    padding: 9px 14px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--purple-dark);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.standalone-game-back:hover {
+    border-color: rgba(84, 72, 229, 0.3);
+    background: var(--purple-soft);
+}
+
 .menu-button,
 .mobile-brand {
     display: none;

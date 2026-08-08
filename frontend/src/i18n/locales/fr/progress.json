@@ -1,0 +1,30 @@
+{
+  "page": {
+    "eyebrow": "Progression",
+    "title": "Ta progression",
+    "description": "Retrouve tes résultats EXETAT enregistrés sur cet appareil."
+  },
+  "summary": {
+    "subjects": "Matières commencées",
+    "average": "Meilleure moyenne",
+    "correct": "Bonnes réponses",
+    "review": "Questions à revoir"
+  },
+  "subjects": {
+    "title": "Progression par matière",
+    "best": "Meilleur score",
+    "attempts": "Tentatives",
+    "continue": "Continuer"
+  },
+  "status": {
+    "NOT_STARTED": "Non commencé",
+    "IN_PROGRESS": "En progression",
+    "MASTERED": "Maîtrisé",
+    "TO_REVIEW": "À revoir"
+  },
+  "empty": {
+    "title": "Aucun quiz terminé pour le moment",
+    "description": "Commence une matière EXETAT : tes résultats apparaîtront ici sans créer de compte.",
+    "cta": "Choisir une matière"
+  }
+}

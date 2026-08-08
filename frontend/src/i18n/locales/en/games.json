@@ -1,0 +1,40 @@
+{
+  "cataloguePage": {
+    "eyebrow": "Catalogue",
+    "title": "Games"
+  },
+  "badge": {
+    "new": "New"
+  },
+  "multiplicationTrain": {
+    "name": "The Multiplication Train",
+    "description": "Learn the 2 and 5 times tables while driving your train forward.",
+    "cta": "Play"
+  },
+  "fractionRiver": {
+    "name": "The Fraction River",
+    "description": "Cross the river by picking the right fractions.",
+    "cta": "Play"
+  },
+  "newGame": {
+    "name": "New educational game",
+    "description": "A new math adventure is coming soon.",
+    "cta": "Coming soon"
+  },
+  "comingSoonPage": {
+    "eyebrow": "New educational game",
+    "title": "The game is being built",
+    "description": "A new math adventure is coming soon to the portal. Come back to find it once it's ready.",
+    "back": "Back to games"
+  },
+  "upcoming": {
+    "numberMarket": {
+      "name": "The Number Market",
+      "description": "Count, compare and trade at the market."
+    },
+    "shapeBuilder": {
+      "name": "The Shape Builder",
+      "description": "Assemble shapes to discover geometry."
+    }
+  }
+}
