@@ -109,10 +109,10 @@ function createDam(scene: Scene): void {
   dam.material = damMaterial;
 }
 
-// Un plan surélevé, calé contre la face amont du mur : une eau "retenue",
-// sans bassin creusé — simplification qui reste assumée à cette étape.
-// Suffisamment subdivisé pour que le déplacement de sommets (animateWater)
-// produise une vraie ondulation, pas un motif grossier.
+// Un plan surélevé, calé contre la face amont du mur : une eau "retenue".
+// Trois berges en pente (createReservoirBanks) ferment les côtés ouverts du
+// bassin, pour qu'on ne voie plus l'eau "flotter" au-dessus du sol vert —
+// point resté en suspens depuis l'étape 2.
 function createReservoir(scene: Scene): Mesh {
   const water = MeshBuilder.CreateGround(
     "water",
@@ -127,7 +127,39 @@ function createReservoir(scene: Scene): Mesh {
   waterMaterial.alpha = 0.88;
   water.material = waterMaterial;
 
+  createReservoirBanks(scene);
+
   return water;
+}
+
+// Trois pentes (gauche, droite, amont) qui relient le niveau du sol (Y=0) au
+// niveau de l'eau (Y=4) sur les côtés du bassin non fermés par le mur —
+// une rampe inclinée, pas un vrai relief sculpté, mais suffisant pour que
+// l'eau ait l'air posée dans un creux plutôt qu'en lévitation.
+function createReservoirBanks(scene: Scene): void {
+  const bankMaterial = new StandardMaterial("bankMaterial", scene);
+  bankMaterial.diffuseColor = new Color3(0.45, 0.38, 0.28);
+
+  const rise = 4;
+  const run = 3.5;
+  const slopeLength = Math.hypot(rise, run);
+  const angle = Math.atan2(rise, run);
+
+  const leftBank = MeshBuilder.CreateBox("bank-left", { width: slopeLength, height: 0.3, depth: 13 }, scene);
+  leftBank.rotation.z = angle;
+  leftBank.position.set(-11 - run / 2, rise / 2, -7);
+
+  const rightBank = MeshBuilder.CreateBox("bank-right", { width: slopeLength, height: 0.3, depth: 13 }, scene);
+  rightBank.rotation.z = -angle;
+  rightBank.position.set(11 + run / 2, rise / 2, -7);
+
+  const farBank = MeshBuilder.CreateBox("bank-far", { width: 23, height: 0.3, depth: slopeLength }, scene);
+  farBank.rotation.x = -angle;
+  farBank.position.set(0, rise / 2, -13 - run / 2);
+
+  for (const bank of [leftBank, rightBank, farBank]) {
+    bank.material = bankMaterial;
+  }
 }
 
 // Vagues "à la main" : on décale chaque sommet en Y selon un sinus qui
