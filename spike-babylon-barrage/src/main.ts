@@ -13,9 +13,12 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
-// Étape 1 du spike : la scène la plus simple possible qui prouve que le
-// moteur tourne — caméra, lumière, sol. Rien d'autre : le barrage, l'eau
-// et les turbines arrivent aux étapes suivantes, une fois celle-ci validée.
+// Étape 2 du spike : le barrage et l'eau apparaissent, mais tout reste
+// statique — aucune animation encore. L'eau qui défile et les turbines qui
+// tournent viennent à l'étape suivante, une fois cette composition validée.
+//
+// Repères du monde : le mur du barrage longe l'axe X, à Z = 0. L'eau retenue
+// est du côté Z négatif (amont), le terrain sec du côté Z positif (aval).
 
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
@@ -28,23 +31,61 @@ function createScene(): Scene {
     "camera",
     -Math.PI / 2.4,
     Math.PI / 2.6,
-    22,
-    Vector3.Zero(),
+    30,
+    new Vector3(0, 3, 0),
     scene,
   );
   camera.attachControl(canvas, true);
-  camera.lowerRadiusLimit = 8;
-  camera.upperRadiusLimit = 40;
+  camera.lowerRadiusLimit = 10;
+  camera.upperRadiusLimit = 50;
 
   const light = new HemisphericLight("light", new Vector3(0, 1, 0.3), scene);
   light.intensity = 0.9;
 
-  const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 20 }, scene);
+  const ground = MeshBuilder.CreateGround("ground", { width: 34, height: 24 }, scene);
   const groundMaterial = new StandardMaterial("groundMaterial", scene);
   groundMaterial.diffuseColor = new Color3(0.36, 0.55, 0.32);
   ground.material = groundMaterial;
 
+  createDam(scene);
+  createReservoir(scene);
+  createControlBuilding(scene);
+
   return scene;
+}
+
+// Un mur simple : une boîte. Pas encore de vannes ni de turbines visibles —
+// ça viendra habiller cette même boîte aux étapes suivantes.
+function createDam(scene: Scene): void {
+  const dam = MeshBuilder.CreateBox("dam", { width: 24, height: 6, depth: 2 }, scene);
+  dam.position.set(0, 3, 0);
+
+  const damMaterial = new StandardMaterial("damMaterial", scene);
+  damMaterial.diffuseColor = new Color3(0.62, 0.62, 0.6);
+  dam.material = damMaterial;
+}
+
+// Un plan surélevé, calé contre la face amont du mur : une eau "retenue",
+// sans bassin creusé — volontairement simplifié pour cette étape statique.
+function createReservoir(scene: Scene): void {
+  const water = MeshBuilder.CreateGround("water", { width: 22, height: 12 }, scene);
+  water.position.set(0, 4, -7);
+
+  const waterMaterial = new StandardMaterial("waterMaterial", scene);
+  waterMaterial.diffuseColor = new Color3(0.16, 0.42, 0.66);
+  waterMaterial.alpha = 0.88;
+  water.material = waterMaterial;
+}
+
+// Petit bâtiment sur la crête, pour que la boîte du mur se lise comme un
+// barrage équipé plutôt qu'un simple mur de pierre.
+function createControlBuilding(scene: Scene): void {
+  const building = MeshBuilder.CreateBox("controlBuilding", { width: 3, height: 2.4, depth: 2.6 }, scene);
+  building.position.set(7, 6 + 1.2, -0.3);
+
+  const buildingMaterial = new StandardMaterial("controlBuildingMaterial", scene);
+  buildingMaterial.diffuseColor = new Color3(0.82, 0.74, 0.58);
+  building.material = buildingMaterial;
 }
 
 const activeScene = createScene();
