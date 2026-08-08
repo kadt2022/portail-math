@@ -534,6 +534,29 @@ suppression du catalogue Thymeleaf
 
 ---
 
+# Règle des moteurs de jeu (Phaser et Babylon.js)
+
+**Décision officielle, applicable à tout récit de jeu à partir de maintenant.**
+
+Portail-Math fait cohabiter deux moteurs, chacun avec un rôle précis :
+
+```text
+React      → portail, navigation, profils, progression
+Phaser     → moteur standard des jeux 2D (Train, Rivière, et tout futur
+              jeu 2D par défaut)
+Babylon.js → moteur réservé aux jeux où la vraie 3D apporte quelque
+              chose de concret (caméra en profondeur, eau ou mécanismes
+              animés en volume) — jamais un choix par défaut
+```
+
+Règle de chargement, commune aux deux moteurs : un jeu ne charge que **son propre moteur**, à la demande, à l'ouverture. Un jeu Phaser ne télécharge jamais Babylon, et inversement — le tableau de bord ne charge ni l'un ni l'autre.
+
+Babylon.js est sensiblement plus lourd que Phaser au premier chargement d'un jeu qui l'utilise : tout récit proposant un jeu Babylon doit mesurer ses performances sur un téléphone d'entrée de gamme avant d'être considéré prêt pour la production. Un prototype exploratoire (`spike/babylon-barrage`, hors périmètre de livraison) sert justement à vérifier cela avant tout engagement.
+
+Un pont React–Babylon dédié (cycle de vie du moteur, canvas, nettoyage) sera documenté comme un récit `GAME-RUNTIME-02` séparé si le prototype confirme que Babylon est viable — il n'est pas dupliqué ici pour éviter de décrire une décision pas encore prise.
+
+---
+
 # GAME-RUNTIME-01 — Créer le pont React–Phaser commun aux nouveaux jeux
 
 *(Reporté depuis l'ancien backlog archivé — décisions techniques inchangées.)*
