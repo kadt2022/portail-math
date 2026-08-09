@@ -1,23 +1,34 @@
 (function initializeFractionRiverVisuals(root) {
     "use strict";
 
+    const gameI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-i18n.js")
+        : root.GameI18n;
+    const fractionRiverI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./fraction-river-i18n.js")
+        : root.FractionRiverI18n;
+
     const VISUAL_KINDS = ["DISC", "BAR", "BASKET"];
     const INTERACTIVE_KINDS = ["BAR", "BASKET"];
 
-    const VISUAL_LABELS = {
-        DISC: "pizza",
-        BAR: "tablette de chocolat",
-        BASKET: "panier de fruits"
-    };
-
-    function partWord(count) {
-        return count > 1 ? "parts" : "part";
+    function visualLabel(kind, lang) {
+        const key = `visual.${kind}`;
+        const isKnownKind = Object.prototype.hasOwnProperty.call(fractionRiverI18n.fr, key);
+        return gameI18n.translate(fractionRiverI18n, lang, isKnownKind ? key : "visual.default");
     }
 
-    function describeVisual(kind, filled, total) {
-        const support = VISUAL_LABELS[kind] || "objet";
-        return `Une ${support} partagée en ${total} parts égales, `
-            + `${filled} ${partWord(filled)} sur ${total} de couleur différente.`;
+    function partWord(count, lang = "fr") {
+        return gameI18n.translate(fractionRiverI18n, lang, count > 1 ? "visualPartPlural" : "visualPartSingular");
+    }
+
+    function describeVisual(kind, filled, total, lang = "fr") {
+        const support = visualLabel(kind, lang);
+        return gameI18n.translate(fractionRiverI18n, lang, "visualDescription", {
+            support,
+            total,
+            filled,
+            partWord: partWord(filled, lang)
+        });
     }
 
     function polarPoint(centre, radius, degrees) {
@@ -116,7 +127,7 @@
             .replace(/>/g, "&gt;");
     }
 
-    function renderStaticVisual({kind, total, filled, id = "fr"}) {
+    function renderStaticVisual({kind, total, filled, id = "fr", lang = "fr"}) {
         const renderer = RENDERERS[kind];
         if (!renderer) {
             throw new Error(`Type de visuel inconnu : ${kind}`);
@@ -128,25 +139,30 @@
             throw new Error("Nombre de parts coloriées incohérent avec le tout");
         }
         const markup = renderer(total, filled, `${id}-hatch`);
-        return markup.replace("{{label}}", escapeAttribute(describeVisual(kind, filled, total)));
+        return markup.replace("{{label}}", escapeAttribute(describeVisual(kind, filled, total, lang)));
     }
 
     // Les parts cliquables sont de vrais boutons : navigation clavier, focus visible
     // et cible tactile d'au moins 44 px (§4.7).
-    function renderInteractiveParts({kind, total, selected = []}) {
+    function renderInteractiveParts({kind, total, selected = [], lang = "fr"}) {
         if (!INTERACTIVE_KINDS.includes(kind)) {
             throw new Error(`Visuel non interactif : ${kind}`);
         }
         const selection = new Set(selected);
         const buttons = Array.from({length: total}, (_, index) => {
             const isSelected = selection.has(index);
+            const partLabel = gameI18n.translate(fractionRiverI18n, lang, "selectablePartAria", {
+                position: index + 1,
+                total
+            });
             return `<button type="button" class="fr-selectable-part" data-part="${index}" `
                 + `aria-pressed="${isSelected}" `
-                + `aria-label="Part ${index + 1} sur ${total}">`
+                + `aria-label="${escapeAttribute(partLabel)}">`
                 + `<span class="fr-selectable-part__mark" aria-hidden="true"></span></button>`;
         }).join("");
+        const groupLabel = gameI18n.translate(fractionRiverI18n, lang, "selectablePartsAria");
         return `<div class="fr-selectable fr-selectable--${kind.toLowerCase()}" role="group" `
-            + `aria-label="Parts à sélectionner">${buttons}</div>`;
+            + `aria-label="${escapeAttribute(groupLabel)}">${buttons}</div>`;
     }
 
     const api = {

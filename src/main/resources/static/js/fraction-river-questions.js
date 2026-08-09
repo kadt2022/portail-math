@@ -1,6 +1,13 @@
 (function initializeFractionRiverQuestions(root) {
     "use strict";
 
+    const gameI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-i18n.js")
+        : root.GameI18n;
+    const fractionRiverI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./fraction-river-i18n.js")
+        : root.FractionRiverI18n;
+
     const STEP_COUNT = 5;
 
     // Niveau 1 — Le Gué des parts : uniquement la reconnaissance (§7.4).
@@ -38,13 +45,15 @@
     // prouver son absence plutôt que de vérifier une liste de longueur cinq.
     const RETIRED_STEP_TYPES = ["SELECT_PARTS"];
 
-    // Chaque mauvaise réponse correspond à une erreur pédagogique plausible (§5.1).
+    // Vue French de dictionary.fr["hint.*"] : conservée pour la forme d'API
+    // existante (clé = code de distracteur). Le contenu réel vit dans
+    // fraction-river-i18n.js, seule source de vérité pour les deux langues.
     const HINTS = {
-        INVERTED: "Le nombre du haut compte les parts coloriées, celui du bas toutes les parts.",
-        OFF_BY_ONE: "Recompte seulement les parties coloriées, une par une.",
-        WHOLE_CONFUSION: "Ce nombre est le total des parts, pas les parts coloriées.",
-        COLORED_CONFUSION: "Le nombre du bas indique toutes les parts égales du tout.",
-        DENOMINATOR_CONFUSION: "Vérifie que toutes les parts du tout ont été comptées."
+        INVERTED: fractionRiverI18n.fr["hint.INVERTED"],
+        OFF_BY_ONE: fractionRiverI18n.fr["hint.OFF_BY_ONE"],
+        WHOLE_CONFUSION: fractionRiverI18n.fr["hint.WHOLE_CONFUSION"],
+        COLORED_CONFUSION: fractionRiverI18n.fr["hint.COLORED_CONFUSION"],
+        DENOMINATOR_CONFUSION: fractionRiverI18n.fr["hint.DENOMINATOR_CONFUSION"]
     };
 
     const SCENARIOS = [
@@ -67,6 +76,32 @@
     function parseFraction(key) {
         const [numerator, denominator] = key.split("/").map(Number);
         return {numerator, denominator};
+    }
+
+    // Trois formes grammaticales du même "part(s) colorée(s)" selon le contexte
+    // de la phrase (voir les commentaires dans fraction-river-i18n.js).
+    function coloredVerbPhrase(numerator, lang) {
+        return gameI18n.translate(
+            fractionRiverI18n,
+            lang,
+            numerator > 1 ? "coloredVerbPhrasePlural" : "coloredVerbPhraseSingular",
+        );
+    }
+
+    function coloredAdjPhrase(numerator, lang) {
+        return gameI18n.translate(
+            fractionRiverI18n,
+            lang,
+            numerator > 1 ? "coloredAdjPhrasePlural" : "coloredAdjPhraseSingular",
+        );
+    }
+
+    function partWord(numerator, lang) {
+        return gameI18n.translate(
+            fractionRiverI18n,
+            lang,
+            numerator > 1 ? "visualPartPlural" : "visualPartSingular",
+        );
     }
 
     // Générateur déterministe : une graine donnée reproduit exactement la même
@@ -223,7 +258,7 @@
         return shuffle(options, random);
     }
 
-    function buildStep(scenario, fraction, random) {
+    function buildStep(scenario, fraction, random, lang = "fr") {
         const {numerator, denominator} = fraction;
         const id = `${scenario.id}-${fractionKey(fraction).replace("/", "-")}`;
         const base = {
@@ -233,47 +268,67 @@
             fraction,
             visualKind: scenario.visualKind
         };
+        const key = fractionKey(fraction);
 
         if (scenario.type === "IDENTIFY") {
             return {
                 ...base,
-                prompt: "Quelle fraction est représentée ?",
+                prompt: gameI18n.translate(fractionRiverI18n, lang, "prompt.IDENTIFY"),
                 visual: {kind: scenario.visualKind, total: denominator, filled: numerator},
                 options: buildFractionOptions(fraction, random),
-                explanation: `${numerator} ${numerator > 1 ? "parts sont coloriées" : "part est coloriée"} `
-                    + `sur ${denominator} : la fraction est ${fractionKey(fraction)}.`
+                explanation: gameI18n.translate(fractionRiverI18n, lang, "explanation.IDENTIFY", {
+                    numerator,
+                    denominator,
+                    fraction: key,
+                    coloredVerbPhrase: coloredVerbPhrase(numerator, lang)
+                })
             };
         }
 
         if (scenario.type === "MATCH_VISUAL") {
             return {
                 ...base,
-                prompt: `Quel dessin représente ${fractionKey(fraction)} ?`,
+                prompt: gameI18n.translate(fractionRiverI18n, lang, "prompt.MATCH_VISUAL", {fraction: key}),
                 visual: null,
                 options: buildVisualOptions(fraction, scenario.visualKind, random),
-                explanation: `${fractionKey(fraction)} veut dire ${numerator} `
-                    + `${numerator > 1 ? "parts coloriées" : "part coloriée"} sur ${denominator} parts égales.`
+                explanation: gameI18n.translate(fractionRiverI18n, lang, "explanation.MATCH_VISUAL", {
+                    numerator,
+                    denominator,
+                    fraction: key,
+                    coloredAdjPhrase: coloredAdjPhrase(numerator, lang)
+                })
             };
         }
 
         if (scenario.type === "SELECT_PARTS") {
             return {
                 ...base,
-                prompt: `Sélectionne ${numerator} ${numerator > 1 ? "parts" : "part"} sur ${denominator}.`,
+                prompt: gameI18n.translate(fractionRiverI18n, lang, "prompt.SELECT_PARTS", {
+                    numerator,
+                    denominator,
+                    partWord: partWord(numerator, lang)
+                }),
                 visual: {kind: scenario.visualKind, total: denominator, filled: 0},
                 requiredCount: numerator,
                 totalParts: denominator,
                 options: [],
-                explanation: `Il fallait colorier ${numerator} `
-                    + `${numerator > 1 ? "parts" : "part"} sur ${denominator}, c'est-à-dire ${fractionKey(fraction)}.`
+                explanation: gameI18n.translate(fractionRiverI18n, lang, "explanation.SELECT_PARTS", {
+                    numerator,
+                    denominator,
+                    fraction: key,
+                    partWord: partWord(numerator, lang)
+                })
             };
         }
 
         if (scenario.type === "NUMERATOR") {
             return {
                 ...base,
-                prompt: `${numerator} ${numerator > 1 ? "parts sont coloriées" : "part est coloriée"} `
-                    + `sur ${denominator}. Quel est le nombre du haut ?`,
+                prompt: gameI18n.translate(fractionRiverI18n, lang, "prompt.NUMERATOR", {
+                    numerator,
+                    denominator,
+                    coloredVerbPhrase: coloredVerbPhrase(numerator, lang)
+                }),
                 visual: {kind: scenario.visualKind, total: denominator, filled: numerator},
                 options: buildNumberOptions(numerator, [
                     {type: "WHOLE_CONFUSION", value: denominator},
@@ -281,14 +336,17 @@
                     {type: "OFF_BY_ONE", value: numerator - 1},
                     {type: "DENOMINATOR_CONFUSION", value: denominator + 1}
                 ], random),
-                explanation: `Le nombre du haut compte les parts coloriées : ${numerator}.`
+                explanation: gameI18n.translate(fractionRiverI18n, lang, "explanation.NUMERATOR", {numerator})
             };
         }
 
         return {
             ...base,
-            prompt: `${numerator} ${numerator > 1 ? "parts sont coloriées" : "part est coloriée"} `
-                + `et le tout contient ${denominator} parts. Quel est le nombre du bas ?`,
+            prompt: gameI18n.translate(fractionRiverI18n, lang, "prompt.DENOMINATOR", {
+                numerator,
+                denominator,
+                coloredVerbPhrase: coloredVerbPhrase(numerator, lang)
+            }),
             visual: {kind: scenario.visualKind, total: denominator, filled: numerator},
             options: buildNumberOptions(denominator, [
                 {type: "COLORED_CONFUSION", value: numerator},
@@ -296,7 +354,7 @@
                 {type: "DENOMINATOR_CONFUSION", value: denominator - 1},
                 {type: "OFF_BY_ONE", value: denominator + 2}
             ], random),
-            explanation: `Le nombre du bas compte toutes les parts égales : ${denominator}.`
+            explanation: gameI18n.translate(fractionRiverI18n, lang, "explanation.DENOMINATOR", {denominator})
         };
     }
 
@@ -304,7 +362,7 @@
         return SCENARIOS.filter((scenario) => scenario.type === type);
     }
 
-    function createLevel1Steps(random = Math.random, recentQuestionIds = []) {
+    function createLevel1Steps(random = Math.random, recentQuestionIds = [], lang = "fr") {
         const recent = new Set(recentQuestionIds);
         const usedFractions = new Set();
 
@@ -312,8 +370,8 @@
             const scenarios = shuffle(scenariosFor(type), random);
             const attempts = [];
             scenarios.forEach((scenario) => {
-                shuffle(scenario.fractions, random).forEach((key) => {
-                    attempts.push({scenario, fraction: parseFraction(key)});
+                shuffle(scenario.fractions, random).forEach((fractionKeyValue) => {
+                    attempts.push({scenario, fraction: parseFraction(fractionKeyValue)});
                 });
             });
 
@@ -325,7 +383,7 @@
             const chosen = fresh || fallback || attempts[0];
 
             usedFractions.add(fractionKey(chosen.fraction));
-            return buildStep(chosen.scenario, chosen.fraction, random);
+            return buildStep(chosen.scenario, chosen.fraction, random, lang);
         });
     }
 
@@ -349,8 +407,13 @@
         };
     }
 
-    function hintFor(distractorType) {
-        return HINTS[distractorType] || "Regarde à nouveau le dessin et compte les parts.";
+    function hintFor(distractorType, lang = "fr") {
+        const key = `hint.${distractorType}`;
+        const exists = Boolean(
+            (fractionRiverI18n.fr && Object.prototype.hasOwnProperty.call(fractionRiverI18n.fr, key))
+            || (fractionRiverI18n.en && Object.prototype.hasOwnProperty.call(fractionRiverI18n.en, key)),
+        );
+        return gameI18n.translate(fractionRiverI18n, lang, exists ? key : "hint.default");
     }
 
     function countLevel1Variants() {

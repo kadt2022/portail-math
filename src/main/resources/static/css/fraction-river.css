@@ -394,6 +394,19 @@
     text-shadow: 0 0 5px rgb(255 250 230 / 85%);
 }
 
+/* ---------- Rappel numérateur / dénominateur ---------- */
+
+.fraction-legend {
+    margin: 0 0 14px;
+    padding: 8px 14px;
+    border: 1px dashed var(--purple, #6a4fd6);
+    border-radius: 12px;
+    background: rgba(106, 79, 214, 0.06);
+    color: var(--purple, #6a4fd6);
+    font-size: 14px;
+    font-weight: 700;
+}
+
 /* ---------- Visuels de fractions ---------- */
 
 .fr-visual-holder {

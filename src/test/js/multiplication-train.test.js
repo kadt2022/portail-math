@@ -17,7 +17,8 @@ const {
     scoreToLargeStars,
     calculateTrainOffset,
     calculateTrainTravelDistance,
-    calculateWheelRotation
+    calculateWheelRotation,
+    multiplicationExplanation
 } = require("../../main/resources/static/js/multiplication-train.js");
 const {
     createStore,
@@ -154,6 +155,20 @@ function memoryStorage(initial = {}) {
         soundEnabled: true
     });
     console.warn = originalWarn;
+}
+
+// --- Localisation anglaise --------------------------------------------------
+// Le français reste le comportement par défaut (voir les blocs précédents,
+// qui n'appellent jamais multiplicationExplanation avec un argument de
+// langue) : ce test couvre uniquement le nouveau chemin explicite lang="en".
+{
+    const question = {table: 2, multiplier: 5, correctAnswer: 10};
+    const explanationFr = multiplicationExplanation(question);
+    const explanationEn = multiplicationExplanation(question, "en");
+
+    assert.equal(explanationFr, "2 × 5 signifie : 5 + 5 = 10.");
+    assert.equal(explanationEn, "2 × 5 means: 5 + 5 = 10.");
+    assert.notEqual(explanationFr, explanationEn);
 }
 
 console.log("multiplication-train: all tests passed");

@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="La Rivière des fractions du Portail-Math.">
-    <title>La Rivière des fractions · Portail-Math</title>
+    <meta name="description" content="La Rivière des fractions de Mbuyamba Math." data-i18n-attr="content:metaDescription">
+    <title data-i18n="documentTitle">La Rivière des fractions · Mbuyamba Math</title>
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/multiplication-train.css">
     <link rel="stylesheet" href="/css/game-console.css">
     <link rel="stylesheet" href="/css/fraction-river.css">
 </head>
 <body class="is-fraction-river-immersive">
-<a class="skip-link" href="#contenu">Aller au contenu</a>
+<a class="skip-link" href="#contenu" data-i18n="skipLink">Aller au contenu</a>
 <div class="app-shell standalone-game-shell">
     <div class="page-shell">
         <header class="topbar standalone-game-header">
-            <a class="standalone-game-brand" href="/app/" aria-label="Portail-Math — Accueil">✦ Portail-Math</a>
-            <a class="standalone-game-back" href="/app/jeux">Retour aux jeux</a>
+            <a class="standalone-game-brand" href="/app/" aria-label="Mbuyamba Math — Accueil" data-i18n="brandName" data-i18n-attr="aria-label:brandAria">✦ Mbuyamba Math</a>
+            <a class="standalone-game-back" href="/app/jeux" data-i18n="backToGames">Retour aux jeux</a>
         </header>
         <main id="contenu" class="page-content river-page-content" data-fraction-river>
-            <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
-                <a href="/app/">Portail</a>
+            <nav class="game-breadcrumb" aria-label="Fil d’Ariane" data-i18n-attr="aria-label:breadcrumbAria">
+                <a href="/app/" data-i18n="breadcrumbPortal">Portail</a>
                 <span aria-hidden="true">›</span>
-                <a href="/app/jeux">Jeux éducatifs</a>
+                <a href="/app/jeux" data-i18n="breadcrumbGames">Jeux éducatifs</a>
                 <span aria-hidden="true">›</span>
-                <span aria-current="page">La Rivière des fractions</span>
+                <span aria-current="page" data-i18n="breadcrumbCurrent">La Rivière des fractions</span>
             </nav>
 
-            <section class="river-game" data-game-panel hidden aria-label="Plateau de La Rivière des fractions">
+            <section class="river-game" data-game-panel hidden aria-label="Plateau de La Rivière des fractions" data-i18n-attr="aria-label:panelAria">
                 <div class="river-stage" id="fraction-river-game" data-river-stage aria-hidden="true"></div>
                 <p class="visually-hidden" data-scene-summary aria-live="polite"></p>
 
@@ -36,17 +36,21 @@
                         <p class="question-kicker" data-step-kicker>Étape 1 sur 5</p>
                         <h2 id="river-step-title" data-step-title tabindex="-1">Quelle fraction est représentée ?</h2>
                         <div class="fr-visual-holder" data-step-visual></div>
-                        <div class="answer-options" data-step-options aria-label="Choisis une réponse"></div>
+                        <!-- Rappel du vocabulaire numérateur/dénominateur : affiché
+                             uniquement pendant les étapes qui le testent (voir
+                             updateFractionLegend dans fraction-river.js). -->
+                        <p class="fraction-legend" data-fraction-legend hidden></p>
+                        <div class="answer-options" data-step-options aria-label="Choisis une réponse" data-i18n-attr="aria-label:chooseAnswerAria"></div>
                         <div class="answer-feedback" data-step-feedback aria-live="polite" aria-atomic="true"></div>
-                        <button class="game-next-button" type="button" data-next-step hidden>
+                        <button class="game-next-button" type="button" data-next-step hidden data-i18n="nextButtonContinue">
                             Continuer vers la pierre suivante →
                         </button>
                     </section>
 
-                    <aside class="journey-encouragement" aria-label="Conseil de traversée">
+                    <aside class="journey-encouragement" aria-label="Conseil de traversée" data-i18n-attr="aria-label:encouragementAria">
                         <span aria-hidden="true">🌟</span>
                         <strong data-encouragement>Prends ton temps, il n’y a pas de chronomètre.</strong>
-                        <p>Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.</p>
+                        <p data-i18n="encouragementStatic">Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.</p>
                     </aside>
                 </div>
 
@@ -56,18 +60,19 @@
                      et la question se pose sur le parchemin qu'elle réserve. Le
                      créneau à droite ne sert plus. -->
                 <div class="game-console game-console--single" data-game-console hidden
-                     role="dialog" aria-modal="true" aria-label="Mode jeu de La Rivière des fractions">
+                     role="dialog" aria-modal="true" aria-label="Mode jeu de La Rivière des fractions"
+                     data-i18n-attr="aria-label:consoleAria">
                     <header class="game-console__bar">
                         <!-- Une seule indication de progression dans tout le mode
                              immersif : « Étape 1 sur 5 » du panneau est masquée. -->
-                        <p class="game-console__step">Progression <strong data-console-step>1/5</strong></p>
-                        <p class="game-console__calm">Prends ton temps, il n’y a pas de chronomètre.</p>
+                        <p class="game-console__step"><span data-i18n="progressionLabel">Progression</span> <strong data-console-step>1/5</strong></p>
+                        <p class="game-console__calm" data-i18n="encouragementDefault">Prends ton temps, il n’y a pas de chronomètre.</p>
                         <div class="game-console__actions">
                             <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
                                 🔊 Son activé
                             </button>
                             <button class="game-console__quit" type="button" data-console-quit>
-                                <span aria-hidden="true">✕</span> Quitter le jeu
+                                <span aria-hidden="true">✕</span> <span data-i18n="quit">Quitter le jeu</span>
                             </button>
                         </div>
                     </header>
@@ -76,25 +81,25 @@
                         <div class="game-console__panel" data-console-panel></div>
                     </div>
                     <p class="game-console__rotate" data-console-rotate>
-                        <strong>Tourne ton téléphone pour jouer.</strong>
+                        <strong data-i18n="rotate">Tourne ton téléphone pour jouer.</strong>
                     </p>
                 </div>
 
                 <section class="game-result" data-game-result hidden aria-labelledby="river-result-title">
                     <div class="arrival-badge" aria-hidden="true">🧭</div>
-                    <p class="eyebrow">Autre rive atteinte</p>
-                    <h2 id="river-result-title" data-result-title tabindex="-1">Traversée terminée !</h2>
-                    <p>Tu as ouvert le coffre du village.</p>
+                    <p class="eyebrow" data-i18n="resultEyebrow">Autre rive atteinte</p>
+                    <h2 id="river-result-title" data-result-title tabindex="-1" data-i18n="resultTitle">Traversée terminée !</h2>
+                    <p data-i18n="resultIntro">Tu as ouvert le coffre du village.</p>
                     <dl class="result-summary">
-                        <div><dt>Étapes terminées</dt><dd data-final-steps>0/5</dd></div>
-                        <div><dt>Réussites au premier essai</dt><dd data-final-first-try>0/5</dd></div>
-                        <div><dt>Erreurs corrigées</dt><dd data-final-corrected>0</dd></div>
+                        <div><dt data-i18n="statStepsLabel">Étapes terminées</dt><dd data-final-steps>0/5</dd></div>
+                        <div><dt data-i18n="statFirstTryLabel">Réussites au premier essai</dt><dd data-final-first-try>0/5</dd></div>
+                        <div><dt data-i18n="statCorrectedLabel">Erreurs corrigées</dt><dd data-final-corrected>0</dd></div>
                     </dl>
-                    <ul class="fr-badges" data-final-badges aria-label="Badges obtenus"></ul>
+                    <ul class="fr-badges" data-final-badges aria-label="Badges obtenus" data-i18n-attr="aria-label:badgesAria"></ul>
                     <p class="result-message" data-result-message></p>
                     <div class="result-actions">
-                        <button class="game-primary-button" type="button" data-replay>Retraverser</button>
-                        <button class="game-secondary-button" type="button" data-result-quit>Retour aux jeux</button>
+                        <button class="game-primary-button" type="button" data-replay data-i18n="replayButton">Retraverser</button>
+                        <button class="game-secondary-button" type="button" data-result-quit data-i18n="backToGames">Retour aux jeux</button>
                     </div>
                 </section>
             </section>
@@ -111,6 +116,9 @@
 <script src="/js/games/fraction-river/fraction-river-game.js"></script>
 <script src="/js/game-console.js"></script>
 <script src="/js/fraction-river-events.js"></script>
+<script src="/js/game-i18n.js"></script>
+<script src="/js/game-shell-i18n.js"></script>
+<script src="/js/fraction-river-i18n.js"></script>
 <script src="/js/fraction-river-visuals.js"></script>
 <script src="/js/fraction-river-questions.js"></script>
 <script src="/js/fraction-river-store.js"></script>

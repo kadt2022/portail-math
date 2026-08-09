@@ -1,6 +1,13 @@
 (function initializeMultiplicationTrainGame(root) {
     "use strict";
 
+    const gameI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-i18n.js")
+        : root.GameI18n;
+    const multiplicationTrainI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./multiplication-train-i18n.js")
+        : root.MultiplicationTrainI18n;
+
     const QUESTION_COUNT = 5;
     const LEVELS = Object.freeze([
         Object.freeze({
@@ -152,12 +159,17 @@
         return (distance / (Math.PI * wheelDiameter)) * 360;
     }
 
-    function multiplicationExplanation(question) {
+    function multiplicationExplanation(question, lang = "fr") {
         const groups = Array.from(
             {length: question.table},
             () => question.multiplier
         ).join(" + ");
-        return `${question.table} × ${question.multiplier} signifie : ${groups} = ${question.correctAnswer}.`;
+        return gameI18n.translate(multiplicationTrainI18n, lang, "explanation", {
+            table: question.table,
+            multiplier: question.multiplier,
+            groups,
+            result: question.correctAnswer
+        });
     }
 
     function mountGame(document) {
@@ -165,6 +177,13 @@
         if (!rootElement) {
             return;
         }
+
+        // Langue lue une seule fois au chargement de la page (voir game-i18n.js) :
+        // même clé localStorage que le sélecteur de langue du portail React.
+        const lang = gameI18n.resolveLanguage();
+        document.documentElement.lang = lang;
+        gameI18n.applyStaticTranslations(document, multiplicationTrainI18n, lang);
+        const t = (key, params) => gameI18n.translate(multiplicationTrainI18n, lang, key, params);
 
         const gamePanel = rootElement.querySelector("[data-game-panel]");
         const consoleContent = rootElement.querySelector("[data-console-content]");
@@ -300,7 +319,7 @@
         function updateSoundButton() {
             const button = query("[data-sound-toggle]");
             button.setAttribute("aria-pressed", String(soundEnabled));
-            button.textContent = soundEnabled ? "🔊 Son activé" : "🔇 Son désactivé";
+            button.textContent = soundEnabled ? t("soundOn") : t("soundOff");
         }
 
         function playTone(kind) {
@@ -394,10 +413,10 @@
                     button.disabled = true;
                     renderFeedback(
                         "wrong",
-                        "Réponse incorrecte — presque !",
-                        `${multiplicationExplanation(question)} Essaie encore.`
+                        t("feedbackWrongTitle"),
+                        t("feedbackWrongDetail", {explanation: multiplicationExplanation(question, lang)})
                     );
-                    query("[data-encouragement]").textContent = "Presque, regarde les groupes un par un.";
+                    query("[data-encouragement]").textContent = t("encouragementWrong");
                     playTone("incorrect");
                     return;
                 }
@@ -411,15 +430,19 @@
                     });
                     renderFeedback(
                         "correct",
-                        "Bonne réponse — bravo !",
-                        `${question.table} groupes de ${question.multiplier} donnent ${question.correctAnswer}. Le train avance !`
+                        t("feedbackCorrectTitle"),
+                        t("feedbackCorrectDetail", {
+                            table: question.table,
+                            multiplier: question.multiplier,
+                            result: question.correctAnswer
+                        })
                     );
                     query("[data-encouragement]").textContent = state.hadMistake
-                        ? "Bien corrigé ! Ton effort fait avancer le train."
-                        : "Bien joué ! Tu progresses gare après gare.";
+                        ? t("encouragementCorrectedMistake")
+                        : t("encouragementCorrectFirstTry");
                     nextButton.innerHTML = state.completedQuestions === QUESTION_COUNT
-                        ? "Arriver à la gare finale <span aria-hidden=\"true\">→</span>"
-                        : "Continuer vers la prochaine gare <span aria-hidden=\"true\">→</span>";
+                        ? `${t("nextButtonFinal")} <span aria-hidden="true">→</span>`
+                        : `${t("nextButtonContinue")} <span aria-hidden="true">→</span>`;
                     updateStatus();
                     updateTrainPosition(true);
                     playTone("correct");
@@ -441,7 +464,7 @@
             feedback.textContent = "";
             feedback.className = "answer-feedback";
             nextButton.hidden = true;
-            query("[data-encouragement]").textContent = "Ton effort fait avancer le train.";
+            query("[data-encouragement]").textContent = t("encouragementDefault");
             updateStatus();
             if (focus) {
                 questionTitle.focus();
@@ -460,14 +483,14 @@
             stars.setAttribute(
                 "aria-label",
                 largeStarCount
-                    ? `${largeStarCount} grande${largeStarCount > 1 ? "s" : ""} étoile${largeStarCount > 1 ? "s" : ""}`
-                    : "Encouragement à recommencer"
+                    ? t("starsAriaLabel", {count: largeStarCount, plural: largeStarCount > 1 ? "s" : ""})
+                    : t("starsAriaLabelRestart")
             );
             const messages = {
-                3: "Magnifique voyage ! Les tables de 2 et 5 n’ont presque plus de secrets pour toi.",
-                2: "Très beau voyage ! Continue comme ça pour gagner la troisième étoile.",
-                1: "Tu progresses ! Un nouveau voyage t’aidera à consolider tes tables.",
-                0: "Chaque essai te fait avancer. Reprends le train quand tu es prêt."
+                3: t("resultMessage3"),
+                2: t("resultMessage2"),
+                1: t("resultMessage1"),
+                0: t("resultMessage0")
             };
             query("[data-result-message]").textContent = messages[largeStarCount];
             updateSavedProgress();
@@ -508,7 +531,7 @@
             clearGuidedJourneyTimer();
             const currentLevel = LEVELS[currentLevelIndex];
             questions = createGameQuestions(Math.random, currentLevel.tables);
-            query("[data-level-label]").textContent = currentLevel.label;
+            query("[data-level-label]").textContent = t("levelLabel");
             state = createRoundState();
             appliedTrainOffset = 0;
             appliedWheelRotation = 0;

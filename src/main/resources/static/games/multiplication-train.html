@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Le Train des multiplications du Portail-Math.">
-    <title>Le Train des multiplications · Portail-Math</title>
+    <meta name="description" content="Le Train des multiplications de Mbuyamba Math." data-i18n-attr="content:metaDescription">
+    <title data-i18n="documentTitle">Le Train des multiplications · Mbuyamba Math</title>
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/multiplication-train.css">
     <link rel="stylesheet" href="/css/game-console.css">
 </head>
 <body class="is-multiplication-train-immersive">
-<a class="skip-link" href="#contenu">Aller au contenu</a>
+<a class="skip-link" href="#contenu" data-i18n="skipLink">Aller au contenu</a>
 <div class="app-shell standalone-game-shell">
     <div class="page-shell">
         <header class="topbar standalone-game-header">
-            <a class="standalone-game-brand" href="/app/" aria-label="Portail-Math — Accueil">✦ Portail-Math</a>
-            <a class="standalone-game-back" href="/app/jeux">Retour aux jeux</a>
+            <a class="standalone-game-brand" href="/app/" aria-label="Mbuyamba Math — Accueil" data-i18n="brandName" data-i18n-attr="aria-label:brandAria">✦ Mbuyamba Math</a>
+            <a class="standalone-game-back" href="/app/jeux" data-i18n="backToGames">Retour aux jeux</a>
         </header>
         <main id="contenu" class="page-content train-page-content" data-multiplication-train>
-            <nav class="game-breadcrumb" aria-label="Fil d’Ariane">
-                <a href="/app/">Portail</a>
+            <nav class="game-breadcrumb" aria-label="Fil d’Ariane" data-i18n-attr="aria-label:breadcrumbAria">
+                <a href="/app/" data-i18n="breadcrumbPortal">Portail</a>
                 <span aria-hidden="true">›</span>
-                <a href="/app/jeux">Jeux éducatifs</a>
+                <a href="/app/jeux" data-i18n="breadcrumbGames">Jeux éducatifs</a>
                 <span aria-hidden="true">›</span>
-                <span aria-current="page">Train des multiplications</span>
+                <span aria-current="page" data-i18n="breadcrumbCurrent">Train des multiplications</span>
             </nav>
 
-            <section class="train-game" data-game-panel hidden aria-label="Plateau du Train des multiplications">
+            <section class="train-game" data-game-panel hidden aria-label="Plateau du Train des multiplications" data-i18n-attr="aria-label:panelAria">
                 <div class="game-console game-console--train" data-game-console hidden
-                     role="dialog" aria-modal="true" aria-label="Mode jeu du Train des multiplications">
+                     role="dialog" aria-modal="true" aria-label="Mode jeu du Train des multiplications"
+                     data-i18n-attr="aria-label:consoleAria">
                     <header class="game-console__bar">
                         <p class="game-console__step">
-                            Gare <strong data-question-progress>1/5</strong>
+                            <span data-i18n="stationLabel">Gare</span> <strong data-question-progress>1/5</strong>
                             · ⭐ <strong data-star-count>0</strong>
                         </p>
                         <p class="game-console__calm" data-level-label>Niveau 1 · Tables de 2 et 5</p>
@@ -40,7 +41,7 @@
                                 🔊 Son activé
                             </button>
                             <button class="game-console__quit" type="button" data-console-quit>
-                                <span aria-hidden="true">✕</span> Quitter le jeu
+                                <span aria-hidden="true">✕</span> <span data-i18n="quit">Quitter le jeu</span>
                             </button>
                         </div>
                     </header>
@@ -49,11 +50,11 @@
                         <div class="game-console__panel" data-console-panel></div>
                     </div>
                     <p class="game-console__rotate" data-console-rotate>
-                        <strong>Tourne ton téléphone pour jouer.</strong>
+                        <strong data-i18n="rotate">Tourne ton téléphone pour jouer.</strong>
                     </p>
                 </div>
 
-                <div class="game-scene" data-game-scene aria-label="Le train avance dans un paysage vers la gare finale">
+                <div class="game-scene" data-game-scene aria-label="Le train avance dans un paysage vers la gare finale" data-i18n-attr="aria-label:sceneAria">
                     <div class="scene-sky" aria-hidden="true">
                         <span class="scene-sun"></span>
                         <span class="scene-cloud scene-cloud--one"></span>
@@ -63,12 +64,12 @@
                         <span class="scene-hill scene-hill--near"></span>
                     </div>
                     <div class="station-line" aria-hidden="true">
-                        <span class="station-marker station-marker--start"><i></i><b>Départ</b></span>
+                        <span class="station-marker station-marker--start"><i></i><b data-i18n="sceneStart">Départ</b></span>
                         <span class="station-marker"><i></i></span>
                         <span class="station-marker"><i></i></span>
                         <span class="station-marker"><i></i></span>
                         <span class="station-marker"><i></i></span>
-                        <span class="station-marker station-marker--finish"><i></i><b>Gare finale</b></span>
+                        <span class="station-marker station-marker--finish"><i></i><b data-i18n="sceneFinish">Gare finale</b></span>
                     </div>
                     <div class="train-vehicle" data-train aria-hidden="true">
                         <div class="train-smoke"><span></span><span></span><span></span></div>
@@ -88,42 +89,42 @@
                 <div class="train-console-content" data-console-content>
                 <div class="game-learning-area">
                     <section class="game-question" data-question-panel>
-                        <p class="question-kicker">Pour atteindre la prochaine gare :</p>
+                        <p class="question-kicker" data-i18n="questionKicker">Pour atteindre la prochaine gare :</p>
                         <h2 id="game-question-title" tabindex="-1">
                             <span data-operation-left>2</span>
                             <span aria-hidden="true">×</span>
-                            <span class="visually-hidden">multiplié par</span>
+                            <span class="visually-hidden" data-i18n="multipliedBy">multiplié par</span>
                             <span data-operation-right>5</span>
                             <span aria-hidden="true">= ?</span>
                         </h2>
-                        <div class="answer-options" data-answer-options aria-label="Choisis une réponse"></div>
+                        <div class="answer-options" data-answer-options aria-label="Choisis une réponse" data-i18n-attr="aria-label:chooseAnswerAria"></div>
                         <div class="answer-feedback" data-answer-feedback aria-live="polite" aria-atomic="true"></div>
-                        <button class="game-next-button" type="button" data-next-question hidden>
+                        <button class="game-next-button" type="button" data-next-question hidden data-i18n="nextButtonContinue">
                             Continuer vers la prochaine gare <span aria-hidden="true">→</span>
                         </button>
                     </section>
 
-                    <aside class="journey-encouragement" aria-label="Conseil de voyage">
+                    <aside class="journey-encouragement" aria-label="Conseil de voyage" data-i18n-attr="aria-label:encouragementAria">
                         <span aria-hidden="true">🌟</span>
                         <strong data-encouragement>Ton effort fait avancer le train.</strong>
-                        <p>Tu peux prendre ton temps. Il n’y a pas de chronomètre.</p>
+                        <p data-i18n="encouragementStatic">Tu peux prendre ton temps. Il n’y a pas de chronomètre.</p>
                     </aside>
                 </div>
 
                 <section class="game-result" data-game-result hidden aria-labelledby="game-result-title">
                     <div class="arrival-badge" aria-hidden="true">🏁</div>
-                    <p class="eyebrow">Gare finale atteinte</p>
-                    <h2 id="game-result-title" tabindex="-1">Voyage terminé !</h2>
-                    <p>Tu es arrivé à la Gare des Multiplications.</p>
-                    <div class="large-stars" data-large-stars aria-label="Récompense"></div>
+                    <p class="eyebrow" data-i18n="resultEyebrow">Gare finale atteinte</p>
+                    <h2 id="game-result-title" tabindex="-1" data-i18n="resultTitle">Voyage terminé !</h2>
+                    <p data-i18n="resultIntro">Tu es arrivé à la Gare des Multiplications.</p>
+                    <div class="large-stars" data-large-stars aria-label="Récompense" data-i18n-attr="aria-label:rewardAria"></div>
                     <dl class="result-summary">
-                        <div><dt>Résultat</dt><dd data-final-score>0/5</dd></div>
-                        <div><dt>Meilleur score</dt><dd data-final-best>0/5</dd></div>
+                        <div><dt data-i18n="statScoreLabel">Résultat</dt><dd data-final-score>0/5</dd></div>
+                        <div><dt data-i18n="statBestLabel">Meilleur score</dt><dd data-final-best>0/5</dd></div>
                     </dl>
                     <p class="result-message" data-result-message></p>
                     <div class="result-actions">
-                        <button class="game-primary-button" type="button" data-replay>Rejouer</button>
-                        <button class="game-secondary-button" type="button" data-result-quit>Retour aux jeux</button>
+                        <button class="game-primary-button" type="button" data-replay data-i18n="replayButton">Rejouer</button>
+                        <button class="game-secondary-button" type="button" data-result-quit data-i18n="backToGames">Retour aux jeux</button>
                     </div>
                 </section>
                 </div>
@@ -133,6 +134,9 @@
 </div>
 <script src="/js/multiplication-train-store.js"></script>
 <script src="/js/game-console.js"></script>
+<script src="/js/game-i18n.js"></script>
+<script src="/js/game-shell-i18n.js"></script>
+<script src="/js/multiplication-train-i18n.js"></script>
 <script src="/js/multiplication-train.js"></script>
 </body>
 </html>
