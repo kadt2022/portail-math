@@ -187,6 +187,18 @@ sonar {
             'frontend/dist/**',
             'build/**'
         ].join(',')
+        // Les dictionnaires de traduction (fr/en, mêmes clés, valeurs
+        // différentes) déclenchent des faux positifs de duplication : un
+        // détecteur de copier-coller normalise les littéraux de chaîne, donc
+        // deux blocs "clé: chaîne," de même forme mais de contenu différent
+        // se ressemblent structurellement. Cible uniquement la détection de
+        // duplication (les fichiers restent analysés pour tout le reste :
+        // couverture, bugs, failles).
+        property 'sonar.cpd.exclusions', [
+            'src/main/resources/static/js/game-shell-i18n.js',
+            'src/main/resources/static/js/fraction-river-i18n.js',
+            'src/main/resources/static/js/multiplication-train-i18n.js'
+        ].join(',')
         property 'sonar.java.binaries', 'build/classes/java/main'
         property 'sonar.java.test.binaries', 'build/classes/java/test'
         property 'sonar.junit.reportPaths', 'build/test-results/test'
