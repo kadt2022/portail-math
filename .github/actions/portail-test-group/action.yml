@@ -78,6 +78,7 @@ runs:
           build/reports/tests/**
           build/test-results/**
           build/reports/jacoco/**
+          build/reports/coverage/**
           build/classes/java/test/**
         if-no-files-found: warn
         retention-days: 7

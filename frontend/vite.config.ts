@@ -37,5 +37,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/vitest.setup.ts"],
     css: true,
+    coverage: {
+      provider: "v8",
+      // Écrit sous build/ (racine du dépôt), au même endroit que le rapport
+      // JaCoCo du backend : la CI télécharge tout ce qui vit sous build/
+      // comme un seul arbre pour l'analyse Sonar (voir build.gradle).
+      reportsDirectory: "../build/reports/coverage/frontend",
+      reporter: ["text", "lcov"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/vite-env.d.ts", "src/main.tsx"],
+    },
   },
 });

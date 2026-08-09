@@ -55,10 +55,26 @@ tasks.register('frontendLint', Exec) {
 }
 
 tasks.register('frontendTest', Exec) {
-    description = 'Tests du portail React.'
+    description = 'Tests du portail React, avec couverture pour Sonar.'
     dependsOn 'frontendInstall'
     workingDir frontendDir
-    commandLine npmExecutable, 'run', 'test'
+    // Écrit sous build/reports/coverage/frontend (voir vite.config.ts) :
+    // même arbre que le rapport JaCoCo du backend, pour que la CI télécharge
+    // et publie les deux avec le même artefact "sous build/".
+    commandLine npmExecutable, 'run', 'test', '--', '--coverage'
+    doLast {
+        // vitest écrit des chemins SF relatifs à frontend/ (son propre cwd),
+        // mais le sensor JS/TS de Sonar les résout depuis la racine du
+        // projet (là où sonar.sources déclare "frontend/src") : sans ce
+        // préfixe, aucun fichier ne correspond et la couverture reste à 0 %.
+        def lcovFile = file("${rootDir}/build/reports/coverage/frontend/lcov.info")
+        if (lcovFile.exists()) {
+            def rewritten = lcovFile.readLines().collect { line ->
+                line.startsWith('SF:') ? "SF:frontend/${line.substring(3).replace('\\', '/')}" : line
+            }.join(System.lineSeparator())
+            lcovFile.text = rewritten + System.lineSeparator()
+        }
+    }
 }
 
 tasks.register('frontendBuild', Exec) {
@@ -140,5 +156,7 @@ sonar {
         property 'sonar.java.test.binaries', 'build/classes/java/test'
         property 'sonar.junit.reportPaths', 'build/test-results/test'
         property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+        property 'sonar.javascript.lcov.reportPaths', 'build/reports/coverage/frontend/lcov.info'
+        property 'sonar.typescript.lcov.reportPaths', 'build/reports/coverage/frontend/lcov.info'
     }
 }

@@ -311,6 +311,12 @@ jobs:
           name: portail-test-results-backend
           path: build
 
+      - name: Télécharger les résultats frontend
+        uses: actions/download-artifact@v6
+        with:
+          name: portail-test-results-frontend
+          path: build
+
       - name: Exécuter l'analyse Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -329,6 +335,11 @@ jobs:
 
           if [[ ! -f build/reports/jacoco/test/jacocoTestReport.xml ]]; then
             echo "::error::Le rapport JaCoCo backend est introuvable."
+            exit 1
+          fi
+
+          if [[ ! -f build/reports/coverage/frontend/lcov.info ]]; then
+            echo "::error::Le rapport de couverture frontend (lcov) est introuvable."
             exit 1
           fi
 
