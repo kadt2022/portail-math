@@ -26,6 +26,7 @@ class OpenShiftDeploymentAssetsTests {
         var jobs = map(workflow.get("jobs"));
         var permissions = map(workflow.get("permissions"));
         var deployment = map(jobs.get("deploy-openshift"));
+        var bvtSteps = list(map(jobs.get("bvt")).get("steps"));
         var deploymentCondition = deployment.get("if").toString()
                 .replaceAll("\\s+", " ")
                 .trim();
@@ -45,6 +46,12 @@ class OpenShiftDeploymentAssetsTests {
         assertEquals("read", permissions.get("contents"));
         assertEquals("openshift-dev", deployment.get("environment"));
         assertEquals("status-check", deployment.get("needs"));
+        assertTrue(bvtSteps.stream()
+                .map(this::map)
+                .filter(step -> "actions/setup-java@v5".equals(step.get("uses")))
+                .map(step -> map(step.get("with")))
+                .anyMatch(configuration -> "temurin".equals(configuration.get("distribution"))
+                        && "21".equals(configuration.get("java-version"))));
         assertEquals(
                 "github.ref == 'refs/heads/main' && "
                         + "needs['status-check'].result == 'success' && "
