@@ -10,10 +10,29 @@ const gameI18n = require("../../main/resources/static/js/game-i18n.js");
     assert.equal(gameI18n.isSupportedLanguage("es"), false);
     assert.equal(gameI18n.isSupportedLanguage(null), false);
 
-    // Sans window.localStorage/navigator (environnement Node), le repli
-    // français par défaut s'applique — même comportement que
-    // resolveInitialLanguage côté React lorsque rien n'est disponible.
-    assert.equal(gameI18n.resolveLanguage(), "fr");
+    // storage/languageTags sont explicitement injectés à vide : Node 21+
+    // expose un `navigator.language` global reflétant la locale de la
+    // machine qui exécute le test (ex. "fr-CA" en local, "en-US" sur les
+    // runners CI), donc s'appuyer sur les globals ambiants rendrait ce test
+    // dépendant de l'environnement plutôt que du code.
+    assert.equal(gameI18n.resolveLanguage({storage: null, languageTags: []}), "fr");
+
+    // Préférence enregistrée prioritaire sur la langue du navigateur.
+    const storedEn = {getItem: (key) => (key === gameI18n.STORAGE_KEY ? "en" : null)};
+    assert.equal(
+        gameI18n.resolveLanguage({storage: storedEn, languageTags: ["fr-FR"]}),
+        "en",
+    );
+
+    // Sans préférence enregistrée, la langue du navigateur est utilisée —
+    // seul le préfixe compte, et une variante inconnue est ignorée.
+    assert.equal(gameI18n.resolveLanguage({storage: null, languageTags: ["en-US"]}), "en");
+    assert.equal(gameI18n.resolveLanguage({storage: null, languageTags: ["es-ES", "fr-CA"]}), "fr");
+
+    // Une valeur stockée invalide (langue non supportée) est ignorée, comme
+    // une entrée absente.
+    const storedInvalid = {getItem: () => "es"};
+    assert.equal(gameI18n.resolveLanguage({storage: storedInvalid, languageTags: ["en-GB"]}), "en");
 }
 
 // --- Traduction et interpolation ------------------------------------------

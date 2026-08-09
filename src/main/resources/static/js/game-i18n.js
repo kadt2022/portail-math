@@ -9,37 +9,50 @@
         return typeof value === "string" && SUPPORTED_LANGUAGES.indexOf(value) !== -1;
     }
 
-    function readStoredLanguage() {
+    function safeLocalStorage() {
         try {
-            if (!root.localStorage) {
+            return root.localStorage || null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function safeNavigatorLanguages() {
+        try {
+            const nav = root.navigator;
+            if (!nav) {
+                return [];
+            }
+            if (nav.languages && nav.languages.length > 0) {
+                return nav.languages;
+            }
+            return nav.language ? [nav.language] : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function readStoredLanguage(storage) {
+        try {
+            if (!storage) {
                 return null;
             }
-            const raw = root.localStorage.getItem(STORAGE_KEY);
+            const raw = storage.getItem(STORAGE_KEY);
             return isSupportedLanguage(raw) ? raw : null;
         } catch (error) {
             return null;
         }
     }
 
-    function detectBrowserLanguage() {
-        try {
-            const nav = root.navigator;
-            if (!nav) {
-                return null;
+    function detectBrowserLanguage(languageTags) {
+        const tags = languageTags || [];
+        for (let index = 0; index < tags.length; index += 1) {
+            const prefix = String(tags[index]).slice(0, 2).toLowerCase();
+            if (isSupportedLanguage(prefix)) {
+                return prefix;
             }
-            const tags = nav.languages && nav.languages.length > 0
-                ? nav.languages
-                : (nav.language ? [nav.language] : []);
-            for (let index = 0; index < tags.length; index += 1) {
-                const prefix = String(tags[index]).slice(0, 2).toLowerCase();
-                if (isSupportedLanguage(prefix)) {
-                    return prefix;
-                }
-            }
-            return null;
-        } catch (error) {
-            return null;
         }
+        return null;
     }
 
     // Même ordre de résolution que frontend/src/i18n/language-storage.ts
@@ -47,8 +60,18 @@
     // navigateur, puis français par défaut. Réimplémenté en JS vanille car ces
     // pages jeux ne chargent pas le bundle React — mais lisent la même clé
     // localStorage, posée par le sélecteur de langue du portail (même origine).
-    function resolveLanguage() {
-        return readStoredLanguage() || detectBrowserLanguage() || FALLBACK_LANGUAGE;
+    //
+    // storage/languageTags sont injectables (mêmes noms que les fonctions
+    // ci-dessus) pour les tests : Node 21+ expose un `navigator.language`
+    // global reflétant la locale du système, donc s'appuyer sur les globals
+    // ambiants sans pouvoir les remplacer rendrait ce test dépendant de la
+    // machine qui l'exécute.
+    function resolveLanguage(overrides) {
+        const storage = overrides && "storage" in overrides ? overrides.storage : safeLocalStorage();
+        const languageTags = overrides && overrides.languageTags
+            ? overrides.languageTags
+            : safeNavigatorLanguages();
+        return readStoredLanguage(storage) || detectBrowserLanguage(languageTags) || FALLBACK_LANGUAGE;
     }
 
     function interpolate(template, params) {
