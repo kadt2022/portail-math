@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
 import styles from "./GameCard.module.css";
-import { NewGameScene, TrainScene } from "./GameScenes";
+import { GrilleMagiqueScene, NewGameScene, TrainScene } from "./GameScenes";
 
 interface GameCardProps {
   game: GameCatalogueEntry;
@@ -15,6 +15,9 @@ function CardVisual({ game }: GameCardProps) {
   }
   if (game.sceneId === "train") {
     return <TrainScene />;
+  }
+  if (game.sceneId === "grille-magique") {
+    return <GrilleMagiqueScene />;
   }
   return <NewGameScene />;
 }

@@ -1,0 +1,460 @@
+import React, { useState, useCallback, useEffect } from "react";
+import { Sparkles, RotateCcw, Trophy, Timer, ChevronRight, Move } from "lucide-react";
+
+const COLORS = {
+  bg: "#120E28",
+  bgAlt: "#1A1440",
+  panel: "#211A4D",
+  gold: "#D9A62E",
+  goldSoft: "#F0CD7A",
+  teal: "#2FB6AC",
+  paper: "#F4ECDA",
+  paperDim: "#B9AFD6",
+  danger: "#E4685D",
+};
+
+const DIFFICULTIES = {
+  facile: { label: "Facile", scrambleMoves: 15, points: 100 },
+  moyen: { label: "Moyen", scrambleMoves: 35, points: 200 },
+  expert: { label: "Expert", scrambleMoves: 70, points: 400 },
+};
+
+// positions 0..8 laid out as:
+// 0 1 2
+// 3 4 5
+// 6 7 8
+const CENTER = 4;
+const NEIGHBORS = {
+  0: [1, 3],
+  1: [0, 2, 4],
+  2: [1, 5],
+  3: [0, 4, 6],
+  4: [1, 3, 5, 7],
+  5: [2, 4, 8],
+  6: [3, 7],
+  7: [4, 6, 8],
+  8: [5, 7],
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildSolution() {
+  const digits = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  // solved[4] (center) is reserved for the magic card, removed from the ring
+  const magicNumber = digits[CENTER];
+  const solved = [...digits];
+  solved[CENTER] = null; // blank at center when solved
+  const rowSums = [0, 1, 2].map((r) => digits[r * 3] + digits[r * 3 + 1] + digits[r * 3 + 2]);
+  const colSums = [0, 1, 2].map((c) => digits[c] + digits[c + 3] + digits[c + 6]);
+  return { solved, magicNumber, rowSums, colSums, digits };
+}
+
+// scramble by performing random legal slides starting from the solved state
+function scramble(solved, moves) {
+  let tiles = [...solved];
+  let blank = CENTER;
+  let lastFrom = -1;
+  for (let i = 0; i < moves; i++) {
+    const options = NEIGHBORS[blank].filter((n) => n !== lastFrom);
+    const pick = options[Math.floor(Math.random() * options.length)];
+    tiles[blank] = tiles[pick];
+    tiles[pick] = null;
+    lastFrom = blank;
+    blank = pick;
+  }
+  return tiles;
+}
+
+function isRingSolved(tiles, solved) {
+  return tiles.every((v, i) => (i === CENTER ? v === null : v === solved[i]));
+}
+
+export default function GrilleMagiqueTaquin() {
+  const [difficulty, setDifficulty] = useState("facile");
+  const [solution, setSolution] = useState(() => buildSolution());
+  const [tiles, setTiles] = useState(() => scramble(solution.solved, DIFFICULTIES.facile.scrambleMoves));
+  const [status, setStatus] = useState("playing"); // playing | ready | won
+  const [seconds, setSeconds] = useState(0);
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [moves, setMoves] = useState(0);
+
+  const setup = useCallback((diff) => {
+    const sol = buildSolution();
+    const scr = scramble(sol.solved, DIFFICULTIES[diff].scrambleMoves);
+    setSolution(sol);
+    setTiles(scr);
+    setStatus("playing");
+    setSeconds(0);
+    setMoves(0);
+  }, []);
+
+  useEffect(() => {
+    if (status === "won") return;
+    const t = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [status]);
+
+  useEffect(() => {
+    const blank = tiles.indexOf(null);
+    if (blank === CENTER && isRingSolved(tiles, solution.solved)) {
+      setStatus("ready");
+    } else if (status === "ready") {
+      setStatus("playing");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tiles]);
+
+  function slideTile(idx) {
+    if (status === "won") return;
+    const blank = tiles.indexOf(null);
+    if (!NEIGHBORS[blank].includes(idx)) return;
+    setTiles((prev) => {
+      const next = [...prev];
+      next[blank] = next[idx];
+      next[idx] = null;
+      return next;
+    });
+    setMoves((m) => m + 1);
+  }
+
+  function placeMagicCard() {
+    if (status !== "ready") return;
+    setTiles((prev) => {
+      const next = [...prev];
+      next[CENTER] = solution.magicNumber;
+      return next;
+    });
+    const bonus = Math.max(0, 120 - seconds) * 2 + Math.max(0, 40 - moves) * 4;
+    setScore((s) => s + DIFFICULTIES[difficulty].points + bonus);
+    setStatus("won");
+  }
+
+  function nextLevel() {
+    setLevel((l) => l + 1);
+    setup(difficulty);
+  }
+
+  function changeDifficulty(diff) {
+    setDifficulty(diff);
+    setup(diff);
+  }
+
+  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const ss = String(seconds % 60).padStart(2, "0");
+
+  const rowOf = (i) => Math.floor(i / 3);
+  const colOf = (i) => i % 3;
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: `radial-gradient(1200px 600px at 50% -10%, ${COLORS.bgAlt} 0%, ${COLORS.bg} 60%)`,
+        color: COLORS.paper,
+        fontFamily: "'Inter', system-ui, sans-serif",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "32px 16px 60px",
+        userSelect: "none",
+      }}
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Inter:wght@400;500;600;700&display=swap');
+        .gm-title { font-family: 'Fraunces', serif; }
+        .gm-btn { transition: transform .15s ease; }
+        .gm-btn:active { transform: scale(0.96); }
+        .gm-tile { transition: transform .1s ease, background .2s ease; cursor: pointer; }
+        .gm-tile:active { transform: scale(0.94); }
+        .gm-pulse { animation: gmPulse 1.4s ease-in-out infinite; }
+        @keyframes gmPulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.7; transform:scale(1.06);} }
+        .gm-reveal { animation: gmReveal .5s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes gmReveal { 0%{transform:scale(0.3) rotate(-15deg); opacity:0;} 100%{transform:scale(1) rotate(0); opacity:1;} }
+      `}</style>
+
+      <div style={{ textAlign: "center", marginBottom: 20, maxWidth: 480 }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 12,
+            letterSpacing: 2,
+            color: COLORS.teal,
+            textTransform: "uppercase",
+            marginBottom: 10,
+          }}
+        >
+          <Sparkles size={14} /> Makumi Academy — Défi logique
+        </div>
+        <h1 className="gm-title" style={{ fontSize: "clamp(28px,7vw,38px)", margin: 0, fontWeight: 800 }}>
+          La Grille Magique — Taquin
+        </h1>
+        <p style={{ color: COLORS.paperDim, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>
+          Fais glisser les tuiles vers la case vide jusqu'à ce que chaque ligne et
+          colonne vérifie son égalité. La case centrale se révèle en dernier.
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        {Object.entries(DIFFICULTIES).map(([k, d]) => (
+          <button
+            key={k}
+            onClick={() => changeDifficulty(k)}
+            className="gm-btn"
+            style={{
+              padding: "8px 16px",
+              borderRadius: 999,
+              border: `1px solid ${difficulty === k ? COLORS.gold : "rgba(244,236,218,0.2)"}`,
+              background: difficulty === k ? "rgba(217,166,46,0.15)" : "transparent",
+              color: difficulty === k ? COLORS.gold : COLORS.paperDim,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {d.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 18, marginBottom: 18, fontSize: 13, color: COLORS.paperDim }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Timer size={14} color={COLORS.teal} /> {mm}:{ss}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Trophy size={14} color={COLORS.gold} /> {score} pts
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Move size={14} /> {moves}
+        </div>
+        <div>Niveau {level}</div>
+      </div>
+
+      {/* Grid with static operators */}
+      <div
+        style={{
+          background: COLORS.panel,
+          borderRadius: 20,
+          padding: "26px 20px",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          border: "1px solid rgba(217,166,46,0.25)",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "62px 22px 62px 22px 62px 30px 46px",
+            gridTemplateRows: "62px 22px 62px 22px 62px",
+            alignItems: "center",
+            justifyItems: "center",
+          }}
+        >
+          {[0, 1, 2].map((r) => (
+            <React.Fragment key={`r-${r}`}>
+              {[0, 1, 2].map((c) => {
+                const idx = r * 3 + c;
+                const val = tiles[idx];
+                const isCenter = idx === CENTER;
+                const empty = val === null;
+                return (
+                  <React.Fragment key={`cell-${idx}`}>
+                    <div
+                      onClick={() => slideTile(idx)}
+                      className={!empty ? "gm-tile gm-title" : ""}
+                      style={{
+                        gridColumn: c * 2 + 1,
+                        gridRow: r * 2 + 1,
+                        width: 62,
+                        height: 62,
+                        borderRadius: 12,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 26,
+                        fontWeight: 700,
+                        background: empty
+                          ? isCenter && status === "ready"
+                            ? "rgba(217,166,46,0.15)"
+                            : "rgba(244,236,218,0.03)"
+                          : "rgba(47,182,172,0.14)",
+                        border: `1px solid ${
+                          empty
+                            ? isCenter && status === "ready"
+                              ? "rgba(217,166,46,0.6)"
+                              : "rgba(244,236,218,0.1)"
+                            : "rgba(47,182,172,0.4)"
+                        }`,
+                        color: COLORS.paper,
+                      }}
+                    >
+                      {empty ? (
+                        isCenter ? (
+                          <span
+                            style={{
+                              fontSize: 20,
+                              color: status === "ready" ? COLORS.gold : "rgba(244,236,218,0.25)",
+                            }}
+                            className={status === "ready" ? "gm-pulse" : ""}
+                          >
+                            ✕
+                          </span>
+                        ) : null
+                      ) : (
+                        <span className={status === "won" && isCenter ? "gm-reveal" : ""}>{val}</span>
+                      )}
+                    </div>
+                    {c < 2 && (
+                      <div style={{ gridColumn: c * 2 + 2, gridRow: r * 2 + 1, color: COLORS.paperDim, fontSize: 16 }}>
+                        +
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+              <div style={{ gridColumn: 6, gridRow: r * 2 + 1, color: COLORS.paperDim, fontSize: 16 }}>=</div>
+              <div
+                style={{
+                  gridColumn: 7,
+                  gridRow: r * 2 + 1,
+                  fontSize: 17,
+                  fontWeight: 700,
+                  color: COLORS.gold,
+                }}
+                className="gm-title"
+              >
+                {solution.rowSums[r]}
+              </div>
+              {r < 2 && (
+                <>
+                  <div style={{ gridColumn: 1, gridRow: r * 2 + 2, color: COLORS.paperDim, fontSize: 16 }}>+</div>
+                  <div style={{ gridColumn: 3, gridRow: r * 2 + 2, color: COLORS.paperDim, fontSize: 16 }}>+</div>
+                  <div style={{ gridColumn: 5, gridRow: r * 2 + 2, color: COLORS.paperDim, fontSize: 16 }}>+</div>
+                </>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        {/* col sums row, static */}
+        <div style={{ display: "flex", gap: 22, justifyContent: "center", marginTop: 8 }}>
+          {[0, 1, 2].map((c) => (
+            <div key={`cs-${c}`} style={{ width: 62, textAlign: "center", color: COLORS.paperDim, fontSize: 12 }}>
+              <span style={{ opacity: 0.5 }}>=</span>{" "}
+              <span className="gm-title" style={{ color: COLORS.gold, fontWeight: 700, fontSize: 15 }}>
+                {solution.colSums[c]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Magic card, hors cadre */}
+      <div style={{ marginTop: 26, textAlign: "center" }}>
+        <div style={{ fontSize: 11, color: COLORS.paperDim, marginBottom: 10, letterSpacing: 1 }}>
+          LA CARTE MAGIQUE
+        </div>
+        <div
+          onClick={placeMagicCard}
+          className={status === "ready" ? "gm-tile gm-pulse" : ""}
+          style={{
+            width: 64,
+            height: 64,
+            margin: "0 auto",
+            borderRadius: 14,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background:
+              status === "ready"
+                ? "linear-gradient(145deg, rgba(217,166,46,0.35), rgba(217,166,46,0.15))"
+                : status === "won"
+                ? "transparent"
+                : "rgba(244,236,218,0.05)",
+            border: `2px solid ${status === "ready" ? COLORS.gold : "rgba(244,236,218,0.15)"}`,
+            cursor: status === "ready" ? "pointer" : "default",
+          }}
+        >
+          {status === "won" ? (
+            <span style={{ color: COLORS.paperDim, fontSize: 12 }}>placée ✓</span>
+          ) : (
+            <span
+              className="gm-title"
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: status === "ready" ? COLORS.gold : COLORS.paperDim,
+              }}
+            >
+              ✕
+            </span>
+          )}
+        </div>
+        <div style={{ fontSize: 12, color: COLORS.paperDim, marginTop: 8, maxWidth: 220 }}>
+          {status === "ready"
+            ? "Tape la carte pour la déposer au centre et révéler le nombre magique."
+            : status === "won"
+            ? "Le nombre magique est révélé au centre de la grille."
+            : "Se révèle une fois les 8 tuiles bien placées autour du centre."}
+        </div>
+      </div>
+
+      <div style={{ minHeight: 24, marginTop: 16, textAlign: "center" }}>
+        {status === "won" && (
+          <div style={{ color: COLORS.teal, fontWeight: 700, fontSize: 15 }}>
+            ✓ Grille résolue ! Nombre magique : {solution.magicNumber} — +{DIFFICULTIES[difficulty].points} pts
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+        {status === "won" && (
+          <button
+            onClick={nextLevel}
+            className="gm-btn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "12px 22px",
+              borderRadius: 12,
+              border: "none",
+              background: COLORS.teal,
+              color: COLORS.bg,
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            Niveau suivant <ChevronRight size={16} />
+          </button>
+        )}
+        <button
+          onClick={() => setup(difficulty)}
+          className="gm-btn"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "12px 18px",
+            borderRadius: 12,
+            border: "1px solid rgba(244,236,218,0.2)",
+            background: "transparent",
+            color: COLORS.paperDim,
+            fontSize: 14,
+            cursor: "pointer",
+          }}
+        >
+          <RotateCcw size={15} /> Nouvelle grille
+        </button>
+      </div>
+    </div>
+  );
+}

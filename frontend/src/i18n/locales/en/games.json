@@ -16,6 +16,51 @@
     "description": "Cross the river by picking the right fractions.",
     "cta": "Play"
   },
+  "grilleMagique": {
+    "name": "The Magic Tiles",
+    "description": "Slide the tiles and place the magic card to solve the equations.",
+    "cta": "Play",
+    "game": {
+      "title": "The Magic Tiles",
+      "instructions": "Reveal the magic card, then slide the tiles so every equation checks out. Bring the empty space back to the center and place the card to check your grid.",
+      "difficultyLabel": "Difficulty",
+      "difficulty": {
+        "facile": "Easy",
+        "moyen": "Medium"
+      },
+      "stats": {
+        "time": "Time",
+        "moves": "Moves",
+        "score": "Score",
+        "level": "Level"
+      },
+      "card": {
+        "heading": "The magic card",
+        "hiddenAria": "Magic card, hidden value. Tap to reveal it.",
+        "revealedAria": "Magic card revealed: {{value}}.",
+        "placeAria": "Place the magic card at the center of the grid.",
+        "placeHintReady": "The empty space is at the center: place the card to check your grid.",
+        "placeHintNotReady": "Bring the empty space back to the center to place the card.",
+        "wonLabel": "Card placed: {{value}}."
+      },
+      "tile": {
+        "movableAria": "Row {{row}}, column {{col}}, value {{value}}, can move into the empty space.",
+        "blockedAria": "Row {{row}}, column {{col}}, value {{value}}, cannot move.",
+        "blankAria": "Empty space, row {{row}}, column {{col}}."
+      },
+      "feedback": {
+        "win": "Well done! Every equation checks out.",
+        "incorrect": "Some equations are not correct yet. Keep sliding the tiles.",
+        "rowIncorrect": "Row {{index}} is incorrect.",
+        "colIncorrect": "Column {{index}} is incorrect."
+      },
+      "actions": {
+        "newGrid": "New grid",
+        "nextLevel": "Next level",
+        "backToGames": "Back to games"
+      }
+    }
+  },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",

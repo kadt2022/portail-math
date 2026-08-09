@@ -9,6 +9,7 @@ import {
   ExetatTrainingPage,
 } from "../exetat/ExetatPages";
 import { GamesCataloguePage } from "../games/GamesCataloguePage";
+import { GrilleMagiquePage } from "../games/grille-magique/GrilleMagiquePage";
 import { NewGameComingSoonPage } from "../games/new-game/NewGameComingSoonPage";
 import { AboutPage } from "./AboutPage";
 import { AppLayout } from "./AppLayout";
@@ -35,6 +36,7 @@ export function AppRouter() {
           <Route path="exetat/matieres/:subjectId/quiz" element={<ExetatQuizPage />} />
           <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
           <Route path="jeux" element={<GamesCataloguePage />} />
+          <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />

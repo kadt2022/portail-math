@@ -87,6 +87,66 @@ export function NewGameScene() {
   );
 }
 
+export function GrilleMagiqueScene() {
+  const tiles = [
+    { x: 46, y: 48 },
+    { x: 130, y: 48 },
+    { x: 214, y: 48 },
+    { x: 46, y: 132 },
+    { x: 130, y: 132 },
+    { x: 214, y: 132 },
+    { x: 46, y: 216 },
+    { x: 130, y: 216 },
+    { x: 214, y: 216 },
+  ];
+  return (
+    <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="grilleMagiqueSky" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3a2a63" />
+          <stop offset="100%" stopColor="#17493f" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#grilleMagiqueSky)" />
+      <g fill="#ffffff" opacity="0.35">
+        <circle cx="330" cy="36" r="2.2" />
+        <circle cx="360" cy="70" r="1.6" />
+        <circle cx="24" cy="60" r="1.8" />
+      </g>
+      {tiles.map(({ x, y }, index) =>
+        index === 4 ? (
+          <g key="magic-card" transform={`translate(${x} ${y})`}>
+            <rect x="-30" y="-30" width="60" height="60" rx="14" fill="#e2762b" opacity="0.22" />
+            <path
+              d="M0 -22 L6 -6 L22 0 L6 6 L0 22 L-6 6 L-22 0 L-6 -6 Z"
+              fill="#fce3cd"
+              stroke="#e2762b"
+              strokeWidth="2"
+            />
+          </g>
+        ) : (
+          <rect
+            key={`tile-${x}-${y}`}
+            x={x - 30}
+            y={y - 30}
+            width="60"
+            height="60"
+            rx="12"
+            fill="#fef3e6"
+            opacity="0.92"
+          />
+        ),
+      )}
+      <g stroke="#fce3cd" strokeWidth="2.5" strokeLinecap="round" opacity="0.6">
+        <line x1="88" y1="48" x2="106" y2="48" />
+        <line x1="172" y1="48" x2="190" y2="48" />
+        <line x1="88" y1="216" x2="106" y2="216" />
+        <line x1="172" y1="216" x2="190" y2="216" />
+      </g>
+    </svg>
+  );
+}
+
 export function ExploreScene() {
   return (
     <svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
