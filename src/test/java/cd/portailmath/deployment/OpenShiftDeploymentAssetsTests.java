@@ -30,12 +30,24 @@ class OpenShiftDeploymentAssetsTests {
                 .replaceAll("\\s+", " ")
                 .trim();
 
-        assertTrue(jobs.containsKey("ci"));
-        assertTrue(jobs.containsKey("deploy-openshift"));
+        assertTrue(jobs.keySet().containsAll(List.of(
+                "preflight",
+                "assemble",
+                "test-backend",
+                "test-frontend",
+                "test-games",
+                "bvt",
+                "sonar",
+                "quality-gate",
+                "status-check",
+                "deploy-openshift"
+        )));
         assertEquals("read", permissions.get("contents"));
         assertEquals("openshift-dev", deployment.get("environment"));
+        assertEquals("status-check", deployment.get("needs"));
         assertEquals(
                 "github.ref == 'refs/heads/main' && "
+                        + "needs['status-check'].result == 'success' && "
                         + "(github.event_name == 'workflow_dispatch' || github.event_name == 'push')",
                 deploymentCondition
         );

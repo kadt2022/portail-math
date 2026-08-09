@@ -1,7 +1,9 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '4.0.7'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.sonarqube' version '7.3.0.8198'
 }
 
 group = 'cd.portailmath'
@@ -26,8 +28,8 @@ dependencies {
 }
 
 // ---------------------------------------------------------------------------
-// Portail React (frontend/). Il est construit par le même build Gradle et
-// empaqueté dans le même JAR : un seul artefact, un seul déploiement OpenShift.
+// Portail React (frontend/). Il est construit par le mÃªme build Gradle et
+// empaquetÃ© dans le mÃªme JAR : un seul artefact, un seul dÃ©ploiement OpenShift.
 // ---------------------------------------------------------------------------
 
 def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
@@ -35,10 +37,10 @@ def npmExecutable = isWindows ? 'npm.cmd' : 'npm'
 def frontendDir = file('frontend')
 
 tasks.register('frontendInstall', Exec) {
-    description = 'Installe les dépendances du portail React à partir du verrou.'
+    description = 'Installe les dÃ©pendances du portail React Ã  partir du verrou.'
     workingDir frontendDir
-    // npm ci et non npm install : l'installation doit être reproductible et
-    // refuser toute dérive par rapport à package-lock.json.
+    // npm ci et non npm install : l'installation doit Ãªtre reproductible et
+    // refuser toute dÃ©rive par rapport Ã  package-lock.json.
     commandLine npmExecutable, 'ci'
     inputs.file(new File(frontendDir, 'package.json'))
     inputs.file(new File(frontendDir, 'package-lock.json'))
@@ -97,10 +99,46 @@ tasks.register('testFractionRiverAnchors', Exec) {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+// `test` reste la suite backend Java/Spring. `check` demeure la validation
+// locale complÃ¨te, tandis que la CI peut lancer les trois groupes en parallÃ¨le
+// sans rejouer les suites frontend et jeux dans le job backend.
+tasks.named('check') {
     dependsOn tasks.named('testProgressStore')
     dependsOn tasks.named('testMultiplicationTrain')
     dependsOn tasks.named('testFractionRiver')
     dependsOn tasks.named('frontendLint')
     dependsOn tasks.named('frontendTest')
     dependsOn tasks.named('testFractionRiverAnchors')
+}
+
+sonar {
+    properties {
+        property 'sonar.projectName', 'Portail Ã©ducatif'
+        property 'sonar.sourceEncoding', 'UTF-8'
+        property 'sonar.sources', 'src/main/java,src/main/resources/static/js,frontend/src'
+        property 'sonar.tests', 'src/test/java,src/test/js'
+        property 'sonar.exclusions', [
+            'frontend/src/**/*.test.ts',
+            'frontend/src/**/*.test.tsx',
+            'frontend/node_modules/**',
+            'frontend/dist/**',
+            'build/**'
+        ].join(',')
+        property 'sonar.java.binaries', 'build/classes/java/main'
+        property 'sonar.java.test.binaries', 'build/classes/java/test'
+        property 'sonar.junit.reportPaths', 'build/test-results/test'
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+    }
 }
