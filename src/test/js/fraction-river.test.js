@@ -504,4 +504,57 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
     console.warn = originalWarn;
 }
 
+// --- Localisation anglaise --------------------------------------------------
+// Le français reste le comportement par défaut (voir les blocs ci-dessus, qui
+// n'appellent jamais createLevel1Steps/hintFor avec un argument de langue) :
+// ces tests couvrent uniquement le nouveau chemin explicite lang="en".
+{
+    for (let seed = 1; seed <= 15; seed += 1) {
+        const stepsEn = createLevel1Steps(createSeededRandom(seed), [], "en");
+        assert.equal(stepsEn.length, STEP_COUNT);
+        stepsEn.forEach((step) => {
+            assert.equal(typeof step.prompt, "string");
+            assert.ok(step.prompt.length > 0);
+            assert.equal(typeof step.explanation, "string");
+            assert.ok(step.explanation.length > 0);
+            // Aucune trace de gabarit non résolu (clé i18n oubliée).
+            assert.equal(/\{\{/.test(step.prompt), false);
+            assert.equal(/\{\{/.test(step.explanation), false);
+        });
+    }
+}
+
+// --- Vocabulaire numérateur / dénominateur (FR et EN) -----------------------
+// CA : les questions doivent employer les vrais termes mathématiques, pas
+// seulement « nombre du haut »/« nombre du bas ».
+{
+    const stepsFr = createLevel1Steps(createSeededRandom(3));
+    const stepsEn = createLevel1Steps(createSeededRandom(3), [], "en");
+
+    const numeratorFr = stepsFr.find((step) => step.type === "NUMERATOR");
+    const denominatorFr = stepsFr.find((step) => step.type === "DENOMINATOR");
+    const numeratorEn = stepsEn.find((step) => step.type === "NUMERATOR");
+    const denominatorEn = stepsEn.find((step) => step.type === "DENOMINATOR");
+
+    assert.ok(numeratorFr && /numérateur/i.test(numeratorFr.prompt));
+    assert.ok(numeratorFr && /numérateur/i.test(numeratorFr.explanation));
+    assert.ok(denominatorFr && /dénominateur/i.test(denominatorFr.prompt));
+    assert.ok(denominatorFr && /dénominateur/i.test(denominatorFr.explanation));
+
+    assert.ok(numeratorEn && /numerator/i.test(numeratorEn.prompt));
+    assert.ok(numeratorEn && /numerator/i.test(numeratorEn.explanation));
+    assert.ok(denominatorEn && /denominator/i.test(denominatorEn.prompt));
+    assert.ok(denominatorEn && /denominator/i.test(denominatorEn.explanation));
+
+    // Le pont pédagogique garde la formulation déjà connue de l'enfant.
+    assert.ok(/nombre du haut/i.test(numeratorFr.prompt));
+    assert.ok(/nombre du bas/i.test(denominatorFr.prompt));
+    assert.ok(/top number/i.test(numeratorEn.prompt));
+    assert.ok(/bottom number/i.test(denominatorEn.prompt));
+
+    // Les indices ciblés emploient aussi les vrais termes, dans les deux langues.
+    assert.ok(/numérateur/i.test(hintFor("INVERTED")));
+    assert.ok(/numerator/i.test(hintFor("INVERTED", "en")));
+}
+
 console.log("fraction-river: all tests passed");

@@ -113,6 +113,10 @@ tasks.register('testFractionRiverAnchors', Exec) {
     commandLine 'node', 'src/test/js/fraction-river-anchors.test.js'
 }
 
+tasks.register('testGameI18n', Exec) {
+    commandLine 'node', 'src/test/js/game-i18n.test.js'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy tasks.named('jacocoTestReport')
@@ -137,6 +141,7 @@ tasks.named('check') {
     dependsOn tasks.named('frontendLint')
     dependsOn tasks.named('frontendTest')
     dependsOn tasks.named('testFractionRiverAnchors')
+    dependsOn tasks.named('testGameI18n')
 }
 
 sonar {

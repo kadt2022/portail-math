@@ -55,6 +55,7 @@ runs:
               testMultiplicationTrain
               testFractionRiver
               testFractionRiverAnchors
+              testGameI18n
               testProgressStore
             )
             ;;

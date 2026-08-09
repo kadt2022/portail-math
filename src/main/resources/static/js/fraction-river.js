@@ -7,6 +7,12 @@
     const visuals = typeof require === "function" && typeof module !== "undefined"
         ? require("./fraction-river-visuals.js")
         : root.FractionRiverVisuals;
+    const gameI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-i18n.js")
+        : root.GameI18n;
+    const fractionRiverI18n = typeof require === "function" && typeof module !== "undefined"
+        ? require("./fraction-river-i18n.js")
+        : root.FractionRiverI18n;
 
     const STEP_COUNT = questions.STEP_COUNT;
     const LEVEL = 1;
@@ -119,17 +125,17 @@
         };
     }
 
-    function resultMessage(firstTryCorrect) {
+    function resultMessage(firstTryCorrect, lang = "fr") {
         if (firstTryCorrect >= 5) {
-            return "Traversée parfaite ! Tu lis les fractions comme un explorateur chevronné.";
+            return gameI18n.translate(fractionRiverI18n, lang, "resultMessagePerfect");
         }
         if (firstTryCorrect >= 3) {
-            return "Belle traversée ! Tu reconnais déjà bien les parts d’un tout.";
+            return gameI18n.translate(fractionRiverI18n, lang, "resultMessageGreat");
         }
         if (firstTryCorrect >= 1) {
-            return "Tu progresses ! Chaque erreur corrigée t’a fait avancer d’une pierre.";
+            return gameI18n.translate(fractionRiverI18n, lang, "resultMessageProgress");
         }
-        return "Tu as traversé la rivière grâce à ta persévérance. Recommence quand tu veux.";
+        return gameI18n.translate(fractionRiverI18n, lang, "resultMessagePersistence");
     }
 
     function mountGame(document) {
@@ -137,6 +143,15 @@
         if (!rootElement) {
             return;
         }
+
+        // Langue lue une seule fois au chargement de la page (voir game-i18n.js) :
+        // même clé localStorage que le sélecteur de langue du portail React.
+        // Appliquée avant tout rendu pour qu'aucun texte français ne s'affiche
+        // le temps d'un instant si le portail est en anglais.
+        const lang = gameI18n.resolveLanguage();
+        document.documentElement.lang = lang;
+        gameI18n.applyStaticTranslations(document, fractionRiverI18n, lang);
+        const t = (key, params) => gameI18n.translate(fractionRiverI18n, lang, key, params);
 
         const store = root.FractionRiverStore;
         const query = (selector) => rootElement.querySelector(selector);
@@ -423,12 +438,12 @@
         function updateSoundButton() {
             const button = query("[data-sound-toggle]");
             button.setAttribute("aria-pressed", String(soundEnabled));
-            button.textContent = soundEnabled ? "🔊 Son activé" : "🔇 Son désactivé";
+            button.textContent = soundEnabled ? t("soundOn") : t("soundOff");
         }
 
         function renderVisualInto(container, visual, id) {
             container.innerHTML = visual
-                ? visuals.renderStaticVisual({...visual, id})
+                ? visuals.renderStaticVisual({...visual, id, lang})
                 : "";
         }
 
@@ -441,18 +456,18 @@
             renderFeedback(
                 feedback,
                 "correct",
-                state.hadMistake ? "Bien corrigé !" : "Bonne réponse — bravo !",
-                `${step.explanation} Une pierre apparaît dans la rivière.`
+                state.hadMistake ? t("feedbackCorrectedTitle") : t("feedbackCorrectTitle"),
+                `${step.explanation}${t("feedbackCorrectSuffix")}`
             );
             query("[data-encouragement]").textContent = state.hadMistake
-                ? "Ton effort t’a fait traverser cette étape."
-                : "Tu avances de pierre en pierre.";
+                ? t("encouragementCorrectedMistake")
+                : t("encouragementCorrectFirstTry");
             updateStatus();
             bus.emit("answer:correct", {step, hadMistake: state.hadMistake});
             playTone("correct");
             showNextButton(state.completedSteps === STEP_COUNT
-                ? "Monter l’escalier et rejoindre le village →"
-                : "Continuer vers la pierre suivante →");
+                ? t("nextButtonFinale")
+                : t("nextButtonContinue"));
             nextButton.hidden = true;
             // La pierre n'apparaît qu'une fois la scène sous les yeux de l'enfant.
             playSceneThen(
@@ -466,9 +481,9 @@
         }
 
         function handleIncorrectStep(step) {
-            const hint = questions.hintFor(state.lastDistractor);
-            renderFeedback(feedback, "wrong", "Pas encore — regarde bien le dessin.", hint);
-            query("[data-encouragement]").textContent = "Tu peux essayer autant de fois que tu veux.";
+            const hint = questions.hintFor(state.lastDistractor, lang);
+            renderFeedback(feedback, "wrong", t("feedbackIncorrectTitle"), hint);
+            query("[data-encouragement]").textContent = t("encouragementTryAgain");
             // La grenouille répète l'indice dans la scène ; le texte HTML reste
             // la source lisible par un lecteur d'écran.
             bus.emit("answer:incorrect", {step, hint, distractor: state.lastDistractor});
@@ -482,7 +497,7 @@
                 ? "answer-option answer-option--visual"
                 : "answer-option";
             if (option.visual) {
-                button.innerHTML = visuals.renderStaticVisual({...option.visual, id: `opt-${option.key}`});
+                button.innerHTML = visuals.renderStaticVisual({...option.visual, id: `opt-${option.key}`, lang});
             } else {
                 button.textContent = option.label;
             }
@@ -510,12 +525,13 @@
             optionsContainer.innerHTML = visuals.renderInteractiveParts({
                 kind: step.visual.kind,
                 total: step.totalParts,
-                selected: []
+                selected: [],
+                lang
             });
             const validate = document.createElement("button");
             validate.type = "button";
             validate.className = "game-primary-button fr-validate";
-            validate.textContent = "Valider ma sélection";
+            validate.textContent = t("validateSelection");
             validate.setAttribute("data-validate-selection", "");
 
             optionsContainer.querySelectorAll("[data-part]").forEach((partButton) => {
@@ -568,27 +584,38 @@
                 ? `${step.fraction.numerator}/${step.fraction.denominator}`
                 : "";
             if (step.type === "IDENTIFY") {
-                return "Quelle fraction ?";
+                return t("prompt.IDENTIFY.short");
             }
             if (step.type === "MATCH_VISUAL") {
-                return `Quel dessin montre ${fraction} ?`;
+                return t("prompt.MATCH_VISUAL.short", {fraction});
             }
             if (step.type === "NUMERATOR") {
-                return "Le nombre du haut ?";
+                return t("prompt.NUMERATOR.short");
             }
             if (step.type === "DENOMINATOR") {
-                return "Le nombre du bas ?";
+                return t("prompt.DENOMINATOR.short");
             }
             return step.prompt;
+        }
+
+        function updateFractionLegend(step) {
+            const legend = query("[data-fraction-legend]");
+            if (!legend) {
+                return;
+            }
+            const showsLegend = step.type === "NUMERATOR" || step.type === "DENOMINATOR";
+            legend.hidden = !showsLegend;
+            legend.textContent = showsLegend ? t("fractionLegend") : "";
         }
 
         function renderStep({focus = true} = {}) {
             const step = steps[state.stepIndex];
             // Même découpage que le Train : un intitulé court en capitales,
             // puis la question seule dans le titre.
-            query("[data-step-kicker]").textContent = `Étape ${state.stepIndex + 1} sur ${STEP_COUNT}`;
+            query("[data-step-kicker]").textContent = t("stepKicker", {index: state.stepIndex + 1, total: STEP_COUNT});
             stepTitle.textContent = consoleActive() ? promptCourt(step) : step.prompt;
             renderVisualInto(query("[data-step-visual]"), step.visual, `step-${state.stepIndex}`);
+            updateFractionLegend(step);
             optionsContainer.textContent = "";
             optionsContainer.className = step.type === "MATCH_VISUAL"
                 ? "answer-options answer-options--visual"
@@ -604,7 +631,7 @@
 
             clearFeedback(feedback);
             nextButton.hidden = true;
-            query("[data-encouragement]").textContent = "Prends ton temps, il n’y a pas de chronomètre.";
+            query("[data-encouragement]").textContent = t("encouragementDefault");
             updateStatus();
             bus.emit("step:rendered", {step, stepIndex: state.stepIndex});
             if (focus) {
@@ -633,16 +660,15 @@
             query("[data-final-steps]").textContent = `${state.completedSteps}/${STEP_COUNT}`;
             query("[data-final-first-try]").textContent = `${state.firstTryCorrect}/${STEP_COUNT}`;
             query("[data-final-corrected]").textContent = String(state.correctedErrors);
-            query("[data-result-message]").textContent = resultMessage(state.firstTryCorrect);
+            query("[data-result-message]").textContent = resultMessage(state.firstTryCorrect, lang);
 
             const badgeList = query("[data-final-badges]");
             badgeList.textContent = "";
             const badgeCodes = progress ? progress.badges : [];
-            const labels = root.FractionRiverStoreApi ? root.FractionRiverStoreApi.BADGES : {};
             badgeCodes.forEach((code) => {
                 const item = document.createElement("li");
                 item.className = "fr-badge";
-                item.textContent = `🏅 ${labels[code] || code}`;
+                item.textContent = `🏅 ${t(`badge.${code}`)}`;
                 badgeList.appendChild(item);
             });
 
@@ -690,7 +716,7 @@
             clearGuidedJourneyTimer();
             restoreResultPosition();
             const saved = store ? store.load() : {recentQuestionIds: []};
-            steps = questions.createLevel1Steps(Math.random, saved.recentQuestionIds || []);
+            steps = questions.createLevel1Steps(Math.random, saved.recentQuestionIds || [], lang);
             state = createTraversalState();
             if (setupPanel) {
                 setupPanel.hidden = true;
