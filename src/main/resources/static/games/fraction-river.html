@@ -28,16 +28,6 @@
             </nav>
 
             <section class="river-game" data-game-panel hidden aria-label="Plateau de La Rivière des fractions">
-                <header class="game-toolbar">
-                    <div class="game-status" aria-label="Progression de la traversée">
-                        <span class="game-status__step">Pierre <strong data-step-progress>1/5</strong></span>
-                        <span class="game-status__stars" aria-label="Pierres posées">🪨 <strong data-stone-count>0</strong></span>
-                    </div>
-                    <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
-                        🔊 Son activé
-                    </button>
-                </header>
-
                 <div class="river-stage" id="fraction-river-game" data-river-stage aria-hidden="true"></div>
                 <p class="visually-hidden" data-scene-summary aria-live="polite"></p>
 
@@ -72,9 +62,14 @@
                              immersif : « Étape 1 sur 5 » du panneau est masquée. -->
                         <p class="game-console__step">Progression <strong data-console-step>1/5</strong></p>
                         <p class="game-console__calm">Prends ton temps, il n’y a pas de chronomètre.</p>
-                        <button class="game-console__quit" type="button" data-console-quit>
-                            <span aria-hidden="true">✕</span> Quitter le jeu
-                        </button>
+                        <div class="game-console__actions">
+                            <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
+                                🔊 Son activé
+                            </button>
+                            <button class="game-console__quit" type="button" data-console-quit>
+                                <span aria-hidden="true">✕</span> Quitter le jeu
+                            </button>
+                        </div>
                     </header>
                     <div class="game-console__body">
                         <div class="game-console__stage" data-console-stage></div>
@@ -99,7 +94,7 @@
                     <p class="result-message" data-result-message></p>
                     <div class="result-actions">
                         <button class="game-primary-button" type="button" data-replay>Retraverser</button>
-                        <a class="game-secondary-button" href="/app/jeux">Retour aux jeux</a>
+                        <button class="game-secondary-button" type="button" data-result-quit>Retour aux jeux</button>
                     </div>
                 </section>
             </section>

@@ -3,6 +3,7 @@
 const assert = require("node:assert/strict");
 const {
     ALLOWED_TABLES,
+    LEVELS,
     QUESTION_COUNT,
     GUIDED_INITIAL_SCENE_PAUSE_MS,
     GUIDED_CORRECTION_PAUSE_MS,
@@ -11,6 +12,7 @@ const {
     createAnswerOptions,
     createGameQuestions,
     createRoundState,
+    nextAvailableLevelIndex,
     evaluateAnswer,
     scoreToLargeStars,
     calculateTrainOffset,
@@ -48,6 +50,11 @@ function memoryStorage(initial = {}) {
 }
 
 {
+    assert.equal(LEVELS.length, 1);
+    assert.equal(nextAvailableLevelIndex(0), null);
+    assert.equal(nextAvailableLevelIndex(0, [{id: "LEVEL_1"}, {id: "LEVEL_2"}]), 1);
+    assert.equal(nextAvailableLevelIndex(1, [{id: "LEVEL_1"}, {id: "LEVEL_2"}]), null);
+
     const questions = createGameQuestions(sequenceRandom());
     assert.equal(questions.length, QUESTION_COUNT);
     assert.equal(new Set(questions.map((question) => question.id)).size, QUESTION_COUNT);

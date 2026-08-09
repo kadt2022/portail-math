@@ -40,6 +40,12 @@ class MultiplicationTrainPageTests {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("data-multiplication-train")))
                 .andExpect(content().string(containsString("Tables de 2 et 5")))
+                .andExpect(content().string(containsString("data-game-console")))
+                .andExpect(content().string(containsString("data-console-quit")))
+                .andExpect(content().string(containsString("data-console-rotate")))
+                .andExpect(content().string(not(containsString("data-start-game"))))
+                .andExpect(content().string(not(containsString("Changer de niveau"))))
+                .andExpect(content().string(containsString("/js/game-console.js")))
                 .andExpect(content().string(containsString("/js/multiplication-train.js")))
                 .andExpect(content().string(not(containsString("th:"))));
     }

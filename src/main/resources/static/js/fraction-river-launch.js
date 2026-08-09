@@ -1,9 +1,9 @@
-(function initializeFractionRiverDirectLaunch(root) {
+(function initializeGameDirectLaunch(root) {
     "use strict";
 
-    const LINK_SELECTOR = "[data-fraction-river-direct-launch]";
+    const LINK_SELECTOR = "[data-game-direct-launch], [data-fraction-river-direct-launch]";
     const STYLE_ID = "fraction-river-direct-launch-styles";
-    const EXIT_MESSAGE = "fraction-river:exit";
+    const EXIT_MESSAGES = new Set(["portal-game:exit", "fraction-river:exit"]);
     const DEVICE_READY_TIMEOUT_MS = 1200;
     const FRAME_READY_TIMEOUT_MS = 6000;
     let activeSession = null;
@@ -95,12 +95,14 @@
         document.head.appendChild(style);
     }
 
-    function createLaunchSurface(document, url) {
+    function createLaunchSurface(document, url, metadata = {}) {
+        const gameTitle = metadata.title || "Jeu éducatif";
+        const gameMark = metadata.mark || "🎮";
         const overlay = document.createElement("div");
         overlay.className = "fraction-river-launch";
         overlay.setAttribute("role", "dialog");
         overlay.setAttribute("aria-modal", "true");
-        overlay.setAttribute("aria-label", "La Rivière des fractions");
+        overlay.setAttribute("aria-label", gameTitle);
 
         const loader = document.createElement("div");
         loader.className = "fraction-river-launch__loader";
@@ -109,10 +111,10 @@
         const mark = document.createElement("span");
         mark.className = "fraction-river-launch__loader-mark";
         mark.setAttribute("aria-hidden", "true");
-        mark.textContent = "🏞️";
+        mark.textContent = gameMark;
 
         const title = document.createElement("strong");
-        title.textContent = "La rivière se prépare…";
+        title.textContent = `${gameTitle} se prépare…`;
 
         const hint = document.createElement("span");
         hint.textContent = "Passage en plein écran paysage";
@@ -125,7 +127,7 @@
 
         const frame = document.createElement("iframe");
         frame.className = "fraction-river-launch__frame";
-        frame.title = "Jeu La Rivière des fractions";
+        frame.title = `Jeu ${gameTitle}`;
         frame.setAttribute("allow", "fullscreen");
         frame.setAttribute("allowfullscreen", "");
 
@@ -149,7 +151,10 @@
         installStyles(document);
 
         const previousFocus = document.activeElement;
-        const surface = createLaunchSurface(document, link.href);
+        const surface = createLaunchSurface(document, link.href, {
+            title: link.dataset.gameTitle,
+            mark: link.dataset.gameMark
+        });
         const overlay = surface.overlay;
         const frame = surface.frame;
         let fullscreenEntered = false;
@@ -191,7 +196,7 @@
             if (event.origin !== root.location.origin
                 || event.source !== frame.contentWindow
                 || !event.data
-                || event.data.type !== EXIT_MESSAGE) {
+                || !EXIT_MESSAGES.has(event.data.type)) {
                 return;
             }
             cleanup();
@@ -242,7 +247,10 @@
     }
 
     function handleLaunchClick(event) {
-        const link = event.currentTarget;
+        const target = event.target;
+        const link = target && typeof target.closest === "function"
+            ? target.closest(LINK_SELECTOR)
+            : null;
         if (!link || !link.href) {
             return;
         }
@@ -251,12 +259,15 @@
     }
 
     function mount(document) {
-        document.querySelectorAll(LINK_SELECTOR).forEach((link) => {
-            link.addEventListener("click", handleLaunchClick);
-        });
+        // Délégation nécessaire pour React : les cartes sont rendues après le
+        // chargement de ce script et peuvent être remplacées sans réamorçage.
+        document.addEventListener("click", handleLaunchClick);
     }
 
     const api = {mount, launch, createLaunchSurface, requestFullscreen, lockLandscape};
+    root.GameDirectLaunch = api;
+    // Alias conservé pour les pages ou tests historiques qui chargeaient ce
+    // fichier avant qu'il ne devienne le lanceur commun à tous les jeux.
     root.FractionRiverLaunch = api;
 
     if (typeof module !== "undefined" && module.exports) {

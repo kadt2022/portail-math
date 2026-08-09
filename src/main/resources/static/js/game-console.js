@@ -185,6 +185,13 @@
             }
         }
 
+        function quitterParCommande() {
+            exit();
+            if (typeof options.onQuit === "function") {
+                options.onQuit();
+            }
+        }
+
         // Sortie native du plein écran : bouton du navigateur, geste système,
         // ou touche Échap interceptée par le navigateur lui-même.
         function surChangementPleinEcran() {
@@ -195,7 +202,7 @@
 
         function surTouche(evenement) {
             if (active && evenement.key === "Escape") {
-                exit();
+                quitterParCommande();
             }
         }
 
@@ -210,7 +217,7 @@
             launchButton.addEventListener("click", enter);
         }
         if (quitButton) {
-            quitButton.addEventListener("click", exit);
+            quitButton.addEventListener("click", quitterParCommande);
         }
 
         return {

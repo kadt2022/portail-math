@@ -221,6 +221,42 @@
     box-shadow: none;
 }
 
+/* Le résultat appartient au même espace immersif que la question. Auparavant il
+   restait derrière la console plein écran : la partie semblait figée après la
+   dernière pierre. */
+.river-stage > .river-result--immersive {
+    position: absolute;
+    z-index: 30;
+    inset: 7% 12%;
+    min-height: 0;
+    padding: clamp(14px, 3vh, 28px) clamp(16px, 3vw, 34px);
+    overflow: auto;
+    border: 1px solid rgb(255 255 255 / 70%);
+    border-radius: clamp(16px, 3vw, 28px);
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 16px 42px rgb(11 42 58 / 32%);
+}
+
+.river-stage > .river-result--immersive .arrival-badge {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 8px;
+    font-size: 30px;
+}
+
+.river-stage > .river-result--immersive h2 {
+    font-size: clamp(24px, 5vh, 40px);
+}
+
+.river-stage > .river-result--immersive .result-summary {
+    margin-top: 10px;
+    gap: 8px;
+}
+
+.river-stage > .river-result--immersive .result-actions {
+    gap: 8px;
+}
+
 /* La zone centrale prend la place restante et centre son contenu. */
 .river-stage > .game-question .fr-visual-holder {
     flex: 1 1 auto;
