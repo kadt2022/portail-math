@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +15,7 @@ class ReactCutoverArchitectureTests {
 
     @Test
     void thymeleafCannotReturnThroughBuildConfigurationOrTemplates() throws IOException {
-        String build = Files.readString(Path.of("build.gradle"), Charset.forName("windows-1252"));
+        String build = Files.readString(Path.of("build.gradle"), StandardCharsets.UTF_8);
         String application = Files.readString(
                 Path.of("src/main/resources/application.yml"),
                 StandardCharsets.UTF_8

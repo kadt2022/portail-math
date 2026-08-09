@@ -1,0 +1,83 @@
+name: Portail Test Group
+description: Configure l'environnement commun et exécute un groupe de tests du portail.
+
+inputs:
+  group:
+    description: Groupe à exécuter (backend, frontend ou games).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configurer Java 21
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: "21"
+
+    - name: Configurer le cache Gradle
+      uses: gradle/actions/setup-gradle@v6
+
+    - name: Configurer Node 24 pour le frontend
+      if: ${{ inputs.group == 'frontend' }}
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Configurer Node 24 pour les jeux
+      if: ${{ inputs.group == 'games' }}
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: .nvmrc
+
+    - name: Autoriser l'exécution du Gradle Wrapper
+      shell: bash
+      run: chmod +x ./gradlew
+
+    - name: Exécuter les tests ${{ inputs.group }}
+      shell: bash
+      env:
+        PORTAIL_TEST_GROUP: ${{ inputs.group }}
+      run: |
+        set -euo pipefail
+
+        case "${PORTAIL_TEST_GROUP}" in
+          backend)
+            tasks=(test jacocoTestReport -x frontendBuild -x processResources)
+            ;;
+          frontend)
+            tasks=(frontendLint frontendBuild frontendTest)
+            ;;
+          games)
+            tasks=(
+              testMultiplicationTrain
+              testFractionRiver
+              testFractionRiverAnchors
+              testProgressStore
+            )
+            ;;
+          *)
+            echo "::error::Groupe de tests inconnu : ${PORTAIL_TEST_GROUP}"
+            exit 1
+            ;;
+        esac
+
+        mkdir -p build/reports/portail-tests
+        ./gradlew "${tasks[@]}" --no-daemon --build-cache \
+          | tee "build/reports/portail-tests/${PORTAIL_TEST_GROUP}.log"
+
+    - name: Conserver les résultats ${{ inputs.group }}
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: portail-test-results-${{ inputs.group }}
+        path: |
+          build/reports/portail-tests/${{ inputs.group }}.log
+          build/reports/tests/**
+          build/test-results/**
+          build/reports/jacoco/**
+          build/classes/java/test/**
+        if-no-files-found: warn
+        retention-days: 7
