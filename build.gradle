@@ -34,6 +34,7 @@ dependencies {
 
 def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
 def npmExecutable = isWindows ? 'npm.cmd' : 'npm'
+def npxExecutable = isWindows ? 'npx.cmd' : 'npx'
 def frontendDir = file('frontend')
 
 tasks.register('frontendInstall', Exec) {
@@ -117,6 +118,33 @@ tasks.register('testGameI18n', Exec) {
     commandLine 'node', 'src/test/js/game-i18n.test.js'
 }
 
+tasks.register('testGameShellI18n', Exec) {
+    commandLine 'node', 'src/test/js/game-shell-i18n.test.js'
+}
+
+// Les tests ci-dessus (node direct) n'ont pas de couverture : ce jeu de jeux
+// n'a jamais fait remonter de couverture JS à Sonar. c8 (V8 coverage, aucune
+// instrumentation de build nécessaire) rejoue la même suite groupée pour
+// produire un rapport lcov, au même endroit "sous build/" que le reste (voir
+// frontendTest pour le même principe côté frontend React).
+tasks.register('testGamesCoverage', Exec) {
+    description = 'Rejoue les tests des jeux sous c8 pour la couverture Sonar.'
+    commandLine npxExecutable, '--yes', 'c8@10',
+        '--reporter=lcov',
+        '--report-dir=build/reports/coverage/games',
+        '--include=src/main/resources/static/js/**',
+        'node', 'src/test/js/run-all-games-tests.js'
+    doLast {
+        def lcovFile = file("${rootDir}/build/reports/coverage/games/lcov.info")
+        if (lcovFile.exists()) {
+            def rewritten = lcovFile.readLines().collect { line ->
+                line.startsWith('SF:') ? "SF:${line.substring(3).replace('\\', '/')}" : line
+            }.join(System.lineSeparator())
+            lcovFile.text = rewritten + System.lineSeparator()
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy tasks.named('jacocoTestReport')
@@ -142,6 +170,8 @@ tasks.named('check') {
     dependsOn tasks.named('frontendTest')
     dependsOn tasks.named('testFractionRiverAnchors')
     dependsOn tasks.named('testGameI18n')
+    dependsOn tasks.named('testGameShellI18n')
+    dependsOn tasks.named('testGamesCoverage')
 }
 
 sonar {
@@ -161,7 +191,9 @@ sonar {
         property 'sonar.java.test.binaries', 'build/classes/java/test'
         property 'sonar.junit.reportPaths', 'build/test-results/test'
         property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
-        property 'sonar.javascript.lcov.reportPaths', 'build/reports/coverage/frontend/lcov.info'
-        property 'sonar.typescript.lcov.reportPaths', 'build/reports/coverage/frontend/lcov.info'
+        property 'sonar.javascript.lcov.reportPaths',
+            'build/reports/coverage/frontend/lcov.info,build/reports/coverage/games/lcov.info'
+        property 'sonar.typescript.lcov.reportPaths',
+            'build/reports/coverage/frontend/lcov.info,build/reports/coverage/games/lcov.info'
     }
 }

@@ -1,24 +1,20 @@
 (function initializeMultiplicationTrainI18n(root) {
     "use strict";
 
+    const shell = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-shell-i18n.js")
+        : root.GameShellI18n;
+
     const dictionary = {
         fr: {
-            // Coquille HTML — chrome partagé avec les autres jeux "standalone".
+            // Coquille HTML : voir game-shell-i18n.js pour les clés partagées
+            // avec les autres jeux "standalone" (skipLink, brandName...).
+            ...shell.fr,
             documentTitle: "Le Train des multiplications · Mbuyamba Math",
             metaDescription: "Le Train des multiplications de Mbuyamba Math.",
-            skipLink: "Aller au contenu",
-            brandName: "✦ Mbuyamba Math",
-            brandAria: "Mbuyamba Math — Accueil",
-            backToGames: "Retour aux jeux",
-            breadcrumbAria: "Fil d’Ariane",
-            breadcrumbPortal: "Portail",
-            breadcrumbGames: "Jeux éducatifs",
             breadcrumbCurrent: "Train des multiplications",
             panelAria: "Plateau du Train des multiplications",
             consoleAria: "Mode jeu du Train des multiplications",
-            quit: "Quitter le jeu",
-            rotate: "Tourne ton téléphone pour jouer.",
-            chooseAnswerAria: "Choisis une réponse",
             stationLabel: "Gare",
             sceneAria: "Le train avance dans un paysage vers la gare finale",
             rewardAria: "Récompense",
@@ -36,8 +32,6 @@
             replayButton: "Rejouer",
 
             levelLabel: "Niveau 1 · Tables de 2 et 5",
-            soundOn: "🔊 Son activé",
-            soundOff: "🔇 Son désactivé",
             encouragementDefault: "Ton effort fait avancer le train.",
             encouragementWrong: "Presque, regarde les groupes un par un.",
             encouragementCorrectedMistake: "Bien corrigé ! Ton effort fait avancer le train.",
@@ -60,21 +54,12 @@
             resultMessage0: "Chaque essai te fait avancer. Reprends le train quand tu es prêt."
         },
         en: {
+            ...shell.en,
             documentTitle: "The Multiplication Train · Mbuyamba Math",
             metaDescription: "The Multiplication Train from Mbuyamba Math.",
-            skipLink: "Skip to main content",
-            brandName: "✦ Mbuyamba Math",
-            brandAria: "Mbuyamba Math — Home",
-            backToGames: "Back to games",
-            breadcrumbAria: "Breadcrumb",
-            breadcrumbPortal: "Portal",
-            breadcrumbGames: "Educational games",
             breadcrumbCurrent: "Multiplication train",
             panelAria: "The Multiplication Train board",
             consoleAria: "The Multiplication Train game mode",
-            quit: "Quit game",
-            rotate: "Turn your phone to play.",
-            chooseAnswerAria: "Choose an answer",
             stationLabel: "Station",
             sceneAria: "The train moves through a landscape toward the final station",
             rewardAria: "Reward",
@@ -92,8 +77,6 @@
             replayButton: "Play again",
 
             levelLabel: "Level 1 · 2 and 5 times tables",
-            soundOn: "🔊 Sound on",
-            soundOff: "🔇 Sound off",
             encouragementDefault: "Your effort keeps the train moving.",
             encouragementWrong: "Almost — look at the groups one by one.",
             encouragementCorrectedMistake: "Well corrected! Your effort keeps the train moving.",

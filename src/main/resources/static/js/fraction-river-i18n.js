@@ -1,26 +1,20 @@
 (function initializeFractionRiverI18n(root) {
     "use strict";
 
+    const shell = typeof require === "function" && typeof module !== "undefined"
+        ? require("./game-shell-i18n.js")
+        : root.GameShellI18n;
+
     const dictionary = {
         fr: {
-            // Coquille HTML — chrome partagé avec les autres jeux "standalone".
+            // Coquille HTML : voir game-shell-i18n.js pour les clés partagées
+            // avec les autres jeux "standalone" (skipLink, brandName...).
+            ...shell.fr,
             documentTitle: "La Rivière des fractions · Mbuyamba Math",
             metaDescription: "La Rivière des fractions de Mbuyamba Math.",
-            skipLink: "Aller au contenu",
-            brandName: "✦ Mbuyamba Math",
-            brandAria: "Mbuyamba Math — Accueil",
-            backToGames: "Retour aux jeux",
-            breadcrumbAria: "Fil d’Ariane",
-            breadcrumbPortal: "Portail",
-            breadcrumbGames: "Jeux éducatifs",
             breadcrumbCurrent: "La Rivière des fractions",
             panelAria: "Plateau de La Rivière des fractions",
             consoleAria: "Mode jeu de La Rivière des fractions",
-            quit: "Quitter le jeu",
-            rotate: "Tourne ton téléphone pour jouer.",
-            soundOn: "🔊 Son activé",
-            soundOff: "🔇 Son désactivé",
-            chooseAnswerAria: "Choisis une réponse",
             progressionLabel: "Progression",
             encouragementAria: "Conseil de traversée",
             encouragementStatic: "Une erreur ne fait jamais tomber à l’eau. Tu peux toujours recommencer.",
@@ -109,23 +103,12 @@
             "hint.default": "Regarde à nouveau le dessin et compte les parts."
         },
         en: {
+            ...shell.en,
             documentTitle: "The Fraction River · Mbuyamba Math",
             metaDescription: "The Fraction River from Mbuyamba Math.",
-            skipLink: "Skip to main content",
-            brandName: "✦ Mbuyamba Math",
-            brandAria: "Mbuyamba Math — Home",
-            backToGames: "Back to games",
-            breadcrumbAria: "Breadcrumb",
-            breadcrumbPortal: "Portal",
-            breadcrumbGames: "Educational games",
             breadcrumbCurrent: "The Fraction River",
             panelAria: "The Fraction River board",
             consoleAria: "The Fraction River game mode",
-            quit: "Quit game",
-            rotate: "Turn your phone to play.",
-            soundOn: "🔊 Sound on",
-            soundOff: "🔇 Sound off",
-            chooseAnswerAria: "Choose an answer",
             progressionLabel: "Progress",
             encouragementAria: "Crossing tip",
             encouragementStatic: "A mistake never makes you fall in the water. You can always try again.",

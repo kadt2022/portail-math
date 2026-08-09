@@ -317,6 +317,12 @@ jobs:
           name: portail-test-results-frontend
           path: build
 
+      - name: Télécharger les résultats jeux
+        uses: actions/download-artifact@v6
+        with:
+          name: portail-test-results-games
+          path: build
+
       - name: Exécuter l'analyse Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -340,6 +346,11 @@ jobs:
 
           if [[ ! -f build/reports/coverage/frontend/lcov.info ]]; then
             echo "::error::Le rapport de couverture frontend (lcov) est introuvable."
+            exit 1
+          fi
+
+          if [[ ! -f build/reports/coverage/games/lcov.info ]]; then
+            echo "::error::Le rapport de couverture des jeux (lcov) est introuvable."
             exit 1
           fi
 
