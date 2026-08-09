@@ -44,7 +44,13 @@ export function GameCard({ game }: GameCardProps) {
             {ctaLabel}
           </Link>
         ) : (
-          <a className={styles.cta} href={game.href}>
+          <a
+            className={styles.cta}
+            href={game.href}
+            data-game-direct-launch
+            data-game-title={name}
+            data-game-mark={game.id === "multiplication-train" ? "🚂" : "🏞️"}
+          >
             {ctaLabel}
           </a>
         )}

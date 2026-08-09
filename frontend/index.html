@@ -15,6 +15,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Le lanceur est servi par Spring à la racine du même JAR. Une insertion
+      // précoce le charge avant le bundle React sans demander à Vite de le
+      // résoudre dans le dossier frontend.
+      const gameLauncher = document.createElement("script");
+      gameLauncher.src = "/js/fraction-river-launch.js";
+      gameLauncher.async = false;
+      document.head.appendChild(gameLauncher);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

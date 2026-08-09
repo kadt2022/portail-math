@@ -2,7 +2,14 @@
     "use strict";
 
     const QUESTION_COUNT = 5;
-    const ALLOWED_TABLES = [2, 5];
+    const LEVELS = Object.freeze([
+        Object.freeze({
+            id: "LEVEL_1",
+            label: "Niveau 1 · Tables de 2 et 5",
+            tables: Object.freeze([2, 5])
+        })
+    ]);
+    const ALLOWED_TABLES = LEVELS[0].tables;
     const GUIDED_INITIAL_SCENE_PAUSE_MS = 1500;
     const GUIDED_CORRECTION_PAUSE_MS = 4500;
     const TRAIN_TRAVEL_DURATION_MS = 3600;
@@ -44,8 +51,8 @@
         return shuffle([correctAnswer, ...wrongAnswers], random);
     }
 
-    function createGameQuestions(random = Math.random) {
-        const operations = ALLOWED_TABLES.flatMap((table) =>
+    function createGameQuestions(random = Math.random, allowedTables = ALLOWED_TABLES) {
+        const operations = allowedTables.flatMap((table) =>
             Array.from({length: 10}, (_, index) => ({
                 table,
                 multiplier: index + 1
@@ -72,6 +79,11 @@
             locked: false,
             outcome: null
         };
+    }
+
+    function nextAvailableLevelIndex(currentLevelIndex, levels = LEVELS) {
+        const nextIndex = currentLevelIndex + 1;
+        return nextIndex < levels.length ? nextIndex : null;
     }
 
     function evaluateAnswer(state, question, answer) {
@@ -154,8 +166,8 @@
             return;
         }
 
-        const setupPanel = rootElement.querySelector("[data-game-setup]");
         const gamePanel = rootElement.querySelector("[data-game-panel]");
+        const consoleContent = rootElement.querySelector("[data-console-content]");
         const learningArea = rootElement.querySelector(".game-learning-area");
         const questionPanel = rootElement.querySelector("[data-question-panel]");
         const resultPanel = rootElement.querySelector("[data-game-result]");
@@ -170,6 +182,30 @@
         const finishMarker = scene.querySelector(".station-marker--finish i");
         const store = root.MultiplicationTrainStore;
 
+        function returnToCatalogue() {
+            if (root.parent && root.parent !== root) {
+                root.parent.postMessage({type: "portal-game:exit"}, root.location.origin);
+                return;
+            }
+            root.location.assign("/app/jeux");
+        }
+
+        const gameConsole = root.GameConsole
+            ? root.GameConsole.createGameConsole({
+                document,
+                console: rootElement.querySelector("[data-game-console]"),
+                stageSlot: rootElement.querySelector("[data-console-stage]"),
+                panelSlot: rootElement.querySelector("[data-console-panel]"),
+                stage: scene,
+                panel: consoleContent,
+                quitButton: rootElement.querySelector("[data-console-quit]"),
+                focusOnEnter: questionTitle,
+                keepImmersiveOnFullscreenExit: true,
+                onEnter: () => root.requestAnimationFrame(() => updateTrainPosition(false)),
+                onQuit: returnToCatalogue
+            })
+            : null;
+
         rootElement.style.setProperty("--train-travel-duration", `${TRAIN_TRAVEL_DURATION_MS}ms`);
 
         let questions = [];
@@ -180,6 +216,11 @@
         let guidedJourneyTimer = null;
         let appliedTrainOffset = 0;
         let appliedWheelRotation = 0;
+        let currentLevelIndex = 0;
+
+        function consoleActive() {
+            return Boolean(gameConsole && gameConsole.isActive);
+        }
 
         function query(selector) {
             return rootElement.querySelector(selector);
@@ -209,16 +250,22 @@
         }
 
         function scrollToScene() {
-            scrollToElement(scene);
+            if (!consoleActive()) {
+                scrollToElement(scene);
+            }
         }
 
         function scrollToQuestion() {
-            scrollToElement(questionPanel);
+            if (!consoleActive()) {
+                scrollToElement(questionPanel);
+            }
             focusWithoutScrolling(questionTitle);
         }
 
         function scrollToResult() {
-            scrollToElement(resultPanel);
+            if (!consoleActive()) {
+                scrollToElement(resultPanel);
+            }
             focusWithoutScrolling(resultTitle);
         }
 
@@ -240,8 +287,14 @@
 
         function updateSavedProgress() {
             const progress = store ? store.load() : {bestScore: 0, gamesPlayed: 0};
-            query("[data-best-score]").textContent = `${progress.bestScore}/5`;
-            query("[data-games-played]").textContent = String(progress.gamesPlayed);
+            const bestScore = query("[data-best-score]");
+            const gamesPlayed = query("[data-games-played]");
+            if (bestScore) {
+                bestScore.textContent = `${progress.bestScore}/5`;
+            }
+            if (gamesPlayed) {
+                gamesPlayed.textContent = String(progress.gamesPlayed);
+            }
         }
 
         function updateSoundButton() {
@@ -396,9 +449,7 @@
         }
 
         function finishGame({focus = true} = {}) {
-            const progress = store
-                ? store.recordGame(state.score)
-                : {bestScore: state.score};
+            const progress = recordCompletedLevel();
             const largeStarCount = scoreToLargeStars(state.score);
             learningArea.hidden = true;
             resultPanel.hidden = false;
@@ -426,9 +477,20 @@
             }
         }
 
+        function recordCompletedLevel() {
+            return store ? store.recordGame(state.score) : {bestScore: state.score};
+        }
+
         function continueJourney(automatic = false) {
             clearGuidedJourneyTimer();
             if (state.completedQuestions === QUESTION_COUNT) {
+                const nextLevelIndex = nextAvailableLevelIndex(currentLevelIndex);
+                if (nextLevelIndex !== null) {
+                    recordCompletedLevel();
+                    currentLevelIndex = nextLevelIndex;
+                    startGame();
+                    return;
+                }
                 finishGame({focus: !automatic});
                 if (automatic) {
                     root.requestAnimationFrame(scrollToResult);
@@ -444,12 +506,13 @@
 
         function startGame() {
             clearGuidedJourneyTimer();
-            questions = createGameQuestions();
+            const currentLevel = LEVELS[currentLevelIndex];
+            questions = createGameQuestions(Math.random, currentLevel.tables);
+            query("[data-level-label]").textContent = currentLevel.label;
             state = createRoundState();
             appliedTrainOffset = 0;
             appliedWheelRotation = 0;
             rootElement.style.setProperty("--wheel-rotation", "0deg");
-            setupPanel.hidden = true;
             gamePanel.hidden = false;
             learningArea.hidden = false;
             questionPanel.hidden = false;
@@ -465,18 +528,13 @@
             });
         }
 
-        function showLevels() {
-            clearGuidedJourneyTimer();
-            gamePanel.hidden = true;
-            setupPanel.hidden = false;
-            updateSavedProgress();
-            query("[data-start-game]").focus();
-        }
-
-        query("[data-start-game]").addEventListener("click", startGame);
         query("[data-replay]").addEventListener("click", startGame);
-        query("[data-change-level]").addEventListener("click", showLevels);
-        query("[data-result-change-level]").addEventListener("click", showLevels);
+        query("[data-result-quit]").addEventListener("click", () => {
+            if (gameConsole) {
+                gameConsole.exit();
+            }
+            returnToCatalogue();
+        });
         nextButton.addEventListener("click", () => continueJourney(false));
         query("[data-sound-toggle]").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
@@ -496,10 +554,17 @@
 
         updateSavedProgress();
         updateSoundButton();
+        startGame();
+        root.setTimeout(() => {
+            if (gameConsole && !gameConsole.isActive) {
+                gameConsole.enter();
+            }
+        }, 0);
     }
 
     const api = {
         ALLOWED_TABLES,
+        LEVELS,
         QUESTION_COUNT,
         GUIDED_INITIAL_SCENE_PAUSE_MS,
         GUIDED_CORRECTION_PAUSE_MS,
@@ -509,6 +574,7 @@
         createAnswerOptions,
         createGameQuestions,
         createRoundState,
+        nextAvailableLevelIndex,
         evaluateAnswer,
         advanceRound,
         scoreToLargeStars,

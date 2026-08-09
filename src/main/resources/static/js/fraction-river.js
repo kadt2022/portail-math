@@ -153,6 +153,31 @@
         const nextButton = query("[data-next-step]");
         const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
+        const resultAnchor = document.createComment("emplacement du résultat de la rivière");
+
+        function returnToCatalogue() {
+            if (root.parent && root.parent !== root) {
+                root.parent.postMessage({type: "portal-game:exit"}, root.location.origin);
+                return;
+            }
+            root.location.assign("/app/jeux");
+        }
+
+        function moveResultIntoGame() {
+            if (!resultAnchor.parentNode) {
+                resultPanel.parentNode.insertBefore(resultAnchor, resultPanel);
+            }
+            riverStage.appendChild(resultPanel);
+            resultPanel.classList.add("river-result--immersive");
+        }
+
+        function restoreResultPosition() {
+            if (resultAnchor.parentNode) {
+                resultAnchor.parentNode.insertBefore(resultPanel, resultAnchor);
+                resultAnchor.parentNode.removeChild(resultAnchor);
+            }
+            resultPanel.classList.remove("river-result--immersive");
+        }
 
         // Console immersive. Tant qu'elle est active, la scène et les questions
         // sont côte à côte : plus rien ne doit défiler ni attendre.
@@ -173,6 +198,7 @@
                 quitButton: query("[data-console-quit]"),
                 focusOnEnter: stepTitle,
                 keepImmersiveOnFullscreenExit: true,
+                onQuit: returnToCatalogue,
                 // La bascule change la largeur disponible pour l'énoncé : sur le
                 // parchemin peint il n'y a que 114 px, contre toute la page en
                 // dehors. Sans ce rafraîchissement, la formulation longue restait
@@ -184,15 +210,6 @@
                 onExit: () => {
                     setLayoutMode("panoramic");
                     rafraichirEnonce();
-                    // Quand le jeu a été lancé depuis le catalogue dans sa
-                    // surface plein écran, le bouton Quitter rend la main au
-                    // catalogue au lieu d'afficher la page du jeu dans l'iframe.
-                    if (root.parent && root.parent !== root) {
-                        root.parent.postMessage(
-                            {type: "fraction-river:exit"},
-                            root.location.origin
-                        );
-                    }
                 }
             })
             : null;
@@ -377,8 +394,14 @@
 
         function updateStatus() {
             const avancement = `${Math.min(state.stepIndex + 1, STEP_COUNT)}/${STEP_COUNT}`;
-            query("[data-step-progress]").textContent = avancement;
-            query("[data-stone-count]").textContent = String(state.completedSteps);
+            const stepProgress = query("[data-step-progress]");
+            const stoneCount = query("[data-stone-count]");
+            if (stepProgress) {
+                stepProgress.textContent = avancement;
+            }
+            if (stoneCount) {
+                stoneCount.textContent = String(state.completedSteps);
+            }
             // La barre de la console porte le même compteur : elle reste dehors
             // quand le panneau de questions est déplacé à l'intérieur.
             const compteurConsole = query("[data-console-step]");
@@ -602,6 +625,10 @@
                 : null;
 
             learningArea.hidden = true;
+            stepPanel.hidden = true;
+            if (consoleActive()) {
+                moveResultIntoGame();
+            }
             resultPanel.hidden = false;
             query("[data-final-steps]").textContent = `${state.completedSteps}/${STEP_COUNT}`;
             query("[data-final-first-try]").textContent = `${state.firstTryCorrect}/${STEP_COUNT}`;
@@ -627,7 +654,9 @@
             });
             playTone("arrival");
             resultTitle.focus();
-            scrollToElement(resultPanel);
+            if (!consoleActive()) {
+                scrollToElement(resultPanel);
+            }
         }
 
         function startFinale() {
@@ -659,6 +688,7 @@
 
         function startGame() {
             clearGuidedJourneyTimer();
+            restoreResultPosition();
             const saved = store ? store.load() : {recentQuestionIds: []};
             steps = questions.createLevel1Steps(Math.random, saved.recentQuestionIds || []);
             state = createTraversalState();
@@ -680,6 +710,12 @@
         }
 
         query("[data-replay]").addEventListener("click", startGame);
+        query("[data-result-quit]").addEventListener("click", () => {
+            if (gameConsole) {
+                gameConsole.exit();
+            }
+            returnToCatalogue();
+        });
         nextButton.addEventListener("click", continueTraversal);
         query("[data-sound-toggle]").addEventListener("click", () => {
             soundEnabled = !soundEnabled;

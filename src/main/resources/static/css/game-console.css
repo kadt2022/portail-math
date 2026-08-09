@@ -13,7 +13,9 @@ body.is-game-console {
 }
 
 html.is-fraction-river-immersive,
-body.is-fraction-river-immersive {
+body.is-fraction-river-immersive,
+html.is-multiplication-train-immersive,
+body.is-multiplication-train-immersive {
     overflow: hidden;
     height: 100%;
 }
@@ -28,12 +30,31 @@ body.is-fraction-river-immersive .game-toolbar {
     display: none !important;
 }
 
+body.is-multiplication-train-immersive .topbar,
+body.is-multiplication-train-immersive .skip-link,
+body.is-multiplication-train-immersive .game-breadcrumb,
+body.is-multiplication-train-immersive [data-game-setup],
+body.is-multiplication-train-immersive .game-toolbar {
+    display: none !important;
+}
+
 body.is-fraction-river-immersive .page-shell {
     min-height: 100vh;
     margin-left: 0;
 }
 
+body.is-multiplication-train-immersive .page-shell {
+    min-height: 100vh;
+    margin-left: 0;
+}
+
 body.is-fraction-river-immersive .river-page-content {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+}
+
+body.is-multiplication-train-immersive .train-page-content {
     width: 100%;
     min-height: 100vh;
     padding: 0;
@@ -105,6 +126,13 @@ body.is-fraction-river-immersive .river-page-content {
 
 .game-console__quit:hover {
     border-color: var(--purple);
+}
+
+.game-console__actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
 }
 
 /* ---------- Corps : scène à gauche, questions à droite ---------- */
@@ -330,6 +358,16 @@ body.is-fraction-river-immersive .river-page-content {
 
     body.is-fraction-river-immersive .game-console--single .game-console__rotate {
         display: none;
+    }
+
+    /* La console est tournée en CSS lorsque le navigateur refuse le verrouillage
+       paysage. Phaser mesure alors le rectangle transformé (360 × 640) au lieu
+       du cadre logique (640 × 360). Le canvas conserve ici explicitement le
+       même 16/9 que l'illustration, sans recadrage ni décalage des ancrages. */
+    body.is-fraction-river-immersive .fraction-river-illustrated__phaser canvas {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
     }
 }
 

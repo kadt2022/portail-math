@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="is-multiplication-train-immersive">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,8 +7,9 @@
     <title>Le Train des multiplications · Portail-Math</title>
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/multiplication-train.css">
+    <link rel="stylesheet" href="/css/game-console.css">
 </head>
-<body>
+<body class="is-multiplication-train-immersive">
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <div class="app-shell standalone-game-shell">
     <div class="page-shell">
@@ -25,64 +26,32 @@
                 <span aria-current="page">Train des multiplications</span>
             </nav>
 
-            <section class="train-launch-panel" data-game-setup aria-labelledby="train-title">
-                <div class="train-launch-hero">
-                    <div class="train-launch-copy">
-                        <p class="eyebrow">Une aventure en cinq gares</p>
-                        <h1 id="train-title">Le Train des multiplications</h1>
-                        <p>Réponds aux multiplications, fais avancer le train et atteins la Gare des Multiplications.</p>
-                        <div class="saved-progress" aria-label="Progression sauvegardée">
-                            <span>🏆 Meilleur score : <strong data-best-score>0/5</strong></span>
-                            <span>🎟️ Voyages terminés : <strong data-games-played>0</strong></span>
-                        </div>
-                    </div>
-                    <div class="launch-train-art" aria-hidden="true">
-                        <span class="launch-sun"></span>
-                        <span class="launch-cloud launch-cloud--one"></span>
-                        <span class="launch-cloud launch-cloud--two"></span>
-                        <span class="launch-train">🚂</span>
-                    </div>
-                </div>
-
-                <div class="journey-picker" aria-labelledby="journey-picker-title">
-                    <div class="journey-picker__heading">
-                        <p class="eyebrow">Choisis ton voyage</p>
-                        <h2 id="journey-picker-title">Quelle ligne veux-tu prendre ?</h2>
-                    </div>
-                    <div class="journey-levels">
-                        <button class="journey-level journey-level--active" type="button" data-start-game>
-                            <span class="journey-level__number">Niveau 1</span>
-                            <strong>Tables de 2 et 5</strong>
-                            <span>5 gares · environ 5 minutes</span>
-                            <span class="journey-level__action">Monter dans le train →</span>
-                        </button>
-                        <div class="journey-level journey-level--locked" aria-disabled="true">
-                            <span class="journey-level__number">Niveau 2</span>
-                            <strong>Tables de 3 et 4</strong>
-                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
-                        </div>
-                        <div class="journey-level journey-level--locked" aria-disabled="true">
-                            <span class="journey-level__number">Niveau 3</span>
-                            <strong>Tables de 6 à 10</strong>
-                            <span class="journey-level__soon">🔒 Bientôt disponible</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="train-game" data-game-panel hidden aria-label="Plateau du Train des multiplications">
-                <header class="game-toolbar">
-                    <button class="game-quiet-button" type="button" data-change-level>
-                        <span aria-hidden="true">←</span> Niveaux
-                    </button>
-                    <div class="game-status" aria-label="Progression de la partie">
-                        <span class="game-status__step">Gare <strong data-question-progress>1/5</strong></span>
-                        <span class="game-status__stars" aria-label="Étoiles gagnées">⭐ <strong data-star-count>0</strong></span>
+                <div class="game-console game-console--train" data-game-console hidden
+                     role="dialog" aria-modal="true" aria-label="Mode jeu du Train des multiplications">
+                    <header class="game-console__bar">
+                        <p class="game-console__step">
+                            Gare <strong data-question-progress>1/5</strong>
+                            · ⭐ <strong data-star-count>0</strong>
+                        </p>
+                        <p class="game-console__calm" data-level-label>Niveau 1 · Tables de 2 et 5</p>
+                        <div class="game-console__actions">
+                            <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
+                                🔊 Son activé
+                            </button>
+                            <button class="game-console__quit" type="button" data-console-quit>
+                                <span aria-hidden="true">✕</span> Quitter le jeu
+                            </button>
+                        </div>
+                    </header>
+                    <div class="game-console__body">
+                        <div class="game-console__stage" data-console-stage></div>
+                        <div class="game-console__panel" data-console-panel></div>
                     </div>
-                    <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
-                        🔊 Son activé
-                    </button>
-                </header>
+                    <p class="game-console__rotate" data-console-rotate>
+                        <strong>Tourne ton téléphone pour jouer.</strong>
+                    </p>
+                </div>
 
                 <div class="game-scene" data-game-scene aria-label="Le train avance dans un paysage vers la gare finale">
                     <div class="scene-sky" aria-hidden="true">
@@ -116,6 +85,7 @@
                     <div class="railway" aria-hidden="true"><span></span></div>
                 </div>
 
+                <div class="train-console-content" data-console-content>
                 <div class="game-learning-area">
                     <section class="game-question" data-question-panel>
                         <p class="question-kicker">Pour atteindre la prochaine gare :</p>
@@ -153,15 +123,16 @@
                     <p class="result-message" data-result-message></p>
                     <div class="result-actions">
                         <button class="game-primary-button" type="button" data-replay>Rejouer</button>
-                        <button class="game-secondary-button" type="button" data-result-change-level>Changer de niveau</button>
-                        <a class="game-secondary-button" href="/app/jeux">Retour aux jeux</a>
+                        <button class="game-secondary-button" type="button" data-result-quit>Retour aux jeux</button>
                     </div>
                 </section>
+                </div>
             </section>
         </main>
     </div>
 </div>
 <script src="/js/multiplication-train-store.js"></script>
+<script src="/js/game-console.js"></script>
 <script src="/js/multiplication-train.js"></script>
 </body>
 </html>

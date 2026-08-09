@@ -81,6 +81,7 @@ class FractionRiverPageTests {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("requestFullscreen")))
                 .andExpect(content().string(containsString("orientation.lock(\"landscape\")")))
+                .andExpect(content().string(containsString("data-game-direct-launch")))
                 // Le jeu reste dans le document qui a reçu le clic : une
                 // navigation annulerait le plein écran et le paysage.
                 .andExpect(content().string(containsString("createLaunchSurface")))
@@ -90,7 +91,7 @@ class FractionRiverPageTests {
 
         mockMvc.perform(get("/js/fraction-river.js"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("fraction-river:exit")))
+                .andExpect(content().string(containsString("portal-game:exit")))
                 .andExpect(content().string(containsString("root.parent.postMessage")));
     }
 

@@ -24,6 +24,7 @@ describe("Tableau de bord", () => {
     const hrefs = links.map((link) => link.getAttribute("href"));
     expect(hrefs).toContain("/games/multiplication-train.html");
     expect(hrefs).toContain("/games/fraction-river.html");
+    expect(links.every((link) => link.hasAttribute("data-game-direct-launch"))).toBe(true);
   });
 
   it("le nouveau jeu n'a pas de bouton actif tant qu'il n'est pas développé", () => {
