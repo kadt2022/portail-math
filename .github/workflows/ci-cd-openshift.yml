@@ -15,7 +15,9 @@ env:
 
 concurrency:
   group: portail-ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Les PR peuvent abandonner une validation obsolète. Sur main, le workflow
+  # courant doit aller jusqu'au bout pour ne pas interrompre un déploiement.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   preflight:
@@ -274,6 +276,11 @@ jobs:
   sonar:
     name: Portail Sonar Analysis
     needs: bvt
+    if: >-
+      needs.bvt.result == 'success' &&
+      (github.event_name != 'pull_request' ||
+       (github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.user.login != 'dependabot[bot]'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -354,6 +361,11 @@ jobs:
   quality-gate:
     name: Portail Quality Gate
     needs: sonar
+    if: >-
+      needs.sonar.result == 'success' &&
+      (github.event_name != 'pull_request' ||
+       (github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.user.login != 'dependabot[bot]'))
     runs-on: ubuntu-latest
     steps:
       - name: Télécharger les métadonnées Sonar
@@ -450,6 +462,11 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     permissions: {}
+    env:
+      SONAR_REQUIRED: >-
+        ${{ github.event_name != 'pull_request' ||
+            (github.event.pull_request.head.repo.full_name == github.repository &&
+             github.event.pull_request.user.login != 'dependabot[bot]') }}
     steps:
       - name: Synthétiser les jobs obligatoires
         shell: bash
@@ -468,14 +485,27 @@ jobs:
             fi
           }
 
+          check_sonar_result() {
+            local job="$1"
+            local result="$2"
+            if [[ "${result}" == "success" ]]; then
+              echo "${job}: ${result}"
+            elif [[ "${SONAR_REQUIRED}" != "true" && "${result}" == "skipped" ]]; then
+              echo "${job}: skipped (secrets indisponibles pour cette PR)"
+            else
+              echo "::error::${job}: ${result}"
+              failed=1
+            fi
+          }
+
           check_result preflight "${{ needs.preflight.result }}"
           check_result assemble "${{ needs.assemble.result }}"
           check_result test-backend "${{ needs['test-backend'].result }}"
           check_result test-frontend "${{ needs['test-frontend'].result }}"
           check_result test-games "${{ needs['test-games'].result }}"
           check_result bvt "${{ needs.bvt.result }}"
-          check_result sonar "${{ needs.sonar.result }}"
-          check_result quality-gate "${{ needs['quality-gate'].result }}"
+          check_sonar_result sonar "${{ needs.sonar.result }}"
+          check_sonar_result quality-gate "${{ needs['quality-gate'].result }}"
 
           if [[ "${failed}" -ne 0 ]]; then
             echo "Portail CI status: FAILED"
