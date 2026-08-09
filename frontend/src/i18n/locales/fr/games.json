@@ -16,6 +16,51 @@
     "description": "Traverse la rivière en reconnaissant les bonnes fractions.",
     "cta": "Jouer"
   },
+  "grilleMagique": {
+    "name": "Les Tuiles magiques",
+    "description": "Fais glisser les tuiles et pose la carte magique pour résoudre les égalités.",
+    "cta": "Jouer",
+    "game": {
+      "title": "Les Tuiles magiques",
+      "instructions": "Révèle la carte magique, puis fais glisser les tuiles pour respecter toutes les opérations. Ramène la case vide au centre et pose la carte pour valider ta grille.",
+      "difficultyLabel": "Difficulté",
+      "difficulty": {
+        "facile": "Facile",
+        "moyen": "Moyen"
+      },
+      "stats": {
+        "time": "Temps",
+        "moves": "Déplacements",
+        "score": "Score",
+        "level": "Niveau"
+      },
+      "card": {
+        "heading": "La carte magique",
+        "hiddenAria": "Carte magique, valeur cachée. Appuie pour la révéler.",
+        "revealedAria": "Carte magique révélée : {{value}}.",
+        "placeAria": "Poser la carte magique au centre de la grille.",
+        "placeHintReady": "La case vide est au centre : pose la carte pour valider ta grille.",
+        "placeHintNotReady": "Ramène la case vide au centre pour pouvoir poser la carte.",
+        "wonLabel": "Carte posée : {{value}}."
+      },
+      "tile": {
+        "movableAria": "Ligne {{row}}, colonne {{col}}, valeur {{value}}, déplaçable vers la case vide.",
+        "blockedAria": "Ligne {{row}}, colonne {{col}}, valeur {{value}}, non déplaçable.",
+        "blankAria": "Case vide, ligne {{row}}, colonne {{col}}."
+      },
+      "feedback": {
+        "win": "Bravo ! Toutes les égalités sont vérifiées.",
+        "incorrect": "Certaines égalités ne sont pas encore correctes. Continue à déplacer les tuiles.",
+        "rowIncorrect": "Ligne {{index}} incorrecte.",
+        "colIncorrect": "Colonne {{index}} incorrecte."
+      },
+      "actions": {
+        "newGrid": "Nouvelle grille",
+        "nextLevel": "Niveau suivant",
+        "backToGames": "Retour aux jeux"
+      }
+    }
+  },
   "newGame": {
     "name": "Nouveau jeu éducatif",
     "description": "Une nouvelle aventure mathématique arrive bientôt.",

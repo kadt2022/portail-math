@@ -9,7 +9,7 @@
 
 export type GameAvailability = "standalone" | "react" | "coming-soon";
 
-export type GameSceneId = "train" | "new-game";
+export type GameSceneId = "train" | "new-game" | "grille-magique";
 
 export interface GameCatalogueEntry {
   id: string;
@@ -45,6 +45,15 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     // voir images/dashboard/riviere-carte.webp (75 Ko, contre 2,6 Mo pour
     // l'originale, qui inclut aussi le parchemin vide du jeu, inutile ici).
     imageSrc: "/images/dashboard/riviere-carte.webp",
+  },
+  {
+    id: "grille-magique",
+    nameKey: "grilleMagique.name",
+    descriptionKey: "grilleMagique.description",
+    ctaLabelKey: "grilleMagique.cta",
+    href: "/jeux/grille-magique",
+    availability: "react",
+    sceneId: "grille-magique",
   },
   {
     id: "new-game",
