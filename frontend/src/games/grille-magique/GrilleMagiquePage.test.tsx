@@ -88,6 +88,31 @@ describe("Les Tuiles magiques", () => {
     expect(movesValue()).toBe("1");
   });
 
+  it("garde le focus clavier sur la tuile déplacée après un coup, sur plusieurs coups d'affilée", async () => {
+    const user = userEvent.setup();
+    renderGame();
+
+    const firstTile = screen.getByRole("button", {
+      name: "Ligne 1, colonne 2, valeur 2, déplaçable vers la case vide.",
+    });
+    firstTile.focus();
+    await user.keyboard("{Enter}");
+
+    // la tuile déplacée prend l'ancienne position de la case vide : le focus
+    // doit la suivre plutôt que de retomber sur <body>.
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement?.tagName).toBe("BUTTON");
+    expect(document.activeElement).toHaveAccessibleName(
+      "Ligne 1, colonne 1, valeur 2, déplaçable vers la case vide.",
+    );
+
+    await user.keyboard("{Enter}");
+
+    expect(movesValue()).toBe("2");
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement?.tagName).toBe("BUTTON");
+  });
+
   it("refuse la pose de la carte tant que la case vide n'est pas au centre", async () => {
     const user = userEvent.setup();
     renderGame();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -36,6 +36,19 @@ export function GrilleMagiquePage() {
   const [level, setLevel] = useState(1);
   const [lastValidation, setLastValidation] = useState<ValidationResult | null>(null);
 
+  const tileRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  const focusTargetRef = useRef<number | null>(null);
+
+  // Un déplacement remplace le bouton de la tuile activée par une case vide
+  // (div non focusable) : sans ce recalage, le focus clavier disparaît à
+  // chaque coup, obligeant à retourner dans la grille avec la souris.
+  useEffect(() => {
+    if (focusTargetRef.current !== null) {
+      tileRefs.current[focusTargetRef.current]?.focus();
+      focusTargetRef.current = null;
+    }
+  }, [gameState.tiles]);
+
   useEffect(() => {
     if (gameState.status !== "playing") {
       return;
@@ -72,6 +85,8 @@ export function GrilleMagiquePage() {
     if (!canMoveTile(gameState, index)) {
       return;
     }
+    // La tuile activée se retrouve à l'ancienne position de la case vide.
+    focusTargetRef.current = gameState.tiles.indexOf(null);
     setGameState((current) => applyMove(current, index));
     setLastValidation(null);
   }
@@ -179,6 +194,9 @@ export function GrilleMagiquePage() {
             return (
               <button
                 key={index}
+                ref={(el) => {
+                  tileRefs.current[index] = el;
+                }}
                 type="button"
                 style={cellStyle}
                 className={movable ? styles.tileMovable : styles.tile}
@@ -233,22 +251,26 @@ export function GrilleMagiquePage() {
             ) : null}
           </span>
         ))}
-      </div>
 
-      <div className={styles.columnResults}>
         {[0, 1, 2].map((col) => (
           <div
             key={`col-result-${col}`}
             className={styles.columnResultItem}
-            style={{ gridColumn: col * 2 + 1 }}
+            style={{ gridColumn: col * 2 + 1, gridRow: 7 }}
           >
-            = {gridSpec.colResults[col]}
-            {lastValidation && !lastValidation.valid && !lastValidation.colValid[col] ? (
-              <span className={styles.invalidMark}>
-                {" "}
-                ✕<span className={styles.srOnly}>{t("grilleMagique.game.feedback.colIncorrect", { index: col + 1 })}</span>
-              </span>
-            ) : null}
+            <span className={styles.verticalEquals}>=</span>
+            <span className={styles.result}>
+              {gridSpec.colResults[col]}
+              {lastValidation && !lastValidation.valid && !lastValidation.colValid[col] ? (
+                <span className={styles.invalidMark}>
+                  {" "}
+                  ✕
+                  <span className={styles.srOnly}>
+                    {t("grilleMagique.game.feedback.colIncorrect", { index: col + 1 })}
+                  </span>
+                </span>
+              ) : null}
+            </span>
           </div>
         ))}
       </div>

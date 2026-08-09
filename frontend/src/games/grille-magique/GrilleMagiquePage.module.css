@@ -86,7 +86,7 @@
 .board {
   display: grid;
   grid-template-columns: var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-eq) var(--gm-result);
-  grid-template-rows: var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-gap) var(--gm-tile);
+  grid-template-rows: var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-gap) auto;
   align-items: center;
   justify-items: center;
   padding: 20px;
@@ -145,20 +145,25 @@
   color: var(--pm-accent-dark);
 }
 
-.columnResults {
-  display: grid;
-  grid-template-columns: var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-gap) var(--gm-tile) var(--gm-eq) var(--gm-result);
+.columnResultItem {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-items: center;
-  margin-top: 6px;
-  padding: 0 20px;
+  gap: 2px;
+  padding-top: 4px;
+  text-align: center;
 }
 
-.columnResultItem {
+/* Le signe = pivoté à la verticale : les résultats de colonnes se lisent de
+   haut en bas, un = horizontal (pensé pour une lecture gauche-droite comme
+   les lignes) serait visuellement incohérent avec ce sens de lecture. */
+.verticalEquals {
+  display: inline-block;
+  color: var(--pm-ink-soft);
   font-size: clamp(15px, 4vw, 18px);
-  font-weight: 800;
-  color: var(--pm-accent-dark);
-  text-align: center;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(90deg);
 }
 
 .invalidMark {
