@@ -1,0 +1,65 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 640px;
+  padding: 56px 0 72px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--pm-accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 8px 0 22px;
+  font-size: clamp(28px, 5vw, 42px);
+}
+
+.notice {
+  width: 100%;
+  padding: 22px;
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-sm);
+}
+
+.notice p {
+  margin: 12px 0 0;
+  color: var(--pm-ink-soft);
+}
+
+.badge {
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--pm-surface-warm);
+  color: var(--pm-accent-dark);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 20px;
+  padding: 10px 17px;
+  border: 1px solid var(--pm-line);
+  border-radius: 999px;
+  color: var(--pm-brand);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.back:hover {
+  border-color: var(--pm-brand);
+  background: var(--pm-surface-warm);
+}

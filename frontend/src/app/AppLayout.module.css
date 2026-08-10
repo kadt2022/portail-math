@@ -120,7 +120,7 @@
 }
 
 .body {
-  padding-top: var(--pm-topbar);
+  padding-top: calc(var(--pm-topbar) + var(--pm-course-nav-height));
 }
 
 .main {
@@ -132,12 +132,38 @@
 
 @media (min-width: 900px) {
   .body {
+    padding-top: var(--pm-topbar);
     padding-left: var(--pm-sidebar);
+  }
+
+  .menuButton {
+    display: none;
   }
 }
 
-@media (min-width: 900px) {
-  .menuButton {
+@media (max-width: 430px) {
+  .header {
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .brand {
+    gap: 7px;
+  }
+
+  .brandMark {
+    width: 28px;
+    height: 28px;
+    border-width: 6px;
+  }
+
+  .brandName {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .brandTagline {
     display: none;
   }
 }

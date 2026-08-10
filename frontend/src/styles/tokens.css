@@ -35,6 +35,7 @@
   --pm-max-width: 1560px;
   --pm-sidebar: 264px;
   --pm-topbar: 68px;
+  --pm-course-nav-height: 56px;
 }
 
 .pm-root {

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { useSyncDocumentLanguage } from "../i18n/useSyncDocumentLanguage";
+import { CourseNavigation } from "./CourseNavigation";
 import { Sidebar } from "./Sidebar";
 import styles from "./AppLayout.module.css";
 
@@ -59,6 +60,8 @@ export function AppLayout() {
             <span className={styles.brandTagline}>{t("tagline")}</span>
           </span>
         </Link>
+
+        <CourseNavigation />
 
         <LanguageSwitcher />
 
