@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { AppRouter } from "./AppRouter";
+import { PRIMARY_COURSES } from "./course-navigation";
 
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
@@ -34,6 +35,19 @@ describe("Routeur du portail React", () => {
     renderAt("/app/progression");
     expect(screen.getByRole("heading", { level: 1, name: /ta progression/i })).toBeInTheDocument();
   });
+
+  it.each(PRIMARY_COURSES)(
+    "affiche l'état d'attente de $id sur sa route sans page 404",
+    (course) => {
+      renderAt(`/app${course.route}`);
+
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        new RegExp(`${course.level}.*primaire`, "i"),
+      );
+      expect(screen.getByText(/les cours de ce niveau seront bientôt disponibles/i)).toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: /page n'existe pas/i })).not.toBeInTheDocument();
+    },
+  );
 
   it("compose les liens de navigation avec le basename /app, sans le doubler", () => {
     renderAt("/app/jeux");

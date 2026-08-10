@@ -14,6 +14,28 @@
     "progress": "Progression",
     "about": "À propos"
   },
+  "courseNavigation": {
+    "label": "Navigation des cours",
+    "primary": "Cours primaires",
+    "secondary": "Cours secondaires",
+    "exetat": "Préparation EXETAT",
+    "progress": "Ma progression",
+    "comingSoon": "À venir",
+    "primaryLevels": "Niveaux du primaire",
+    "secondaryInformation": "Disponibilité des cours secondaires",
+    "levels": {
+      "primary1": "1re primaire",
+      "primary2": "2e primaire",
+      "primary3": "3e primaire",
+      "primary4": "4e primaire",
+      "primary5": "5e primaire",
+      "primary6": "6e primaire"
+    }
+  },
+  "primaryCourse": {
+    "comingSoon": "Les cours de ce niveau seront bientôt disponibles.",
+    "back": "Retour au tableau de bord"
+  },
   "language": {
     "label": "Langue",
     "french": "Français",

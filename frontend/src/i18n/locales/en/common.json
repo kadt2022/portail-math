@@ -14,6 +14,28 @@
     "progress": "Progress",
     "about": "About"
   },
+  "courseNavigation": {
+    "label": "Course navigation",
+    "primary": "Primary courses",
+    "secondary": "Secondary courses",
+    "exetat": "EXETAT preparation",
+    "progress": "My progress",
+    "comingSoon": "Coming soon",
+    "primaryLevels": "Primary levels",
+    "secondaryInformation": "Secondary course availability",
+    "levels": {
+      "primary1": "1st year of primary",
+      "primary2": "2nd year of primary",
+      "primary3": "3rd year of primary",
+      "primary4": "4th year of primary",
+      "primary5": "5th year of primary",
+      "primary6": "6th year of primary"
+    }
+  },
+  "primaryCourse": {
+    "comingSoon": "Courses for this level will be available soon.",
+    "back": "Back to dashboard"
+  },
   "language": {
     "label": "Language",
     "french": "Français",

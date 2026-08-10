@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
 import { DashboardPage } from "../dashboard/DashboardPage";
 import {
   ExetatCataloguePage,
@@ -13,6 +14,7 @@ import { GrilleMagiquePage } from "../games/grille-magique/GrilleMagiquePage";
 import { NewGameComingSoonPage } from "../games/new-game/NewGameComingSoonPage";
 import { AboutPage } from "./AboutPage";
 import { AppLayout } from "./AppLayout";
+import { PRIMARY_COURSES } from "./course-navigation";
 import { NotFoundPage } from "./NotFoundPage";
 import { ProgressionPage } from "./ProgressionPage";
 
@@ -40,6 +42,13 @@ export function AppRouter() {
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />
+          {PRIMARY_COURSES.map((course) => (
+            <Route
+              key={course.id}
+              path={course.route.replace(/^\//, "")}
+              element={<PrimaryCoursePage course={course} />}
+            />
+          ))}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

@@ -48,6 +48,12 @@ describe("Changement de langue dans l'application", () => {
     expect(within(nav).getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
     expect(within(nav).getByRole("link", { name: "Games" })).toBeInTheDocument();
 
+    const courseNav = screen.getByRole("navigation", { name: /course navigation/i });
+    expect(within(courseNav).getByRole("button", { name: /primary courses/i })).toBeInTheDocument();
+    expect(within(courseNav).getByRole("button", { name: /secondary courses/i })).toBeInTheDocument();
+    expect(within(courseNav).getByRole("link", { name: /exetat preparation/i })).toBeInTheDocument();
+    expect(within(courseNav).getByRole("link", { name: /my progress/i })).toBeInTheDocument();
+
     // Aucune clé i18next non résolue (ex. "welcome.title") ne doit fuiter à
     // l'écran. On inspecte chaque nœud de texte isolément — pas le body
     // entier concaténé, où une phrase suivie d'un élément voisin sans
