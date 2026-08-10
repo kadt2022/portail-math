@@ -38,6 +38,13 @@
   --pm-course-nav-height: 56px;
 }
 
+@media (max-width: 767px) {
+  :root {
+    --pm-topbar: 60px;
+    --pm-course-nav-height: 48px;
+  }
+}
+
 .pm-root {
   min-height: 100%;
   background: var(--pm-bg);

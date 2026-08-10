@@ -40,3 +40,16 @@
 .optionActive:hover {
   color: #fff;
 }
+
+@media (max-width: 767px) {
+  .switcher {
+    gap: 0;
+    padding: 0;
+  }
+
+  .option {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 4px 8px;
+  }
+}

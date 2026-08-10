@@ -7,11 +7,16 @@ import styles from "./CourseNavigation.module.css";
 
 type OpenMenu = "primary" | "secondary" | null;
 
-export function CourseNavigation() {
-  const { t } = useTranslation("common");
+interface CourseNavigationProps {
+  concealed?: boolean;
+}
+
+export function CourseNavigation({ concealed = false }: CourseNavigationProps) {
+  const { t, i18n } = useTranslation("common");
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const primaryButtonRef = useRef<HTMLButtonElement>(null);
   const secondaryButtonRef = useRef<HTMLButtonElement>(null);
   const firstPrimaryLinkRef = useRef<HTMLAnchorElement>(null);
@@ -48,6 +53,49 @@ export function CourseNavigation() {
     };
   }, [openMenu]);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    const track = trackRef.current;
+    if (!root || !track) {
+      return;
+    }
+    const rootElement = root;
+    const trackElement = track;
+
+    function updateOverflowIndicators() {
+      const startHidden = trackElement.scrollLeft > 2;
+      const endHidden =
+        trackElement.scrollLeft + trackElement.clientWidth < trackElement.scrollWidth - 2;
+      rootElement.dataset.overflowStart = String(startHidden);
+      rootElement.dataset.overflowEnd = String(endHidden);
+    }
+
+    const frame = window.requestAnimationFrame(updateOverflowIndicators);
+    trackElement.addEventListener("scroll", updateOverflowIndicators, { passive: true });
+    window.addEventListener("resize", updateOverflowIndicators);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      trackElement.removeEventListener("scroll", updateOverflowIndicators);
+      window.removeEventListener("resize", updateOverflowIndicators);
+    };
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const activeEntry = track.querySelector<HTMLElement>('[aria-current="page"]');
+      if (typeof activeEntry?.scrollIntoView === "function") {
+        activeEntry.scrollIntoView({ block: "nearest", inline: "center", behavior: "auto" });
+      }
+      track.dispatchEvent(new Event("scroll"));
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [i18n.language, location.pathname]);
+
   function toggleMenu(menu: Exclude<OpenMenu, null>) {
     setOpenMenu((current) => (current === menu ? null : menu));
   }
@@ -62,8 +110,13 @@ export function CourseNavigation() {
   }
 
   return (
-    <nav ref={rootRef} className={styles.navigation} aria-label={t("courseNavigation.label")}>
-      <div className={styles.track}>
+    <nav
+      ref={rootRef}
+      className={`${styles.navigation}${concealed ? ` ${styles.navigationConcealed}` : ""}`}
+      aria-label={t("courseNavigation.label")}
+      aria-hidden={concealed || undefined}
+    >
+      <div ref={trackRef} className={styles.track}>
         <div className={styles.item}>
           <button
             ref={primaryButtonRef}

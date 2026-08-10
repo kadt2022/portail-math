@@ -61,7 +61,7 @@ export function AppLayout() {
           </span>
         </Link>
 
-        <CourseNavigation />
+        <CourseNavigation concealed={sidebarOpen} />
 
         <LanguageSwitcher />
 

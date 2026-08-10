@@ -105,3 +105,28 @@
     background: rgb(15 24 20 / 45%);
   }
 }
+
+@media (max-width: 767px) {
+  .sidebar {
+    width: min(var(--pm-sidebar), calc(100vw - 24px));
+    padding: 12px 12px 20px;
+    background: var(--pm-surface);
+  }
+
+  .navLabel {
+    margin: 2px 8px 6px;
+  }
+
+  .nav {
+    gap: 2px;
+  }
+
+  .link {
+    min-height: 52px;
+    white-space: nowrap;
+  }
+
+  .sidebarOpen .backdrop {
+    background: rgb(15 24 20 / 62%);
+  }
+}
