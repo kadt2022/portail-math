@@ -11,6 +11,7 @@ function renderAt(path: string) {
 
 describe("Routeur du portail React", () => {
   beforeEach(() => {
+    localStorage.clear();
     window.history.pushState({}, "", "/app");
   });
 
@@ -36,7 +37,15 @@ describe("Routeur du portail React", () => {
     expect(screen.getByRole("heading", { level: 1, name: /ta progression/i })).toBeInTheDocument();
   });
 
-  it.each(PRIMARY_COURSES)(
+  it("affiche le parcours de 1re primaire avec ses dix modules", () => {
+    renderAt("/app/apprentissages/primaire/1/mathematiques");
+
+    expect(screen.getByRole("heading", { level: 1, name: /1re primaire/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(10);
+    expect(screen.getByRole("link", { name: /commencer mon parcours/i })).toBeInTheDocument();
+  });
+
+  it.each(PRIMARY_COURSES.filter((course) => course.availability === "coming-soon"))(
     "affiche l'état d'attente de $id sur sa route sans page 404",
     (course) => {
       renderAt(`/app${course.route}`);

@@ -1,0 +1,110 @@
+{
+  "course": {
+    "eyebrow": "Mathematics learning path",
+    "title": "1st year of primary",
+    "lead": "Move forward at your own pace, one small step at a time. You can stop and return exactly where you left off."
+  },
+  "status": {
+    "not-started": "Not started",
+    "in-progress": "In progress",
+    "completed": "Completed"
+  },
+  "progress": {
+    "overall": "My overall progress",
+    "lessons": "{{completed}} lessons completed out of {{total}}",
+    "moduleLessons": "{{completed}} lessons completed out of {{total}}",
+    "contentPending": "Lessons to be completed",
+    "module": "Module {{number}} progress",
+    "steps": "{{completed}} steps out of {{total}}",
+    "item": "Progress for {{title}}"
+  },
+  "actions": {
+    "start": "Start my learning path",
+    "resume": "Resume the lesson",
+    "next-lesson": "Next lesson",
+    "next-module": "Next module",
+    "review": "Review my lessons",
+    "backToCourse": "Back to the course"
+  },
+  "moduleActions": {
+    "not-started": "Start",
+    "in-progress": "Resume",
+    "completed": "Review"
+  },
+  "modules": {
+    "eyebrow": "10 modules",
+    "title": "My learning path",
+    "orderHint": "The order is recommended, but every module remains available.",
+    "number": "Module {{number}}",
+    "m1": { "title": "I observe and sort" },
+    "m2": { "title": "I count to 5" },
+    "m3": { "title": "I count to 10" },
+    "m4": { "title": "I compare numbers" },
+    "m5": { "title": "I discover addition" },
+    "m6": { "title": "I discover subtraction" },
+    "m7": { "title": "Numbers up to 20" },
+    "m8": { "title": "I measure around me" },
+    "m9": { "title": "Shapes and paths" },
+    "m10": { "title": "Time and challenges" }
+  },
+  "module": {
+    "referenceLead": "Explore the lessons in the suggested order, then complete the module assessment.",
+    "pendingLead": "This module is available. Its lessons will be added from the approved teaching material.",
+    "pathEyebrow": "Small steps",
+    "pathTitle": "Module lessons",
+    "pathHint": "Your progress is saved automatically on this device."
+  },
+  "lessons": {
+    "number": "Lesson {{number}}",
+    "l1": { "title": "Same or different?" },
+    "l2": { "title": "I sort by colour or shape" },
+    "l3": { "title": "From smallest to largest" },
+    "l4": { "title": "I continue a pattern" }
+  },
+  "evaluation": {
+    "label": "Module assessment",
+    "title": "Module assessment"
+  },
+  "steps": {
+    "discover": "I discover",
+    "manipulate": "I explore",
+    "understand": "I understand",
+    "practice": "I practise",
+    "play": "I play",
+    "remember": "I remember"
+  },
+  "breadcrumbs": {
+    "label": "Course breadcrumb",
+    "course": "1st year of primary"
+  },
+  "lesson": {
+    "label": "Lesson",
+    "stepProgress": "Step {{current}} of {{total}} — {{label}}",
+    "progressLabel": "Lesson progress",
+    "currentStep": "My activity",
+    "back": "Back to module",
+    "continue": "Continue",
+    "finish": "Finish the lesson",
+    "finishEvaluation": "Finish the assessment"
+  },
+  "contentPending": {
+    "title": "Teaching content to be completed",
+    "moduleMessage": "The approved material does not yet include this module's lessons. No concepts or questions have been invented.",
+    "activityMessage": "The exact instructions for this activity are not available in the supplied material. They will be added after educational approval.",
+    "prototypeNote": "You can continue to check the learning path and progress saving."
+  },
+  "lessonComplete": {
+    "eyebrow": "Step completed",
+    "title": "Well done, the lesson is complete!",
+    "evaluationTitle": "Well done, the module is assessed!",
+    "message": "Your progress is saved. You can continue or review this lesson later.",
+    "backToModule": "Back to module",
+    "nextLesson": "Next lesson",
+    "nextModule": "Next module",
+    "reviewCourse": "Review my lessons"
+  },
+  "errors": {
+    "moduleNotFound": "This module does not exist.",
+    "lessonNotFound": "This lesson does not exist."
+  }
+}

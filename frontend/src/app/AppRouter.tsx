@@ -1,6 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
+import { PrimaryOneCoursePage } from "../courses/primary-one/PrimaryOneCoursePage";
+import { PrimaryOneLessonPage } from "../courses/primary-one/PrimaryOneLessonPage";
+import { PrimaryOneModulePage } from "../courses/primary-one/PrimaryOneModulePage";
 import { DashboardPage } from "../dashboard/DashboardPage";
 import {
   ExetatCataloguePage,
@@ -42,7 +45,19 @@ export function AppRouter() {
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />
-          {PRIMARY_COURSES.map((course) => (
+          <Route
+            path="apprentissages/primaire/1/mathematiques"
+            element={<PrimaryOneCoursePage />}
+          />
+          <Route
+            path="apprentissages/primaire/1/mathematiques/modules/:moduleId"
+            element={<PrimaryOneModulePage />}
+          />
+          <Route
+            path="apprentissages/primaire/1/mathematiques/modules/:moduleId/lecons/:lessonId"
+            element={<PrimaryOneLessonPage />}
+          />
+          {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route
               key={course.id}
               path={course.route.replace(/^\//, "")}

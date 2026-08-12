@@ -5,11 +5,13 @@ import dashboardEn from "./locales/en/dashboard.json";
 import exetatEn from "./locales/en/exetat.json";
 import gamesEn from "./locales/en/games.json";
 import progressEn from "./locales/en/progress.json";
+import primaryOneEn from "./locales/en/primaryOne.json";
 import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
 import exetatFr from "./locales/fr/exetat.json";
 import gamesFr from "./locales/fr/games.json";
 import progressFr from "./locales/fr/progress.json";
+import primaryOneFr from "./locales/fr/primaryOne.json";
 
 // Chemins de clés triés, quel que soit l'ordre des propriétés dans le JSON :
 // "welcome.title" plutôt que la structure imbriquée brute, pour comparer
@@ -29,6 +31,7 @@ const NAMESPACES = [
   { name: "exetat", fr: exetatFr, en: exetatEn },
   { name: "games", fr: gamesFr, en: gamesEn },
   { name: "progress", fr: progressFr, en: progressEn },
+  { name: "primaryOne", fr: primaryOneFr, en: primaryOneEn },
 ];
 
 describe("Complétude des traductions français / anglais", () => {
