@@ -51,6 +51,18 @@ class MultiplicationTrainPageTests {
     }
 
     @Test
+    void multiplicationTrainKeepsPlayingWhenLandscapeLockIsRefused() throws Exception {
+        mockMvc.perform(get("/css/game-console.css"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(
+                        "body.is-multiplication-train-immersive .game-console--train .game-console__body")))
+                .andExpect(content().string(containsString(
+                        "body.is-multiplication-train-immersive .game-console--train .game-console__rotate")))
+                .andExpect(content().string(containsString("flex-direction: column")))
+                .andExpect(content().string(not(containsString("rotate(90deg)"))));
+    }
+
+    @Test
     void unknownGameUsesClean404Page() throws Exception {
         mockMvc.perform(get("/primaire/jeux/inconnu"))
                 .andExpect(status().isNotFound())

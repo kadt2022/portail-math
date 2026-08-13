@@ -1,5 +1,6 @@
+import { Capacitor } from "@capacitor/core";
 import { render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppRouter } from "./AppRouter";
 import { PRIMARY_COURSES } from "./course-navigation";
@@ -11,12 +12,22 @@ function renderAt(path: string) {
 
 describe("Routeur du portail React", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     window.history.pushState({}, "", "/app");
   });
 
   it("affiche le tableau de bord sur /app", () => {
     renderAt("/app");
     expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
+  });
+
+  it("affiche le tableau de bord à la racine dans la WebView Capacitor", () => {
+    vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
+
+    renderAt("/");
+
+    expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /tableau de bord/i })).toHaveAttribute("href", "/");
   });
 
   it("affiche le catalogue sur /app/jeux", () => {

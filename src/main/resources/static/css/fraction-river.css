@@ -584,6 +584,70 @@
     }
 }
 
+/* Dans la console verticale native, la question quitte le parchemin trop étroit
+   de l'illustration et retrouve un vrai panneau sous la scène. La page web et la
+   composition paysage conservent leur rendu actuel. */
+@media (orientation: portrait) and (max-width: 899px) {
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question {
+        width: 100%;
+        margin: 0;
+        padding: clamp(12px, 3vw, 18px);
+        overflow: visible;
+        text-align: center;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question [data-step-title] {
+        margin: 0 0 10px;
+        color: var(--navy-950);
+        font-size: clamp(24px, 7vw, 34px);
+        line-height: 1.15;
+        text-shadow: none;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question .fr-visual-holder {
+        margin: 6px 0 10px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question .fr-visual {
+        width: min(100%, 210px);
+        max-height: 150px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option {
+        min-width: 0;
+        min-height: 52px;
+        padding: 6px;
+        font-size: clamp(20px, 6vw, 28px);
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual .answer-option--visual:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: calc(50% - 4px);
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel [data-step-feedback]:not(:empty) {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: var(--navy-900);
+        background: #fff;
+        font-size: 15px;
+        text-shadow: none;
+    }
+}
+
 /* Mouvement réduit : la page s'apaise. Phaser reçoit la même préférence et
    coupe ses propres tweens et particules. */
 @media (prefers-reduced-motion: reduce) {

@@ -1496,6 +1496,38 @@ button.journey-level {
     gap: 8px;
 }
 
+@media (orientation: portrait) and (max-width: 899px) {
+    .game-console--train .game-console__stage .game-scene {
+        border-radius: 10px;
+    }
+
+    .game-console--train .game-console__panel .train-console-content {
+        min-height: 0;
+    }
+
+    .game-console--train .game-learning-area {
+        padding: 0;
+    }
+
+    .game-console--train .game-question {
+        padding: 12px;
+    }
+
+    .game-console--train .game-question h2 {
+        margin: 2px 0 10px;
+        font-size: clamp(32px, 10vw, 46px);
+    }
+
+    .game-console--train .answer-options {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .game-console--train .answer-option {
+        min-height: 54px;
+        font-size: clamp(20px, 6vw, 26px);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .train-vehicle,
     .train-wheel,

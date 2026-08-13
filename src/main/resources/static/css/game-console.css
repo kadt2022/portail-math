@@ -335,39 +335,58 @@ body.is-multiplication-train-immersive .train-page-content {
     }
 }
 
-/* La Riviere force le lancement du jeu. Si le navigateur refuse de verrouiller
-   le paysage, on garde quand meme la console ouverte au lieu de remplacer le jeu
-   par une consigne. */
+/* Les deux jeux démarrent sans attendre le verrouillage paysage. Si une WebView
+   Android le refuse, une vraie disposition verticale remplace la consigne. La
+   console n'est jamais tournée en CSS : les rectangles transformés faussent les
+   animations et peuvent rogner les réponses tactiles. */
 @media (orientation: portrait) and (max-width: 899px) {
-    body.is-fraction-river-immersive .game-console--single {
-        inset: auto;
-        top: 0;
-        left: 0;
-        width: 100vh;
-        width: 100dvh;
-        height: 100vw;
-        height: 100dvw;
-        padding: 0;
-        transform: rotate(90deg) translateY(-100%);
-        transform-origin: top left;
-    }
-
-    body.is-fraction-river-immersive .game-console--single .game-console__body {
+    body.is-fraction-river-immersive .game-console--single .game-console__body,
+    body.is-multiplication-train-immersive .game-console--train .game-console__body {
         display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px;
     }
 
-    body.is-fraction-river-immersive .game-console--single .game-console__rotate {
+    body.is-fraction-river-immersive .game-console--single .game-console__rotate,
+    body.is-multiplication-train-immersive .game-console--train .game-console__rotate {
         display: none;
     }
 
-    /* La console est tournée en CSS lorsque le navigateur refuse le verrouillage
-       paysage. Phaser mesure alors le rectangle transformé (360 × 640) au lieu
-       du cadre logique (640 × 360). Le canvas conserve ici explicitement le
-       même 16/9 que l'illustration, sans recadrage ni décalage des ancrages. */
-    body.is-fraction-river-immersive .fraction-river-illustrated__phaser canvas {
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
+    /* Le Train garde une scène assez haute pour son véhicule ; le panneau de
+       calcul utilise tout le reste de l'écran et peut défiler si nécessaire. */
+    body.is-multiplication-train-immersive .game-console--train .game-console__stage {
+        flex: 0 0 clamp(230px, 34dvh, 320px);
+        width: 100%;
+    }
+
+    body.is-multiplication-train-immersive .game-console--train .game-console__panel {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    /* La Rivière garde son illustration 16/9 en haut. Le script place la
+       question et ses réponses dans le panneau visible en dessous. */
+    body.is-fraction-river-immersive .game-console--single .game-console__stage {
+        flex: 0 0 auto;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__stage > * {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel {
+        display: flex;
+        flex: 1 1 auto;
+        width: 100%;
+        padding: 6px;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 }
 

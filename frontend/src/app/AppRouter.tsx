@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
@@ -18,14 +19,14 @@ import { PRIMARY_COURSES } from "./course-navigation";
 import { NotFoundPage } from "./NotFoundPage";
 import { ProgressionPage } from "./ProgressionPage";
 
-// Le basename est fixé à /app : react-router-dom compose alors des chemins
-// absolus (/app/jeux, ...) sans qu'aucune route ne répète le préfixe.
-// Spring Boot sert déjà index.html pour toute URL sous /app/** qui ne
-// correspond à aucun fichier réel (voir ReactPortalWebConfig côté Java) :
-// c'est ce qui permet à une actualisation directe de fonctionner.
+// Spring Boot sert le portail web sous /app. Capacitor sert le même bundle à
+// la racine de sa WebView : le basename doit donc être retiré uniquement sur
+// Android, sans modifier les routes du déploiement web existant.
 export function AppRouter() {
+  const basename = Capacitor.isNativePlatform() ? undefined : "/app";
+
   return (
-    <BrowserRouter basename="/app">
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />

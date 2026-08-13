@@ -169,6 +169,33 @@
         const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
         const resultAnchor = document.createComment("emplacement du résultat de la rivière");
+        const consolePanelSlot = query("[data-console-panel]");
+
+        function usesPortraitConsoleLayout() {
+            return typeof root.matchMedia === "function"
+                && root.matchMedia("(orientation: portrait) and (max-width: 899px)").matches;
+        }
+
+        function immersiveContentSlot() {
+            return usesPortraitConsoleLayout() && consolePanelSlot
+                ? consolePanelSlot
+                : riverStage;
+        }
+
+        function placeImmersiveContent() {
+            if (!consoleActive()) {
+                return;
+            }
+            const target = immersiveContentSlot();
+            if (!stepPanel.hidden && stepPanel.parentNode !== target) {
+                target.appendChild(stepPanel);
+            }
+            if (!resultPanel.hidden
+                && resultPanel.classList.contains("river-result--immersive")
+                && resultPanel.parentNode !== target) {
+                target.appendChild(resultPanel);
+            }
+        }
 
         function returnToCatalogue() {
             if (root.parent && root.parent !== root) {
@@ -182,7 +209,7 @@
             if (!resultAnchor.parentNode) {
                 resultPanel.parentNode.insertBefore(resultAnchor, resultPanel);
             }
-            riverStage.appendChild(resultPanel);
+            immersiveContentSlot().appendChild(resultPanel);
             resultPanel.classList.add("river-result--immersive");
         }
 
@@ -220,6 +247,7 @@
                 // affichée en immersif et débordait du parchemin.
                 onEnter: () => {
                     setLayoutMode("immersive");
+                    placeImmersiveContent();
                     rafraichirEnonce();
                 },
                 onExit: () => {
@@ -232,6 +260,12 @@
         function consoleActive() {
             return Boolean(gameConsole && gameConsole.isActive);
         }
+
+        root.addEventListener("resize", () => {
+            if (consoleActive()) {
+                root.requestAnimationFrame(placeImmersiveContent);
+            }
+        });
 
         // Réécrit le seul énoncé, sans toucher au reste de l'étape : ni options
         // régénérées, ni progression, ni état de la traversée.

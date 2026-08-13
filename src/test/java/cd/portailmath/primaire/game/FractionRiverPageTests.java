@@ -75,7 +75,13 @@ class FractionRiverPageTests {
                 .andExpect(content().string(containsString("body.is-fraction-river-immersive .sidebar")))
                 .andExpect(content().string(containsString("body.is-fraction-river-immersive .topbar")))
                 .andExpect(content().string(containsString("body.is-fraction-river-immersive .game-console--single .game-console__rotate")))
-                .andExpect(content().string(containsString("rotate(90deg)")));
+                .andExpect(content().string(containsString("aspect-ratio: 16 / 9")))
+                .andExpect(content().string(not(containsString("rotate(90deg)"))));
+
+        mockMvc.perform(get("/js/fraction-river.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("usesPortraitConsoleLayout")))
+                .andExpect(content().string(containsString("immersiveContentSlot")));
 
         mockMvc.perform(get("/js/fraction-river-launch.js"))
                 .andExpect(status().isOk())
