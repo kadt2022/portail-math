@@ -584,6 +584,616 @@
     }
 }
 
+/* ---------- Correctif téléphone : scène et apprentissage séparés ---------- */
+
+/* Le canvas reste strictement 16/9. Les questions vivent dans le panneau de la
+   console, jamais en position absolue sur l'eau : un retour plus long peut donc
+   agrandir le contenu et le panneau devient le seul axe de défilement. */
+html.is-fraction-river-immersive,
+body.is-fraction-river-immersive {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+/* Le CSS partagé conserve son ancien repli pivoté pour les autres jeux. La
+   Rivière l'annule localement : sa scène et son panneau s'adaptent au viewport. */
+body.is-fraction-river-immersive .game-console--single {
+    width: 100%;
+    height: 100%;
+    transform: none;
+}
+
+body.is-fraction-river-immersive .app-shell,
+body.is-fraction-river-immersive .page-shell,
+body.is-fraction-river-immersive .river-page-content {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+body.is-fraction-river-immersive .game-console,
+body.is-fraction-river-immersive .game-console *,
+body.is-fraction-river-immersive .game-console *::before,
+body.is-fraction-river-immersive .game-console *::after {
+    box-sizing: border-box;
+}
+
+body.is-fraction-river-immersive .game-console {
+    width: 100vw;
+    max-width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    padding:
+        max(env(safe-area-inset-top), 0px)
+        max(env(safe-area-inset-right), 0px)
+        max(env(safe-area-inset-bottom), 0px)
+        max(env(safe-area-inset-left), 0px);
+    background: #f3f7ff;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__bar {
+    position: relative;
+    z-index: 50;
+    inset: auto;
+    min-width: 0;
+    min-height: 60px;
+    padding: 6px clamp(8px, 2vw, 16px);
+    gap: 8px;
+    border: 0;
+    border-bottom: 1px solid #d9e2f2;
+    background: rgb(255 255 255 / 98%);
+    box-shadow: 0 4px 18px rgb(20 38 74 / 10%);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__step {
+    min-height: 40px;
+    padding: 9px 12px;
+    border: 2px solid #d8d3ff;
+    border-radius: 14px;
+    color: #19153d;
+    background: #f4f1ff;
+    box-shadow: none;
+    font-size: clamp(12px, 3.4vw, 14px);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__calm {
+    display: none;
+}
+
+body.is-fraction-river-immersive .game-console__actions {
+    min-width: 0;
+    gap: 6px;
+}
+
+body.is-fraction-river-immersive .game-sound-button,
+body.is-fraction-river-immersive .game-console__quit {
+    display: inline-flex;
+    min-width: 48px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 100ms ease, border-color 100ms ease, box-shadow 100ms ease;
+}
+
+body.is-fraction-river-immersive .game-sound-button {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 2px solid #d8d3ff;
+    color: #30266f;
+    background: #f4f1ff;
+    font-size: 20px;
+}
+
+body.is-fraction-river-immersive .game-sound-button__label {
+    display: none;
+}
+
+body.is-fraction-river-immersive .game-console__quit {
+    padding: 8px 12px;
+    border: 2px solid #cad5e6;
+    color: #27364d;
+    background: #fff;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgb(31 45 74 / 10%);
+}
+
+body.is-fraction-river-immersive .game-console__quit-icon {
+    font-size: 17px;
+    line-height: 1;
+}
+
+body.is-fraction-river-immersive .game-console__quit-label {
+    margin-left: 6px;
+}
+
+body.is-fraction-river-immersive .game-sound-button:hover,
+body.is-fraction-river-immersive .game-console__quit:hover {
+    border-color: #7667d8;
+    box-shadow: 0 5px 14px rgb(74 58 154 / 16%);
+}
+
+body.is-fraction-river-immersive .game-sound-button:active,
+body.is-fraction-river-immersive .game-console__quit:active {
+    transform: scale(0.94);
+}
+
+body.is-fraction-river-immersive .game-sound-button:focus-visible,
+body.is-fraction-river-immersive .game-console__quit:focus-visible {
+    outline: 3px solid #f3b61f;
+    outline-offset: 2px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__body {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    gap: 8px;
+    padding: 8px;
+    overflow: hidden;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__stage {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #0b2a3a;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__stage > .river-stage {
+    flex: 0 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: 18px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel {
+    display: flex;
+    flex: 0 1 clamp(260px, 40vw, 420px);
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    border-radius: 22px;
+    background: #fffaf0;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    margin: 0;
+    padding: clamp(12px, 2.2vw, 22px);
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(8px, 1.6dvh, 14px);
+    overflow: visible;
+    border: 2px solid #e3d8bd;
+    border-radius: 22px;
+    color: #171932;
+    background: #fffdf7;
+    box-shadow: 0 12px 28px rgb(41 33 15 / 12%);
+    text-align: center;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .question-kicker {
+    display: block;
+    margin: 0;
+    color: #5b46b3;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question [data-step-title] {
+    margin: 0;
+    color: #171932;
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-shadow: none;
+    text-wrap: balance;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-visual-holder {
+    display: flex;
+    flex: 0 1 auto;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-visual-holder .fr-visual {
+    width: min(100%, 240px);
+    height: auto;
+    max-width: 100%;
+    max-height: clamp(68px, 19dvh, 150px);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-visual-holder .fr-visual--disc {
+    width: min(100%, 142px);
+}
+
+body.is-fraction-river-immersive .stacked-fraction {
+    display: inline-grid;
+    min-width: 1.35em;
+    margin: 0 0.08em;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-items: center;
+    color: inherit;
+    font-size: 1em;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.9;
+    vertical-align: -0.28em;
+}
+
+body.is-fraction-river-immersive .stacked-fraction__numerator,
+body.is-fraction-river-immersive .stacked-fraction__denominator {
+    display: block;
+    width: 100%;
+    min-width: 1.2em;
+    padding: 0.03em 0.16em;
+    text-align: center;
+}
+
+body.is-fraction-river-immersive .stacked-fraction__numerator {
+    padding-bottom: 0.1em;
+    border-bottom: max(2px, 0.08em) solid currentColor;
+}
+
+body.is-fraction-river-immersive .stacked-fraction__denominator {
+    padding-top: 0.1em;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 60px;
+    padding: 8px 6px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #d7d2ec;
+    border-radius: 18px;
+    color: #211a52;
+    background: #faf8ff;
+    box-shadow: 0 5px 0 #d8d3e9, 0 8px 16px rgb(55 44 107 / 12%);
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 950;
+    line-height: 1;
+    touch-action: manipulation;
+    transition: transform 100ms ease, border-color 100ms ease, box-shadow 100ms ease;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option:hover:not(:disabled),
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option:focus-visible {
+    border-color: #725ed0;
+    background: #f1edff;
+    box-shadow: 0 5px 0 #bdb4e4, 0 8px 18px rgb(72 55 147 / 18%);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option:focus-visible {
+    outline: 3px solid #f3b61f;
+    outline-offset: 2px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option:active:not(:disabled) {
+    transform: translateY(4px) scale(0.98);
+    box-shadow: 0 1px 0 #bdb4e4, 0 3px 8px rgb(72 55 147 / 16%);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-correct,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-wrong {
+    padding-right: 30px;
+    opacity: 1;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-correct {
+    color: #123b27;
+    border-color: #25845a;
+    background: #e5f8ee;
+    box-shadow: 0 5px 0 #8bc5aa;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-wrong {
+    color: #6d1e2b;
+    border-color: #bc4c5b;
+    background:
+        repeating-linear-gradient(135deg, rgb(188 76 91 / 8%) 0 8px, transparent 8px 16px),
+        #fff0f2;
+    box-shadow: 0 5px 0 #e0a5ad;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-correct::after,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-wrong::after {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 950;
+    line-height: 1;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-correct::after {
+    content: "✓";
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option.is-wrong::after {
+    content: "✕";
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual .answer-option--visual {
+    min-height: 76px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual .answer-option--visual:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 5px);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options--visual .fr-visual {
+    width: 100%;
+    max-height: 66px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel [data-step-feedback]:not(:empty) {
+    position: relative;
+    flex: 0 0 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 12px 12px 12px 48px;
+    border: 2px solid currentColor;
+    border-radius: 16px;
+    background: #fff;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: left;
+    text-shadow: none;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel [data-step-feedback]:not(:empty)::before {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    font-weight: 950;
+    line-height: 1;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-feedback--correct {
+    color: #185637;
+    background: #edf9f2;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-feedback--correct::before {
+    content: "✓";
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-feedback--wrong {
+    color: #762d39;
+    background: #fff2f3;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-feedback--wrong::before {
+    content: "!";
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-next-button,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-validate {
+    width: 100%;
+    min-height: 56px;
+    margin: 0;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #7357d8 0%, #4b36ae 100%);
+    box-shadow: 0 6px 0 #352583, 0 12px 24px rgb(66 46 153 / 24%);
+    font-size: clamp(15px, 2.4vw, 18px);
+    font-weight: 950;
+    line-height: 1.2;
+    touch-action: manipulation;
+    transition: transform 100ms ease, box-shadow 100ms ease;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-next-button:hover,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-validate:hover {
+    background: linear-gradient(135deg, #8269e2 0%, #5740bd 100%);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-next-button:active,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-validate:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #352583, 0 5px 12px rgb(66 46 153 / 20%);
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .game-next-button:focus-visible,
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-validate:focus-visible {
+    outline: 3px solid #f3b61f;
+    outline-offset: 3px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-selectable-part {
+    min-width: 58px;
+    min-height: 58px;
+    border-width: 3px;
+    border-radius: 17px;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-selectable-part.is-selected {
+    border-color: #4b36ae;
+    outline: 3px solid #f3b61f;
+    outline-offset: 2px;
+    background:
+        repeating-linear-gradient(135deg, rgb(75 54 174 / 10%) 0 7px, transparent 7px 14px),
+        #eeeaff;
+}
+
+body.is-fraction-river-immersive .game-console--single .game-console__panel .river-result--immersive {
+    position: static;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: clamp(16px, 3vw, 28px);
+    overflow: visible;
+    border: 2px solid #e3d8bd;
+    border-radius: 22px;
+    background: #fffdf7;
+}
+
+@media (orientation: portrait) {
+    body.is-fraction-river-immersive .game-console--single .game-console__body {
+        flex-direction: column;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__stage {
+        flex: 0 0 auto;
+        width: 100%;
+        height: auto;
+        max-height: min(29dvh, 260px);
+        aspect-ratio: 16 / 9;
+        border-radius: 16px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__stage > .river-stage {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border-radius: 14px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel {
+        flex: 1 1 0;
+        width: 100%;
+        max-width: none;
+        min-height: 0;
+        border-radius: 20px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question {
+        min-height: auto;
+        padding: clamp(12px, 3vw, 18px);
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 360px) {
+    body.is-fraction-river-immersive .game-console--single .game-console__bar {
+        gap: 5px;
+        padding-inline: 6px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__step {
+        padding-inline: 9px;
+        font-size: 12px;
+    }
+
+    body.is-fraction-river-immersive .game-console__actions {
+        gap: 5px;
+    }
+
+    body.is-fraction-river-immersive .game-console__quit {
+        padding-inline: 9px;
+        font-size: 13px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-options {
+        gap: 7px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 420px) {
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question {
+        padding: 11px;
+        gap: 4px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .game-question [data-step-title] {
+        font-size: clamp(21px, 3.8vw, 27px);
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .fr-visual-holder .fr-visual {
+        max-height: 84px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel .answer-option {
+        min-height: 54px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel [data-step-feedback]:not(:empty) {
+        padding: 8px 8px 8px 42px;
+        font-size: 13px;
+    }
+
+    body.is-fraction-river-immersive .game-console--single .game-console__panel [data-step-feedback]:not(:empty)::before {
+        top: 8px;
+        left: 8px;
+        width: 24px;
+        height: 24px;
+    }
+}
+
 /* Mouvement réduit : la page s'apaise. Phaser reçoit la même préférence et
    coupe ses propres tweens et particules. */
 @media (prefers-reduced-motion: reduce) {

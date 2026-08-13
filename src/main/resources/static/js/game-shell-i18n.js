@@ -16,9 +16,12 @@
             breadcrumbPortal: "Portail",
             breadcrumbGames: "Jeux éducatifs",
             quit: "Quitter le jeu",
+            quitShort: "Quitter",
             rotate: "Tourne ton téléphone pour jouer.",
             soundOn: "🔊 Son activé",
             soundOff: "🔇 Son désactivé",
+            soundOnShort: "Son activé",
+            soundOffShort: "Son coupé",
             chooseAnswerAria: "Choisis une réponse"
         },
         en: {
@@ -30,9 +33,12 @@
             breadcrumbPortal: "Portal",
             breadcrumbGames: "Educational games",
             quit: "Quit game",
+            quitShort: "Quit",
             rotate: "Turn your phone to play.",
             soundOn: "🔊 Sound on",
             soundOff: "🔇 Sound off",
+            soundOnShort: "Sound on",
+            soundOffShort: "Sound off",
             chooseAnswerAria: "Choose an answer"
         }
     };

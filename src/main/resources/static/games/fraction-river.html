@@ -2,7 +2,7 @@
 <html lang="fr" class="is-fraction-river-immersive">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="La Rivière des fractions de Mbuyamba Math." data-i18n-attr="content:metaDescription">
     <title data-i18n="documentTitle">La Rivière des fractions · Mbuyamba Math</title>
     <link rel="stylesheet" href="/css/app.css">
@@ -43,7 +43,7 @@
                         <div class="answer-options" data-step-options aria-label="Choisis une réponse" data-i18n-attr="aria-label:chooseAnswerAria"></div>
                         <div class="answer-feedback" data-step-feedback aria-live="polite" aria-atomic="true"></div>
                         <button class="game-next-button" type="button" data-next-step hidden data-i18n="nextButtonContinue">
-                            Continuer vers la pierre suivante →
+                            Continuer maintenant →
                         </button>
                     </section>
 
@@ -56,9 +56,8 @@
 
                 <!-- Console immersive. Elle accueille la scène et le panneau de
                      questions le temps du mode, puis les rend à leur place. -->
-                <!-- Mode à une seule zone : l'illustration est la scène entière,
-                     et la question se pose sur le parchemin qu'elle réserve. Le
-                     créneau à droite ne sert plus. -->
+                <!-- La scène Phaser et le panneau pédagogique restent dans deux
+                     zones distinctes afin qu'aucun texte ne recouvre la rivière. -->
                 <div class="game-console game-console--single" data-game-console hidden
                      role="dialog" aria-modal="true" aria-label="Mode jeu de La Rivière des fractions"
                      data-i18n-attr="aria-label:consoleAria">
@@ -68,11 +67,15 @@
                         <p class="game-console__step"><span data-i18n="progressionLabel">Progression</span> <strong data-console-step>1/5</strong></p>
                         <p class="game-console__calm" data-i18n="encouragementDefault">Prends ton temps, il n’y a pas de chronomètre.</p>
                         <div class="game-console__actions">
-                            <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true">
-                                🔊 Son activé
+                            <button class="game-sound-button" type="button" data-sound-toggle aria-pressed="true"
+                                    aria-label="Son activé" data-i18n-attr="aria-label:soundOn">
+                                <span aria-hidden="true" data-sound-icon>🔊</span>
+                                <span class="game-sound-button__label" data-sound-label>Son</span>
                             </button>
-                            <button class="game-console__quit" type="button" data-console-quit>
-                                <span aria-hidden="true">✕</span> <span data-i18n="quit">Quitter le jeu</span>
+                            <button class="game-console__quit" type="button" data-console-quit
+                                    aria-label="Quitter le jeu" data-i18n-attr="aria-label:quit">
+                                <span class="game-console__quit-icon" aria-hidden="true">✕</span>
+                                <span class="game-console__quit-label" data-i18n="quitShort">Quitter</span>
                             </button>
                         </div>
                     </header>

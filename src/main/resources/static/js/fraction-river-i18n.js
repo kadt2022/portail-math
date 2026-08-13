@@ -39,8 +39,11 @@
             feedbackCorrectTitle: "Bonne réponse — bravo !",
             feedbackCorrectSuffix: " Une pierre apparaît dans la rivière.",
             feedbackIncorrectTitle: "Pas encore — regarde bien le dessin.",
-            nextButtonFinale: "Monter l’escalier et rejoindre le village →",
-            nextButtonContinue: "Continuer vers la pierre suivante →",
+            answerStateCorrect: "réponse correcte",
+            answerStateWrong: "réponse incorrecte, essaie un autre choix",
+            fractionAria: "{{numerator}} sur {{denominator}}",
+            nextButtonFinale: "Rejoindre le village maintenant →",
+            nextButtonContinue: "Continuer maintenant →",
             validateSelection: "Valider ma sélection",
 
             // Résultat final.
@@ -131,8 +134,11 @@
             feedbackCorrectTitle: "Correct answer — well done!",
             feedbackCorrectSuffix: " A stone appears in the river.",
             feedbackIncorrectTitle: "Not yet — look closely at the drawing.",
-            nextButtonFinale: "Climb the stairs and reach the village →",
-            nextButtonContinue: "Continue to the next stone →",
+            answerStateCorrect: "correct answer",
+            answerStateWrong: "incorrect answer, try another choice",
+            fractionAria: "{{numerator}} over {{denominator}}",
+            nextButtonFinale: "Reach the village now →",
+            nextButtonContinue: "Continue now →",
             validateSelection: "Validate my selection",
 
             resultMessagePerfect: "Perfect crossing! You read fractions like a seasoned explorer.",

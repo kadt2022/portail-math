@@ -77,6 +77,11 @@ class FractionRiverPageTests {
                 .andExpect(content().string(containsString("body.is-fraction-river-immersive .game-console--single .game-console__rotate")))
                 .andExpect(content().string(containsString("rotate(90deg)")));
 
+        mockMvc.perform(get("/js/fraction-river.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("panelSlot: immersiveContentSlot()")))
+                .andExpect(content().string(not(containsString("panelSlot: riverStage"))));
+
         mockMvc.perform(get("/js/fraction-river-launch.js"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("requestFullscreen")))
@@ -128,6 +133,36 @@ class FractionRiverPageTests {
                 .andExpect(content().string(containsString("data-step-options")))
                 .andExpect(content().string(containsString("data-step-feedback")))
                 .andExpect(content().string(containsString("aria-live=\"polite\"")));
+    }
+
+    @Test
+    void fractionRiverKeepsPhoneContentInsideTheDynamicViewport() throws Exception {
+        mockMvc.perform(get("/games/fraction-river.html"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("viewport-fit=cover")))
+                .andExpect(content().string(containsString("data-sound-icon")))
+                .andExpect(content().string(containsString("data-i18n-attr=\"aria-label:quit\"")))
+                .andExpect(content().string(containsString("Continuer maintenant")));
+
+        mockMvc.perform(get("/css/fraction-river.css"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("height: 100dvh")))
+                .andExpect(content().string(containsString("env(safe-area-inset-top)")))
+                .andExpect(content().string(containsString("overflow-x: hidden")))
+                .andExpect(content().string(containsString("min-height: 48px")))
+                .andExpect(content().string(containsString("transform: none")))
+                .andExpect(content().string(containsString("stacked-fraction__numerator")))
+                .andExpect(content().string(containsString("answer-option.is-correct::after")))
+                .andExpect(content().string(containsString("answer-option.is-wrong::after")))
+                .andExpect(content().string(not(containsString("transform: rotate(90deg)"))));
+
+        mockMvc.perform(get("/js/fraction-river.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("renderTextWithFractions")))
+                .andExpect(content().string(containsString("optionAccessibleLabel")))
+                .andExpect(content().string(not(containsString("`${option.label} —"))))
+                .andExpect(content().string(containsString("revealConsoleContent(feedback)")))
+                .andExpect(content().string(containsString("revealConsoleContent(nextButton)")));
     }
 
     @Test

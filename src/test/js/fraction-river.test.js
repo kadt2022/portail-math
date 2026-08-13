@@ -557,4 +557,373 @@ const ALLOWED_KEYS = new Set(ALLOWED_FRACTIONS.map(fractionKey));
     assert.ok(/numerator/i.test(hintFor("INVERTED", "en")));
 }
 
+// --- Interface téléphone : fractions, états et action principale ------------
+// Un DOM minimal suffit ici : le test exécute le vrai mountGame et ses handlers
+// sans ajouter jsdom aux dépendances du portail ni à l'image CI des jeux.
+{
+    class FakeClassList {
+        constructor(owner) {
+            this.owner = owner;
+        }
+
+        values() {
+            return new Set(this.owner.className.split(/\s+/).filter(Boolean));
+        }
+
+        write(values) {
+            this.owner.className = [...values].join(" ");
+        }
+
+        add(...names) {
+            const values = this.values();
+            names.forEach((name) => values.add(name));
+            this.write(values);
+        }
+
+        remove(...names) {
+            const values = this.values();
+            names.forEach((name) => values.delete(name));
+            this.write(values);
+        }
+
+        contains(name) {
+            return this.values().has(name);
+        }
+
+        toggle(name, force) {
+            const values = this.values();
+            const active = force === undefined ? !values.has(name) : Boolean(force);
+            if (active) {
+                values.add(name);
+            } else {
+                values.delete(name);
+            }
+            this.write(values);
+            return active;
+        }
+    }
+
+    class FakeNode {
+        constructor(tagName = "div") {
+            this.tagName = tagName.toUpperCase();
+            this.children = [];
+            this.parentNode = null;
+            this.attributes = new Map();
+            this.dataset = {};
+            this.listeners = new Map();
+            this.className = "";
+            this.classList = new FakeClassList(this);
+            this.hidden = false;
+            this.disabled = false;
+            this.focused = false;
+            this.scrolled = false;
+            this._textContent = "";
+            this._innerHTML = "";
+        }
+
+        set textContent(value) {
+            this._textContent = String(value ?? "");
+            this._innerHTML = "";
+            this.children = [];
+        }
+
+        get textContent() {
+            return this._textContent + this.children.map((child) => child.textContent).join("");
+        }
+
+        set innerHTML(value) {
+            this._innerHTML = String(value ?? "");
+            this._textContent = "";
+            this.children = [];
+            const imageLabel = this._innerHTML.match(/role="img"[^>]*aria-label="([^"]+)"/);
+            if (imageLabel) {
+                const image = new FakeNode("svg");
+                image.setAttribute("role", "img");
+                image.setAttribute("aria-label", imageLabel[1]);
+                this.appendChild(image);
+            }
+        }
+
+        get innerHTML() {
+            return this._innerHTML;
+        }
+
+        append(...nodes) {
+            nodes.forEach((node) => this.appendChild(node));
+        }
+
+        appendChild(node) {
+            if (node.parentNode) {
+                node.parentNode.removeChild(node);
+            }
+            this.children.push(node);
+            node.parentNode = this;
+            return node;
+        }
+
+        insertBefore(node, reference) {
+            if (node.parentNode) {
+                node.parentNode.removeChild(node);
+            }
+            const index = this.children.indexOf(reference);
+            this.children.splice(index < 0 ? this.children.length : index, 0, node);
+            node.parentNode = this;
+            return node;
+        }
+
+        removeChild(node) {
+            const index = this.children.indexOf(node);
+            if (index >= 0) {
+                this.children.splice(index, 1);
+                node.parentNode = null;
+            }
+            return node;
+        }
+
+        descendants() {
+            return this.children.flatMap((child) => [child, ...child.descendants()]);
+        }
+
+        querySelector(selector) {
+            return this.querySelectorAll(selector)[0] || null;
+        }
+
+        querySelectorAll(selector) {
+            const nodes = this.descendants();
+            if (selector === "button") {
+                return nodes.filter((node) => node.tagName === "BUTTON");
+            }
+            if (selector === "[role='img']" || selector === "[role=\"img\"]") {
+                return nodes.filter((node) => node.getAttribute("role") === "img");
+            }
+            const dataMatch = selector.match(/^\[([a-z0-9-]+)\]$/i);
+            return dataMatch
+                ? nodes.filter((node) => node.attributes.has(dataMatch[1]))
+                : [];
+        }
+
+        setAttribute(name, value) {
+            this.attributes.set(name, String(value));
+            if (name.startsWith("data-")) {
+                const key = name.slice(5).replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+                this.dataset[key] = String(value);
+            }
+        }
+
+        getAttribute(name) {
+            return this.attributes.has(name) ? this.attributes.get(name) : null;
+        }
+
+        addEventListener(type, handler) {
+            this.listeners.set(type, handler);
+        }
+
+        click() {
+            const handler = this.listeners.get("click");
+            if (handler && !this.disabled) {
+                handler({type: "click", currentTarget: this});
+            }
+        }
+
+        focus() {
+            this.focused = true;
+        }
+
+        scrollIntoView() {
+            this.scrolled = true;
+        }
+
+        getBoundingClientRect() {
+            return {top: 0, bottom: 100, left: 0, right: 100, width: 100, height: 100};
+        }
+    }
+
+    class FakeRoot extends FakeNode {
+        constructor(elements) {
+            super("main");
+            this.elements = elements;
+        }
+
+        querySelector(selector) {
+            return this.elements.get(selector) || super.querySelector(selector);
+        }
+    }
+
+    const selectors = [
+        "[data-game-setup]", "[data-game-panel]", "[data-learning-area]", "[data-step-panel]",
+        "[data-game-result]", "[data-step-title]", "[data-result-title]", "[data-step-options]",
+        "[data-step-feedback]", "[data-next-step]", "[data-river-stage]", "[data-console-panel]",
+        "[data-game-console]", "[data-console-stage]", "[data-console-launch]", "[data-console-quit]",
+        "[data-step-progress]", "[data-stone-count]", "[data-console-step]", "[data-best-first-try]",
+        "[data-games-played]", "[data-sound-toggle]", "[data-encouragement]", "[data-step-kicker]",
+        "[data-step-visual]", "[data-fraction-legend]", "[data-final-steps]",
+        "[data-final-first-try]", "[data-final-corrected]", "[data-result-message]",
+        "[data-final-badges]", "[data-replay]", "[data-result-quit]"
+    ];
+    const elements = new Map(selectors.map((selector) => [selector, new FakeNode(
+        selector.includes("button") || selector.includes("next") || selector.includes("replay")
+            || selector.includes("quit") || selector.includes("sound") ? "button" : "div"
+    )]));
+    const rootElement = new FakeRoot(elements);
+    const soundButton = elements.get("[data-sound-toggle]");
+    const soundIcon = new FakeNode("span");
+    const soundLabel = new FakeNode("span");
+    soundIcon.setAttribute("data-sound-icon", "");
+    soundLabel.setAttribute("data-sound-label", "");
+    soundButton.append(soundIcon, soundLabel);
+
+    const documentElement = new FakeNode("html");
+    documentElement.clientHeight = 640;
+    const body = new FakeNode("body");
+    const fakeDocument = {
+        documentElement,
+        body,
+        querySelector: (selector) => selector === "[data-fraction-river]" ? rootElement : null,
+        querySelectorAll: () => [],
+        createElement: (tagName) => new FakeNode(tagName),
+        createTextNode: (text) => {
+            const node = new FakeNode("#text");
+            node.textContent = text;
+            return node;
+        },
+        createComment: (text) => {
+            const node = new FakeNode("#comment");
+            node.textContent = text;
+            return node;
+        }
+    };
+
+    const emitted = [];
+    const savedGlobals = new Map([
+        ["FractionRiverStore", globalThis.FractionRiverStore],
+        ["FractionRiverEvents", globalThis.FractionRiverEvents],
+        ["GameConsole", globalThis.GameConsole],
+        ["fractionRiverGameController", globalThis.fractionRiverGameController],
+        ["startFractionRiverGame", globalThis.startFractionRiverGame],
+        ["matchMedia", globalThis.matchMedia],
+        ["requestAnimationFrame", globalThis.requestAnimationFrame],
+        ["setTimeout", globalThis.setTimeout],
+        ["clearTimeout", globalThis.clearTimeout],
+        ["localStorage", globalThis.localStorage]
+    ]);
+    let consoleOptions;
+    let storedSound = false;
+
+    try {
+        globalThis.FractionRiverStore = {
+            load: () => ({soundEnabled: storedSound, recentQuestionIds: [], gamesPlayed: 0}),
+            levelProgress: () => ({firstTryCorrect: 0}),
+            setSoundEnabled: (enabled) => {
+                storedSound = enabled;
+            }
+        };
+        globalThis.FractionRiverEvents = {
+            emit: (name, payload) => {
+                emitted.push({name, payload});
+                return 0;
+            }
+        };
+        globalThis.GameConsole = {
+            createGameConsole: (options) => {
+                consoleOptions = options;
+                return {
+                    isActive: true,
+                    enter() {
+                        this.isActive = true;
+                        options.onEnter();
+                    },
+                    exit() {
+                        this.isActive = false;
+                        options.onExit();
+                    }
+                };
+            }
+        };
+        globalThis.fractionRiverGameController = {setLayoutMode() {}};
+        globalThis.startFractionRiverGame = () => {};
+        globalThis.matchMedia = () => ({matches: true});
+        globalThis.requestAnimationFrame = (callback) => {
+            callback();
+            return 1;
+        };
+        globalThis.setTimeout = (callback) => {
+            callback();
+            return 1;
+        };
+        globalThis.clearTimeout = () => {};
+        globalThis.localStorage = {
+            getItem: (key) => key === "portailMath.preferences.language" ? "fr" : null
+        };
+
+        game.mountGame(fakeDocument);
+
+        assert.equal(consoleOptions.panelSlot, elements.get("[data-console-panel]"));
+        assert.equal(soundButton.getAttribute("aria-pressed"), "false");
+        const mutedIcon = soundIcon.textContent;
+        assert.ok(mutedIcon.length > 0);
+        assert.equal(elements.get("[data-step-options]").querySelectorAll("button").length, 3);
+
+        const firstVisualLabel = elements.get("[data-step-visual]")
+            .querySelector("[role='img']").getAttribute("aria-label");
+        const firstFraction = firstVisualLabel.match(/(\d+) part(?:s)? sur (\d+)/);
+        const firstCorrectLabel = `${firstFraction[1]}/${firstFraction[2]}`;
+        const firstOptions = elements.get("[data-step-options]").querySelectorAll("button");
+        const firstWrong = firstOptions.find((button) => button.getAttribute("aria-label") !== firstCorrectLabel);
+        const firstCorrect = firstOptions.find((button) => button.getAttribute("aria-label") === firstCorrectLabel);
+
+        firstWrong.click();
+        assert.equal(firstWrong.classList.contains("is-wrong"), true);
+        assert.match(firstWrong.getAttribute("aria-label"), /incorrecte/);
+        assert.equal(elements.get("[data-step-feedback]").scrolled, true);
+
+        firstCorrect.click();
+        assert.equal(firstCorrect.classList.contains("is-correct"), true);
+        assert.match(firstCorrect.getAttribute("aria-label"), /correcte/);
+        assert.equal(elements.get("[data-next-step]").hidden, false);
+        assert.equal(elements.get("[data-next-step]").focused, true);
+        assert.equal(elements.get("[data-next-step]").scrolled, true);
+        assert.ok(elements.get("[data-step-feedback]").querySelector("[role='img']"));
+
+        soundButton.click();
+        assert.equal(storedSound, true);
+        assert.equal(soundButton.getAttribute("aria-pressed"), "true");
+        assert.notEqual(soundIcon.textContent, mutedIcon);
+
+        elements.get("[data-next-step]").click();
+        const titleFraction = elements.get("[data-step-title]").querySelector("[role='img']");
+        assert.ok(titleFraction, "la question visuelle doit afficher une fraction empilÃ©e");
+        const visualFraction = titleFraction.getAttribute("aria-label").match(/(\d+) sur (\d+)/);
+        const visualOptions = elements.get("[data-step-options]").querySelectorAll("button");
+        const correctVisual = visualOptions.find((button) => {
+            const optionFraction = button.getAttribute("aria-label").match(/(\d+) part(?:s)? sur (\d+)/);
+            return optionFraction
+                && optionFraction[1] === visualFraction[1]
+                && optionFraction[2] === visualFraction[2];
+        });
+        assert.ok(correctVisual, JSON.stringify({
+            fraction: visualFraction.slice(1),
+            options: visualOptions.map((button) => button.getAttribute("aria-label"))
+        }));
+        const wrongVisual = visualOptions.find((button) => button !== correctVisual);
+
+        wrongVisual.click();
+        assert.doesNotMatch(wrongVisual.getAttribute("aria-label"), /undefined/);
+        assert.match(wrongVisual.getAttribute("aria-label"), /incorrecte/);
+        correctVisual.click();
+        assert.doesNotMatch(correctVisual.getAttribute("aria-label"), /undefined/);
+        assert.match(correctVisual.getAttribute("aria-label"), /correcte/);
+        assert.ok(emitted.some((event) => event.name === "answer:incorrect"));
+        assert.ok(emitted.some((event) => event.name === "answer:correct"));
+        assert.ok(emitted.some((event) => event.name === "step:completed"));
+    } finally {
+        savedGlobals.forEach((value, name) => {
+            if (value === undefined) {
+                delete globalThis[name];
+            } else {
+                globalThis[name] = value;
+            }
+        });
+    }
+}
+
 console.log("fraction-river: all tests passed");
