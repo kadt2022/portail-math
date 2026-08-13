@@ -153,6 +153,33 @@
         gameI18n.applyStaticTranslations(document, fractionRiverI18n, lang);
         const t = (key, params) => gameI18n.translate(fractionRiverI18n, lang, key, params);
 
+        function renderTextWithFractions(target, text) {
+            target.textContent = "";
+            let cursor = 0;
+            for (const match of String(text).matchAll(/(\d+)\/(\d+)/g)) {
+                target.append(document.createTextNode(String(text).slice(cursor, match.index)));
+                const fraction = document.createElement("span");
+                fraction.className = "stacked-fraction";
+                fraction.setAttribute("role", "img");
+                fraction.setAttribute("aria-label", t("fractionAria", {
+                    numerator: match[1],
+                    denominator: match[2]
+                }));
+                const numerator = document.createElement("span");
+                numerator.className = "stacked-fraction__numerator";
+                numerator.setAttribute("aria-hidden", "true");
+                numerator.textContent = match[1];
+                const denominator = document.createElement("span");
+                denominator.className = "stacked-fraction__denominator";
+                denominator.setAttribute("aria-hidden", "true");
+                denominator.textContent = match[2];
+                fraction.append(numerator, denominator);
+                target.append(fraction);
+                cursor = match.index + match[0].length;
+            }
+            target.append(document.createTextNode(String(text).slice(cursor)));
+        }
+
         const store = root.FractionRiverStore;
         const query = (selector) => rootElement.querySelector(selector);
 
@@ -169,6 +196,11 @@
         const riverStage = query("[data-river-stage]");
         const bus = root.FractionRiverEvents;
         const resultAnchor = document.createComment("emplacement du résultat de la rivière");
+        const consolePanelSlot = query("[data-console-panel]");
+
+        function immersiveContentSlot() {
+            return consolePanelSlot || riverStage;
+        }
 
         function returnToCatalogue() {
             if (root.parent && root.parent !== root) {
@@ -182,7 +214,7 @@
             if (!resultAnchor.parentNode) {
                 resultPanel.parentNode.insertBefore(resultAnchor, resultPanel);
             }
-            riverStage.appendChild(resultPanel);
+            immersiveContentSlot().appendChild(resultPanel);
             resultPanel.classList.add("river-result--immersive");
         }
 
@@ -201,12 +233,9 @@
                 document,
                 console: query("[data-game-console]"),
                 stageSlot: query("[data-console-stage]"),
-                // Le panneau de questions n'est plus posé À CÔTÉ de la scène :
-                // il est posé DEDANS. Le décor peint réserve un parchemin sur sa
-                // droite, et c'est là que la question doit s'afficher — sinon
-                // deux interfaces se font concurrence, un parchemin vide dans
-                // l'image et un panneau blanc à côté.
-                panelSlot: riverStage,
+                // Le panneau reste séparé du canvas : aucun texte ni aucune
+                // réponse ne peut être rogné par le cadre 16/9 de Phaser.
+                panelSlot: immersiveContentSlot(),
                 stage: riverStage,
                 panel: stepPanel,
                 launchButton: query("[data-console-launch]"),
@@ -214,10 +243,9 @@
                 focusOnEnter: stepTitle,
                 keepImmersiveOnFullscreenExit: true,
                 onQuit: returnToCatalogue,
-                // La bascule change la largeur disponible pour l'énoncé : sur le
-                // parchemin peint il n'y a que 114 px, contre toute la page en
-                // dehors. Sans ce rafraîchissement, la formulation longue restait
-                // affichée en immersif et débordait du parchemin.
+                // La bascule change la largeur disponible pour l'énoncé. Le
+                // rafraîchissement conserve la formulation compacte dans le
+                // panneau immersif, notamment en paysage très bas.
                 onEnter: () => {
                     setLayoutMode("immersive");
                     rafraichirEnonce();
@@ -238,7 +266,7 @@
         function rafraichirEnonce() {
             const step = steps[state.stepIndex];
             if (step && stepTitle) {
-                stepTitle.textContent = consoleActive() ? promptCourt(step) : step.prompt;
+                renderTextWithFractions(stepTitle, consoleActive() ? promptCourt(step) : step.prompt);
             }
         }
 
@@ -361,6 +389,17 @@
             });
         }
 
+        function revealConsoleContent(element) {
+            if (!consoleActive() || !element || typeof element.scrollIntoView !== "function") {
+                return;
+            }
+            root.requestAnimationFrame(() => element.scrollIntoView({
+                behavior: prefersReducedMotion() ? "auto" : "smooth",
+                block: "nearest",
+                inline: "nearest"
+            }));
+        }
+
         function playTone(kind) {
             if (!soundEnabled) {
                 return;
@@ -398,7 +437,7 @@
             const strong = document.createElement("strong");
             strong.textContent = title;
             const paragraph = document.createElement("span");
-            paragraph.textContent = detail;
+            renderTextWithFractions(paragraph, detail);
             target.append(strong, paragraph);
         }
 
@@ -417,8 +456,7 @@
             if (stoneCount) {
                 stoneCount.textContent = String(state.completedSteps);
             }
-            // La barre de la console porte le même compteur : elle reste dehors
-            // quand le panneau de questions est déplacé à l'intérieur.
+            // La barre de la console porte le même compteur que le panneau.
             const compteurConsole = query("[data-console-step]");
             if (compteurConsole) {
                 compteurConsole.textContent = avancement;
@@ -438,6 +476,14 @@
         function updateSoundButton() {
             const button = query("[data-sound-toggle]");
             button.setAttribute("aria-pressed", String(soundEnabled));
+            button.setAttribute("aria-label", soundEnabled ? t("soundOn") : t("soundOff"));
+            const icon = button.querySelector("[data-sound-icon]");
+            const label = button.querySelector("[data-sound-label]");
+            if (icon && label) {
+                icon.textContent = soundEnabled ? "🔊" : "🔇";
+                label.textContent = soundEnabled ? t("soundOnShort") : t("soundOffShort");
+                return;
+            }
             button.textContent = soundEnabled ? t("soundOn") : t("soundOff");
         }
 
@@ -465,9 +511,9 @@
             updateStatus();
             bus.emit("answer:correct", {step, hadMistake: state.hadMistake});
             playTone("correct");
-            showNextButton(state.completedSteps === STEP_COUNT
+            const nextLabel = state.completedSteps === STEP_COUNT
                 ? t("nextButtonFinale")
-                : t("nextButtonContinue"));
+                : t("nextButtonContinue");
             nextButton.hidden = true;
             // La pierre n'apparaît qu'une fois la scène sous les yeux de l'enfant.
             playSceneThen(
@@ -476,7 +522,11 @@
                     completedSteps: state.completedSteps,
                     totalSteps: STEP_COUNT
                 }),
-                () => continueTraversal({automatic: true})
+                () => {
+                    showNextButton(nextLabel);
+                    revealConsoleContent(nextButton);
+                    nextButton.focus({preventScroll: true});
+                }
             );
         }
 
@@ -488,6 +538,7 @@
             // la source lisible par un lecteur d'écran.
             bus.emit("answer:incorrect", {step, hint, distractor: state.lastDistractor});
             playTone("incorrect");
+            revealConsoleContent(feedback);
         }
 
         function createOptionButton(step, option) {
@@ -496,15 +547,20 @@
             button.className = option.visual
                 ? "answer-option answer-option--visual"
                 : "answer-option";
+            let optionAccessibleLabel = option.label || String(option.key);
             if (option.visual) {
                 button.innerHTML = visuals.renderStaticVisual({...option.visual, id: `opt-${option.key}`, lang});
+                optionAccessibleLabel = button.querySelector("[role='img']")?.getAttribute("aria-label")
+                    || optionAccessibleLabel;
             } else {
-                button.textContent = option.label;
+                renderTextWithFractions(button, option.label);
             }
+            button.setAttribute("aria-label", optionAccessibleLabel);
             button.addEventListener("click", () => {
                 state = evaluateChoice(state, step, option.key);
                 if (state.outcome === "INCORRECT") {
                     button.classList.add("is-wrong");
+                    button.setAttribute("aria-label", `${optionAccessibleLabel} — ${t("answerStateWrong")}`);
                     button.disabled = true;
                     handleIncorrectStep(step);
                     return;
@@ -514,6 +570,7 @@
                         candidate.disabled = true;
                     });
                     button.classList.add("is-correct");
+                    button.setAttribute("aria-label", `${optionAccessibleLabel} — ${t("answerStateCorrect")}`);
                     handleCorrectStep(step);
                 }
             });
@@ -570,15 +627,12 @@
 
         // Énoncé court, pour le mode immersif seulement.
         //
-        // La question s'affiche là sur le parchemin peint de l'illustration : une
-        // bande de 114 px de large sur un téléphone en paysage. Mesuré, « Quelle
-        // fraction est représentée ? » y occupe QUATRE lignes et 92 px de haut, et
-        // le contenu débordait de 53 px.
+        // En paysage très bas, une formulation longue peut repousser les trois
+        // choix et l'action principale hors de la zone immédiatement accessible.
         //
         // Rien n'est retiré à la pédagogie : la formulation complète reste dans
-        // les données, et c'est elle qui s'affiche sur la page normale. Ce qui
-        // disparaît ici, c'est la reprise des nombres déjà lisibles sur le dessin
-        // juste en dessous.
+        // les données et reste affichée sur la page normale. La version immersive
+        // évite seulement de répéter les nombres déjà annoncés par la figure.
         function promptCourt(step) {
             const fraction = step.fraction
                 ? `${step.fraction.numerator}/${step.fraction.denominator}`
@@ -613,7 +667,7 @@
             // Même découpage que le Train : un intitulé court en capitales,
             // puis la question seule dans le titre.
             query("[data-step-kicker]").textContent = t("stepKicker", {index: state.stepIndex + 1, total: STEP_COUNT});
-            stepTitle.textContent = consoleActive() ? promptCourt(step) : step.prompt;
+            renderTextWithFractions(stepTitle, consoleActive() ? promptCourt(step) : step.prompt);
             renderVisualInto(query("[data-step-visual]"), step.visual, `step-${state.stepIndex}`);
             updateFractionLegend(step);
             optionsContainer.textContent = "";
