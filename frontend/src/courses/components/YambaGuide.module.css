@@ -19,8 +19,7 @@
   box-shadow:
     0 0 0 2px rgb(226 118 43 / 38%),
     0 8px 20px rgb(15 51 43 / 14%);
-  transform-origin: 50% 68%;
-  animation: yambaServo 5.8s ease-in-out infinite;
+  animation: yambaFloat 2.6s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -53,38 +52,14 @@
   object-fit: cover;
 }
 
-@keyframes yambaServo {
+@keyframes yambaFloat {
   0%,
-  60%,
-  78%,
   100% {
-    box-shadow:
-      0 0 0 2px rgb(226 118 43 / 38%),
-      0 8px 20px rgb(15 51 43 / 14%);
-    transform: translateY(0) rotate(0);
+    transform: translateY(0);
   }
 
-  65% {
-    box-shadow:
-      0 0 0 3px rgb(95 211 224 / 35%),
-      0 0 20px rgb(95 211 224 / 27%),
-      0 10px 23px rgb(15 51 43 / 16%);
-    transform: translateY(-2px) rotate(-1.4deg);
-  }
-
-  70% {
-    box-shadow:
-      0 0 0 3px rgb(95 211 224 / 24%),
-      0 0 14px rgb(95 211 224 / 18%),
-      0 9px 21px rgb(15 51 43 / 15%);
-    transform: translateY(-2px) rotate(0.8deg);
-  }
-
-  74% {
-    box-shadow:
-      0 0 0 2px rgb(226 118 43 / 38%),
-      0 8px 20px rgb(15 51 43 / 14%);
-    transform: translateY(-1px) rotate(-0.35deg);
+  50% {
+    transform: translateY(-4px);
   }
 }
 
