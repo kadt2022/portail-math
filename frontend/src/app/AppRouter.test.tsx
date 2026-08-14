@@ -43,6 +43,16 @@ describe("Routeur du portail React", () => {
     expect(screen.getByRole("heading", { level: 1, name: /1re primaire/i })).toBeInTheDocument();
     expect(screen.getAllByRole("article")).toHaveLength(10);
     expect(screen.getByRole("link", { name: /commencer mon parcours/i })).toBeInTheDocument();
+    expect(screen.getByRole("complementary", { name: /Yamba.*accompagne/i })).toBeInTheDocument();
+  });
+
+  it("ouvre la page dédiée de 2e primaire avec ses dix modules", () => {
+    renderAt("/app/apprentissages/primaire/2/mathematiques");
+
+    expect(screen.getByRole("heading", { level: 1, name: /2e primaire/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(10);
+    expect(screen.getByText("0 / 40 leçons")).toBeInTheDocument();
+    expect(screen.getByRole("complementary", { name: /Yamba.*à ton rythme/i })).toBeInTheDocument();
   });
 
   it.each(PRIMARY_COURSES.filter((course) => course.availability === "coming-soon"))(

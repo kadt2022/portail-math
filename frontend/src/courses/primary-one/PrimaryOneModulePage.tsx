@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
 import {
   getLearningItems,
   getPrimaryOneModule,
@@ -59,8 +60,8 @@ function LearningCard({ item, index, progress }: LearningCardProps) {
         </div>
       </div>
       <Link className={styles.cardAction} to={lessonPath(item.moduleId, item.id)}>
+        <CourseActionIcon className={styles.actionIcon} name={state} />
         {t(`moduleActions.${state}`)}
-        <span aria-hidden="true">→</span>
       </Link>
     </article>
   );
@@ -77,6 +78,7 @@ export function PrimaryOneModulePage() {
       <div className={styles.missingPage}>
         <h1>{t("errors.moduleNotFound")}</h1>
         <Link className={styles.secondaryAction} to={PRIMARY_ONE_BASE_PATH}>
+          <CourseActionIcon className={styles.actionIcon} name="return-to-modules" />
           {t("actions.backToCourse")}
         </Link>
       </div>
@@ -153,11 +155,13 @@ export function PrimaryOneModulePage() {
 
       <div className={styles.moduleFooterActions}>
         <Link className={styles.secondaryAction} to={PRIMARY_ONE_BASE_PATH}>
-          ← {t("actions.backToCourse")}
+          <CourseActionIcon className={styles.actionIcon} name="return-to-modules" />
+          {t("actions.backToCourse")}
         </Link>
         {moduleProgress.state === "completed" && nextModule ? (
           <Link className={styles.primaryAction} to={modulePath(nextModule.id)}>
-            {t("actions.next-module")} <span aria-hidden="true">→</span>
+            <CourseActionIcon className={styles.actionIcon} name="next-module" />
+            {t("actions.next-module")}
           </Link>
         ) : null}
       </div>

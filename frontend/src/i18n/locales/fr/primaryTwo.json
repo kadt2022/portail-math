@@ -1,0 +1,179 @@
+{
+  "course": {
+    "eyebrow": "Parcours de mathématiques",
+    "title": "2e primaire",
+    "lead": "Retrouve les nombres autour de toi et avance par petites activités. Ta place est enregistrée sur cet appareil.",
+    "published": "{{count}} leçon disponible aujourd’hui"
+  },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "Je t’accompagne dans ce parcours, à ton rythme. On commence quand tu veux !",
+    "lessonTip": "Prends ton temps. Je reste près de toi pendant cette première étape.",
+    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+  },
+  "status": {
+    "not-started": "À commencer",
+    "in-progress": "En cours",
+    "completed": "Terminé",
+    "coming-soon": "À venir"
+  },
+  "progress": {
+    "overall": "Ma progression générale",
+    "lessons": "{{completed}} / {{total}} leçons",
+    "moduleLessons": "{{completed}} / {{total}} leçons",
+    "plannedLessons": "{{total}} leçons prévues",
+    "module": "Progression du module {{number}}",
+    "steps": "{{completed}} / {{total}} étapes réussies",
+    "item": "Progression de {{title}}"
+  },
+  "actions": {
+    "start": "Commencer mon parcours",
+    "resume": "Reprendre la leçon",
+    "next-lesson": "Leçon suivante",
+    "next-module": "Module suivant",
+    "return-to-modules": "Retour à mes modules",
+    "review": "Revoir",
+    "backToCourse": "Retour au cours"
+  },
+  "moduleActions": {
+    "not-started": "Commencer",
+    "in-progress": "Reprendre",
+    "completed": "Revoir",
+    "view": "Voir le module"
+  },
+  "modules": {
+    "eyebrow": "10 modules · 40 leçons",
+    "title": "Mon parcours de 2e primaire",
+    "orderHint": "Une leçon publiée fait avancer le compteur sur les 40 leçons prévues.",
+    "number": "Module {{number}}",
+    "m1": { "title": "Je retrouve les nombres" },
+    "m2": { "title": "Dizaines et nombres jusqu'à 100" },
+    "m3": { "title": "J'additionne avec des stratégies" },
+    "m4": { "title": "Je soustrais et je vérifie" },
+    "m5": { "title": "Groupes égaux et multiplication" },
+    "m6": { "title": "Je partage équitablement" },
+    "m7": { "title": "Argent et petits achats" },
+    "m8": { "title": "Je mesure et j'estime" },
+    "m9": { "title": "Formes, solides et symétrie" },
+    "m10": { "title": "Temps, calendrier et problèmes" }
+  },
+  "module": {
+    "referenceLead": "Commence par compter jusqu’à 20. Les trois autres leçons et l’évaluation seront publiées ensuite.",
+    "pendingLead": "Ce module est planifié. Ses activités seront ajoutées après validation pédagogique.",
+    "pathEyebrow": "Petites étapes",
+    "pathTitle": "Les leçons du module",
+    "pathHint": "Un contenu à venir ne produit jamais de progression."
+  },
+  "lessons": {
+    "number": "Leçon {{number}}",
+    "plannedTitle": "Titre pédagogique à confirmer",
+    "l1": { "title": "Je compte jusqu'à 20" },
+    "l2": { "title": "Avant, après, entre" },
+    "l3": { "title": "Je compare" },
+    "l4": { "title": "Je range et j'explique" }
+  },
+  "evaluation": {
+    "label": "Évaluation du module",
+    "title": "Évaluation du module"
+  },
+  "steps": {
+    "discover": "Je découvre",
+    "manipulate": "Je manipule",
+    "understand": "Je comprends",
+    "practice": "Je m'entraîne",
+    "play": "Je joue",
+    "remember": "Je retiens"
+  },
+  "breadcrumbs": {
+    "label": "Fil d'Ariane du cours",
+    "course": "2e primaire"
+  },
+  "lesson": {
+    "label": "Leçon",
+    "objectiveLabel": "Mon objectif",
+    "objective": "Je peux compter une collection sans oublier ni compter deux fois.",
+    "duration": "Environ 25 minutes",
+    "situation": "La classe prépare 18 graines pour un jeu. Trouve comment vérifier le nombre sans te perdre.",
+    "stepProgress": "Étape {{current}} sur {{total}} — {{label}}",
+    "progressLabel": "Progression dans la leçon",
+    "back": "Retour au module",
+    "continue": "Continuer",
+    "finish": "Terminer la leçon",
+    "contentUnavailableTitle": "Contenu bientôt disponible en anglais",
+    "contentUnavailableMessage": "La leçon interactive est publiée en français. Sa version anglaise sera ajoutée après validation pédagogique."
+  },
+  "activity": {
+    "validate": "Vérifier ma réponse",
+    "success": "Bravo, cette activité est réussie !",
+    "tryAgain": "Essaie encore. Ta réponse reste à l’écran.",
+    "discover": {
+      "title": "Compte les 18 graines",
+      "instruction": "Touche chaque graine une seule fois. Elle passera dans le panier « déjà comptées ».",
+      "toCount": "À compter",
+      "counted": "Déjà comptées",
+      "counter": "{{count}} sur 18 graines comptées",
+      "seedLabel": "Compter la graine {{number}}"
+    },
+    "manipulate": {
+      "title": "Forme le nombre 17",
+      "instruction": "Prépare un paquet de 10 bâtonnets et ajoute les bâtonnets seuls.",
+      "bundles": "Paquets de 10",
+      "units": "Bâtonnets seuls",
+      "decrease": "Enlever un élément de {{label}}",
+      "increase": "Ajouter un élément à {{label}}",
+      "hint": "Cherche d’abord une dizaine, puis complète avec les unités pour faire 17.",
+      "representation": "{{bundles}} dizaine et {{units}} unités"
+    },
+    "understand": {
+      "title": "Choisis une stratégie sûre",
+      "instruction": "Tu dois compter beaucoup de graines sans en oublier. Quelle stratégie t’aide ?",
+      "move": "Je déplace chaque graine déjà comptée dans un autre panier.",
+      "guess": "Je regarde vite et je devine le total.",
+      "restart": "Je recommence au hasard plusieurs fois.",
+      "hint": "Choisis la stratégie qui sépare clairement ce qui est compté de ce qui ne l’est pas.",
+      "strategyMove": "Déplacer chaque objet compté",
+      "strategyTen": "Former un groupe de 10, puis compter les unités"
+    },
+    "practice": {
+      "title": "Résous les trois petits défis",
+      "instruction": "Complète chaque réponse, puis vérifie l’ensemble.",
+      "dots": "Combien y a-t-il de points dans deux lignes de 6 ?",
+      "groups": "Combien de groupes de 5 faut-il pour former 15 ?",
+      "found": "14 graines sont comptées et 2 sont retrouvées. Quel est le total ?",
+      "answer": "Ta réponse",
+      "groupPreview": "{{count}} groupe(s) de 5",
+      "hint": "Regarde les points par lignes, les objets par groupes de 5, puis ajoute les 2 graines retrouvées."
+    },
+    "play": {
+      "title": "Replace les cartes sur le sentier",
+      "instruction": "Choisis une carte-nombre, puis la maison vide située entre ses deux voisines.",
+      "cards": "Mes cartes",
+      "path": "Le sentier de 0 à 20",
+      "selectCard": "Choisir la carte {{number}}",
+      "slot": "Maison vide entre {{before}} et {{after}}",
+      "placed": "Carte {{number}} placée entre {{before}} et {{after}}",
+      "hint": "Regarde le nombre juste avant et le nombre juste après chaque maison.",
+      "selected": "Carte {{number}} sélectionnée"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "rule": "Je déplace chaque objet déjà compté pour ne pas le compter deux fois.",
+      "question": "Que fais-tu d’un objet que tu viens de compter ?",
+      "move": "Je le déplace dans la zone déjà comptée.",
+      "leave": "Je le laisse au milieu des autres.",
+      "double": "Je le compte encore une fois pour être sûr.",
+      "hint": "Pense aux deux paniers utilisés au début de la leçon."
+    }
+  },
+  "lessonComplete": {
+    "eyebrow": "Leçon réussie",
+    "title": "Bravo, tu sais compter sans te perdre !",
+    "message": "Ta progression est enregistrée : 1 leçon terminée sur les 40 prévues.",
+    "nextComing": "La prochaine leçon arrive bientôt. Elle ne peut pas encore être commencée.",
+    "backToModule": "Retour à mes modules"
+  },
+  "errors": {
+    "moduleNotFound": "Ce module n'existe pas.",
+    "lessonNotFound": "Cette leçon n'est pas disponible."
+  }
+}

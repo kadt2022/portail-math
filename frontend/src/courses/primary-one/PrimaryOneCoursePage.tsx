@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
+import { YambaGuide } from "../components/YambaGuide";
 import {
   lessonPath,
   modulePath,
@@ -24,7 +26,7 @@ function actionHref(action: CoursePrimaryAction) {
   if (action.type === "next-module") {
     return modulePath(action.moduleId);
   }
-  if (action.itemId) {
+  if ("itemId" in action && action.itemId) {
     return lessonPath(action.moduleId, action.itemId);
   }
   return modulePath(action.moduleId);
@@ -47,6 +49,7 @@ export function PrimaryOneCoursePage() {
           <p className={styles.eyebrow}>{t("course.eyebrow")}</p>
           <h1 id="primary-one-title">{t("course.title")}</h1>
           <p className={styles.lead}>{t("course.lead")}</p>
+          <YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />
         </div>
 
         <div className={styles.overallProgress}>
@@ -73,8 +76,8 @@ export function PrimaryOneCoursePage() {
             <span style={{ width: `${summary.percentage}%` }} />
           </div>
           <Link className={styles.primaryAction} to={actionHref(primaryAction)}>
+            <CourseActionIcon className={styles.actionIcon} name={primaryAction.type} />
             {t(actionLabelKey(primaryAction))}
-            <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
@@ -127,8 +130,8 @@ export function PrimaryOneCoursePage() {
                   </div>
                 </div>
                 <Link className={styles.cardAction} to={modulePath(module.id)}>
+                  <CourseActionIcon className={styles.actionIcon} name={moduleProgress.state} />
                   {t(`moduleActions.${moduleProgress.state}`)}
-                  <span aria-hidden="true">→</span>
                 </Link>
               </article>
             );

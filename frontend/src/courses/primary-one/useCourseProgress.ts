@@ -1,40 +1,12 @@
-import { useCallback, useMemo, useState } from "react";
-
-import type { LearningItem } from "./course-catalogue";
-import {
-  completeLearningStep,
-  startLearningItem,
-  type CourseProgress,
-} from "./course-progress";
-import { createLocalCourseProgressStorage } from "./progress-storage";
+import { useCourseProgress as useGenericCourseProgress } from "../course-engine/useCourseProgress";
+import { PRIMARY_ONE_COURSE_ID, type LearningItem } from "./course-catalogue";
 
 export function useCourseProgress() {
-  const storage = useMemo(() => createLocalCourseProgressStorage(window.localStorage), []);
-  const [progress, setProgress] = useState<CourseProgress>(() => storage.load());
-
-  const startItem = useCallback(
-    (item: LearningItem) => {
-      setProgress((current) => {
-        const next = startLearningItem(current, item);
-        if (next !== current) {
-          storage.save(next);
-        }
-        return next;
-      });
+  const courseProgress = useGenericCourseProgress(PRIMARY_ONE_COURSE_ID);
+  return {
+    ...courseProgress,
+    completeStep(item: LearningItem, stepId: string) {
+      courseProgress.completeStep(item, stepId, true);
     },
-    [storage],
-  );
-
-  const completeStep = useCallback(
-    (item: LearningItem, stepId: string) => {
-      setProgress((current) => {
-        const next = completeLearningStep(current, item, stepId);
-        storage.save(next);
-        return next;
-      });
-    },
-    [storage],
-  );
-
-  return { progress, startItem, completeStep };
+  };
 }

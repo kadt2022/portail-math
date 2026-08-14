@@ -4,6 +4,12 @@
     "title": "1st year of primary",
     "lead": "Move forward at your own pace, one small step at a time. You can stop and return exactly where you left off."
   },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "I’m here with you on this learning path. Choose where to begin and let’s move forward together!",
+    "lessonTip": "Take your time. I’ll stay close during this first step.",
+    "lessonComplete": "Well done! Your progress is saved, and we can continue whenever you are ready."
+  },
   "status": {
     "not-started": "Not started",
     "in-progress": "In progress",
@@ -23,6 +29,7 @@
     "resume": "Resume the lesson",
     "next-lesson": "Next lesson",
     "next-module": "Next module",
+    "return-to-modules": "Back to my modules",
     "review": "Review my lessons",
     "backToCourse": "Back to the course"
   },
