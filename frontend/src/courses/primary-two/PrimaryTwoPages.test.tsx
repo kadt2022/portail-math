@@ -31,6 +31,10 @@ describe("Pages du parcours de 2e primaire", () => {
     expect(screen.getByText("0 / 40 leçons")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /commencer mon parcours/i })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /voir le module/i })).toHaveLength(9);
+    expect(screen.getByRole("complementary", { name: /Yamba.*à ton rythme/i })).toBeInTheDocument();
+    for (const card of screen.getAllByRole("article")) {
+      expect(within(card).queryByText("Yamba")).not.toBeInTheDocument();
+    }
   });
 
   it("montre les quatre leçons et l’évaluation du module 1, une seule étant disponible", () => {
@@ -117,6 +121,15 @@ describe("Pages du parcours de 2e primaire", () => {
     expect(screen.getByRole("heading", { name: "À compter" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "Déjà comptées" })).toBeVisible();
     expect(screen.getByRole("link", { name: /retour au module/i })).toBeVisible();
+    expect(screen.getByRole("complementary", { name: /Yamba.*première étape/i })).toBeVisible();
+  });
+
+  it("affiche l’accompagnement de l’accueil en anglais", async () => {
+    await i18next.changeLanguage("en");
+    renderAt("/app/apprentissages/primaire/2/mathematiques");
+
+    expect(screen.getByRole("complementary", { name: /Yamba.*at your pace/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /start my learning path/i })).toBeInTheDocument();
   });
 
   it("signale la traduction pédagogique anglaise manquante sans démarrer la leçon", async () => {

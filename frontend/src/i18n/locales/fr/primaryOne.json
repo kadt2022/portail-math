@@ -4,6 +4,12 @@
     "title": "1re primaire",
     "lead": "Avance à ton rythme, une petite étape à la fois. Tu peux t'arrêter et reprendre exactement où tu en étais."
   },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "Je t’accompagne dans ce parcours. Choisis ton point de départ et avançons ensemble !",
+    "lessonTip": "Prends ton temps. Je reste près de toi pendant cette première étape.",
+    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+  },
   "status": {
     "not-started": "À commencer",
     "in-progress": "En cours",

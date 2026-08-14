@@ -135,36 +135,66 @@
   gap: 10px;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 11px 17px;
-  border-radius: 999px;
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 14px;
   font: inherit;
   font-weight: 850;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.actionIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: rgb(23 73 63 / 9%);
+  place-items: center;
+}
+
+.actionIcon svg {
+  width: 17px;
+  height: 17px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .primaryAction {
   border: 1px solid var(--pm-accent);
-  background: var(--pm-accent);
+  background: linear-gradient(135deg, var(--pm-accent), var(--pm-accent-dark));
   color: #fff;
-  box-shadow: 0 7px 18px rgb(184 92 28 / 19%);
+  box-shadow: 0 8px 20px rgb(184 92 28 / 22%);
+}
+
+.primaryAction .actionIcon {
+  background: rgb(255 255 255 / 18%);
 }
 
 .primaryAction:hover {
   border-color: var(--pm-accent-dark);
   background: var(--pm-accent-dark);
+  box-shadow: 0 10px 24px rgb(184 92 28 / 25%);
+  transform: translateY(-1px);
 }
 
 .secondaryAction {
-  border: 1px solid var(--pm-line);
-  background: var(--pm-surface);
+  border: 1px solid rgb(23 73 63 / 20%);
+  background: #f7fbf9;
   color: var(--pm-brand);
+  box-shadow: var(--pm-shadow-sm);
 }
 
 .secondaryAction:hover {
   border-color: var(--pm-brand);
-  background: var(--pm-surface-warm);
+  background: var(--pm-success-soft);
+  transform: translateY(-1px);
 }
 
 .overallProgress .primaryAction {
@@ -302,19 +332,22 @@
 }
 
 .cardAction {
-  justify-content: space-between;
-  min-height: 44px;
+  justify-content: flex-start;
+  min-height: 48px;
   margin-top: 16px;
-  padding: 9px 14px;
-  border: 1px solid var(--pm-line);
-  border-radius: var(--pm-radius-sm);
-  background: #fffdfa;
+  padding: 9px 12px;
+  border: 1px solid rgb(23 73 63 / 18%);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff, #f4faf7);
   color: var(--pm-brand);
+  box-shadow: 0 4px 12px rgb(31 42 36 / 7%);
 }
 
 .cardAction:hover {
   border-color: var(--pm-brand);
-  background: #f5faf7;
+  background: var(--pm-success-soft);
+  box-shadow: 0 7px 18px rgb(31 42 36 / 10%);
+  transform: translateY(-1px);
 }
 
 .breadcrumbs {
@@ -434,6 +467,7 @@
 .moduleFooterActions,
 .completionActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
@@ -553,24 +587,22 @@
 }
 
 .lessonActions {
-  position: sticky;
-  bottom: 10px;
-  z-index: 5;
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: space-between;
   margin-top: 18px;
-  padding: 12px;
-  border: 1px solid var(--pm-line);
-  border-radius: 999px;
-  background: rgb(251 247 240 / 94%);
-  box-shadow: var(--pm-shadow-md);
-  backdrop-filter: blur(9px);
+  padding: 10px;
+  border: 1px solid rgb(23 73 63 / 14%);
+  border-radius: 20px;
+  background: rgb(255 254 251 / 95%);
+  box-shadow: 0 14px 38px rgb(15 51 43 / 14%);
+  backdrop-filter: blur(12px);
 }
 
 .lessonActions .primaryAction,
 .lessonActions .secondaryAction {
   min-width: 170px;
+  min-height: 48px;
 }
 
 .completionCard {
@@ -709,16 +741,25 @@
   }
 
   .lessonActions {
-    bottom: 6px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
     border-radius: var(--pm-radius-md);
   }
 
   .lessonActions .primaryAction,
   .lessonActions .secondaryAction {
-    flex: 1 1 0;
+    width: 100%;
     min-width: 0;
     padding-right: 11px;
     padding-left: 11px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .lessonActions > :only-child {
+    grid-column: 1 / -1;
   }
 
   .completionActions,

@@ -5,6 +5,12 @@
     "lead": "Retrouve les nombres autour de toi et avance par petites activités. Ta place est enregistrée sur cet appareil.",
     "published": "{{count}} leçon disponible aujourd’hui"
   },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "Je t’accompagne dans ce parcours, à ton rythme. On commence quand tu veux !",
+    "lessonTip": "Prends ton temps. Je reste près de toi pendant cette première étape.",
+    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+  },
   "status": {
     "not-started": "À commencer",
     "in-progress": "En cours",

@@ -1,0 +1,114 @@
+.guide {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  width: min(100%, 620px);
+  margin-top: 20px;
+}
+
+.medallion {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  overflow: hidden;
+  width: 66px;
+  height: 66px;
+  border: 3px solid var(--pm-surface);
+  border-radius: 50%;
+  background: var(--pm-surface-warm);
+  box-shadow:
+    0 0 0 2px rgb(226 118 43 / 38%),
+    0 8px 20px rgb(15 51 43 / 14%);
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bubble {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 11px 14px;
+  border: 1px solid rgb(23 73 63 / 13%);
+  border-radius: var(--pm-radius-signature);
+  background: rgb(255 255 255 / 91%);
+  color: var(--pm-ink-soft);
+  font-size: 14px;
+  line-height: 1.42;
+  box-shadow: var(--pm-shadow-sm);
+}
+
+.bubble::before {
+  position: absolute;
+  top: 22px;
+  left: -6px;
+  width: 11px;
+  height: 11px;
+  border-bottom: 1px solid rgb(23 73 63 / 13%);
+  border-left: 1px solid rgb(23 73 63 / 13%);
+  background: var(--pm-surface);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.name {
+  display: block;
+  margin-bottom: 1px;
+  color: var(--pm-brand);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.message {
+  display: block;
+}
+
+.compact {
+  width: min(100%, 540px);
+  margin-right: auto;
+  margin-left: auto;
+  text-align: left;
+}
+
+.compact .medallion {
+  width: 56px;
+  height: 56px;
+}
+
+.compact .bubble {
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.compact .bubble::before {
+  top: 18px;
+}
+
+@media (max-width: 560px) {
+  .guide {
+    gap: 10px;
+  }
+
+  .medallion,
+  .compact .medallion {
+    width: 52px;
+    height: 52px;
+  }
+
+  .bubble,
+  .compact .bubble {
+    padding: 9px 11px;
+    font-size: 12.5px;
+  }
+
+  .bubble::before,
+  .compact .bubble::before {
+    top: 17px;
+  }
+}

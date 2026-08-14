@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
+import { YambaGuide } from "../components/YambaGuide";
 import {
   getCoursePrimaryAction,
   getCourseProgress,
@@ -37,6 +39,7 @@ export function PrimaryTwoCoursePage() {
           <h1 id="primary-two-title">{t("course.title")}</h1>
           <p className={baseStyles.lead}>{t("course.lead")}</p>
           <p className={styles.publishedNote}>{t("course.published", { count: 1 })}</p>
+          <YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />
         </div>
 
         <div className={baseStyles.overallProgress}>
@@ -65,8 +68,8 @@ export function PrimaryTwoCoursePage() {
             <span style={{ width: `${summary.percentage}%` }} />
           </div>
           <Link className={baseStyles.primaryAction} to={actionHref(primaryAction)}>
+            <CourseActionIcon className={baseStyles.actionIcon} name={primaryAction.type} />
             {t(`actions.${primaryAction.type}`)}
-            <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
@@ -125,8 +128,11 @@ export function PrimaryTwoCoursePage() {
                   ) : null}
                 </div>
                 <Link className={baseStyles.cardAction} to={modulePath(module.id)}>
+                  <CourseActionIcon
+                    className={baseStyles.actionIcon}
+                    name={state ?? "view"}
+                  />
                   {state ? t(`moduleActions.${state}`) : t("moduleActions.view")}
-                  <span aria-hidden="true">→</span>
                 </Link>
               </article>
             );

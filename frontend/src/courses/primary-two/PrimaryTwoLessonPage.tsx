@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
+import { YambaGuide } from "../components/YambaGuide";
 import { isPublished } from "../course-engine/course-model";
 import { useCourseProgress } from "../course-engine/useCourseProgress";
 import baseStyles from "../primary-one/PrimaryOneCourse.module.css";
@@ -43,6 +45,7 @@ export function PrimaryTwoLessonPage() {
       <div className={baseStyles.missingPage}>
         <h1>{t("errors.lessonNotFound")}</h1>
         <Link className={baseStyles.secondaryAction} to={PRIMARY_TWO_BASE_PATH}>
+          <CourseActionIcon className={baseStyles.actionIcon} name="return-to-modules" />
           {t("actions.backToCourse")}
         </Link>
       </div>
@@ -58,7 +61,8 @@ export function PrimaryTwoLessonPage() {
           <h1>{t("lesson.contentUnavailableTitle")}</h1>
           <p>{t("lesson.contentUnavailableMessage")}</p>
           <Link className={baseStyles.secondaryAction} to={modulePath(module.id)}>
-            ← {t("lesson.back")}
+            <CourseActionIcon className={baseStyles.actionIcon} name="back" />
+            {t("lesson.back")}
           </Link>
         </section>
       </div>
@@ -78,9 +82,15 @@ export function PrimaryTwoLessonPage() {
           <h1>{t("lessonComplete.title")}</h1>
           <p>{t("lessonComplete.message")}</p>
           <p className={styles.nextComing}>{t("lessonComplete.nextComing")}</p>
+          <YambaGuide
+            compact
+            name={t("yamba.name")}
+            message={t("yamba.lessonComplete")}
+          />
           <div className={baseStyles.completionActions}>
             <Link className={baseStyles.primaryAction} to={modulePath(module.id)}>
-              {t("lessonComplete.backToModule")} <span aria-hidden="true">→</span>
+              <CourseActionIcon className={baseStyles.actionIcon} name="back" />
+              {t("lessonComplete.backToModule")}
             </Link>
           </div>
         </section>
@@ -113,6 +123,9 @@ export function PrimaryTwoLessonPage() {
           <p><strong>{t("lesson.objectiveLabel")} :</strong> {t("lesson.objective")}</p>
           <p>{t("lesson.situation")}</p>
         </div>
+        {safeStepIndex === 0 ? (
+          <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonTip")} />
+        ) : null}
         <div className={baseStyles.stepProgressLine}>
           <strong>
             {t("lesson.stepProgress", {
@@ -146,7 +159,8 @@ export function PrimaryTwoLessonPage() {
 
       <div className={`${baseStyles.lessonActions} ${styles.lessonActions}`}>
         <Link className={baseStyles.secondaryAction} to={modulePath(module.id)}>
-          ← {t("lesson.back")}
+          <CourseActionIcon className={baseStyles.actionIcon} name="back" />
+          {t("lesson.back")}
         </Link>
         {stepCompleted ? (
           <button
@@ -154,8 +168,8 @@ export function PrimaryTwoLessonPage() {
             type="button"
             onClick={() => setView(nextStep?.id ?? "done")}
           >
+            <CourseActionIcon className={baseStyles.actionIcon} name="continue" />
             {nextStep ? t("lesson.continue") : t("lesson.finish")}
-            <span aria-hidden="true">→</span>
           </button>
         ) : null}
       </div>

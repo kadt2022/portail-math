@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
 import { getModuleItems, type CourseItem } from "../course-engine/course-model";
 import {
   getLearningState,
@@ -68,7 +69,8 @@ function LearningCard({ item, index, progress }: LearningCardProps) {
       </div>
       {state ? (
         <Link className={baseStyles.cardAction} to={lessonPath(item.moduleId, item.id)}>
-          {t(`moduleActions.${state}`)} <span aria-hidden="true">→</span>
+          <CourseActionIcon className={baseStyles.actionIcon} name={state} />
+          {t(`moduleActions.${state}`)}
         </Link>
       ) : (
         <span className={styles.unavailableLabel}>{t("status.coming-soon")}</span>
@@ -88,6 +90,7 @@ export function PrimaryTwoModulePage() {
       <div className={baseStyles.missingPage}>
         <h1>{t("errors.moduleNotFound")}</h1>
         <Link className={baseStyles.secondaryAction} to={PRIMARY_TWO_BASE_PATH}>
+          <CourseActionIcon className={baseStyles.actionIcon} name="return-to-modules" />
           {t("actions.backToCourse")}
         </Link>
       </div>
@@ -161,7 +164,8 @@ export function PrimaryTwoModulePage() {
 
       <div className={baseStyles.moduleFooterActions}>
         <Link className={baseStyles.secondaryAction} to={PRIMARY_TWO_BASE_PATH}>
-          ← {t("actions.backToCourse")}
+          <CourseActionIcon className={baseStyles.actionIcon} name="return-to-modules" />
+          {t("actions.backToCourse")}
         </Link>
       </div>
     </div>

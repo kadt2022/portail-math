@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { CourseActionIcon } from "../components/CourseActionIcon";
+import { YambaGuide } from "../components/YambaGuide";
 import {
   getAllLearningItems,
   getLearningItem,
@@ -41,6 +43,7 @@ export function PrimaryOneLessonPage() {
       <div className={styles.missingPage}>
         <h1>{t("errors.lessonNotFound")}</h1>
         <Link className={styles.secondaryAction} to={PRIMARY_ONE_BASE_PATH}>
+          <CourseActionIcon className={styles.actionIcon} name="return-to-modules" />
           {t("actions.backToCourse")}
         </Link>
       </div>
@@ -78,12 +81,19 @@ export function PrimaryOneLessonPage() {
               : t("lessonComplete.title")}
           </h1>
           <p>{t("lessonComplete.message")}</p>
+          <YambaGuide
+            compact
+            name={t("yamba.name")}
+            message={t("yamba.lessonComplete")}
+          />
           <div className={styles.completionActions}>
             <Link className={styles.secondaryAction} to={modulePath(module.id)}>
+              <CourseActionIcon className={styles.actionIcon} name="back" />
               {t("lessonComplete.backToModule")}
             </Link>
             <Link className={styles.primaryAction} to={primaryHref}>
-              {t(primaryLabel)} <span aria-hidden="true">→</span>
+              <CourseActionIcon className={styles.actionIcon} name="continue" />
+              {t(primaryLabel)}
             </Link>
           </div>
         </section>
@@ -123,6 +133,9 @@ export function PrimaryOneLessonPage() {
             <span className={`${styles.status} ${styles.completed}`}>{t("status.completed")}</span>
           ) : null}
         </div>
+        {safeStepIndex === 0 ? (
+          <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonTip")} />
+        ) : null}
         <div className={styles.stepProgressLine}>
           <strong>
             {t("lesson.stepProgress", {
@@ -161,15 +174,16 @@ export function PrimaryOneLessonPage() {
 
       <div className={styles.lessonActions}>
         <Link className={styles.secondaryAction} to={modulePath(module.id)}>
-          ← {t("lesson.back")}
+          <CourseActionIcon className={styles.actionIcon} name="back" />
+          {t("lesson.back")}
         </Link>
         <button className={styles.primaryAction} type="button" onClick={continueLesson}>
+          <CourseActionIcon className={styles.actionIcon} name="continue" />
           {nextStep
             ? t("lesson.continue")
             : item.kind === "evaluation"
               ? t("lesson.finishEvaluation")
               : t("lesson.finish")}
-          <span aria-hidden="true">→</span>
         </button>
       </div>
     </div>
