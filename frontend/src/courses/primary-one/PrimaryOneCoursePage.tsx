@@ -24,7 +24,7 @@ function actionHref(action: CoursePrimaryAction) {
   if (action.type === "next-module") {
     return modulePath(action.moduleId);
   }
-  if (action.itemId) {
+  if ("itemId" in action && action.itemId) {
     return lessonPath(action.moduleId, action.itemId);
   }
   return modulePath(action.moduleId);

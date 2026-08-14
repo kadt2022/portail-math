@@ -1,0 +1,110 @@
+{
+  "course": {
+    "eyebrow": "Mathematics learning path",
+    "title": "2nd year of primary",
+    "lead": "Find numbers around you and move forward through short activities. Your place is saved on this device.",
+    "published": "{{count}} lesson available today"
+  },
+  "status": {
+    "not-started": "Not started",
+    "in-progress": "In progress",
+    "completed": "Completed",
+    "coming-soon": "Coming soon"
+  },
+  "progress": {
+    "overall": "My overall progress",
+    "lessons": "{{completed}} / {{total}} lessons",
+    "moduleLessons": "{{completed}} / {{total}} lessons",
+    "plannedLessons": "{{total}} lessons planned",
+    "module": "Module {{number}} progress",
+    "steps": "{{completed}} / {{total}} steps completed",
+    "item": "Progress for {{title}}"
+  },
+  "actions": {
+    "start": "Start my learning path",
+    "resume": "Resume the lesson",
+    "next-lesson": "Next lesson",
+    "next-module": "Next module",
+    "return-to-modules": "Back to my modules",
+    "review": "Review",
+    "backToCourse": "Back to the course"
+  },
+  "moduleActions": {
+    "not-started": "Start",
+    "in-progress": "Resume",
+    "completed": "Review",
+    "view": "View module"
+  },
+  "modules": {
+    "eyebrow": "10 modules · 40 lessons",
+    "title": "My 2nd year learning path",
+    "orderHint": "Each published lesson advances the counter across all 40 planned lessons.",
+    "number": "Module {{number}}",
+    "m1": { "title": "I revisit numbers" },
+    "m2": { "title": "Tens and numbers up to 100" },
+    "m3": { "title": "I add using strategies" },
+    "m4": { "title": "I subtract and check" },
+    "m5": { "title": "Equal groups and multiplication" },
+    "m6": { "title": "I share fairly" },
+    "m7": { "title": "Money and small purchases" },
+    "m8": { "title": "I measure and estimate" },
+    "m9": { "title": "Shapes, solids and symmetry" },
+    "m10": { "title": "Time, calendar and problems" }
+  },
+  "module": {
+    "referenceLead": "Start by counting to 20. The other three lessons and the assessment will be published later.",
+    "pendingLead": "This module is planned. Its activities will be added after educational review.",
+    "pathEyebrow": "Small steps",
+    "pathTitle": "Module lessons",
+    "pathHint": "Coming-soon content never creates progress."
+  },
+  "lessons": {
+    "number": "Lesson {{number}}",
+    "plannedTitle": "Teaching title to be confirmed",
+    "l1": { "title": "I count to 20" },
+    "l2": { "title": "Before, after, between" },
+    "l3": { "title": "I compare" },
+    "l4": { "title": "I order and explain" }
+  },
+  "evaluation": {
+    "label": "Module assessment",
+    "title": "Module assessment"
+  },
+  "steps": {
+    "discover": "I discover",
+    "manipulate": "I explore",
+    "understand": "I understand",
+    "practice": "I practise",
+    "play": "I play",
+    "remember": "I remember"
+  },
+  "breadcrumbs": {
+    "label": "Course breadcrumb",
+    "course": "2nd year of primary"
+  },
+  "lesson": {
+    "label": "Lesson",
+    "objectiveLabel": "My goal",
+    "objective": "I can count a collection without missing or counting anything twice.",
+    "duration": "About 25 minutes",
+    "situation": "The class is preparing 18 seeds for a game.",
+    "stepProgress": "Step {{current}} of {{total}} — {{label}}",
+    "progressLabel": "Lesson progress",
+    "back": "Back to module",
+    "continue": "Continue",
+    "finish": "Finish the lesson",
+    "contentUnavailableTitle": "Content coming soon in English",
+    "contentUnavailableMessage": "The interactive lesson is currently published in French. Its English version will be added after educational review."
+  },
+  "lessonComplete": {
+    "eyebrow": "Lesson completed",
+    "title": "Well done! You can count without losing your place.",
+    "message": "Your progress is saved: 1 completed lesson out of 40 planned.",
+    "nextComing": "The next lesson is coming soon and cannot be started yet.",
+    "backToModule": "Back to my modules"
+  },
+  "errors": {
+    "moduleNotFound": "This module does not exist.",
+    "lessonNotFound": "This lesson is not available."
+  }
+}

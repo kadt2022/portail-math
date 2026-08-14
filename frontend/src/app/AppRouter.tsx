@@ -4,6 +4,9 @@ import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
 import { PrimaryOneCoursePage } from "../courses/primary-one/PrimaryOneCoursePage";
 import { PrimaryOneLessonPage } from "../courses/primary-one/PrimaryOneLessonPage";
 import { PrimaryOneModulePage } from "../courses/primary-one/PrimaryOneModulePage";
+import { PrimaryTwoCoursePage } from "../courses/primary-two/PrimaryTwoCoursePage";
+import { PrimaryTwoLessonPage } from "../courses/primary-two/PrimaryTwoLessonPage";
+import { PrimaryTwoModulePage } from "../courses/primary-two/PrimaryTwoModulePage";
 import { DashboardPage } from "../dashboard/DashboardPage";
 import {
   ExetatCataloguePage,
@@ -56,6 +59,18 @@ export function AppRouter() {
           <Route
             path="apprentissages/primaire/1/mathematiques/modules/:moduleId/lecons/:lessonId"
             element={<PrimaryOneLessonPage />}
+          />
+          <Route
+            path="apprentissages/primaire/2/mathematiques"
+            element={<PrimaryTwoCoursePage />}
+          />
+          <Route
+            path="apprentissages/primaire/2/mathematiques/modules/:moduleId"
+            element={<PrimaryTwoModulePage />}
+          />
+          <Route
+            path="apprentissages/primaire/2/mathematiques/modules/:moduleId/lecons/:lessonId"
+            element={<PrimaryTwoLessonPage />}
           />
           {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route
