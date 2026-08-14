@@ -11,14 +11,39 @@
   z-index: 1;
   flex: 0 0 auto;
   overflow: hidden;
-  width: 66px;
-  height: 66px;
+  width: 84px;
+  height: 84px;
   border: 3px solid var(--pm-surface);
   border-radius: 50%;
   background: var(--pm-surface-warm);
   box-shadow:
     0 0 0 2px rgb(226 118 43 / 38%),
     0 8px 20px rgb(15 51 43 / 14%);
+  transform-origin: 50% 68%;
+  animation: yambaServo 5.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.medallion::after {
+  position: absolute;
+  z-index: 2;
+  top: -18px;
+  right: 8%;
+  left: 8%;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    rgb(134 232 241 / 0%),
+    rgb(134 232 241 / 42%),
+    rgb(255 255 255 / 58%),
+    rgb(134 232 241 / 0%)
+  );
+  box-shadow: 0 0 12px rgb(79 205 220 / 28%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  animation: yambaScan 5.8s ease-in-out infinite;
 }
 
 .portrait {
@@ -26,6 +51,60 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+@keyframes yambaServo {
+  0%,
+  60%,
+  78%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgb(226 118 43 / 38%),
+      0 8px 20px rgb(15 51 43 / 14%);
+    transform: translateY(0) rotate(0);
+  }
+
+  65% {
+    box-shadow:
+      0 0 0 3px rgb(95 211 224 / 35%),
+      0 0 20px rgb(95 211 224 / 27%),
+      0 10px 23px rgb(15 51 43 / 16%);
+    transform: translateY(-2px) rotate(-1.4deg);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 3px rgb(95 211 224 / 24%),
+      0 0 14px rgb(95 211 224 / 18%),
+      0 9px 21px rgb(15 51 43 / 15%);
+    transform: translateY(-2px) rotate(0.8deg);
+  }
+
+  74% {
+    box-shadow:
+      0 0 0 2px rgb(226 118 43 / 38%),
+      0 8px 20px rgb(15 51 43 / 14%);
+    transform: translateY(-1px) rotate(-0.35deg);
+  }
+}
+
+@keyframes yambaScan {
+  0%,
+  58%,
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  62% {
+    opacity: 0.72;
+  }
+
+  76% {
+    opacity: 0.18;
+    transform: translateY(112px);
+  }
 }
 
 .bubble {
@@ -44,7 +123,7 @@
 
 .bubble::before {
   position: absolute;
-  top: 22px;
+  top: 30px;
   left: -6px;
   width: 11px;
   height: 11px;
@@ -77,8 +156,8 @@
 }
 
 .compact .medallion {
-  width: 56px;
-  height: 56px;
+  width: 68px;
+  height: 68px;
 }
 
 .compact .bubble {
@@ -87,7 +166,7 @@
 }
 
 .compact .bubble::before {
-  top: 18px;
+  top: 23px;
 }
 
 @media (max-width: 560px) {
@@ -97,8 +176,8 @@
 
   .medallion,
   .compact .medallion {
-    width: 52px;
-    height: 52px;
+    width: 74px;
+    height: 74px;
   }
 
   .bubble,
@@ -109,6 +188,17 @@
 
   .bubble::before,
   .compact .bubble::before {
-    top: 17px;
+    top: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medallion {
+    animation: none;
+  }
+
+  .medallion::after {
+    display: none;
+    animation: none;
   }
 }
