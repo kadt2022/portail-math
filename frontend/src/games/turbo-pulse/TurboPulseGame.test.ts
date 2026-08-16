@@ -30,6 +30,7 @@ interface SceneInternals {
   spawnArrival(now: number): void;
   scheduleCompletion(): void;
   emitSnapshot(): void;
+  cannonBadge?: { text: string };
 }
 
 function internalsOf(scene: TurboPulseScene): SceneInternals {
@@ -48,9 +49,16 @@ const games: Phaser.Game[] = [];
  * de `create()` (différence de timing du bootstrap Phaser dans cet
  * environnement, sans rapport avec la logique de jeu) : `restartRun()`
  * s'arrête donc sur son garde-fou `isActive()` lors de ce tout premier appel
- * automatique. On attend que la scène soit active puis on relance nous-mêmes
- * `restartRun()` — exactement l'action qu'exécute le bouton « Recommencer »
- * une fois la partie chargée.
+ * automatique. Pire, une frame update() isolée peut s'exécuter dans cette
+ * fenêtre avant même notre restartRun() explicite (scène active mais niveau
+ * pas encore démarré) : ensureSafetyStock()/ensureTarget() créent alors des
+ * fruits temporaires et émettent un instantané parasite — un simple
+ * "au moins un instantané est arrivé" n'est donc plus un signal fiable
+ * (c'est justement ce que corrige ce fichier : setTarget() publie désormais
+ * chaque changement). On relance systématiquement restartRun() ici — il
+ * repart proprement d'un niveau 0 à 3 fruits quoi qu'il se soit passé avant
+ * — et on attend ce marqueur fiable (remainingFruits === 3, garanti par
+ * createStartingFruitSpecs) plutôt qu'un simple compteur d'instantanés.
  */
 async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
   const parent = document.createElement("div");
@@ -67,8 +75,8 @@ async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboP
   });
   games.push(game);
   await vi.waitFor(() => expect(scene.scene.isActive()).toBe(true), { timeout: 5000 });
-  if (snapshots.length === 0) scene.restartRun();
-  await vi.waitFor(() => expect(snapshots.length).toBeGreaterThan(0), { timeout: 5000 });
+  scene.restartRun();
+  await vi.waitFor(() => expect(lastSnapshot(snapshots)?.remainingFruits).toBe(3), { timeout: 5000 });
   return { scene, snapshots };
 }
 
@@ -474,6 +482,75 @@ describe("scène Turbo Pulse", () => {
     internals.spawnArrival(0);
 
     expect(internals.fruits.length).toBeGreaterThan(avant);
+  });
+
+  // Régression : le fruit ciblé peut disparaître entre deux instantanés
+  // (intrusion, arrivée qui le remplace...). ensureTarget() choisit alors une
+  // nouvelle cible en cours de frame, via update() — un enfant ne doit jamais
+  // voir « À résoudre » indiquer un calcul différent de celui affiché sur le
+  // piston Phaser ou de celui réellement validé par les tirs.
+  it("republie immédiatement le nouveau calcul quand le fruit ciblé disparaît en cours de frame", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    const ancienResultat = internals.operation.result;
+    const nombreInstantanesAvant = snapshots.length;
+
+    // Le fruit ciblé n'existe plus parmi les fruits présents : ensureTarget()
+    // doit constater l'absence et retargeter dès le prochain update().
+    internals.fruits = internals.fruits.filter((fruit) => fruit.spec.number !== ancienResultat);
+    internals.fruits.push(fakeFruit(ancienResultat + 37));
+
+    scene.update(1000, 16);
+
+    expect(snapshots.length).toBeGreaterThan(nombreInstantanesAvant);
+    const snapshot = lastSnapshot(snapshots);
+    const nouveauResultat = internals.operation.result;
+    expect(nouveauResultat).not.toBe(ancienResultat);
+    // HUD React, piston Phaser et validation des tirs partagent la même
+    // source (this.operation) : les trois doivent afficher exactement le
+    // même calcul dès qu'il change, sans attendre un futur évènement de jeu.
+    // La réponse elle-même reste volontairement absente du texte affiché
+    // (voir formatOperation) : on ne vérifie donc que l'égalité stricte des
+    // deux affichages, jamais la présence du résultat caché.
+    expect(snapshot.operation).toBe(internals.cannonBadge!.text);
+  });
+
+  it("garde le HUD, le piston et la validation des tirs synchronisés sur un parcours complet", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+
+    function assertSynchronise() {
+      const snapshot = lastSnapshot(snapshots);
+      // La réponse reste cachée dans le texte affiché : seule l'égalité
+      // stricte HUD/piston prouve la synchronisation, jamais son contenu.
+      expect(snapshot.operation).toBe(internals.cannonBadge!.text);
+      expect(snapshot.operation).toMatch(/= \?$/);
+    }
+
+    // démarrage
+    assertSynchronise();
+
+    // bonne réponse (peut déclencher un combo selon les fruits de départ)
+    const cible = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+    internals.correctHit(cible);
+    assertSynchronise();
+
+    // nouveau calcul provoqué par la disparition du fruit ciblé pendant une frame
+    const resultatCourant = internals.operation.result;
+    internals.fruits = internals.fruits.filter((fruit) => fruit.spec.number !== resultatCourant);
+    internals.fruits.push(fakeFruit(resultatCourant + 41));
+    scene.update(2000, 16);
+    assertSynchronise();
+
+    // resize (refreshLayout ne doit ni recréer la scène ni désynchroniser l'affichage)
+    scene.refreshLayout();
+    assertSynchronise();
+
+    // pause/reprise
+    scene.togglePause();
+    assertSynchronise();
+    scene.togglePause();
+    assertSynchronise();
   });
 });
 
