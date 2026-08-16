@@ -1,0 +1,260 @@
+.page {
+  --turbo-navy: #0d2634;
+  --turbo-deep: #071921;
+  --turbo-teal: #1d645f;
+  --turbo-mint: #9bd7b1;
+  --turbo-gold: #ffc857;
+  --turbo-cream: #fff7dc;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  width: 100%;
+  min-width: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 82% -10%, rgb(54 145 140 / 45%), transparent 36%),
+    linear-gradient(145deg, var(--turbo-navy), var(--turbo-deep));
+  color: var(--turbo-cream);
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) auto minmax(110px, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; text-align: left; justify-self: start; margin-left: clamp(4px, 1vw, 12px); }
+.brandMark { display: grid; width: 46px; height: 46px; place-items: center; border: 2px solid #ffe59b; border-radius: 16px 5px 16px 5px; background: var(--turbo-gold); color: var(--turbo-navy); font-size: 25px; box-shadow: 0 5px 0 #9f6c14; }
+.brand h1 { margin: 0; color: #fff; font-size: clamp(20px, 2.3vw, 31px); letter-spacing: -0.035em; white-space: nowrap; }
+.brand p { margin: 2px 0 0; color: var(--turbo-mint); font-size: clamp(10px, 1.2vw, 14px); font-weight: 750; text-transform: uppercase; letter-spacing: 0.1em; }
+
+.exitButton,
+.soundButton,
+.pauseButton,
+.fullscreenButton,
+.restartButton,
+.primaryAction,
+.dangerAction {
+  min-height: 48px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.exitButton,
+.soundButton,
+.pauseButton,
+.fullscreenButton { display: inline-flex; align-items: center; gap: 8px; width: max-content; padding: 8px 14px; border: 1px solid rgb(255 255 255 / 18%); background: rgb(255 255 255 / 8%); color: #fff; }
+.exitButton:hover,
+.soundButton:hover,
+.pauseButton:hover,
+.fullscreenButton:hover { background: rgb(255 255 255 / 14%); }
+.exitButton:active,
+.soundButton:active,
+.pauseButton:active,
+.fullscreenButton:active,
+.restartButton:active,
+.primaryAction:active,
+.dangerAction:active { transform: translateY(3px); box-shadow: none; }
+.pauseButton[aria-pressed="true"] { background: rgb(255 200 87 / 24%); border-color: rgb(255 200 87 / 55%); }
+
+.topbarActions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+
+.statusBar {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) auto;
+  align-items: center;
+  gap: clamp(10px, 2vw, 24px);
+  padding: 9px 14px;
+  border: 1px solid rgb(155 215 177 / 20%);
+  border-radius: 18px;
+  background: rgb(4 22 29 / 68%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 7%);
+}
+
+.levelBlock { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.levelBlock span,
+.progressLabels span,
+.stats dt { color: #9fc8be; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.levelBlock strong { color: var(--turbo-gold); font-size: 16px; }
+.progressBlock { min-width: 0; }
+.progressLabels { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progressLabels strong { color: #fff; font-size: 12px; }
+.progressTrack { height: 9px; overflow: hidden; border-radius: 999px; background: rgb(255 255 255 / 12%); }
+.progressTrack span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f2a93b, var(--turbo-gold)); transition: width 220ms ease; }
+.stats { display: flex; gap: 8px; margin: 0; }
+.stats div { min-width: 73px; padding: 5px 9px; border-radius: 12px; background: rgb(255 255 255 / 7%); text-align: center; }
+.stats dt { margin: 0; font-size: 9px; }
+.stats dd { margin: 1px 0 0; color: #fff; font-size: 14px; font-weight: 900; }
+
+.playArea { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; padding-top: 8px; }
+/* height:100% reprend la hauteur déjà correctement calculée par la grille
+   (ligne 1fr de .playArea) ; width reste "auto" et se déduit de cette
+   hauteur via aspect-ratio, donc le ratio 16/9 est toujours respecté. Sans
+   cela (width fixe + aspect-ratio seul), sur une fenêtre large mais peu
+   haute, la hauteur déduite de la largeur dépassait l'espace disponible et
+   chevauchait la barre de statut ou la mission. max-width/max-height
+   plafonnent chaque axe (mêmes proportions, 1100px * 9/16) pour retrouver la
+   taille d'origine dès que la place le permet. */
+.canvasFrame { position: relative; width: auto; height: 100%; max-width: min(100%, 1100px); max-height: min(100%, calc(1100px * 9 / 16)); min-width: 0; aspect-ratio: 16 / 9; align-self: center; justify-self: center; overflow: hidden; border: 3px solid #d5bd80; border-radius: clamp(16px, 2.4vw, 30px); background: #123d55; box-shadow: 0 14px 36px rgb(0 0 0 / 42%), inset 0 0 0 2px rgb(255 255 255 / 24%); }
+.gameHost { position: absolute; inset: 0; touch-action: none; }
+.gameHost canvas { display: block; width: 100% !important; height: 100% !important; touch-action: none; }
+.operation { position: absolute; top: 10px; left: 50%; z-index: 6; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 7px 17px; border: 2px solid rgb(255 255 255 / 72%); border-radius: 16px 5px 16px 5px; background: rgb(7 25 33 / 90%); box-shadow: 0 7px 16px rgb(0 0 0 / 28%); transform: translateX(-50%); pointer-events: none; white-space: nowrap; }
+.operation span { color: var(--turbo-mint); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em; }
+.operation strong { color: #fff; font-size: clamp(20px, 3.3vw, 30px); }
+
+/* Commandes affichées uniquement en plein écran, ancrées dans le bandeau HUD
+   réservé côté Phaser (voir HUD_SAFE_TOP dans turbo-pulse-engine.ts) : elles
+   ne recouvrent donc jamais une trajectoire de fruit possible. */
+.mission { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; width: min(100%, 1100px); justify-self: center; margin-top: 7px; padding: 7px 10px; border-radius: 16px; background: rgb(255 255 255 / 8%); }
+.missionIcon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 13px; background: var(--turbo-gold); color: var(--turbo-navy); font-size: 21px; }
+.mission strong { color: #fff; font-size: 13px; }
+.mission p { margin: 2px 0 0; color: #b8d4cd; font-size: clamp(11px, 1.15vw, 13px); line-height: 1.25; }
+.restartButton { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; background: var(--turbo-cream); color: var(--turbo-navy); box-shadow: 0 4px 0 #9b8657; }
+.footerHint { display: flex; justify-content: center; gap: 7px; padding-top: 4px; color: #9fc8be; font-size: 11px; text-align: center; }
+
+/* Panneau de pause : volontairement plus léger qu'échec/réussite (pas de
+   flou ni de grand encart) — juste de quoi confirmer que le jeu est figé. */
+.pauseBackdrop { position: absolute; inset: 0; z-index: 11; display: grid; place-items: center; padding: 18px; background: rgb(4 18 24 / 55%); }
+.pauseCard { width: min(360px, 92%); padding: clamp(16px, 3vw, 24px); border: 3px solid var(--turbo-gold); border-radius: 22px 8px 22px 8px; background: #fffaf0; color: #153541; text-align: center; box-shadow: 0 16px 34px rgb(0 0 0 / 38%); }
+.pauseCard h2 { margin: 0 0 8px; color: #17493f; font-size: clamp(20px, 3.4vw, 28px); }
+.pauseCard p { margin: 0 0 4px; font-size: clamp(13px, 1.8vw, 16px); line-height: 1.35; }
+
+.modalBackdrop { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 18px; background: rgb(4 18 24 / 78%); backdrop-filter: blur(5px); }
+.modal { width: min(510px, 96%); max-height: 96%; overflow: auto; padding: clamp(18px, 3.8vw, 30px); border: 4px solid var(--turbo-gold); border-radius: 28px 8px 28px 8px; background: #fffaf0; color: #153541; text-align: center; box-shadow: 0 24px 54px rgb(0 0 0 / 45%); }
+.failureModal { border-color: #e65d58; }
+.modalIcon { display: inline-grid; width: 58px; height: 58px; place-items: center; border-radius: 19px 6px 19px 6px; background: #f8e2aa; font-size: 31px; }
+.failureModal .modalIcon { background: #fde1dd; }
+.modalEyebrow { margin: 10px 0 4px !important; color: #7e6a38; font-size: 11px !important; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
+.modal h2 { margin: 0 0 8px; color: #17493f; font-size: clamp(23px, 4vw, 36px); }
+.failureModal h2 { color: #9f302d; }
+.modal p { margin: 7px 0; font-size: clamp(14px, 2vw, 18px); line-height: 1.35; }
+.modalDetail,
+.attemptNote,
+.nextPreview { padding: 10px 12px; border-radius: 14px; background: #edf6f1; }
+.attemptNote { color: #7c2a27; background: #fff0ed; font-weight: 800; }
+.nextPreview { display: flex; flex-direction: column; gap: 3px; margin: 13px 0; }
+.primaryAction,
+.dangerAction { margin-top: 12px; padding: 11px 24px; background: var(--turbo-teal); color: #fff; box-shadow: 0 6px 0 #0e413c; }
+.dangerAction { background: #cf4e49; box-shadow: 0 6px 0 #842f2b; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Plein écran : le jeu occupe tout le viewport en dessous du header. Le header
+   reste visible pour les commandes (Quitter, Pause, Son, Plein écran). Les
+   dimensions de la fenêtre changent mais Phaser n'est jamais recréé. */
+.fullscreen { padding: 0; background: #000; }
+.fullscreen .topbar { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.fullscreen .playArea { padding-top: 8px; }
+.fullscreen .canvasFrame { border-width: 0; border-radius: 0; box-shadow: none; }
+.fullscreen .footerHint { display: none; }
+
+@media (max-width: 720px) {
+  .page { padding-inline: max(6px, env(safe-area-inset-left)) max(6px, env(safe-area-inset-right)); }
+  .topbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 7px; min-height: 50px; }
+  .brand { justify-self: start; margin-left: 4px; }
+  .brandMark { width: 36px; height: 36px; border-radius: 12px 4px 12px 4px; font-size: 20px; box-shadow: 0 3px 0 #9f6c14; }
+  .brand h1 { font-size: clamp(17px, 5vw, 22px); }
+  .brand p { display: none; }
+  .topbarActions { gap: 6px; }
+  .exitButton,
+  .soundButton,
+  .pauseButton,
+  .fullscreenButton { min-width: 48px; min-height: 48px; justify-content: center; padding: 8px; }
+  .exitButton span:last-child,
+  .soundButton span:last-child,
+  .pauseButton span:last-child,
+  .fullscreenButton span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .statusBar { grid-template-columns: auto minmax(100px, 1fr); gap: 7px; padding: 6px 8px; border-radius: 14px; }
+  .stats { grid-column: 1 / -1; width: 100%; justify-content: space-between; }
+  .stats div { flex: 1; min-width: 0; padding-block: 3px; }
+  /* En dessous de 720px, la largeur redevient la contrainte pilote (comme
+     avant) : on annule height/max-height pour ne pas entrer en conflit avec
+     width (les deux ne doivent jamais être définis en même temps, sous
+     peine de casser le ratio 16/9 et d'étirer le canvas Phaser). */
+  .canvasFrame { width: 100%; height: auto; max-height: none; border-width: 2px; }
+  .mission { grid-template-columns: auto minmax(0, 1fr) auto; gap: 7px; padding: 5px 7px; }
+  .missionIcon { width: 34px; height: 34px; }
+  .mission p { display: none; }
+  .restartButton { min-width: 48px; padding: 7px 9px; font-size: 0; }
+  .restartButton span { font-size: 22px; }
+  .footerHint { font-size: 10px; }
+}
+
+/* En paysage (téléphones ou desktop) : la scène Phaser domine à gauche,
+   infos à droite. Ce layout s'applique dès que l'orientation est paysage,
+   sans limite de hauteur (fullscreen sur grand écran inclus). */
+@media (orientation: landscape) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) minmax(148px, 26%);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "top top" "game info" "game mission";
+    column-gap: 8px;
+    padding-top: max(4px, env(safe-area-inset-top));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+  .topbar { grid-area: top; min-height: 38px; }
+  .brandMark { width: 32px; height: 32px; }
+  .brand p,
+  .footerHint { display: none; }
+
+  /* .playArea disparaît de la boîte (display:contents) : ses deux enfants
+     (.canvasFrame et .mission) deviennent des items directs de la grille de
+     .page et peuvent donc rejoindre des zones nommées distinctes. */
+  .playArea { display: contents; }
+  .canvasFrame { grid-area: game; width: auto; height: 100%; max-width: 100%; max-height: 100%; }
+
+  .statusBar {
+    grid-area: info;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 0;
+    padding: 8px;
+    overflow-y: auto;
+  }
+  .levelBlock { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .stats { flex-direction: column; grid-column: auto; }
+  .stats div { width: 100%; }
+
+  .mission {
+    grid-area: mission;
+    display: flex;
+    width: auto;
+    margin: 0;
+    padding: 6px;
+    justify-content: center;
+  }
+  .mission > div { display: none; }
+  .missionIcon { display: none; }
+  .restartButton { width: 100%; justify-content: center; }
+  .mission { justify-self: stretch; }
+
+  .operation { top: 6px; min-height: 42px; padding-block: 4px; }
+
+  /* Le plein écran doit toujours réduire l'affichage au seul jeu, y compris
+     depuis ce layout à deux zones : la colonne d'informations (retirée du
+     JSX en plein écran) laisse place à une grille à une seule cellule. */
+  .fullscreen.page { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "game"; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressTrack span,
+  .exitButton,
+  .soundButton,
+  .restartButton,
+  .primaryAction,
+  .dangerAction { transition: none; }
+}

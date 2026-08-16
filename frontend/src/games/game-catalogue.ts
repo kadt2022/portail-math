@@ -9,7 +9,7 @@
 
 export type GameAvailability = "standalone" | "react" | "coming-soon";
 
-export type GameSceneId = "train" | "new-game" | "grille-magique";
+export type GameSceneId = "train" | "new-game" | "grille-magique" | "turbo-pulse";
 
 export interface GameCatalogueEntry {
   id: string;
@@ -54,6 +54,15 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/grille-magique",
     availability: "react",
     sceneId: "grille-magique",
+  },
+  {
+    id: "turbo-pulse",
+    nameKey: "turboPulse.name",
+    descriptionKey: "turboPulse.description",
+    ctaLabelKey: "turboPulse.cta",
+    href: "/jeux/turbo-pulse",
+    availability: "react",
+    sceneId: "turbo-pulse",
   },
   {
     id: "new-game",
