@@ -29,6 +29,78 @@ export function fruitSpawnYRange(
   };
 }
 
+// Monde de référence (voir TurboPulseGame.ts) : le monde réel suit la taille
+// du conteneur (Scale.RESIZE), mais toutes les tailles visuelles/hitboxes
+// ci-dessous sont conçues pour cette résolution — c'est le point de départ
+// du facteur visuel borné (voir getTurboPulseVisualMetrics).
+export const REFERENCE_WORLD_WIDTH = 960;
+export const REFERENCE_WORLD_HEIGHT = 540;
+export const FRUIT_RADIUS = 31;
+// Marge de tolérance de tir ajoutée au rayon pour la détection de collision
+// (facilite le ciblage tactile) : réduite avec le fruit, jamais fixe.
+export const FRUIT_HIT_MARGIN = 22;
+export const CANNON_X = 178;
+// Distance fixe (à l'échelle 1) entre le bas du monde de référence et le
+// centre du canon (540 - 465) : réduite avec le reste du canon sur petit
+// écran pour rester ancré près du bas sans dévorer une part disproportionnée
+// d'un monde déjà réduit.
+export const CANNON_BOTTOM_MARGIN = 75;
+
+export function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+const MIN_VISUAL_SCALE = 0.68;
+const MAX_VISUAL_SCALE = 1;
+
+export interface TurboPulseVisualMetrics {
+  scale: number;
+  fruitRadius: number;
+  fruitHitRadius: number;
+  cannonScale: number;
+  cannonX: number;
+  cannonBottomMargin: number;
+  emojiFontSize: number;
+  numberFontSize: number;
+  numberFontSizeLarge: number;
+  labelFontSize: number;
+  cannonBadgeFontSize: number;
+  projectileFontSize: number;
+}
+
+// Facteur visuel unique et borné : un grand écran révèle davantage de
+// terrain de jeu (le monde Phaser suit déjà la taille réelle du conteneur,
+// voir worldWidth/worldHeight) mais ne doit jamais agrandir les objets
+// au-delà de leur taille de référence (960×540) — sinon on ne fait que
+// reproduire, en sens inverse, le défaut qu'a corrigé le passage de
+// Scale.FIT à Scale.RESIZE. À l'inverse, sur un petit écran (ex. téléphone
+// Android en paysage, où la scène peut ne faire que ~300px de haut une fois
+// le panneau d'informations retiré), le facteur réduit ensemble fruits,
+// canon, textes ET leurs hitboxes de collision, jusqu'à un plancher de 0.68
+// pour rester jouable. Le minimum dépend de la largeur ET de la hauteur : un
+// monde étroit OU bas doit réduire les objets, pas seulement l'un des deux.
+export function getTurboPulseVisualMetrics(worldWidth: number, worldHeight: number): TurboPulseVisualMetrics {
+  const scale = clamp(
+    Math.min(worldWidth / REFERENCE_WORLD_WIDTH, worldHeight / REFERENCE_WORLD_HEIGHT),
+    MIN_VISUAL_SCALE,
+    MAX_VISUAL_SCALE,
+  );
+  return {
+    scale,
+    fruitRadius: FRUIT_RADIUS * scale,
+    fruitHitRadius: (FRUIT_RADIUS + FRUIT_HIT_MARGIN) * scale,
+    cannonScale: scale,
+    cannonX: CANNON_X * scale,
+    cannonBottomMargin: CANNON_BOTTOM_MARGIN * scale,
+    emojiFontSize: 31 * scale,
+    numberFontSize: 22 * scale,
+    numberFontSizeLarge: 18 * scale,
+    labelFontSize: 10 * scale,
+    cannonBadgeFontSize: 20 * scale,
+    projectileFontSize: 18 * scale,
+  };
+}
+
 export type FruitColor = "red" | "green" | "purple" | "orange" | "yellow" | "pink";
 export type Operator = "+" | "−" | "×";
 export type RandomSource = () => number;

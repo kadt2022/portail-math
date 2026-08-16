@@ -2,15 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import {
   chooseTargetResult,
+  clamp,
   comboForHit,
   createFruitSpec,
   createStartingFruitSpecs,
+  FRUIT_HIT_MARGIN,
+  FRUIT_RADIUS,
   fruitSpawnYRange,
+  getTurboPulseVisualMetrics,
   hasDuplicateTriplets,
   hasFullyCrossedDefense,
   HUD_SAFE_TOP,
   INTRUSION_LIMITS,
   operationForResult,
+  REFERENCE_WORLD_HEIGHT,
+  REFERENCE_WORLD_WIDTH,
   registerFailure,
   TURBO_LEVELS,
   type ExpertFailures,
@@ -139,5 +145,78 @@ describe("moteur Turbo Pulse", () => {
       fruits.push(createFruitSpec(fruits, 3, id, () => 0.15 + Math.random() * 0.7));
     }
     expect(hasDuplicateTriplets(fruits)).toBe(false);
+  });
+
+  it("borne clamp entre les extrêmes fournis", () => {
+    expect(clamp(0.4, 0.68, 1)).toBe(0.68);
+    expect(clamp(1.5, 0.68, 1)).toBe(1);
+    expect(clamp(0.8, 0.68, 1)).toBe(0.8);
+  });
+
+  describe("getTurboPulseVisualMetrics", () => {
+    it("garde l'échelle de référence (1) à la taille de référence 960×540 et au-delà", () => {
+      expect(getTurboPulseVisualMetrics(REFERENCE_WORLD_WIDTH, REFERENCE_WORLD_HEIGHT).scale).toBe(1);
+      // Un très grand écran ne doit jamais agrandir les objets au-delà de la
+      // référence : c'est justement le défaut que corrige ce plafond à 1
+      // (sinon on ne fait que reproduire, en sens inverse, le problème que la
+      // migration FIT → RESIZE a résolu pour la taille du monde lui-même).
+      expect(getTurboPulseVisualMetrics(2560, 1440).scale).toBe(1);
+      expect(getTurboPulseVisualMetrics(1920, 1080).scale).toBe(1);
+    });
+
+    it("réduit l'échelle sur un petit monde, jamais en dessous du plancher 0.68", () => {
+      // Téléphone Android compact en paysage, panneau d'informations retiré :
+      // largeur et hauteur toutes deux nettement sous la référence.
+      const metrics = getTurboPulseVisualMetrics(640, 300);
+      expect(metrics.scale).toBeLessThan(1);
+      expect(metrics.scale).toBeGreaterThanOrEqual(0.68);
+
+      // Un monde extrêmement petit ne doit jamais franchir le plancher : en
+      // dessous, le jeu deviendrait injouable plutôt que simplement compact.
+      const extreme = getTurboPulseVisualMetrics(200, 120);
+      expect(extreme.scale).toBe(0.68);
+    });
+
+    it("prend le minimum de la largeur ET de la hauteur : l'un des deux suffit à réduire l'échelle", () => {
+      // Large mais bas (ex. barre d'état empiétant sur la hauteur disponible) ;
+      // 400/540 ≈ 0.74 reste au-dessus du plancher, donc directement observable.
+      const wideButShort = getTurboPulseVisualMetrics(1400, 400);
+      expect(wideButShort.scale).toBeLessThan(1);
+      expect(wideButShort.scale).toBeCloseTo(400 / REFERENCE_WORLD_HEIGHT, 5);
+
+      // Étroit mais haut ; 700/960 ≈ 0.73 reste au-dessus du plancher.
+      const narrowButTall = getTurboPulseVisualMetrics(700, 900);
+      expect(narrowButTall.scale).toBeLessThan(1);
+      expect(narrowButTall.scale).toBeCloseTo(700 / REFERENCE_WORLD_WIDTH, 5);
+    });
+
+    it("réduit ensemble le rayon visuel du fruit et son rayon de collision, dans la même proportion", () => {
+      const metrics = getTurboPulseVisualMetrics(640, 300);
+      // Le rayon de collision doit toujours refléter le rayon réellement
+      // affiché : jamais une hitbox plus grande que ce que l'enfant voit à
+      // l'écran (source du bug signalé : fruit rétréci visuellement mais
+      // toujours détecté avec l'ancien rayon de référence).
+      expect(metrics.fruitRadius).toBeCloseTo(FRUIT_RADIUS * metrics.scale, 5);
+      expect(metrics.fruitHitRadius).toBeCloseTo((FRUIT_RADIUS + FRUIT_HIT_MARGIN) * metrics.scale, 5);
+      expect(metrics.fruitRadius).toBeLessThan(FRUIT_RADIUS);
+    });
+
+    it("réduit position et taille du canon dans la même proportion que le reste", () => {
+      const reference = getTurboPulseVisualMetrics(REFERENCE_WORLD_WIDTH, REFERENCE_WORLD_HEIGHT);
+      const small = getTurboPulseVisualMetrics(640, 300);
+      expect(small.cannonX).toBeLessThan(reference.cannonX);
+      expect(small.cannonBottomMargin).toBeLessThan(reference.cannonBottomMargin);
+      expect(small.cannonScale).toBe(small.scale);
+    });
+
+    it("réduit toutes les tailles de police ensemble, jamais une seule isolément", () => {
+      const metrics = getTurboPulseVisualMetrics(640, 300);
+      expect(metrics.emojiFontSize).toBeLessThan(31);
+      expect(metrics.numberFontSize).toBeLessThan(22);
+      expect(metrics.numberFontSizeLarge).toBeLessThan(18);
+      expect(metrics.labelFontSize).toBeLessThan(10);
+      expect(metrics.cannonBadgeFontSize).toBeLessThan(20);
+      expect(metrics.projectileFontSize).toBeLessThan(18);
+    });
   });
 });

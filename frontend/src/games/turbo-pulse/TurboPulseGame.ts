@@ -2,41 +2,40 @@ import Phaser from "phaser";
 
 import {
   CALCULATIONS_PER_LEVEL,
+  CANNON_BOTTOM_MARGIN,
   chooseTargetResult,
   comboForHit,
   createFruitSpec,
   createStartingFruitSpecs,
   formatOperation,
+  FRUIT_RADIUS,
   fruitSpawnYRange,
+  getTurboPulseVisualMetrics,
   hasFullyCrossedDefense,
   HUD_SAFE_TOP,
   INTRUSION_LIMITS,
   MAX_FRUITS,
   operationForResult,
   randomInt,
+  REFERENCE_WORLD_HEIGHT,
+  REFERENCE_WORLD_WIDTH,
   registerFailure,
   TURBO_LEVELS,
   type ExpertFailures,
   type FruitSpec,
   type Operation,
+  type TurboPulseVisualMetrics,
 } from "./turbo-pulse-engine";
 
-// Dimensions de référence : servent de valeur plancher/initiale et de base
-// de proportion (sx/sy) pour le décor de drawWorld(). La taille réelle du
-// monde suit désormais la place réellement disponible (voir worldWidth /
-// worldHeight, mis à jour par handleResize) : un grand écran doit révéler
-// une surface de jeu plus grande, pas agrandir une scène 960×540 figée.
-const WORLD_WIDTH = 960;
-const WORLD_HEIGHT = 540;
+// MIN_WORLD_WIDTH/HEIGHT ne sont PAS appliqués côté logique de jeu (voir
+// mountTurboPulseGame) : ils sont passés à Phaser via scale.minWidth/
+// minHeight, qui clampe ensemble displaySize, gameSize ET le canvas réel.
+// Un clamp maison ici (sur worldWidth/worldHeight seuls) laisserait le
+// canvas continuer à rétrécir en dessous pendant que la logique de jeu
+// croirait le monde plus grand qu'il ne l'est réellement à l'écran.
 const MIN_WORLD_WIDTH = 480;
 const MIN_WORLD_HEIGHT = 270;
 const DEFENSE_X = 72;
-const CANNON_X = 178;
-// Distance fixe entre le bas du monde et le centre du canon (540 - 465 dans
-// la référence 960×540) : sa position Y réelle (cannonY) se déduit de
-// worldHeight à chaque redimensionnement, pour rester ancré près du bas.
-const CANNON_BOTTOM_MARGIN = 75;
-const FRUIT_RADIUS = 31;
 const SHOT_SPEED = 620;
 
 export type TurboPulseStatus = "playing" | "clearing" | "level-complete" | "failed" | "mastered";
@@ -105,12 +104,14 @@ export class TurboPulseScene extends Phaser.Scene {
   private worldGraphics?: Phaser.GameObjects.Graphics;
   private stationLabel?: Phaser.GameObjects.Text;
   // Taille réelle du monde de jeu : suit la place disponible (voir
-  // handleResize), jamais figée à 960×540. cannonY et fruitYRange en
+  // handleResize), jamais figée à 960×540. cannonY, fruitYRange et metrics
+  // (tailles visuelles/hitboxes bornées, voir getTurboPulseVisualMetrics) en
   // dépendent et sont recalculés à chaque changement.
-  private worldWidth = WORLD_WIDTH;
-  private worldHeight = WORLD_HEIGHT;
-  private cannonY = WORLD_HEIGHT - CANNON_BOTTOM_MARGIN;
-  private fruitYRange = fruitSpawnYRange(FRUIT_RADIUS, WORLD_HEIGHT);
+  private worldWidth = REFERENCE_WORLD_WIDTH;
+  private worldHeight = REFERENCE_WORLD_HEIGHT;
+  private cannonY = REFERENCE_WORLD_HEIGHT - CANNON_BOTTOM_MARGIN;
+  private fruitYRange = fruitSpawnYRange(FRUIT_RADIUS, REFERENCE_WORLD_HEIGHT);
+  private metrics: TurboPulseVisualMetrics = getTurboPulseVisualMetrics(REFERENCE_WORLD_WIDTH, REFERENCE_WORLD_HEIGHT);
   private operation: Operation = { left: 2, right: 3, operator: "+", result: 5 };
   private operationToken = 0;
   private aimAngle = -0.35;
@@ -142,11 +143,15 @@ export class TurboPulseScene extends Phaser.Scene {
   create() {
     // La taille réelle allouée par mountTurboPulseGame (mesurée sur le
     // conteneur DOM) est déjà connue de Phaser à ce stade : on l'adopte
-    // comme monde de jeu initial plutôt que la référence 960×540.
-    this.worldWidth = Math.max(MIN_WORLD_WIDTH, Math.round(this.scale.width));
-    this.worldHeight = Math.max(MIN_WORLD_HEIGHT, Math.round(this.scale.height));
-    this.cannonY = this.worldHeight - CANNON_BOTTOM_MARGIN;
-    this.fruitYRange = fruitSpawnYRange(FRUIT_RADIUS, this.worldHeight);
+    // comme monde de jeu initial plutôt que la référence 960×540. Le plancher
+    // (scale.minWidth/minHeight, voir mountTurboPulseGame) est déjà appliqué
+    // par Phaser lui-même à this.scale.width/height : le canvas réel et cette
+    // lecture ne peuvent donc jamais diverger.
+    this.worldWidth = Math.round(this.scale.width);
+    this.worldHeight = Math.round(this.scale.height);
+    this.metrics = getTurboPulseVisualMetrics(this.worldWidth, this.worldHeight);
+    this.cannonY = this.worldHeight - this.metrics.cannonBottomMargin;
+    this.fruitYRange = fruitSpawnYRange(this.metrics.fruitRadius, this.worldHeight);
 
     const spark = this.make.graphics({ x: 0, y: 0 });
     spark.fillStyle(0xffffff, 1).fillCircle(6, 6, 6);
@@ -189,7 +194,7 @@ export class TurboPulseScene extends Phaser.Scene {
       fruit.view.x -= fruit.speed * seconds;
       fruit.phase += fruit.wobble * seconds;
       fruit.view.y += Math.sin(fruit.phase) * 0.35;
-      if (hasFullyCrossedDefense(fruit.view.x, FRUIT_RADIUS, DEFENSE_X)) {
+      if (hasFullyCrossedDefense(fruit.view.x, this.metrics.fruitRadius, DEFENSE_X)) {
         if (this.registerIntrusion(fruit)) return;
       }
     }
@@ -204,7 +209,7 @@ export class TurboPulseScene extends Phaser.Scene {
         this.shots.splice(index, 1);
         continue;
       }
-      const hit = this.fruits.find((fruit) => Phaser.Math.Distance.Between(shot.view.x, shot.view.y, fruit.view.x, fruit.view.y) <= FRUIT_RADIUS + 22);
+      const hit = this.fruits.find((fruit) => Phaser.Math.Distance.Between(shot.view.x, shot.view.y, fruit.view.x, fruit.view.y) <= this.metrics.fruitHitRadius);
       if (hit) {
         shot.view.destroy();
         this.shots.splice(index, 1);
@@ -266,23 +271,38 @@ export class TurboPulseScene extends Phaser.Scene {
   };
 
   // Déclenché par mountTurboPulseGame/refreshLayout (this.scale.resize()) :
-  // met à jour la taille de monde utilisée par le décor, la zone de sécurité
-  // des fruits et la position du canon, puis redessine/repositionne sans
-  // jamais recréer la scène ni perdre l'état de partie en cours (fruits,
-  // score, niveau...).
+  // met à jour la taille de monde, l'échelle visuelle bornée (metrics — voir
+  // getTurboPulseVisualMetrics), la zone de sécurité des fruits et la
+  // position/taille du canon, puis redessine/repositionne sans jamais
+  // recréer la scène ni perdre l'état de partie en cours (fruits, score,
+  // niveau...). Le plancher de taille du monde (largeur/hauteur) est déjà
+  // garanti par scale.minWidth/minHeight (voir mountTurboPulseGame) : ce que
+  // gameSize rapporte ici correspond toujours exactement au canvas réel.
   private handleResize = (gameSize: Phaser.Structs.Size) => {
-    const width = Math.max(MIN_WORLD_WIDTH, Math.round(gameSize.width));
-    const height = Math.max(MIN_WORLD_HEIGHT, Math.round(gameSize.height));
+    const width = Math.round(gameSize.width);
+    const height = Math.round(gameSize.height);
     if (width === this.worldWidth && height === this.worldHeight) return;
     this.worldWidth = width;
     this.worldHeight = height;
-    this.cannonY = height - CANNON_BOTTOM_MARGIN;
-    this.fruitYRange = fruitSpawnYRange(FRUIT_RADIUS, height);
+    this.metrics = getTurboPulseVisualMetrics(width, height);
+    this.cannonY = height - this.metrics.cannonBottomMargin;
+    this.fruitYRange = fruitSpawnYRange(this.metrics.fruitRadius, height);
     this.drawWorld();
-    this.cannonBase?.setPosition(CANNON_X, this.cannonY);
-    this.cannonArm?.setPosition(CANNON_X, this.cannonY);
-    this.cannonBadge?.setPosition(CANNON_X, this.cannonY + 54);
+    this.applyCannonMetrics();
   };
+
+  // Repositionne/redimensionne le canon existant sur l'échelle visuelle
+  // courante (this.metrics), sans redessiner ses graphismes : cannonBase et
+  // cannonArm ne contiennent que des formes vectorielles (aucun texte), la
+  // mise à l'échelle du conteneur Phaser leur suffit donc sans jamais
+  // introduire de flou. cannonBadge est un texte autonome (hors conteneur) :
+  // sa taille de police est ajustée explicitement pour rester nette.
+  private applyCannonMetrics() {
+    const { cannonX, cannonScale, cannonBadgeFontSize } = this.metrics;
+    this.cannonBase?.setPosition(cannonX, this.cannonY).setScale(cannonScale);
+    this.cannonArm?.setPosition(cannonX, this.cannonY).setScale(cannonScale);
+    this.cannonBadge?.setPosition(cannonX, this.cannonY + 54 * cannonScale).setFontSize(cannonBadgeFontSize);
+  }
 
   // Phaser ne surveille nativement que le redimensionnement de la FENÊTRE,
   // jamais celui d'un conteneur CSS : sous Scale.RESIZE, updateScale() lit
@@ -310,10 +330,13 @@ export class TurboPulseScene extends Phaser.Scene {
     const width = this.worldWidth;
     const height = this.worldHeight;
     // Facteurs de proportion par rapport au décor de référence (960×540) :
-    // seules les POSITIONS du décor suivent la taille du monde, jamais la
-    // taille des fruits/canon/textes (fixée en pixels, voir FRUIT_RADIUS).
-    const sx = width / WORLD_WIDTH;
-    const sy = height / WORLD_HEIGHT;
+    // ce sont les POSITIONS du décor qui suivent la taille du monde. Les
+    // fruits/canon/textes suivent séparément l'échelle visuelle bornée
+    // (this.metrics, voir getTurboPulseVisualMetrics) — jamais ces sx/sy
+    // directement, qui ne sont pas bornés et grandiraient sans limite sur
+    // un très grand écran.
+    const sx = width / REFERENCE_WORLD_WIDTH;
+    const sy = height / REFERENCE_WORLD_HEIGHT;
 
     graphics.fillGradientStyle(0x123d55, 0x123d55, 0x6fb8c5, 0x6fb8c5, 1);
     graphics.fillRect(0, 0, width, height);
@@ -362,18 +385,23 @@ export class TurboPulseScene extends Phaser.Scene {
     // dépend jamais de la taille du monde.
     this.add.text(20, 70, "🛡\nDÉFENSE", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "15px", fontStyle: "bold", align: "center", color: "#fff7dc" }).setAngle(-90).setOrigin(0.5);
 
+    // Formes vectorielles dessinées une fois à l'échelle de référence, à
+    // l'origine locale du conteneur : applyCannonMetrics() les redimensionne
+    // ensuite via .setScale(), sans jamais les redessiner ni introduire de
+    // flou (aucun texte dans ces deux conteneurs).
     const baseGraphics = this.add.graphics();
     baseGraphics.fillStyle(0x0d2137, 0.55).fillEllipse(0, 24, 134, 42);
     baseGraphics.fillStyle(0x355b70, 1).fillCircle(0, 0, 45);
     baseGraphics.lineStyle(5, 0xffc857, 1).strokeCircle(0, 0, 36);
     baseGraphics.fillStyle(0x172f46, 1).fillCircle(0, 0, 19);
-    this.cannonBase = this.add.container(CANNON_X, this.cannonY, [baseGraphics]);
+    this.cannonBase = this.add.container(this.metrics.cannonX, this.cannonY, [baseGraphics]);
 
     const tube = this.add.rectangle(48, 0, 96, 32, 0x79a9b8).setStrokeStyle(4, 0xd8f0ec).setOrigin(0, 0.5);
     const muzzle = this.add.rectangle(94, 0, 22, 43, 0xffc857).setStrokeStyle(3, 0x6b4b18).setOrigin(0.5);
-    this.cannonArm = this.add.container(CANNON_X, this.cannonY, [tube, muzzle]);
-    this.cannonBadge = this.add.text(CANNON_X, this.cannonY + 54, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#102c3c", backgroundColor: "#fff7dc", padding: { x: 14, y: 7 } }).setOrigin(0.5).setDepth(5);
+    this.cannonArm = this.add.container(this.metrics.cannonX, this.cannonY, [tube, muzzle]);
+    this.cannonBadge = this.add.text(this.metrics.cannonX, this.cannonY + 54, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#102c3c", backgroundColor: "#fff7dc", padding: { x: 14, y: 7 } }).setOrigin(0.5).setDepth(5);
     this.aimGuide = this.add.graphics().setDepth(2);
+    this.applyCannonMetrics();
   }
 
   private startLevel(index: number, retry: boolean) {
@@ -407,11 +435,18 @@ export class TurboPulseScene extends Phaser.Scene {
   }
 
   private createFruitActor(spec: FruitSpec, x: number, y: number) {
-    const halo = this.add.circle(0, 0, FRUIT_RADIUS + 7, spec.color, 1).setStrokeStyle(3, 0xffffff, 0.74);
-    const plate = this.add.circle(0, 0, FRUIT_RADIUS, 0xfff3cf, 1).setStrokeStyle(2, 0x16324a, 0.55);
-    const emoji = this.add.text(0, -11, spec.emoji, { fontFamily: "Segoe UI Emoji, sans-serif", fontSize: "31px" }).setOrigin(0.5);
-    const value = this.add.text(0, 15, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: spec.number >= 100 ? "18px" : "22px", fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
-    const label = this.add.text(0, 39, spec.variantLabel.toUpperCase(), { fontFamily: "Trebuchet MS, sans-serif", fontSize: "10px", fontStyle: "bold", color: "#ffffff", backgroundColor: "#102c3c", padding: { x: 5, y: 2 } }).setOrigin(0.5);
+    // Rayon et polices explicitement recalculés depuis this.metrics (jamais
+    // FRUIT_RADIUS brut, ni un .setScale() de conteneur) : ce dernier
+    // mélangerait formes vectorielles et texte, qui se remettrait alors à
+    // l'échelle deux fois (une fois via sa propre taille de police, une
+    // fois via la transformation du conteneur parent) — au lieu de rester
+    // net, le texte flouterait sur petit écran.
+    const { fruitRadius, scale, emojiFontSize, numberFontSize, numberFontSizeLarge, labelFontSize } = this.metrics;
+    const halo = this.add.circle(0, 0, fruitRadius + 7 * scale, spec.color, 1).setStrokeStyle(3, 0xffffff, 0.74);
+    const plate = this.add.circle(0, 0, fruitRadius, 0xfff3cf, 1).setStrokeStyle(2, 0x16324a, 0.55);
+    const emoji = this.add.text(0, -11 * scale, spec.emoji, { fontFamily: "Segoe UI Emoji, sans-serif", fontSize: `${emojiFontSize}px` }).setOrigin(0.5);
+    const value = this.add.text(0, 15 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
+    const label = this.add.text(0, 39 * scale, spec.variantLabel.toUpperCase(), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${labelFontSize}px`, fontStyle: "bold", color: "#ffffff", backgroundColor: "#102c3c", padding: { x: 5, y: 2 } }).setOrigin(0.5);
     const view = this.add.container(x, y, [halo, plate, emoji, value, label]).setDepth(3);
     // Amplitude et phase de l'ondulation visuelle du fruit : aucun enjeu de
     // sécurité (ni jeton, ni tirage déterminant une règle de jeu), Math.random
@@ -468,18 +503,20 @@ export class TurboPulseScene extends Phaser.Scene {
   }
 
   private aimAt(x: number, y: number) {
-    this.aimAngle = Phaser.Math.Clamp(Math.atan2(y - this.cannonY, x - CANNON_X), -Math.PI + 0.04, 0.12);
+    const { cannonX, cannonScale } = this.metrics;
+    this.aimAngle = Phaser.Math.Clamp(Math.atan2(y - this.cannonY, x - cannonX), -Math.PI + 0.04, 0.12);
     this.cannonArm?.setRotation(this.aimAngle);
-    this.aimGuide?.clear().lineStyle(3, 0xffffff, 0.28).lineBetween(CANNON_X + Math.cos(this.aimAngle) * 112, this.cannonY + Math.sin(this.aimAngle) * 112, CANNON_X + Math.cos(this.aimAngle) * 215, this.cannonY + Math.sin(this.aimAngle) * 215);
+    this.aimGuide?.clear().lineStyle(3, 0xffffff, 0.28).lineBetween(cannonX + Math.cos(this.aimAngle) * 112 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 112 * cannonScale, cannonX + Math.cos(this.aimAngle) * 215 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 215 * cannonScale);
   }
 
   private fire() {
     if (this.time.now - this.lastFireAt < 130) return;
     this.lastFireAt = this.time.now;
+    const { cannonX, cannonScale, projectileFontSize } = this.metrics;
     const operationText = formatOperation(this.operation).replaceAll(" ", "");
-    const body = this.add.rectangle(0, 0, 82, 38, 0xe5f1f4, 1).setStrokeStyle(4, 0xffc857).setOrigin(0.5);
-    const label = this.add.text(0, 0, operationText, { fontFamily: "Trebuchet MS, sans-serif", fontSize: "18px", fontStyle: "bold", color: "#102c3c" }).setOrigin(0.5);
-    const view = this.add.container(CANNON_X + Math.cos(this.aimAngle) * 112, this.cannonY + Math.sin(this.aimAngle) * 112, [body, label]).setRotation(this.aimAngle).setDepth(4);
+    const body = this.add.rectangle(0, 0, 82 * cannonScale, 38 * cannonScale, 0xe5f1f4, 1).setStrokeStyle(4, 0xffc857).setOrigin(0.5);
+    const label = this.add.text(0, 0, operationText, { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${projectileFontSize}px`, fontStyle: "bold", color: "#102c3c" }).setOrigin(0.5);
+    const view = this.add.container(cannonX + Math.cos(this.aimAngle) * 112 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 112 * cannonScale, [body, label]).setRotation(this.aimAngle).setDepth(4);
     this.shots.push({ view, vx: Math.cos(this.aimAngle) * SHOT_SPEED, vy: Math.sin(this.aimAngle) * SHOT_SPEED, life: 2.4, result: this.operation.result, token: this.operationToken });
     this.playTone(230, 0.06, 0.04, "square");
   }
@@ -630,8 +667,8 @@ export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotLis
   // 960×540 ne sert qu'aux instants où le conteneur n'a pas encore de
   // dimensions mesurables (ex. juste après l'insertion dans le DOM).
   const bounds = parent.getBoundingClientRect();
-  const initialWidth = bounds.width >= MIN_WORLD_WIDTH ? Math.round(bounds.width) : WORLD_WIDTH;
-  const initialHeight = bounds.height >= MIN_WORLD_HEIGHT ? Math.round(bounds.height) : WORLD_HEIGHT;
+  const initialWidth = bounds.width >= MIN_WORLD_WIDTH ? Math.round(bounds.width) : REFERENCE_WORLD_WIDTH;
+  const initialHeight = bounds.height >= MIN_WORLD_HEIGHT ? Math.round(bounds.height) : REFERENCE_WORLD_HEIGHT;
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent,
@@ -640,7 +677,14 @@ export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotLis
     backgroundColor: "#123d55",
     transparent: false,
     scene,
-    scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER },
+    // min: seul plancher appliqué au monde de jeu lui-même — clampe ensemble
+    // displaySize, gameSize ET le canvas réel (this.scale.width/height dans
+    // create()/handleResize() ne peuvent alors jamais diverger de ce que
+    // Phaser affiche vraiment). En dessous de cette taille de conteneur,
+    // c'est getTurboPulseVisualMetrics (plancher 0.68) qui prend le relais en
+    // réduisant fruits/canon/textes, jamais un agrandissement artificiel du
+    // monde logique au-delà du canvas physique.
+    scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER, min: { width: MIN_WORLD_WIDTH, height: MIN_WORLD_HEIGHT } },
     render: { antialias: true, roundPixels: true },
     input: { activePointers: 2 },
   });
