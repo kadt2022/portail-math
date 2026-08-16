@@ -288,6 +288,11 @@ export function TurboPulsePage() {
 
       <section className={styles.playArea}>
         <div className={styles.canvasFrame}>
+          {/* Décor illustré : calque CSS/DOM séparé, derrière le canvas
+              Phaser (transparent). Le flou "façon cinéma" est composé une
+              fois par le navigateur, jamais recalculé par frame comme le
+              serait un shader WebGL sur cette grande image statique. */}
+          <div className={styles.background} aria-hidden="true" />
           <div ref={gameHostRef} className={styles.gameHost} role="img" aria-label={t("turboPulse.game.canvasLabel")} />
           <div className={styles.operation} aria-label={t("turboPulse.game.currentOperation", { operation: snapshot.operation })}>
             <span>{t("turboPulse.game.solve")}</span>

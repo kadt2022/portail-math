@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 
+import cannonArmUrl from "../../assets/turbo-pulse/cannon-arm.png";
+import cannonBaseUrl from "../../assets/turbo-pulse/cannon-base.png";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
@@ -37,6 +39,28 @@ const MIN_WORLD_WIDTH = 480;
 const MIN_WORLD_HEIGHT = 270;
 const DEFENSE_X = 72;
 const SHOT_SPEED = 620;
+
+// cannon-base.png / cannon-arm.png : rendus Babylon.js hors-runtime (atelier
+// de prototypage séparé, jamais exécuté dans le jeu — Phaser reste le seul
+// moteur runtime). Les deux images partagent exactement la même caméra
+// orthographique et la même résolution : le pivot (centre du moyeu / point
+// d'articulation du bras) tombe donc au même endroit dans les deux images,
+// mesuré une fois pour toutes sur les rendus exportés.
+const CANNON_PIVOT_ORIGIN_X = 0.5;
+const CANNON_PIVOT_ORIGIN_Y = 0.4951;
+// La caméra 3/4 fait reposer le tube à ~-10.9° (et non à l'horizontale) dans
+// l'image non tournée : sans cette correction, l'orientation visuelle du
+// canon dérive de la vraie trajectoire du tir (calculée séparément à partir
+// de aimAngle). Mesuré par projection de deux points le long de l'axe local
+// +X du bras (pivot et pivot+2 unités) avec la même caméra que l'export.
+const CANNON_ARM_RESTING_ANGLE = -0.1905;
+// Ramène l'encombrement des nouveaux visuels (images 2048×2048) à celui de
+// l'ancien canon vectoriel à l'échelle de référence (anneau ~100px, portée
+// du bras ~105px) : anneau du socle = 3.8 unités monde × (2048px / 9.6
+// unités de cadre) × ce facteur ≈ 101px. Exportée pour les tests, qui
+// vérifient que cannonBase/cannonArm.scaleX suit toujours metrics.scale — ce
+// facteur constant s'y multiplie désormais.
+export const CANNON_IMAGE_SCALE = 0.125;
 
 export type TurboPulseStatus = "playing" | "clearing" | "level-complete" | "failed" | "mastered";
 
@@ -97,8 +121,8 @@ export class TurboPulseScene extends Phaser.Scene {
   private readonly onSnapshot: SnapshotListener;
   private fruits: FruitActor[] = [];
   private shots: ShotActor[] = [];
-  private cannonBase?: Phaser.GameObjects.Container;
-  private cannonArm?: Phaser.GameObjects.Container;
+  private cannonBase?: Phaser.GameObjects.Image;
+  private cannonArm?: Phaser.GameObjects.Image;
   private cannonBadge?: Phaser.GameObjects.Text;
   private aimGuide?: Phaser.GameObjects.Graphics;
   private worldGraphics?: Phaser.GameObjects.Graphics;
@@ -138,6 +162,11 @@ export class TurboPulseScene extends Phaser.Scene {
   constructor(onSnapshot: SnapshotListener) {
     super({ key: "turbo-pulse" });
     this.onSnapshot = onSnapshot;
+  }
+
+  preload() {
+    this.load.image("cannon-base", cannonBaseUrl);
+    this.load.image("cannon-arm", cannonArmUrl);
   }
 
   create() {
@@ -292,15 +321,17 @@ export class TurboPulseScene extends Phaser.Scene {
   };
 
   // Repositionne/redimensionne le canon existant sur l'échelle visuelle
-  // courante (this.metrics), sans redessiner ses graphismes : cannonBase et
-  // cannonArm ne contiennent que des formes vectorielles (aucun texte), la
-  // mise à l'échelle du conteneur Phaser leur suffit donc sans jamais
-  // introduire de flou. cannonBadge est un texte autonome (hors conteneur) :
-  // sa taille de police est ajustée explicitement pour rester nette.
+  // courante (this.metrics), sans recharger ni retoucher les images :
+  // CANNON_IMAGE_SCALE ramène d'abord les sprites 2048×2048 à l'encombrement
+  // de référence, cannonScale applique ensuite le bornage petit écran par
+  // dessus (les deux facteurs se multiplient, .setScale() n'étant jamais
+  // cumulatif d'un appel à l'autre). cannonBadge est un texte autonome : sa
+  // taille de police est ajustée explicitement pour rester nette.
   private applyCannonMetrics() {
     const { cannonX, cannonScale, cannonBadgeFontSize } = this.metrics;
-    this.cannonBase?.setPosition(cannonX, this.cannonY).setScale(cannonScale);
-    this.cannonArm?.setPosition(cannonX, this.cannonY).setScale(cannonScale);
+    const cannonDisplayScale = CANNON_IMAGE_SCALE * cannonScale;
+    this.cannonBase?.setPosition(cannonX, this.cannonY).setScale(cannonDisplayScale);
+    this.cannonArm?.setPosition(cannonX, this.cannonY).setScale(cannonDisplayScale);
     this.cannonBadge?.setPosition(cannonX, this.cannonY + 54 * cannonScale).setFontSize(cannonBadgeFontSize);
   }
 
@@ -338,33 +369,18 @@ export class TurboPulseScene extends Phaser.Scene {
     const sx = width / REFERENCE_WORLD_WIDTH;
     const sy = height / REFERENCE_WORLD_HEIGHT;
 
-    graphics.fillGradientStyle(0x123d55, 0x123d55, 0x6fb8c5, 0x6fb8c5, 1);
-    graphics.fillRect(0, 0, width, height);
-    graphics.fillStyle(0xffdf83, 0.9);
-    graphics.fillCircle(820 * sx, 76, 48);
-    graphics.fillStyle(0xffffff, 0.14);
-    for (let index = 0; index < 20; index += 1) graphics.fillCircle((40 + index * 49) * sx, 34 + (index % 4) * 19, 2 + (index % 3));
-
-    // Bandeau HUD réservé : fond visuel du calcul « À résoudre » et, en plein
-    // écran, des commandes Pause/Quitter. Aucun fruit ne doit s'y trouver
-    // (voir fruitYRange) — ce liseré matérialise la limite réelle.
+    // Le décor illustré vit désormais dans un calque CSS/DOM séparé, derrière
+    // ce canvas (voir .background dans TurboPulsePage.module.css) : le flou
+    // "façon cinéma" y est appliqué une fois par le compositeur du
+    // navigateur, sans recalcul à chaque frame d'un shader WebGL sur une
+    // grosse image statique. Ce canvas Phaser reste transparent
+    // (mountTurboPulseGame) et ne dessine plus que les éléments qui doivent
+    // rester nets : bandeau HUD, zone de défense, fruits, canon, projectiles.
     graphics.fillStyle(0x0a2630, 0.5);
     graphics.fillRoundedRect(10, 8, width - 20, HUD_SAFE_TOP - 16, 16);
     graphics.lineStyle(2, 0xffd36b, 0.22);
     graphics.strokeRoundedRect(10, 8, width - 20, HUD_SAFE_TOP - 16, 16);
 
-    graphics.fillStyle(0x2a7b72, 1);
-    graphics.fillTriangle(0, 330 * sy, 220 * sx, 150 * sy, 430 * sx, 330 * sy);
-    graphics.fillTriangle(250 * sx, 330 * sy, 560 * sx, 120 * sy, 780 * sx, 330 * sy);
-    graphics.fillTriangle(610 * sx, 330 * sy, 840 * sx, 178 * sy, 1000 * sx, 330 * sy);
-    graphics.fillStyle(0x17493f, 1);
-    graphics.fillRect(0, 330 * sy, width, height - 330 * sy);
-    graphics.fillStyle(0x1d5b4c, 1);
-    for (let row = 0; row < 3; row += 1) {
-      graphics.fillRoundedRect(100 * sx, (350 + row * 57) * sy, 830 * sx, 38, 18);
-      graphics.lineStyle(2, 0x74a783, 0.35);
-      graphics.strokeRoundedRect(100 * sx, (350 + row * 57) * sy, 830 * sx, 38, 18);
-    }
     graphics.fillStyle(0x0a2630, 0.78);
     graphics.fillRect(0, 0, DEFENSE_X, height);
     graphics.fillStyle(0xffd36b, 0.18);
@@ -385,20 +401,12 @@ export class TurboPulseScene extends Phaser.Scene {
     // dépend jamais de la taille du monde.
     this.add.text(20, 70, "🛡\nDÉFENSE", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "15px", fontStyle: "bold", align: "center", color: "#fff7dc" }).setAngle(-90).setOrigin(0.5);
 
-    // Formes vectorielles dessinées une fois à l'échelle de référence, à
-    // l'origine locale du conteneur : applyCannonMetrics() les redimensionne
-    // ensuite via .setScale(), sans jamais les redessiner ni introduire de
-    // flou (aucun texte dans ces deux conteneurs).
-    const baseGraphics = this.add.graphics();
-    baseGraphics.fillStyle(0x0d2137, 0.55).fillEllipse(0, 24, 134, 42);
-    baseGraphics.fillStyle(0x355b70, 1).fillCircle(0, 0, 45);
-    baseGraphics.lineStyle(5, 0xffc857, 1).strokeCircle(0, 0, 36);
-    baseGraphics.fillStyle(0x172f46, 1).fillCircle(0, 0, 19);
-    this.cannonBase = this.add.container(this.metrics.cannonX, this.cannonY, [baseGraphics]);
-
-    const tube = this.add.rectangle(48, 0, 96, 32, 0x79a9b8).setStrokeStyle(4, 0xd8f0ec).setOrigin(0, 0.5);
-    const muzzle = this.add.rectangle(94, 0, 22, 43, 0xffc857).setStrokeStyle(3, 0x6b4b18).setOrigin(0.5);
-    this.cannonArm = this.add.container(this.metrics.cannonX, this.cannonY, [tube, muzzle]);
+    // cannon-base/cannon-arm : sprites Babylon.js pré-rendus (voir constantes
+    // CANNON_* ci-dessus). Origine posée sur le pivot exact (mesuré au même
+    // endroit dans les deux images) : applyCannonMetrics() les repositionne/
+    // redimensionne ensuite via .setScale(), sans jamais les redessiner.
+    this.cannonBase = this.add.image(this.metrics.cannonX, this.cannonY, "cannon-base").setOrigin(CANNON_PIVOT_ORIGIN_X, CANNON_PIVOT_ORIGIN_Y);
+    this.cannonArm = this.add.image(this.metrics.cannonX, this.cannonY, "cannon-arm").setOrigin(CANNON_PIVOT_ORIGIN_X, CANNON_PIVOT_ORIGIN_Y);
     this.cannonBadge = this.add.text(this.metrics.cannonX, this.cannonY + 54, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#102c3c", backgroundColor: "#fff7dc", padding: { x: 14, y: 7 } }).setOrigin(0.5).setDepth(5);
     this.aimGuide = this.add.graphics().setDepth(2);
     this.applyCannonMetrics();
@@ -505,7 +513,11 @@ export class TurboPulseScene extends Phaser.Scene {
   private aimAt(x: number, y: number) {
     const { cannonX, cannonScale } = this.metrics;
     this.aimAngle = Phaser.Math.Clamp(Math.atan2(y - this.cannonY, x - cannonX), -Math.PI + 0.04, 0.12);
-    this.cannonArm?.setRotation(this.aimAngle);
+    // CANNON_ARM_RESTING_ANGLE compense l'angle auquel le tube repose déjà
+    // dans le sprite non tourné (vue 3/4 Babylon) : sans cette soustraction,
+    // la direction visuelle du canon dériverait de aimAngle, qui pilote déjà
+    // séparément la trajectoire réelle du tir (voir fire()).
+    this.cannonArm?.setRotation(this.aimAngle - CANNON_ARM_RESTING_ANGLE);
     this.aimGuide?.clear().lineStyle(3, 0xffffff, 0.28).lineBetween(cannonX + Math.cos(this.aimAngle) * 112 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 112 * cannonScale, cannonX + Math.cos(this.aimAngle) * 215 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 215 * cannonScale);
   }
 
@@ -674,8 +686,12 @@ export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotLis
     parent,
     width: initialWidth,
     height: initialHeight,
-    backgroundColor: "#123d55",
-    transparent: false,
+    // Le décor illustré vit dans un calque CSS/DOM séparé, derrière ce
+    // canvas (voir .background dans TurboPulsePage.module.css) : Phaser ne
+    // doit donc plus peindre de fond opaque, seulement les objets de jeu
+    // (fruits, canon, projectiles) et les overlays fonctionnels (bandeau
+    // HUD, zone de défense), pour laisser transparaître le fond flouté.
+    transparent: true,
     scene,
     // min: seul plancher appliqué au monde de jeu lui-même — clampe ensemble
     // displaySize, gameSize ET le canvas réel (this.scale.width/height dans

@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
-import { mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot } from "./TurboPulseGame";
+import { CANNON_IMAGE_SCALE, mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot } from "./TurboPulseGame";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_X,
@@ -29,6 +29,7 @@ interface SceneInternals {
   intrusions: number;
   failureAction: string;
   paused: boolean;
+  lastFireAt: number;
   completionTimer: unknown;
   correctHit(fruit: SceneInternals["fruits"][number]): void;
   wrongHit(fruit: SceneInternals["fruits"][number]): void;
@@ -430,6 +431,13 @@ describe("scène Turbo Pulse", () => {
     expect(internals.shots.length).toBe(0);
 
     internals.paused = false;
+    // fire() rate-limite les tirs à 130ms via this.time.now - lastFireAt :
+    // juste après le boot de la scène, le temps de jeu réel écoulé peut
+    // encore être sous ce seuil (dépend de la charge machine, pas du
+    // scénario testé), rendant ce garde-fou intermittent ici. On force
+    // lastFireAt largement dans le passé pour ne tester que le
+    // comportement pause/reprise, indépendamment du minutage réel.
+    internals.lastFireAt = -1000;
     scene.input.emit("pointermove", { worldX: 650, worldY: 220 });
     scene.input.emit("pointerdown", { worldX: 650, worldY: 220 });
 
@@ -653,8 +661,8 @@ describe("scène Turbo Pulse", () => {
       expect(internals.metrics.scale).toBe(1);
       expect(internals.metrics.fruitRadius).toBe(FRUIT_RADIUS);
       expect(internals.metrics.cannonX).toBe(CANNON_X);
-      expect(internals.cannonArm!.scaleX).toBe(1);
-      expect(internals.cannonBase!.scaleX).toBe(1);
+      expect(internals.cannonArm!.scaleX).toBeCloseTo(CANNON_IMAGE_SCALE, 5);
+      expect(internals.cannonBase!.scaleX).toBeCloseTo(CANNON_IMAGE_SCALE, 5);
     });
 
     it("réduit le canon et la position/rayon des fruits sur un petit monde (téléphone Android paysage)", async () => {
@@ -672,8 +680,8 @@ describe("scène Turbo Pulse", () => {
       expect(internals.metrics.fruitRadius).toBeLessThan(FRUIT_RADIUS);
       // Le canon suit la même réduction ET se rapproche du bord (marge et
       // position X proportionnellement réduites), pas seulement sa taille.
-      expect(internals.cannonArm!.scaleX).toBeCloseTo(attendu.scale, 5);
-      expect(internals.cannonBase!.scaleX).toBeCloseTo(attendu.scale, 5);
+      expect(internals.cannonArm!.scaleX).toBeCloseTo(CANNON_IMAGE_SCALE * attendu.scale, 5);
+      expect(internals.cannonBase!.scaleX).toBeCloseTo(CANNON_IMAGE_SCALE * attendu.scale, 5);
       expect(internals.cannonArm!.x).toBeCloseTo(attendu.cannonX, 1);
       expect(internals.cannonBase!.x).toBeCloseTo(attendu.cannonX, 1);
     });
