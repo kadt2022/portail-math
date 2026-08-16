@@ -355,6 +355,14 @@ export class TurboPulseScene extends Phaser.Scene {
     }
   }
 
+  // Unique point d'écriture de l'opération courante : le bandeau HUD React
+  // (« À résoudre »), le texte Phaser sur le piston et la validation des tirs
+  // (operationToken) doivent toujours refléter le même calcul. ensureTarget()
+  // appelle cette méthode à chaque frame dès que le fruit ciblé disparaît ;
+  // sans emitSnapshot() ici, le piston (dessiné directement dans Phaser)
+  // changeait instantanément tandis que le HUD React restait figé sur
+  // l'ancien calcul jusqu'au prochain évènement de jeu — d'où le
+  // désaccord visible entre « À résoudre » et le piston.
   private setTarget(result: number | null) {
     if (result === null) return;
     this.operation = operationForResult(result, this.levelIndex);
@@ -362,6 +370,7 @@ export class TurboPulseScene extends Phaser.Scene {
     this.cannonBadge?.setText(`${formatOperation(this.operation)} = ?`);
     this.shots.forEach((shot) => shot.view.destroy());
     this.shots = [];
+    this.emitSnapshot();
   }
 
   private ensureTarget() {
