@@ -105,11 +105,19 @@
    cela (width fixe + aspect-ratio seul), sur une fenêtre large mais peu
    haute, la hauteur déduite de la largeur dépassait l'espace disponible et
    chevauchait la barre de statut ou la mission. max-width/max-height
-   plafonnent chaque axe (mêmes proportions, 1100px * 9/16) pour retrouver la
-   taille d'origine dès que la place le permet. */
-.canvasFrame { position: relative; width: auto; height: 100%; max-width: min(100%, 1100px); max-height: min(100%, calc(1100px * 9 / 16)); min-width: 0; aspect-ratio: 16 / 9; align-self: center; justify-self: center; overflow: hidden; border: 3px solid #d5bd80; border-radius: clamp(16px, 2.4vw, 30px); background: #123d55; box-shadow: 0 14px 36px rgb(0 0 0 / 42%), inset 0 0 0 2px rgb(255 255 255 / 24%); }
+   plafonnent chaque axe (mêmes proportions, 1800px * 9/16) : un grand écran
+   doit révéler une vraie surface de jeu plus grande (Phaser suit cette
+   taille via Scale.RESIZE, voir TurboPulseGame.ts), pas simplement étirer
+   un cadre 960×540 figé — d'où un plafond nettement relevé par rapport à la
+   taille d'affichage cible d'origine. */
+.canvasFrame { position: relative; width: auto; height: 100%; max-width: min(100%, 1800px); max-height: min(100%, calc(1800px * 9 / 16)); min-width: 0; aspect-ratio: 16 / 9; align-self: center; justify-self: center; overflow: hidden; border: 3px solid #d5bd80; border-radius: clamp(16px, 2.4vw, 30px); background: #123d55; box-shadow: 0 14px 36px rgb(0 0 0 / 42%), inset 0 0 0 2px rgb(255 255 255 / 24%); }
 .gameHost { position: absolute; inset: 0; touch-action: none; }
-.gameHost canvas { display: block; width: 100% !important; height: 100% !important; touch-action: none; }
+/* Pas de width/height forcés ici : Phaser (Scale.RESIZE) dimensionne déjà le
+   canvas — attribut ET style — sur la taille réellement mesurée du
+   conteneur. Un override CSS figerait la résolution interne pendant que le
+   canvas continuerait d'être étiré à l'affichage : exactement le flou que
+   ce mode corrige. */
+.gameHost canvas { display: block; touch-action: none; }
 .operation { position: absolute; top: 10px; left: 50%; z-index: 6; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 7px 17px; border: 2px solid rgb(255 255 255 / 72%); border-radius: 16px 5px 16px 5px; background: rgb(7 25 33 / 90%); box-shadow: 0 7px 16px rgb(0 0 0 / 28%); transform: translateX(-50%); pointer-events: none; white-space: nowrap; }
 .operation span { color: var(--turbo-mint); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em; }
 .operation strong { color: #fff; font-size: clamp(20px, 3.3vw, 30px); }

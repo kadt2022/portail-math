@@ -135,11 +135,27 @@ export function TurboPulsePage() {
     };
   }, []);
 
+  // Phaser ne surveille nativement que le redimensionnement de la fenêtre,
+  // jamais celui d'un conteneur CSS : sans cet observateur, un changement de
+  // largeur/hauteur du canvasFrame (mise en page responsive, ouverture du
+  // panneau latéral, simple redimensionnement de la fenêtre) laisserait le
+  // monde de jeu figé à sa dernière taille connue au lieu de suivre la
+  // surface réellement disponible. refreshLayout() remesure et redessine
+  // sans jamais recréer la scène ni perdre la partie en cours.
+  useEffect(() => {
+    if (!gameHostRef.current) return;
+    const observer = new ResizeObserver(() => controllerRef.current?.refreshLayout());
+    observer.observe(gameHostRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   // Le passage plein écran ↔ normal ne recrée jamais Phaser : seul le
   // scale/viewport est réappliqué (refreshLayout) sur le moteur déjà monté.
   // La sortie peut venir de notre bouton, de la touche Échap ou du
   // navigateur : on se synchronise donc sur l'évènement natif plutôt que sur
-  // notre seul état local.
+  // notre seul état local. (Le ResizeObserver ci-dessus couvrirait aussi ce
+  // changement de taille, mais avec un délai : cet appel immédiat garantit
+  // un redessin dès la bascule, sans attendre le prochain tick d'observation.)
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === pageRef.current);
