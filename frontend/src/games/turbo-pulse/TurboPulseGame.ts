@@ -47,20 +47,22 @@ const SHOT_SPEED = 620;
 // d'articulation du bras) tombe donc au même endroit dans les deux images,
 // mesuré une fois pour toutes sur les rendus exportés.
 const CANNON_PIVOT_ORIGIN_X = 0.5;
-const CANNON_PIVOT_ORIGIN_Y = 0.4951;
+const CANNON_PIVOT_ORIGIN_Y = 0.4956;
 // La caméra 3/4 fait reposer le tube à ~-10.9° (et non à l'horizontale) dans
 // l'image non tournée : sans cette correction, l'orientation visuelle du
 // canon dérive de la vraie trajectoire du tir (calculée séparément à partir
 // de aimAngle). Mesuré par projection de deux points le long de l'axe local
-// +X du bras (pivot et pivot+2 unités) avec la même caméra que l'export.
+// +X du bras (pivot et pivot+2 unités) avec la même caméra que l'export —
+// invariant à la position/l'échelle du pivot (projection orthographique),
+// donc inchangé par l'épaississement du modèle ci-dessous.
 const CANNON_ARM_RESTING_ANGLE = -0.1905;
-// Ramène l'encombrement des nouveaux visuels (images 2048×2048) à celui de
-// l'ancien canon vectoriel à l'échelle de référence (anneau ~100px, portée
-// du bras ~105px) : anneau du socle = 3.8 unités monde × (2048px / 9.6
-// unités de cadre) × ce facteur ≈ 101px. Exportée pour les tests, qui
-// vérifient que cannonBase/cannonArm.scaleX suit toujours metrics.scale — ce
-// facteur constant s'y multiplie désormais.
-export const CANNON_IMAGE_SCALE = 0.125;
+// Second passage "volume" : le premier rendu (silhouette fine, échelle
+// 0.125) lisait comme timide en jeu. Le modèle Babylon lui-même a été
+// épaissi (tube, socle, dôme, moyeu nettement plus larges) et cette échelle
+// relevée en plus, pour une vraie présence à l'écran — pas seulement un
+// agrandissement uniforme d'une silhouette fine. Exportée pour les tests,
+// qui vérifient que cannonBase/cannonArm.scaleX suit toujours metrics.scale.
+export const CANNON_IMAGE_SCALE = 0.145;
 
 export type TurboPulseStatus = "playing" | "clearing" | "level-complete" | "failed" | "mastered";
 
