@@ -327,7 +327,10 @@ export class TurboPulseScene extends Phaser.Scene {
     const value = this.add.text(0, 15, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: spec.number >= 100 ? "18px" : "22px", fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
     const label = this.add.text(0, 39, spec.variantLabel.toUpperCase(), { fontFamily: "Trebuchet MS, sans-serif", fontSize: "10px", fontStyle: "bold", color: "#ffffff", backgroundColor: "#102c3c", padding: { x: 5, y: 2 } }).setOrigin(0.5);
     const view = this.add.container(x, y, [halo, plate, emoji, value, label]).setDepth(3);
-    this.fruits.push({ spec, view, speed: randomInt(56, 72), phase: Math.random() * Math.PI * 2, wobble: 1.35 + Math.random() * 0.85 });
+    // Amplitude et phase de l'ondulation visuelle du fruit : aucun enjeu de
+    // sécurité (ni jeton, ni tirage déterminant une règle de jeu), Math.random
+    // reste donc approprié malgré l'alerte générique de Sonar sur ce générateur.
+    this.fruits.push({ spec, view, speed: randomInt(56, 72), phase: Math.random() * Math.PI * 2, wobble: 1.35 + Math.random() * 0.85 }); // NOSONAR
   }
 
   private spawnArrival(now: number) {

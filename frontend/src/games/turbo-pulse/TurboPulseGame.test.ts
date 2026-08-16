@@ -7,19 +7,28 @@ import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS, type FruitSpec } from "./turbo-pu
 // Vue interne d'un acteur de la scène : les tests ont besoin de placer les
 // fruits et de déclencher les transitions de partie, ce que l'interface
 // publique du contrôleur ne permet pas de faire de façon déterministe.
+interface FakeFruitView { x: number; y: number; destroy(): void; setPosition?(x: number, y: number): void }
+interface FakeShotView { x: number; y: number; destroy(): void }
+interface SceneShot { view: FakeShotView; vx: number; vy: number; life: number; result: number; token: number }
 interface SceneInternals {
-  fruits: Array<{ spec: FruitSpec; view: { x: number; y: number; destroy(): void } }>;
-  shots: unknown[];
+  fruits: Array<{ spec: FruitSpec; view: FakeFruitView; speed: number; phase: number; wobble: number }>;
+  shots: SceneShot[];
   operation: { result: number };
+  operationToken: number;
   status: string;
   solved: number;
   levelIndex: number;
   intrusions: number;
+  failureAction: string;
+  paused: boolean;
+  completionTimer: unknown;
   correctHit(fruit: SceneInternals["fruits"][number]): void;
   wrongHit(fruit: SceneInternals["fruits"][number]): void;
   registerIntrusion(fruit: SceneInternals["fruits"][number]): boolean;
   aimAt(x: number, y: number): void;
   fire(): void;
+  spawnArrival(now: number): void;
+  scheduleCompletion(): void;
   emitSnapshot(): void;
 }
 
@@ -77,11 +86,14 @@ let nextFakeFruitId = 1000;
  * n'importe quel objet aux bonnes propriétés numériques, pas seulement ses
  * propres GameObjects.
  */
-function fakeFruit(number: number): SceneInternals["fruits"][number] {
+function fakeFruit(number: number, x = 500): SceneInternals["fruits"][number] {
   const id = nextFakeFruitId++;
   return {
     spec: { id, family: "tomato", familyLabel: "tomate", emoji: "🍅", variant: "red", variantLabel: "rouge", color: 0xe94f4f, number },
-    view: { x: 500, y: 200, destroy: () => {} },
+    view: { x, y: 200, destroy: () => {}, setPosition: () => {} },
+    speed: 60,
+    phase: 0,
+    wobble: 1.5,
   };
 }
 
@@ -305,6 +317,163 @@ describe("scène Turbo Pulse", () => {
 
     expect(internals.fruits).toHaveLength(fruitsAvant);
     expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
+  });
+
+  it("relance le parcours au niveau 1 depuis le panneau maîtrisé", async () => {
+    const { scene, snapshots } = await mountScene();
+    internalsOf(scene).status = "mastered";
+    internalsOf(scene).levelIndex = 6;
+
+    scene.nextLevel();
+
+    const snapshot = lastSnapshot(snapshots);
+    expect(snapshot.levelIndex).toBe(0);
+    expect(snapshot.status).toBe("playing");
+  });
+
+  it("relance directement le parcours quand la limite de tentatives est épuisée", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.correctHit(internals.fruits[0]);
+    internals.failureAction = "restart-run";
+    internals.status = "failed";
+
+    scene.retryLevel();
+
+    const snapshot = lastSnapshot(snapshots);
+    expect(snapshot.levelIndex).toBe(0);
+    expect(snapshot.score).toBe(0);
+    expect(snapshot.status).toBe("playing");
+  });
+
+  it("repousse un fruit intrus au lieu de le détruire pendant le nettoyage de fin de niveau", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.status = "clearing";
+    const fruit = fakeFruit(7);
+    internals.fruits = [fruit];
+    let repositioned = false;
+    fruit.view.setPosition = () => { repositioned = true; };
+
+    const failed = internals.registerIntrusion(fruit);
+
+    expect(failed).toBe(false);
+    expect(repositioned).toBe(true);
+    // Contrairement à la phase de jeu normale, le fruit n'est pas détruit :
+    // il doit encore pouvoir être visé pour terminer le nettoyage.
+    expect(internals.fruits).toContain(fruit);
+  });
+
+  it("n'engage la fin de niveau qu'une seule fois même si le déclencheur est appelé deux fois", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.status = "clearing";
+    internals.fruits = [];
+
+    internals.scheduleCompletion();
+    const feedbackApresPremierAppel = lastSnapshot(snapshots).feedback;
+    internals.scheduleCompletion();
+
+    expect(lastSnapshot(snapshots).feedback).toBe(feedbackApresPremierAppel);
+  });
+
+  it("ignore un second tir tant que la cadence de tir minimale n'est pas écoulée", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+
+    internals.fire();
+    const apresPremierTir = internals.shots.length;
+    internals.fire();
+
+    expect(internals.shots.length).toBe(apresPremierTir);
+  });
+
+  it("vise et tire via les évènements pointeur réels, sans effet pendant la pause", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+
+    internals.paused = true;
+    scene.input.emit("pointermove", { worldX: 650, worldY: 220 });
+    scene.input.emit("pointerdown", { worldX: 650, worldY: 220 });
+    expect(internals.shots.length).toBe(0);
+
+    internals.paused = false;
+    scene.input.emit("pointermove", { worldX: 650, worldY: 220 });
+    scene.input.emit("pointerdown", { worldX: 650, worldY: 220 });
+
+    expect(internals.shots.length).toBeGreaterThan(0);
+    expect(lastSnapshot(snapshots).operation).toMatch(/= \?$/);
+  });
+
+  it("ignore un tir pointeur pendant un panneau d'échec ou de réussite", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.status = "failed";
+
+    scene.input.emit("pointerdown", { worldX: 650, worldY: 220 });
+
+    expect(internals.shots.length).toBe(0);
+  });
+
+  it("fait avancer les fruits et les tirs, détecte un impact et fait expirer un tir manqué", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+
+    // Un fruit positionné exactement sur la valeur ciblée, assez proche du
+    // tir pour être détecté par la boucle de collision de update().
+    const target = fakeFruit(internals.operation.result, 400);
+    internals.fruits = [target];
+    internals.shots = [{ view: { x: 402, y: 200, destroy: () => {} }, vx: 0, vy: 0, life: 1, result: internals.operation.result, token: internals.operationToken }];
+
+    scene.update(1000, 16);
+
+    expect(lastSnapshot(snapshots).score).toBeGreaterThan(0);
+  });
+
+  it("compte comme raté un tir qui touche un fruit sans porter la bonne réponse", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    const wrongNumber = internals.operation.result + 1000;
+    const target = fakeFruit(wrongNumber, 400);
+    internals.fruits = [target];
+    internals.shots = [{ view: { x: 402, y: 200, destroy: () => {} }, vx: 0, vy: 0, life: 1, result: wrongNumber, token: internals.operationToken }];
+
+    scene.update(1000, 16);
+
+    expect(lastSnapshot(snapshots).streak).toBe(0);
+  });
+
+  it("retire un tir qui expire sans avoir touché aucun fruit", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.shots = [{ view: { x: 300, y: 200, destroy: () => {} }, vx: 0, vy: 0, life: 0.001, result: 1, token: 1 }];
+
+    scene.update(1000, 16);
+
+    expect(internals.shots).toHaveLength(0);
+  });
+
+  it("échoue le niveau dès qu'un fruit franchit entièrement la ligne de défense pendant update()", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.intrusions = 4; // à une intrusion de la limite du niveau 1 (5)
+    // Position déjà au-delà de la ligne de défense : un pas d'update() suffit
+    // à constater le franchissement complet (hasFullyCrossedDefense).
+    internals.fruits = [fakeFruit(1, 20)];
+
+    scene.update(1000, 16);
+
+    expect(lastSnapshot(snapshots).status).toBe("failed");
+  });
+
+  it("déclenche une arrivée naturelle de fruits quand l'échéance planifiée est atteinte", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+    const avant = internals.fruits.length;
+
+    internals.spawnArrival(0);
+
+    expect(internals.fruits.length).toBeGreaterThan(avant);
   });
 });
 

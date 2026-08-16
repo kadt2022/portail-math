@@ -1,6 +1,6 @@
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TurboPulseSnapshot } from "./TurboPulseGame";
@@ -102,6 +102,52 @@ describe("page Turbo Pulse", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, status: "failed", intrusions: 1 }));
     expect(screen.queryByRole("button", { name: "Pause" })).not.toBeInTheDocument();
+  });
+
+  it("signale une seule intrusion et une tentative encore disponible sur un échec expert non épuisé", () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 5, levelName: "X High", intrusions: 1, intrusionLimit: 2, status: "failed", expertAttemptUsed: 1, failureAction: "retry" }));
+
+    expect(screen.getByText("1 fruit a franchi entièrement la ligne de défense.")).toBeInTheDocument();
+    expect(screen.getByText("Tentative 1 sur 3 terminée. La prochaine sera la tentative 2 sur 3.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Recommencer le niveau 6" })).toBeInTheDocument();
+  });
+
+  it("propose de jouer le niveau suivant avec son aperçu une fois un niveau non final terminé", () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 0, status: "level-complete" }));
+
+    expect(screen.getByRole("heading", { name: "Niveau 1 terminé !" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "▶ Jouer le niveau 2" })).toBeInTheDocument();
+    expect(screen.getByText("Niveau 2 — Low")).toBeInTheDocument();
+  });
+
+  it("célèbre la maîtrise complète sans aperçu de niveau suivant", () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
+
+    expect(screen.getByRole("heading", { name: "Turbo Pulse maîtrisé !" })).toBeInTheDocument();
+    expect(screen.getByText("Tu as traversé les 7 niveaux et résolu 84 calculs.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Rejouer depuis le niveau 1" })).toBeInTheDocument();
+  });
+
+  it("quitte le plein écran puis retourne au catalogue de jeux au clic sur Quitter", async () => {
+    const exitFullscreen = vi.fn().mockResolvedValue(undefined);
+    document.exitFullscreen = exitFullscreen;
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/jeux/turbo-pulse"]}>
+        <Routes>
+          <Route path="/jeux/turbo-pulse" element={<TurboPulsePage />} />
+          <Route path="/jeux" element={<p>Retour au catalogue</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Quitter" }));
+
+    expect(await screen.findByText("Retour au catalogue")).toBeInTheDocument();
   });
 
   it("passe en plein écran sans recréer Phaser ni dupliquer le canvas, puis revient à l’état précédent", async () => {
