@@ -94,4 +94,50 @@ describe("moteur Turbo Pulse", () => {
     expect(thirdSix.failures[6]).toBe(0);
     expect(registerFailure(6, { 5: 0, 6: 0 }).attemptUsed).toBe(1);
   });
+
+  it("maîtrise les niveaux 1 et 2 avec des additions simples", () => {
+    const op1 = operationForResult(7, 0, () => 0.3);
+    expect(op1.operator).toBe("+");
+    expect(op1.result).toBe(7);
+    expect(op1.left + op1.right).toBe(7);
+
+    const op2 = operationForResult(15, 1, () => 0.7);
+    expect(op2.operator).toBe("+");
+    expect(op2.result).toBe(15);
+  });
+
+  it("niveau 2 alterne additions et soustractions", () => {
+    const add = operationForResult(20, 2, () => 0.4);
+    const sub = operationForResult(15, 2, () => 0.6);
+    expect(add.operator).toBe("+");
+    expect(sub.operator).toBe("−");
+  });
+
+  it("niveau 3 augmente les grandeurs des opérandes", () => {
+    const op = operationForResult(40, 3, () => 0.5);
+    expect(["+", "−"]).toContain(op.operator);
+    expect(op.result).toBe(40);
+  });
+
+  it("niveaux 4+ incluent multiplications quand possible", () => {
+    // 36 = 6 × 6, disponible à la fois en level 4, 5, 6
+    const op4 = operationForResult(36, 4, () => 0.25);
+    const op5 = operationForResult(36, 5, () => 0.35);
+    const op6 = operationForResult(36, 6, () => 0.35);
+    // Au moins un devrait être une multiplication (probabilité ~28%+ en niveau 4)
+    const hasMultiplication = [op4, op5, op6].some((op) => op.operator === "×");
+    expect(hasMultiplication).toBe(true);
+  });
+
+  it("choisit une cible nulle quand il n'y a aucun fruit", () => {
+    expect(chooseTargetResult([], () => 0.5)).toBeNull();
+  });
+
+  it("génère des fruits avec variantes aléatoires tout en gardant les contraintes uniques", () => {
+    const fruits: FruitSpec[] = [];
+    for (let id = 1; id <= 10; id += 1) {
+      fruits.push(createFruitSpec(fruits, 3, id, () => 0.15 + Math.random() * 0.7));
+    }
+    expect(hasDuplicateTriplets(fruits)).toBe(false);
+  });
 });
