@@ -23,15 +23,23 @@
   font-family: Inter, "Segoe UI", sans-serif;
 }
 
+/* Colonnes gauche/droite volontairement asymétriques (0.55fr / 1.45fr) : la
+   colonne de droite porte trois boutons (Pause, Plein écran, Son) collés à
+   son bord droit (topbarActions en justify-content:flex-end), donc
+   l'élargir ne les déplace jamais — elle crée seulement de l'espace entre
+   le titre et ces boutons. La colonne de gauche (un seul bouton Quitter)
+   reçoit moins de cet espace superflu, ce qui rapproche mécaniquement le
+   titre (colonne centrale, largeur automatique) du bord gauche : un vrai
+   décalage via la grille existante, pas un positionnement absolu fragile. */
 .topbar {
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) auto minmax(110px, 1fr);
+  grid-template-columns: minmax(90px, 0.55fr) auto minmax(160px, 1.45fr);
   align-items: center;
   gap: 12px;
   min-height: 58px;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; text-align: left; justify-self: start; margin-left: clamp(4px, 1vw, 12px); }
+.brand { display: flex; align-items: center; gap: 10px; text-align: left; justify-self: start; }
 .brandMark { display: grid; width: 46px; height: 46px; place-items: center; border: 2px solid #ffe59b; border-radius: 16px 5px 16px 5px; background: var(--turbo-gold); color: var(--turbo-navy); font-size: 25px; box-shadow: 0 5px 0 #9f6c14; }
 .brand h1 { margin: 0; color: #fff; font-size: clamp(20px, 2.3vw, 31px); letter-spacing: -0.035em; white-space: nowrap; }
 .brand p { margin: 2px 0 0; color: var(--turbo-mint); font-size: clamp(10px, 1.2vw, 14px); font-weight: 750; text-transform: uppercase; letter-spacing: 0.1em; }

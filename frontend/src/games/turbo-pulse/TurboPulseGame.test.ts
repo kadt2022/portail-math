@@ -2,7 +2,15 @@ import Phaser from "phaser";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import { mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot } from "./TurboPulseGame";
-import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS, type FruitSpec } from "./turbo-pulse-engine";
+import {
+  CALCULATIONS_PER_LEVEL,
+  CANNON_X,
+  FRUIT_RADIUS,
+  getTurboPulseVisualMetrics,
+  TURBO_LEVELS,
+  type FruitSpec,
+  type TurboPulseVisualMetrics,
+} from "./turbo-pulse-engine";
 
 // Vue interne d'un acteur de la scène : les tests ont besoin de placer les
 // fruits et de déclencher les transitions de partie, ce que l'interface
@@ -34,8 +42,9 @@ interface SceneInternals {
   worldWidth: number;
   worldHeight: number;
   cannonY: number;
-  cannonArm?: { x: number; y: number };
-  cannonBase?: { x: number; y: number };
+  cannonArm?: { x: number; y: number; scaleX: number };
+  cannonBase?: { x: number; y: number; scaleX: number };
+  metrics: TurboPulseVisualMetrics;
 }
 
 function internalsOf(scene: TurboPulseScene): SceneInternals {
@@ -66,6 +75,16 @@ const games: Phaser.Game[] = [];
  * createStartingFruitSpecs) plutôt qu'un simple compteur d'instantanés.
  */
 async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
+  return mountSceneAtSize(960, 540);
+}
+
+/**
+ * Variante de mountScene() avec une taille de monde initiale explicite —
+ * utilisée pour vérifier le facteur visuel borné (getTurboPulseVisualMetrics)
+ * sur un petit écran (ex. téléphone Android en paysage), sans perturber les
+ * nombreux tests qui supposent l'échelle de référence 1 (960×540).
+ */
+async function mountSceneAtSize(width: number, height: number): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
   const parent = document.createElement("div");
   document.body.appendChild(parent);
   const snapshots: TurboPulseSnapshot[] = [];
@@ -73,8 +92,8 @@ async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboP
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
-    width: 960,
-    height: 540,
+    width,
+    height,
     scene,
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   });
@@ -619,6 +638,100 @@ describe("scène Turbo Pulse", () => {
     expect(internals.fruits).toHaveLength(fruitsAvant);
     expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
   });
+
+  // Régression signalée sur téléphone Android en paysage : le passage de
+  // Scale.FIT à Scale.RESIZE (pour corriger l'affichage desktop) a rendu le
+  // monde de jeu responsive, mais les tailles visuelles et les hitboxes de
+  // collision restaient figées en pixels — sur un petit écran, fruits/canon
+  // devenaient proportionnellement énormes. getTurboPulseVisualMetrics()
+  // doit réduire les deux ensemble, jamais l'un sans l'autre.
+  describe("échelle visuelle bornée sur petit écran", () => {
+    it("garde l'échelle de référence (aucune régression) à 960×540", async () => {
+      const { scene } = await mountScene();
+      const internals = internalsOf(scene);
+
+      expect(internals.metrics.scale).toBe(1);
+      expect(internals.metrics.fruitRadius).toBe(FRUIT_RADIUS);
+      expect(internals.metrics.cannonX).toBe(CANNON_X);
+      expect(internals.cannonArm!.scaleX).toBe(1);
+      expect(internals.cannonBase!.scaleX).toBe(1);
+    });
+
+    it("réduit le canon et la position/rayon des fruits sur un petit monde (téléphone Android paysage)", async () => {
+      // Panneau d'informations retiré, statusBar/HUD compressés : gabarit
+      // représentatif d'un Android compact en paysage une fois la zone de
+      // jeu réellement mesurée.
+      const { scene } = await mountScene();
+      const internals = internalsOf(scene);
+
+      scene.scale.resize(640, 300);
+
+      const attendu = getTurboPulseVisualMetrics(640, 300);
+      expect(attendu.scale).toBeLessThan(1);
+      expect(internals.metrics.scale).toBeCloseTo(attendu.scale, 5);
+      expect(internals.metrics.fruitRadius).toBeLessThan(FRUIT_RADIUS);
+      // Le canon suit la même réduction ET se rapproche du bord (marge et
+      // position X proportionnellement réduites), pas seulement sa taille.
+      expect(internals.cannonArm!.scaleX).toBeCloseTo(attendu.scale, 5);
+      expect(internals.cannonBase!.scaleX).toBeCloseTo(attendu.scale, 5);
+      expect(internals.cannonArm!.x).toBeCloseTo(attendu.cannonX, 1);
+      expect(internals.cannonBase!.x).toBeCloseTo(attendu.cannonX, 1);
+    });
+
+    it("ne descend jamais sous le plancher 0.68 même sur un monde extrêmement petit", async () => {
+      const { scene } = await mountScene();
+      const internals = internalsOf(scene);
+
+      scene.scale.resize(200, 120);
+
+      expect(internals.metrics.scale).toBe(0.68);
+    });
+
+    it("valide un tir juste à la distance de collision réduite", async () => {
+      // Preuve directe qu'un fruit visuellement rétréci est bien détecté
+      // avec sa hitbox réduite (metrics.fruitHitRadius), pas avec l'ancien
+      // rayon fixe de référence.
+      const { scene, snapshots } = await mountScene();
+      const internals = internalsOf(scene);
+      scene.scale.resize(640, 300);
+      const { fruitHitRadius } = internals.metrics;
+      expect(fruitHitRadius).toBeLessThan(FRUIT_RADIUS + 22);
+
+      const cible = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+      cible.speed = 0; // fruit immobile : le test ne dépend pas du minutage de la frame
+      const fruitsAvant = internals.fruits.length;
+
+      // Tir à l'intérieur du rayon réduit : doit toucher.
+      internals.shots.push({
+        view: { x: cible.view.x + fruitHitRadius - 1, y: cible.view.y, destroy: () => {} },
+        vx: 0, vy: 0, life: 1, result: internals.operation.result, token: internals.operationToken,
+      });
+      scene.update(1000, 16);
+      expect(internals.fruits.length).toBeLessThan(fruitsAvant);
+      expect(lastSnapshot(snapshots).solved).toBeGreaterThan(0);
+    });
+
+    it("ne valide pas un tir situé au-delà de la distance de collision réduite", async () => {
+      const { scene } = await mountScene();
+      const internals = internalsOf(scene);
+      scene.scale.resize(640, 300);
+      const { fruitHitRadius } = internals.metrics;
+
+      const cible = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+      cible.speed = 0;
+      const fruitsAvant = internals.fruits.length;
+
+      // Tir hors du rayon réduit (mais qui aurait touché avec l'ancien rayon
+      // fixe de référence, non réduit) : ne doit pas être compté comme un
+      // fruit détruit.
+      internals.shots.push({
+        view: { x: cible.view.x + fruitHitRadius + 5, y: cible.view.y, destroy: () => {} },
+        vx: 0, vy: 0, life: 1, result: internals.operation.result, token: internals.operationToken,
+      });
+      scene.update(2000, 16);
+      expect(internals.fruits.length).toBe(fruitsAvant);
+    });
+  });
 });
 
 describe("montage du jeu Turbo Pulse", () => {
@@ -725,6 +838,30 @@ describe("montage du jeu Turbo Pulse", () => {
 
     expect(canvas.width).toBe(1366);
     expect(canvas.height).toBe(768);
+
+    controller.destroy();
+  });
+
+  // Régression potentielle signalée en revue : un plancher appliqué
+  // seulement à la logique de jeu (worldWidth/worldHeight), sans clamper le
+  // canvas réel, ferait croire à Phaser que le monde est plus grand qu'il ne
+  // l'affiche vraiment — désynchronisant coordonnées logiques et pixels
+  // réels. scale.min (configuré dans mountTurboPulseGame) clampe ensemble
+  // displaySize/gameSize ET le canvas : le canvas ne doit donc jamais
+  // descendre sous ce plancher, même quand le conteneur réel est mesuré
+  // plus petit.
+  it("ne laisse jamais le canvas descendre sous le plancher minimal, même si le conteneur réel est plus petit", async () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+    mockRect(parent, 200, 120);
+    const snapshots: TurboPulseSnapshot[] = [];
+
+    const controller = mountTurboPulseGame(parent, (snapshot) => snapshots.push(snapshot));
+    await waitForFirstSnapshot(controller, snapshots);
+
+    const canvas = parent.querySelector("canvas")!;
+    expect(canvas.width).toBeGreaterThanOrEqual(480);
+    expect(canvas.height).toBeGreaterThanOrEqual(270);
 
     controller.destroy();
   });
