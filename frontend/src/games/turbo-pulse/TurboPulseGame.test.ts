@@ -31,6 +31,11 @@ interface SceneInternals {
   scheduleCompletion(): void;
   emitSnapshot(): void;
   cannonBadge?: { text: string };
+  worldWidth: number;
+  worldHeight: number;
+  cannonY: number;
+  cannonArm?: { x: number; y: number };
+  cannonBase?: { x: number; y: number };
 }
 
 function internalsOf(scene: TurboPulseScene): SceneInternals {
@@ -552,6 +557,68 @@ describe("scène Turbo Pulse", () => {
     scene.togglePause();
     assertSynchronise();
   });
+
+  // Un grand écran doit révéler une vraie surface de jeu plus grande — pas
+  // agrandir par étirement une scène 960×540 figée — tout en gardant l'état
+  // de partie (niveau, score, fruits) intact et sans recréer le moteur.
+  it("adopte la nouvelle taille de monde au redimensionnement sans recréer la scène ni réinitialiser la partie", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.correctHit(internals.fruits[0]);
+    const scoreAvant = internals.fruits.length >= 0 ? snapshots[snapshots.length - 1].score : 0;
+    const niveauAvant = internals.levelIndex;
+    const fruitsAvant = internals.fruits.length;
+
+    expect(internals.worldWidth).toBe(960);
+    expect(internals.worldHeight).toBe(540);
+    expect(internals.cannonY).toBe(540 - 75);
+
+    scene.scale.resize(1920, 1080);
+
+    expect(internals.worldWidth).toBe(1920);
+    expect(internals.worldHeight).toBe(1080);
+    expect(internals.cannonY).toBe(1080 - 75);
+    // Le canon suit la nouvelle hauteur (près du bas), sans se déplacer en X
+    // (marge fixe depuis le bord gauche).
+    expect(internals.cannonArm!.y).toBe(1080 - 75);
+    expect(internals.cannonBase!.y).toBe(1080 - 75);
+    // Aucun reset : ni le niveau, ni le score, ni les fruits en jeu.
+    expect(internals.levelIndex).toBe(niveauAvant);
+    expect(snapshots[snapshots.length - 1].score).toBe(scoreAvant);
+    expect(internals.fruits).toHaveLength(fruitsAvant);
+  });
+
+  it("fait apparaître les nouveaux fruits par rapport à la largeur de monde actuelle après un redimensionnement", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+
+    scene.scale.resize(1920, 1080);
+    const avant = internals.fruits.length;
+    internals.spawnArrival(0);
+
+    const nouveauxFruits = internals.fruits.slice(avant);
+    expect(nouveauxFruits.length).toBeGreaterThan(0);
+    // Les fruits arrivent juste après le bord droit du monde actuel (1920),
+    // jamais celui de l'ancienne référence 960×540.
+    nouveauxFruits.forEach((fruit) => expect(fruit.view.x).toBeGreaterThan(1920));
+  });
+
+  it("reste stable si la taille de monde ne change pas réellement (redimensionnement idempotent)", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.correctHit(internals.fruits[0]);
+    const scoreAvant = lastSnapshot(snapshots).score;
+    const fruitsAvant = internals.fruits.length;
+
+    scene.scale.resize(960, 540);
+    scene.scale.resize(960, 540);
+
+    expect(internals.worldWidth).toBe(960);
+    expect(internals.worldHeight).toBe(540);
+    expect(internals.cannonY).toBe(540 - 75);
+    expect(internals.fruits).toHaveLength(fruitsAvant);
+    expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
+  });
 });
 
 describe("montage du jeu Turbo Pulse", () => {
@@ -624,6 +691,40 @@ describe("montage du jeu Turbo Pulse", () => {
     // Le rafraîchissement de mise en page ne doit jamais détruire le canvas.
     controller.refreshLayout();
     expect(parent.querySelectorAll("canvas")).toHaveLength(1);
+
+    controller.destroy();
+  });
+
+  function mockRect(parent: HTMLElement, width: number, height: number) {
+    parent.getBoundingClientRect = () => ({
+      width, height, top: 0, left: 0, right: width, bottom: height, x: 0, y: 0, toJSON: () => {},
+    }) as DOMRect;
+  }
+
+  // Un grand écran doit révéler une vraie surface de jeu plus grande, pas
+  // agrandir par étirement une petite résolution interne fixe : le canvas
+  // Phaser doit recevoir la résolution réellement disponible, au montage et
+  // à chaque appel de refreshLayout() (déclenché par le ResizeObserver React
+  // sur le conteneur, y compris hors plein écran — Phaser ne surveille
+  // nativement que le redimensionnement de la fenêtre).
+  it("dimensionne le canvas sur la taille réelle du conteneur, au montage puis à chaque refreshLayout()", async () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+    mockRect(parent, 1920, 1080);
+    const snapshots: TurboPulseSnapshot[] = [];
+
+    const controller = mountTurboPulseGame(parent, (snapshot) => snapshots.push(snapshot));
+    await waitForFirstSnapshot(controller, snapshots);
+
+    const canvas = parent.querySelector("canvas")!;
+    expect(canvas.width).toBe(1920);
+    expect(canvas.height).toBe(1080);
+
+    mockRect(parent, 1366, 768);
+    controller.refreshLayout();
+
+    expect(canvas.width).toBe(1366);
+    expect(canvas.height).toBe(768);
 
     controller.destroy();
   });

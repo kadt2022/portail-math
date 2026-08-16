@@ -21,3 +21,17 @@ if (typeof window.matchMedia !== "function") {
     dispatchEvent: () => false,
   });
 }
+
+// jsdom n'implémente pas ResizeObserver : ce filet neutre (aucune
+// notification de redimensionnement) évite un crash à l'instanciation pour
+// tout composant qui observe la taille d'un conteneur (ex. TurboPulsePage,
+// qui y adapte le monde de jeu Phaser). Les tests qui doivent vérifier un
+// comportement déclenché par un vrai redimensionnement le simulent
+// directement (ex. scene.scale.resize()) plutôt que via cet observateur.
+if (typeof globalThis.ResizeObserver !== "function") {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
