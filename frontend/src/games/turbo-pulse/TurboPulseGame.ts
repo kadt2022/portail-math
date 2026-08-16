@@ -84,7 +84,11 @@ interface ShotActor {
 
 type SnapshotListener = (snapshot: TurboPulseSnapshot) => void;
 
-class TurboPulseScene extends Phaser.Scene {
+// Exportée pour les tests : ils montent la scène dans un Phaser.Game réel et
+// pilotent directement les transitions de partie (tir juste, tir manqué,
+// intrusion, fin de niveau), impossibles à provoquer de façon déterministe
+// depuis la seule interface publique du contrôleur.
+export class TurboPulseScene extends Phaser.Scene {
   private readonly onSnapshot: SnapshotListener;
   private fruits: FruitActor[] = [];
   private shots: ShotActor[] = [];

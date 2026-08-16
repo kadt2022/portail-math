@@ -1,4 +1,7 @@
 import "@testing-library/jest-dom/vitest";
+// jsdom ne fournit aucun contexte de rendu canvas : sans ce polyfill, Phaser
+// ne peut pas démarrer et la scène de jeu reste intestable.
+import "vitest-canvas-mock";
 import "./i18n/test-language-setup";
 import "./i18n/i18n";
 

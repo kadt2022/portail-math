@@ -37,6 +37,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/vitest.setup.ts"],
     css: true,
+    // Vitest résout "phaser" par le champ "main" du paquet, c'est-à-dire la
+    // source CommonJS non compilée. Celle-ci contient une garde bancale
+    // (`typeof WEBGL_DEBUG`, toujours vraie) qui exige le module de debug
+    // optionnel phaser3spectorjs, absent des dépendances : l'import échoue
+    // avant même le premier test. Le bundle navigateur, lui, est déjà
+    // compilé sans cette branche. Cet alias ne concerne que les tests ; le
+    // build applicatif garde la résolution standard de Vite.
+    alias: {
+      phaser: "phaser/dist/phaser.js",
+    },
     coverage: {
       provider: "v8",
       // Écrit sous build/ (racine du dépôt), au même endroit que le rapport
