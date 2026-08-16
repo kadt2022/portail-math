@@ -61,6 +61,63 @@
       }
     }
   },
+  "turboPulse": {
+    "name": "Turbo Pulse",
+    "description": "Résous les calculs, vise les bons fruits et déclenche des combos de couleur.",
+    "cta": "Jouer",
+    "game": {
+      "title": "Turbo Pulse",
+      "subtitle": "Défi de calcul",
+      "statusLabel": "État de la partie",
+      "level": "Niveau {{level}}",
+      "progress": "Calculs réussis",
+      "score": "Score",
+      "streak": "Série",
+      "defense": "Défense",
+      "solve": "À résoudre",
+      "currentOperation": "Calcul actuel : {{operation}}",
+      "canvasLabel": "Scène interactive Turbo Pulse. Oriente le piston et touche un fruit portant la bonne réponse.",
+      "missionTitle": "Mission calcul",
+      "instructions": "Vise un fruit portant la bonne réponse. Tous les fruits de sa couleur exploseront avec lui.",
+      "touchHint": "Glisse le doigt pour viser, puis touche la scène pour tirer. La réponse reste cachée jusqu’au bon impact.",
+      "failure": {
+        "eyebrow": "Défense franchie",
+        "title": "Niveau {{level}} — {{name}} échoué",
+        "oneIntrusion": "1 fruit a franchi entièrement la ligne de défense.",
+        "manyIntrusions": "{{count}} fruits ont franchi entièrement la ligne de défense.",
+        "limit": "Limite de ce niveau : {{limit}} intrusions.",
+        "ultraLimit": "À Ultra High, aucune intrusion n’est autorisée.",
+        "attempt": "Tentative {{used}} sur 3 terminée. La prochaine sera la tentative {{next}} sur 3.",
+        "exhausted": "3 tentatives terminées. Le parcours reprend au niveau 1."
+      },
+      "success": {
+        "eyebrow": "Station sécurisée",
+        "title": "Niveau {{level}} terminé !",
+        "message": "12 calculs réussis, tous les fruits détruits et la dernière explosion entièrement visible.",
+        "next": "Niveau {{level}} — {{name}}",
+        "masteredTitle": "Turbo Pulse maîtrisé !",
+        "masteredMessage": "Tu as traversé les 7 niveaux et résolu {{count}} calculs."
+      },
+      "paused": {
+        "title": "Jeu en pause",
+        "hint": "Les fruits, les tirs et la cadence sont figés. Reprends quand tu es prêt."
+      },
+      "actions": {
+        "exit": "Quitter",
+        "soundOn": "Son activé",
+        "soundOff": "Son coupé",
+        "restart": "Recommencer",
+        "retryLevel": "Recommencer le niveau {{level}}",
+        "restartRun": "Recommencer au niveau 1",
+        "nextLevel": "▶ Jouer le niveau {{level}}",
+        "playAgain": "Rejouer depuis le niveau 1",
+        "pause": "Pause",
+        "resume": "Continuer",
+        "fullscreenOn": "Plein écran",
+        "fullscreenOff": "Quitter le plein écran"
+      }
+    }
+  },
   "newGame": {
     "name": "Nouveau jeu éducatif",
     "description": "Une nouvelle aventure mathématique arrive bientôt.",

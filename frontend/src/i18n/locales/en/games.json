@@ -61,6 +61,63 @@
       }
     }
   },
+  "turboPulse": {
+    "name": "Turbo Pulse",
+    "description": "Solve each equation, aim at the right fruit and trigger colour combos.",
+    "cta": "Play",
+    "game": {
+      "title": "Turbo Pulse",
+      "subtitle": "Mental maths challenge",
+      "statusLabel": "Game status",
+      "level": "Level {{level}}",
+      "progress": "Solved equations",
+      "score": "Score",
+      "streak": "Streak",
+      "defense": "Defence",
+      "solve": "Solve",
+      "currentOperation": "Current equation: {{operation}}",
+      "canvasLabel": "Interactive Turbo Pulse scene. Aim the piston and hit a fruit carrying the correct answer.",
+      "missionTitle": "Maths mission",
+      "instructions": "Aim at a fruit carrying the correct answer. Every fruit of the same colour will explode with it.",
+      "touchHint": "Slide your finger to aim, then touch the scene to fire. The answer stays hidden until a correct hit.",
+      "failure": {
+        "eyebrow": "Defence breached",
+        "title": "Level {{level}} — {{name}} failed",
+        "oneIntrusion": "1 fruit completely crossed the defence line.",
+        "manyIntrusions": "{{count}} fruits completely crossed the defence line.",
+        "limit": "This level’s limit is {{limit}} intrusions.",
+        "ultraLimit": "Ultra High allows no intrusions.",
+        "attempt": "Attempt {{used}} of 3 is over. The next one will be attempt {{next}} of 3.",
+        "exhausted": "All 3 attempts are over. The run restarts at level 1."
+      },
+      "success": {
+        "eyebrow": "Station secured",
+        "title": "Level {{level}} complete!",
+        "message": "12 equations solved, every fruit destroyed and the final explosion shown in full.",
+        "next": "Level {{level}} — {{name}}",
+        "masteredTitle": "Turbo Pulse mastered!",
+        "masteredMessage": "You cleared all 7 levels and solved {{count}} equations."
+      },
+      "paused": {
+        "title": "Game paused",
+        "hint": "Fruits, shots and spawns are frozen. Resume whenever you're ready."
+      },
+      "actions": {
+        "exit": "Exit",
+        "soundOn": "Sound on",
+        "soundOff": "Sound off",
+        "restart": "Restart",
+        "retryLevel": "Retry level {{level}}",
+        "restartRun": "Restart at level 1",
+        "nextLevel": "▶ Play level {{level}}",
+        "playAgain": "Play again from level 1",
+        "pause": "Pause",
+        "resume": "Resume",
+        "fullscreenOn": "Fullscreen",
+        "fullscreenOff": "Exit fullscreen"
+      }
+    }
+  },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",

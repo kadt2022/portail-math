@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
@@ -24,6 +25,14 @@ import { PRIMARY_COURSES } from "./course-navigation";
 import { NotFoundPage } from "./NotFoundPage";
 import { ProgressionPage } from "./ProgressionPage";
 
+// Turbo Pulse embarque Phaser (moteur de jeu lourd, avec effets de bord au
+// chargement du module) : un chargement paresseux évite de l'inclure dans le
+// bundle principal et surtout d'exécuter ces effets de bord dès qu'une page
+// quelconque du portail est importée (tests compris).
+const TurboPulsePage = lazy(() =>
+  import("../games/turbo-pulse/TurboPulsePage").then((module) => ({ default: module.TurboPulsePage })),
+);
+
 // Le basename est fixé à /app : react-router-dom compose alors des chemins
 // absolus (/app/jeux, ...) sans qu'aucune route ne répète le préfixe.
 // Spring Boot sert déjà index.html pour toute URL sous /app/** qui ne
@@ -45,6 +54,14 @@ export function AppRouter() {
           <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
           <Route path="jeux" element={<GamesCataloguePage />} />
           <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
+          <Route
+            path="jeux/turbo-pulse"
+            element={
+              <Suspense fallback={null}>
+                <TurboPulsePage />
+              </Suspense>
+            }
+          />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />

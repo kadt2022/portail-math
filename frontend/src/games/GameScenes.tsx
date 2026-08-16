@@ -181,3 +181,44 @@ export function ExploreScene() {
     </svg>
   );
 }
+
+export function TurboPulseCardScene() {
+  return (
+    <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="turboPulseSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#123d55" />
+          <stop offset="100%" stopColor="#69a99b" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#turboPulseSky)" />
+      <circle cx="330" cy="42" r="28" fill="#ffc857" opacity="0.92" />
+      <path d="M0 145 L86 74 L155 145 L238 55 L328 145 L400 92 V240 H0 Z" fill="#286d65" />
+      <rect y="150" width="400" height="90" fill="#17493f" />
+      <path d="M30 155 H390 M30 190 H390 M30 225 H390" stroke="#6ca78d" strokeWidth="10" strokeLinecap="round" opacity="0.45" />
+      <path d="M32 24 V224" stroke="#ffc857" strokeWidth="4" strokeDasharray="8 7" />
+      <g transform="translate(84 188)">
+        <circle r="29" fill="#355b70" stroke="#ffc857" strokeWidth="6" />
+        <g transform="rotate(-28)">
+          <rect x="0" y="-10" width="76" height="20" rx="8" fill="#a7d2d2" />
+          <rect x="62" y="-14" width="18" height="28" rx="6" fill="#ffc857" />
+        </g>
+      </g>
+      {[
+        { x: 210, y: 96, color: "#e95464", value: 5, mark: "🍓" },
+        { x: 292, y: 135, color: "#69a84f", value: 5, mark: "🥑" },
+        { x: 350, y: 195, color: "#845ec2", value: 8, mark: "🍇" },
+      ].map((fruit) => (
+        <g key={`${fruit.x}-${fruit.y}`} transform={`translate(${fruit.x} ${fruit.y})`}>
+          <circle r="27" fill={fruit.color} />
+          <circle r="21" fill="#fff3cf" />
+          <text y="-4" textAnchor="middle" fontSize="19">{fruit.mark}</text>
+          <text y="16" textAnchor="middle" fontSize="17" fontWeight="900" fill="#16324a">{fruit.value}</text>
+        </g>
+      ))}
+      <path d="M132 160 L180 126" stroke="#ffffff" strokeWidth="3" strokeDasharray="6 7" opacity="0.55" />
+      <rect x="128" y="137" width="54" height="28" rx="10" fill="#fff7dc" stroke="#ffc857" strokeWidth="3" />
+      <text x="155" y="157" textAnchor="middle" fontSize="14" fontWeight="900" fill="#16324a">2+3</text>
+    </svg>
+  );
+}
