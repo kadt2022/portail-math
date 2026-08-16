@@ -47,7 +47,11 @@ const SHOT_SPEED = 620;
 // d'articulation du bras) tombe donc au même endroit dans les deux images,
 // mesuré une fois pour toutes sur les rendus exportés.
 const CANNON_PIVOT_ORIGIN_X = 0.5;
-const CANNON_PIVOT_ORIGIN_Y = 0.4956;
+// Remonté (0.4956 → 0.4473) après la refonte "référence visuelle" : la
+// rotule/le pivot vit maintenant plus haut dans la scène Babylon (au sommet
+// du col, au-dessus du socle bleu élargi), donc plus haut aussi dans le
+// cadrage caméra partagé par les deux images.
+const CANNON_PIVOT_ORIGIN_Y = 0.4473;
 // La caméra 3/4 fait reposer le tube à ~-10.9° (et non à l'horizontale) dans
 // l'image non tournée : sans cette correction, l'orientation visuelle du
 // canon dérive de la vraie trajectoire du tir (calculée séparément à partir
