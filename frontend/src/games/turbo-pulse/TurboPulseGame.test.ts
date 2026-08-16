@@ -30,6 +30,12 @@ interface SceneInternals {
   spawnArrival(now: number): void;
   scheduleCompletion(): void;
   emitSnapshot(): void;
+  cannonBadge?: { text: string };
+  worldWidth: number;
+  worldHeight: number;
+  cannonY: number;
+  cannonArm?: { x: number; y: number };
+  cannonBase?: { x: number; y: number };
 }
 
 function internalsOf(scene: TurboPulseScene): SceneInternals {
@@ -48,9 +54,16 @@ const games: Phaser.Game[] = [];
  * de `create()` (différence de timing du bootstrap Phaser dans cet
  * environnement, sans rapport avec la logique de jeu) : `restartRun()`
  * s'arrête donc sur son garde-fou `isActive()` lors de ce tout premier appel
- * automatique. On attend que la scène soit active puis on relance nous-mêmes
- * `restartRun()` — exactement l'action qu'exécute le bouton « Recommencer »
- * une fois la partie chargée.
+ * automatique. Pire, une frame update() isolée peut s'exécuter dans cette
+ * fenêtre avant même notre restartRun() explicite (scène active mais niveau
+ * pas encore démarré) : ensureSafetyStock()/ensureTarget() créent alors des
+ * fruits temporaires et émettent un instantané parasite — un simple
+ * "au moins un instantané est arrivé" n'est donc plus un signal fiable
+ * (c'est justement ce que corrige ce fichier : setTarget() publie désormais
+ * chaque changement). On relance systématiquement restartRun() ici — il
+ * repart proprement d'un niveau 0 à 3 fruits quoi qu'il se soit passé avant
+ * — et on attend ce marqueur fiable (remainingFruits === 3, garanti par
+ * createStartingFruitSpecs) plutôt qu'un simple compteur d'instantanés.
  */
 async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
   const parent = document.createElement("div");
@@ -67,8 +80,8 @@ async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboP
   });
   games.push(game);
   await vi.waitFor(() => expect(scene.scene.isActive()).toBe(true), { timeout: 5000 });
-  if (snapshots.length === 0) scene.restartRun();
-  await vi.waitFor(() => expect(snapshots.length).toBeGreaterThan(0), { timeout: 5000 });
+  scene.restartRun();
+  await vi.waitFor(() => expect(lastSnapshot(snapshots)?.remainingFruits).toBe(3), { timeout: 5000 });
   return { scene, snapshots };
 }
 
@@ -475,6 +488,137 @@ describe("scène Turbo Pulse", () => {
 
     expect(internals.fruits.length).toBeGreaterThan(avant);
   });
+
+  // Régression : le fruit ciblé peut disparaître entre deux instantanés
+  // (intrusion, arrivée qui le remplace...). ensureTarget() choisit alors une
+  // nouvelle cible en cours de frame, via update() — un enfant ne doit jamais
+  // voir « À résoudre » indiquer un calcul différent de celui affiché sur le
+  // piston Phaser ou de celui réellement validé par les tirs.
+  it("republie immédiatement le nouveau calcul quand le fruit ciblé disparaît en cours de frame", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    const ancienResultat = internals.operation.result;
+    const nombreInstantanesAvant = snapshots.length;
+
+    // Le fruit ciblé n'existe plus parmi les fruits présents : ensureTarget()
+    // doit constater l'absence et retargeter dès le prochain update().
+    internals.fruits = internals.fruits.filter((fruit) => fruit.spec.number !== ancienResultat);
+    internals.fruits.push(fakeFruit(ancienResultat + 37));
+
+    scene.update(1000, 16);
+
+    expect(snapshots.length).toBeGreaterThan(nombreInstantanesAvant);
+    const snapshot = lastSnapshot(snapshots);
+    const nouveauResultat = internals.operation.result;
+    expect(nouveauResultat).not.toBe(ancienResultat);
+    // HUD React, piston Phaser et validation des tirs partagent la même
+    // source (this.operation) : les trois doivent afficher exactement le
+    // même calcul dès qu'il change, sans attendre un futur évènement de jeu.
+    // La réponse elle-même reste volontairement absente du texte affiché
+    // (voir formatOperation) : on ne vérifie donc que l'égalité stricte des
+    // deux affichages, jamais la présence du résultat caché.
+    expect(snapshot.operation).toBe(internals.cannonBadge!.text);
+  });
+
+  it("garde le HUD, le piston et la validation des tirs synchronisés sur un parcours complet", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+
+    function assertSynchronise() {
+      const snapshot = lastSnapshot(snapshots);
+      // La réponse reste cachée dans le texte affiché : seule l'égalité
+      // stricte HUD/piston prouve la synchronisation, jamais son contenu.
+      expect(snapshot.operation).toBe(internals.cannonBadge!.text);
+      expect(snapshot.operation).toMatch(/= \?$/);
+    }
+
+    // démarrage
+    assertSynchronise();
+
+    // bonne réponse (peut déclencher un combo selon les fruits de départ)
+    const cible = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+    internals.correctHit(cible);
+    assertSynchronise();
+
+    // nouveau calcul provoqué par la disparition du fruit ciblé pendant une frame
+    const resultatCourant = internals.operation.result;
+    internals.fruits = internals.fruits.filter((fruit) => fruit.spec.number !== resultatCourant);
+    internals.fruits.push(fakeFruit(resultatCourant + 41));
+    scene.update(2000, 16);
+    assertSynchronise();
+
+    // resize (refreshLayout ne doit ni recréer la scène ni désynchroniser l'affichage)
+    scene.refreshLayout();
+    assertSynchronise();
+
+    // pause/reprise
+    scene.togglePause();
+    assertSynchronise();
+    scene.togglePause();
+    assertSynchronise();
+  });
+
+  // Un grand écran doit révéler une vraie surface de jeu plus grande — pas
+  // agrandir par étirement une scène 960×540 figée — tout en gardant l'état
+  // de partie (niveau, score, fruits) intact et sans recréer le moteur.
+  it("adopte la nouvelle taille de monde au redimensionnement sans recréer la scène ni réinitialiser la partie", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.correctHit(internals.fruits[0]);
+    const scoreAvant = internals.fruits.length >= 0 ? snapshots[snapshots.length - 1].score : 0;
+    const niveauAvant = internals.levelIndex;
+    const fruitsAvant = internals.fruits.length;
+
+    expect(internals.worldWidth).toBe(960);
+    expect(internals.worldHeight).toBe(540);
+    expect(internals.cannonY).toBe(540 - 75);
+
+    scene.scale.resize(1920, 1080);
+
+    expect(internals.worldWidth).toBe(1920);
+    expect(internals.worldHeight).toBe(1080);
+    expect(internals.cannonY).toBe(1080 - 75);
+    // Le canon suit la nouvelle hauteur (près du bas), sans se déplacer en X
+    // (marge fixe depuis le bord gauche).
+    expect(internals.cannonArm!.y).toBe(1080 - 75);
+    expect(internals.cannonBase!.y).toBe(1080 - 75);
+    // Aucun reset : ni le niveau, ni le score, ni les fruits en jeu.
+    expect(internals.levelIndex).toBe(niveauAvant);
+    expect(snapshots[snapshots.length - 1].score).toBe(scoreAvant);
+    expect(internals.fruits).toHaveLength(fruitsAvant);
+  });
+
+  it("fait apparaître les nouveaux fruits par rapport à la largeur de monde actuelle après un redimensionnement", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+
+    scene.scale.resize(1920, 1080);
+    const avant = internals.fruits.length;
+    internals.spawnArrival(0);
+
+    const nouveauxFruits = internals.fruits.slice(avant);
+    expect(nouveauxFruits.length).toBeGreaterThan(0);
+    // Les fruits arrivent juste après le bord droit du monde actuel (1920),
+    // jamais celui de l'ancienne référence 960×540.
+    nouveauxFruits.forEach((fruit) => expect(fruit.view.x).toBeGreaterThan(1920));
+  });
+
+  it("reste stable si la taille de monde ne change pas réellement (redimensionnement idempotent)", async () => {
+    const { scene, snapshots } = await mountScene();
+    const internals = internalsOf(scene);
+    internals.correctHit(internals.fruits[0]);
+    const scoreAvant = lastSnapshot(snapshots).score;
+    const fruitsAvant = internals.fruits.length;
+
+    scene.scale.resize(960, 540);
+    scene.scale.resize(960, 540);
+
+    expect(internals.worldWidth).toBe(960);
+    expect(internals.worldHeight).toBe(540);
+    expect(internals.cannonY).toBe(540 - 75);
+    expect(internals.fruits).toHaveLength(fruitsAvant);
+    expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
+  });
 });
 
 describe("montage du jeu Turbo Pulse", () => {
@@ -547,6 +691,40 @@ describe("montage du jeu Turbo Pulse", () => {
     // Le rafraîchissement de mise en page ne doit jamais détruire le canvas.
     controller.refreshLayout();
     expect(parent.querySelectorAll("canvas")).toHaveLength(1);
+
+    controller.destroy();
+  });
+
+  function mockRect(parent: HTMLElement, width: number, height: number) {
+    parent.getBoundingClientRect = () => ({
+      width, height, top: 0, left: 0, right: width, bottom: height, x: 0, y: 0, toJSON: () => {},
+    }) as DOMRect;
+  }
+
+  // Un grand écran doit révéler une vraie surface de jeu plus grande, pas
+  // agrandir par étirement une petite résolution interne fixe : le canvas
+  // Phaser doit recevoir la résolution réellement disponible, au montage et
+  // à chaque appel de refreshLayout() (déclenché par le ResizeObserver React
+  // sur le conteneur, y compris hors plein écran — Phaser ne surveille
+  // nativement que le redimensionnement de la fenêtre).
+  it("dimensionne le canvas sur la taille réelle du conteneur, au montage puis à chaque refreshLayout()", async () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+    mockRect(parent, 1920, 1080);
+    const snapshots: TurboPulseSnapshot[] = [];
+
+    const controller = mountTurboPulseGame(parent, (snapshot) => snapshots.push(snapshot));
+    await waitForFirstSnapshot(controller, snapshots);
+
+    const canvas = parent.querySelector("canvas")!;
+    expect(canvas.width).toBe(1920);
+    expect(canvas.height).toBe(1080);
+
+    mockRect(parent, 1366, 768);
+    controller.refreshLayout();
+
+    expect(canvas.width).toBe(1366);
+    expect(canvas.height).toBe(768);
 
     controller.destroy();
   });
