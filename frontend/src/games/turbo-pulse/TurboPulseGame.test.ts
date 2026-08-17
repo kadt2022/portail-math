@@ -740,6 +740,41 @@ describe("scène Turbo Pulse", () => {
       expect(internals.fruits.length).toBe(fruitsAvant);
     });
   });
+
+  // Régression signalée en jeu : le canon se bloquait complètement après
+  // plusieurs tirs rapprochés. Un tir juste déclenche correctHit() ->
+  // setTarget(), qui vide ET RÉASSIGNE this.shots (this.shots = []) pour
+  // invalider les tirs visant l'ancienne cible. La boucle de update() partait
+  // du dernier index et relisait `this.shots[index]` à chaque itération :
+  // après cette réassignation, un autre tir pas encore traité dans la même
+  // frame retombait sur le nouveau tableau (vide) à un index inexistant ->
+  // `undefined` -> `shot.view` plantait (exception non rattrapée dans la
+  // boucle Phaser).
+  it("traite plusieurs tirs simultanés sans planter quand l'un d'eux change la cible en cours de frame", async () => {
+    const { scene } = await mountScene();
+    const internals = internalsOf(scene);
+
+    const cible = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+    cible.speed = 0; // fruit immobile : le test ne dépend pas du minutage de la frame
+
+    // Tir A : encore loin de toute cible, doit simplement continuer sa
+    // trajectoire cette frame-ci. Poussé en premier (index le plus bas) :
+    // la boucle descendante le traite APRÈS le tir B.
+    internals.shots.push({
+      view: { x: 10, y: 10, destroy: () => {} },
+      vx: 0, vy: 0, life: 5, result: internals.operation.result, token: internals.operationToken,
+    });
+    // Tir B : touche la cible en plein centre -> correctHit() -> setTarget()
+    // -> this.shots réassigné à [] alors que le tir A n'a pas encore été
+    // traité dans cette même frame. Poussé en dernier (index le plus haut) :
+    // traité EN PREMIER par la boucle descendante.
+    internals.shots.push({
+      view: { x: cible.view.x, y: cible.view.y, destroy: () => {} },
+      vx: 0, vy: 0, life: 5, result: internals.operation.result, token: internals.operationToken,
+    });
+
+    expect(() => scene.update(1000, 16)).not.toThrow();
+  });
 });
 
 describe("montage du jeu Turbo Pulse", () => {
