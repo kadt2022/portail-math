@@ -71,6 +71,11 @@ function FailurePanel({ snapshot, onRetry }: { snapshot: TurboPulseSnapshot; onR
         <h2 id="turbo-failure-title">
           {t("turboPulse.game.failure.title", { level: levelNumber, name: snapshot.levelName })}
         </h2>
+        <button type="button" className={styles.dangerAction} onClick={onRetry}>
+          {exhausted
+            ? t("turboPulse.game.actions.restartRun")
+            : t("turboPulse.game.actions.retryLevel", { level: levelNumber })}
+        </button>
         <p>
           {snapshot.intrusions === 1
             ? t("turboPulse.game.failure.oneIntrusion")
@@ -88,11 +93,6 @@ function FailurePanel({ snapshot, onRetry }: { snapshot: TurboPulseSnapshot; onR
               : t("turboPulse.game.failure.attempt", { used: snapshot.expertAttemptUsed, next: snapshot.expertAttemptUsed + 1 })}
           </p>
         ) : null}
-        <button type="button" className={styles.dangerAction} onClick={onRetry}>
-          {exhausted
-            ? t("turboPulse.game.actions.restartRun")
-            : t("turboPulse.game.actions.retryLevel", { level: levelNumber })}
-        </button>
       </section>
     </div>
   );
