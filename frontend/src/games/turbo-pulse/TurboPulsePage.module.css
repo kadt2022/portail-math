@@ -119,7 +119,41 @@
    un cadre 960×540 figé — d'où un plafond nettement relevé par rapport à la
    taille d'affichage cible d'origine. */
 .canvasFrame { position: relative; width: auto; height: 100%; max-width: min(100%, 1800px); max-height: min(100%, calc(1800px * 9 / 16)); min-width: 0; aspect-ratio: 16 / 9; align-self: center; justify-self: center; overflow: hidden; border: 3px solid #d5bd80; border-radius: clamp(16px, 2.4vw, 30px); background: #123d55; box-shadow: 0 14px 36px rgb(0 0 0 / 42%), inset 0 0 0 2px rgb(255 255 255 / 24%); }
-.gameHost { position: absolute; inset: 0; touch-action: none; }
+/* Décor illustré, calque CSS/DOM séparé sous le canvas Phaser (transparent,
+   voir mountTurboPulseGame) : composé une seule fois par le navigateur (GPU),
+   jamais recalculé par frame comme le serait un shader WebGL appliqué à
+   cette grande image statique.
+   Profondeur "façon cinéma" plutôt qu'un flou uniforme : .background est le
+   décor net (premier plan/rivière 100% nets) ; ::after superpose la MÊME
+   image légèrement floutée, révélée progressivement vers le haut du cadre
+   par mask-image (transparent en bas → opaque en haut). Le flou augmente
+   donc avec l'éloignement apparent (bâtiments, puis montagnes lointaines)
+   sans jamais toucher le premier plan. inset:-2px + scale(1.005) sur ::after
+   masquent le léger liseré vide que son propre flou créerait sur les bords ;
+   overflow:hidden sur .canvasFrame clippe ce débord et arrondit les coins.
+*/
+/* --level-background posée en style inline par TurboPulsePage (chargement
+   paresseux par niveau via import() dynamique, voir LEVEL_BACKGROUND_MODULES)
+   : le décor n'est donc plus un asset figé au build, mais suit
+   snapshot.levelIndex. Repli vers un dégradé neutre tant que le premier
+   import n'a pas résolu (évite un flash de fond transparent au montage). */
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--level-background, linear-gradient(145deg, #123d55, #0d2634)) center/cover no-repeat;
+}
+.background::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: var(--level-background, linear-gradient(145deg, #123d55, #0d2634)) center/cover no-repeat;
+  filter: blur(1.1px) saturate(0.94);
+  transform: scale(1.005);
+  mask-image: linear-gradient(to top, transparent 0%, transparent 30%, rgb(0 0 0 / 25%) 48%, rgb(0 0 0 / 65%) 70%, black 100%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, transparent 30%, rgb(0 0 0 / 25%) 48%, rgb(0 0 0 / 65%) 70%, black 100%);
+}
+.gameHost { position: absolute; inset: 0; z-index: 2; touch-action: none; }
 /* Pas de width/height forcés ici : Phaser (Scale.RESIZE) dimensionne déjà le
    canvas — attribut ET style — sur la taille réellement mesurée du
    conteneur. Un override CSS figerait la résolution interne pendant que le
