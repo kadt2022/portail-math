@@ -199,20 +199,32 @@ export class TurboPulseScene extends Phaser.Scene {
       }
     }
 
-    for (let index = this.shots.length - 1; index >= 0; index -= 1) {
-      const shot = this.shots[index];
+    // Référence stable capturée AVANT la boucle : un tir juste peut déclencher
+    // this.correctHit() -> this.setTarget(), qui vide ET RÉASSIGNE
+    // intégralement this.shots (this.shots = []) pour invalider les tirs en
+    // vol visant l'ancienne cible. Si d'autres tirs restent à traiter dans
+    // CETTE frame (plusieurs tirs simultanés), relire `this.shots[index]`
+    // après cette réassignation retombe sur le NOUVEAU tableau (vide) à un
+    // index qui n'y existe plus -> `undefined`, et `shot.view` plantait
+    // (blocage complet du jeu signalé après plusieurs tirs rapprochés). En
+    // itérant sur cette référence locale, les tirs restants de la frame sont
+    // traités normalement (rejetés côté jeton, voir plus bas) sans jamais
+    // relire le tableau réassigné.
+    const shots = this.shots;
+    for (let index = shots.length - 1; index >= 0; index -= 1) {
+      const shot = shots[index];
       shot.view.x += shot.vx * seconds;
       shot.view.y += shot.vy * seconds;
       shot.life -= seconds;
       if (shot.life <= 0 || shot.view.x < -80 || shot.view.x > this.worldWidth + 80 || shot.view.y < -80 || shot.view.y > this.worldHeight + 80) {
         shot.view.destroy();
-        this.shots.splice(index, 1);
+        shots.splice(index, 1);
         continue;
       }
       const hit = this.fruits.find((fruit) => Phaser.Math.Distance.Between(shot.view.x, shot.view.y, fruit.view.x, fruit.view.y) <= this.metrics.fruitHitRadius);
       if (hit) {
         shot.view.destroy();
-        this.shots.splice(index, 1);
+        shots.splice(index, 1);
         if (hit.spec.number === shot.result && shot.result === this.operation.result && shot.token === this.operationToken) this.correctHit(hit);
         else this.wrongHit(hit);
       }
@@ -315,8 +327,13 @@ export class TurboPulseScene extends Phaser.Scene {
   // (handleResize) sans jamais recréer la scène ni perdre la partie en
   // cours. Appelé par le ResizeObserver React sur le conteneur, y compris
   // hors plein écran.
+  // this.scale peut être absent si la scène a été arrêtée/détruite (ex.
+  // juste après une exception non rattrapée ailleurs dans la boucle de jeu,
+  // ou pendant un démontage React) au moment où le ResizeObserver externe
+  // déclenche cet appel — un plantage silencieux ici ne doit jamais se
+  // reproduire au prochain redimensionnement.
   refreshLayout = () => {
-    if (this.scale.getParentBounds()) this.scale.refresh();
+    if (this.scale?.getParentBounds()) this.scale.refresh();
   };
 
   // Décor purement visuel : ni les positions de collision (défense, canon)
