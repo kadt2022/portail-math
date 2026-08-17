@@ -132,17 +132,22 @@
    masquent le léger liseré vide que son propre flou créerait sur les bords ;
    overflow:hidden sur .canvasFrame clippe ce débord et arrondit les coins.
 */
+/* --level-background posée en style inline par TurboPulsePage (chargement
+   paresseux par niveau via import() dynamique, voir LEVEL_BACKGROUND_MODULES)
+   : le décor n'est donc plus un asset figé au build, mais suit
+   snapshot.levelIndex. Repli vers un dégradé neutre tant que le premier
+   import n'a pas résolu (évite un flash de fond transparent au montage). */
 .background {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: url("../../assets/turbo-pulse/niv001.png") center/cover no-repeat;
+  background: var(--level-background, linear-gradient(145deg, #123d55, #0d2634)) center/cover no-repeat;
 }
 .background::after {
   content: "";
   position: absolute;
   inset: -2px;
-  background: url("../../assets/turbo-pulse/niv001.png") center/cover no-repeat;
+  background: var(--level-background, linear-gradient(145deg, #123d55, #0d2634)) center/cover no-repeat;
   filter: blur(1.1px) saturate(0.94);
   transform: scale(1.005);
   mask-image: linear-gradient(to top, transparent 0%, transparent 30%, rgb(0 0 0 / 25%) 48%, rgb(0 0 0 / 65%) 70%, black 100%);

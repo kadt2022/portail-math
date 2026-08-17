@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +9,20 @@ import {
 } from "./TurboPulseGame";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
 import styles from "./TurboPulsePage.module.css";
+
+// import() dynamique (pas un import statique) : Vite ne télécharge le décor
+// d'un niveau que lorsqu'il est effectivement atteint, au lieu de charger les
+// 7 fonds dès l'arrivée sur le jeu. Un seul décor n'existe pas encore pour le
+// niveau 7 (Ultra High) : il réutilise celui du niveau 6 en attendant.
+const LEVEL_BACKGROUND_MODULES = [
+  () => import("../../assets/turbo-pulse/niv001.webp"),
+  () => import("../../assets/turbo-pulse/niv002.webp"),
+  () => import("../../assets/turbo-pulse/niv003.webp"),
+  () => import("../../assets/turbo-pulse/niv004.webp"),
+  () => import("../../assets/turbo-pulse/niv005.webp"),
+  () => import("../../assets/turbo-pulse/niv006.webp"),
+  () => import("../../assets/turbo-pulse/niv006.webp"),
+] as const;
 
 const INITIAL_SNAPSHOT: TurboPulseSnapshot = {
   levelIndex: 0,
@@ -125,6 +139,24 @@ export function TurboPulsePage() {
   const controllerRef = useRef<TurboPulseController | null>(null);
   const [snapshot, setSnapshot] = useState(INITIAL_SNAPSHOT);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+
+  // Décor chargé par niveau (voir LEVEL_BACKGROUND_MODULES) : re-déclenché
+  // uniquement quand levelIndex change réellement, jamais à chaque
+  // instantané de partie (score/série/etc.), pour ne jamais re-télécharger
+  // le même décor. `cancelled` évite d'appliquer un import résolu en retard
+  // après un changement de niveau plus récent (ex. Recommencer pendant que
+  // l'import du niveau précédent était encore en vol).
+  useEffect(() => {
+    let cancelled = false;
+    const index = Math.min(snapshot.levelIndex, LEVEL_BACKGROUND_MODULES.length - 1);
+    LEVEL_BACKGROUND_MODULES[index]().then((module) => {
+      if (!cancelled) setBackgroundUrl(module.default);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [snapshot.levelIndex]);
 
   useEffect(() => {
     if (!gameHostRef.current) return;
@@ -292,7 +324,11 @@ export function TurboPulsePage() {
               Phaser (transparent). Le flou "façon cinéma" est composé une
               fois par le navigateur, jamais recalculé par frame comme le
               serait un shader WebGL sur cette grande image statique. */}
-          <div className={styles.background} aria-hidden="true" />
+          <div
+            className={styles.background}
+            aria-hidden="true"
+            style={backgroundUrl ? ({ "--level-background": `url("${backgroundUrl}")` } as CSSProperties) : undefined}
+          />
           <div ref={gameHostRef} className={styles.gameHost} role="img" aria-label={t("turboPulse.game.canvasLabel")} />
           <div className={styles.operation} aria-label={t("turboPulse.game.currentOperation", { operation: snapshot.operation })}>
             <span>{t("turboPulse.game.solve")}</span>
