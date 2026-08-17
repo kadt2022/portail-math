@@ -215,9 +215,19 @@ export function createFruitSpec(existing: readonly FruitSpec[], levelIndex: numb
   const occupied = new Set(existing.filter((fruit) => fruit.family === identity.family && fruit.variant === identity.variant).map((fruit) => fruit.number));
   const reusable = existing.filter((fruit) => fruit.variant !== identity.variant && !occupied.has(fruit.number));
   const candidates = Array.from({ length: level.maxResult - level.minResult + 1 }, (_, index) => level.minResult + index).filter((number) => !occupied.has(number));
-  const number = reusable.length > 0 && rng() < 0.52
-    ? reusable[randomInt(0, reusable.length - 1, rng)].number
-    : candidates[randomInt(0, candidates.length - 1, rng)];
+  // candidates peut être vide : si assez de fruits de cette même
+  // famille/variante sont déjà en jeu (plage de niveau parfois réduite, ex.
+  // 9 valeurs seulement au niveau 1) pour occuper TOUTES les valeurs
+  // possibles, candidates[randomInt(0, -1)] valait alors `undefined` — un
+  // nombre de fruit corrompu qui cassait ensuite le calcul affiché (NaN) et
+  // la détection de la bonne réponse. reusable en repli, puis en dernier
+  // recours une valeur du niveau même déjà occupée (doublon accepté), jamais
+  // un fruit sans nombre.
+  const number = candidates.length > 0
+    ? (reusable.length > 0 && rng() < 0.52 ? reusable[randomInt(0, reusable.length - 1, rng)].number : candidates[randomInt(0, candidates.length - 1, rng)])
+    : reusable.length > 0
+      ? reusable[randomInt(0, reusable.length - 1, rng)].number
+      : randomInt(level.minResult, level.maxResult, rng);
   return { id: nextId, ...identity, number };
 }
 
