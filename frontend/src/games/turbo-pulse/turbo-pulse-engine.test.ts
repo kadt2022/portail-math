@@ -57,6 +57,38 @@ describe("moteur Turbo Pulse", () => {
     expect(hasDuplicateTriplets(fruits)).toBe(false);
   });
 
+  // Régression signalée en jeu : quand assez de fruits de la même
+  // famille/variante s'accumulent pour occuper TOUTES les valeurs possibles
+  // du niveau (plage réduite au niveau 1 : seulement 9 valeurs, 2 à 10),
+  // candidates devenait vide et candidates[randomInt(0, -1)] renvoyait
+  // `undefined` — un fruit sans nombre, qui corrompait ensuite le calcul
+  // affiché (NaN + NaN = ?) une fois choisi comme cible.
+  it("ne produit jamais un fruit sans nombre même si toutes les valeurs du niveau sont occupées", () => {
+    const existing: FruitSpec[] = Array.from({ length: 9 }, (_, index) => ({
+      id: index + 1,
+      family: "tomato",
+      familyLabel: "tomate",
+      emoji: "🍅",
+      variant: "red",
+      variantLabel: "rouge",
+      color: 0xe94f4f,
+      number: 2 + index, // occupe 2..10, toute la plage du niveau 1
+    }));
+    // Force la réutilisation de existing[0] comme modèle (même famille/variante,
+    // donc candidates=[]), puis évite la branche reusable pour retomber sur
+    // l'ancien candidates[randomInt(0, -1)].
+    let call = 0;
+    const rng = () => {
+      call += 1;
+      if (call === 1) return 0; // < 0.58 -> réutilise existing[0] comme modèle
+      if (call === 2) return 0; // randomInt(0, existing.length-1) -> index 0
+      return 0.99; // >= 0.52 -> ignore la branche reusable
+    };
+    const spec = createFruitSpec(existing, 0, 100, rng);
+    expect(spec.number).toBeTypeOf("number");
+    expect(Number.isFinite(spec.number)).toBe(true);
+  });
+
   it("privilégie une valeur disponible dans plusieurs couleurs", () => {
     expect(chooseTargetResult([redNine, redFive, greenFive], () => 0.99)).toBe(5);
   });
