@@ -1,0 +1,414 @@
+.page {
+  --ff-gap: 16px;
+  --ff-panel-width: 340px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--ff-gap);
+  max-width: var(--pm-max-width);
+  margin: 0 auto;
+  padding: 20px 16px 32px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--pm-radius-md);
+  color: var(--pm-ink-soft);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: var(--pm-surface-warm);
+}
+
+.titleBlock {
+  flex: 1 1 220px;
+}
+
+.titleBlock h1 {
+  margin: 0;
+  font-size: clamp(22px, 4vw, 30px);
+}
+
+.titleBlock p {
+  margin: 2px 0 0;
+  color: var(--pm-ink-soft);
+}
+
+.houseChips {
+  display: flex;
+  gap: 8px;
+}
+
+.houseChip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  font-weight: 800;
+  border: 2px solid var(--pm-line);
+  color: var(--pm-ink-soft);
+  background: var(--pm-surface);
+}
+
+.houseChip_active {
+  border-color: var(--pm-accent);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+}
+
+.houseChip_completed {
+  border-color: var(--pm-success);
+  background: var(--pm-success-soft);
+  color: var(--pm-success);
+}
+
+.houseChip_locked {
+  opacity: 0.55;
+}
+
+.playArea {
+  display: grid;
+  grid-template-columns: 1fr var(--ff-panel-width);
+  gap: var(--ff-gap);
+  align-items: start;
+}
+
+.canvasFrame {
+  position: relative;
+  min-height: 460px;
+  height: 62vh;
+  max-height: 720px;
+  overflow: hidden;
+  border-radius: var(--pm-radius-lg);
+  background: linear-gradient(180deg, #bfe6ff 0%, #bfe6ff 58%, #9ccf7a 58%, #9ccf7a 100%);
+  box-shadow: var(--pm-shadow-md);
+  transition: box-shadow 0.15s ease;
+}
+
+.canvasFrameDropReady {
+  box-shadow: 0 0 0 4px var(--pm-accent), var(--pm-shadow-md);
+}
+
+.gameHost {
+  position: absolute;
+  inset: 0;
+}
+
+.completeBackdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(15 51 43 / 45%);
+}
+
+.completeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 360px;
+  padding: 28px 24px;
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-lg);
+  text-align: center;
+}
+
+.completeIcon {
+  font-size: 44px;
+}
+
+.completeCard h2 {
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.completeActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.nextLevelButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border: 1px dashed var(--pm-line);
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-surface-warm);
+  color: var(--pm-ink-soft);
+  font-weight: 800;
+  cursor: not-allowed;
+}
+
+.nextLevelButton span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-sm);
+}
+
+.panelToggle {
+  display: none;
+}
+
+.stepsList {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding: 8px 12px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-surface-warm);
+  color: var(--pm-ink-soft);
+  font-weight: 700;
+}
+
+.step_active {
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+}
+
+.step_completed {
+  background: var(--pm-success-soft);
+  color: var(--pm-success);
+}
+
+.step_locked {
+  opacity: 0.55;
+}
+
+.exerciseCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--pm-line);
+}
+
+.engagePrompt {
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-weight: 700;
+  text-align: center;
+}
+
+.exercisePrompt {
+  margin: 0;
+  font-weight: 800;
+}
+
+.exerciseFormula {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--pm-accent-dark);
+}
+
+.exerciseHintRule {
+  margin: 0;
+  font-size: 13px;
+  color: var(--pm-ink-soft);
+}
+
+.answerLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pm-ink-soft);
+}
+
+.answerInput {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 2px solid var(--pm-line);
+  border-radius: var(--pm-radius-md);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.answerInput:focus-visible {
+  border-color: var(--pm-focus);
+}
+
+.exerciseActions {
+  display: flex;
+  gap: 8px;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: var(--pm-radius-md);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryAction {
+  flex: 1;
+  border: 0;
+  background: var(--pm-accent);
+  color: #fff;
+}
+
+.secondaryAction {
+  border: 1px solid var(--pm-line);
+  background: transparent;
+  color: var(--pm-ink-soft);
+}
+
+.feedback,
+.feedbackError,
+.feedbackHidden {
+  min-height: 20px;
+  margin: 0;
+  font-weight: 750;
+}
+
+.feedback {
+  color: var(--pm-success);
+}
+
+.feedbackError {
+  color: #7a2117;
+}
+
+.feedbackHidden {
+  visibility: hidden;
+}
+
+.paletteZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--pm-line);
+  text-align: center;
+}
+
+.paletteTile {
+  min-height: 52px;
+  min-width: 140px;
+  padding: 10px 20px;
+  border: 2px solid var(--pm-accent);
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-size: 17px;
+  font-weight: 800;
+  cursor: grab;
+  touch-action: none;
+}
+
+.paletteTile:active {
+  cursor: grabbing;
+}
+
+.dragHint {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 12px;
+  color: var(--pm-ink-soft);
+}
+
+.dragGhost {
+  position: fixed;
+  z-index: 40;
+  padding: 10px 20px;
+  border: 2px solid var(--pm-accent);
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-weight: 800;
+  opacity: 0.7;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.progressTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pm-surface-warm);
+  overflow: hidden;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  background: var(--pm-accent);
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 900px) {
+  .playArea {
+    grid-template-columns: 1fr;
+  }
+
+  .canvasFrame {
+    height: 48vh;
+    min-height: 340px;
+  }
+
+  .panelToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 16px;
+    border: 1px solid var(--pm-line);
+    border-radius: var(--pm-radius-md);
+    background: var(--pm-surface-warm);
+    color: var(--pm-ink-soft);
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .sidePanelCollapsed .panelBody {
+    display: none;
+  }
+}

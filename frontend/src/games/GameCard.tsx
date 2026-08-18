@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
 import styles from "./GameCard.module.css";
-import { GrilleMagiqueScene, NewGameScene, TrainScene, TurboPulseCardScene } from "./GameScenes";
+import { FluxForgeScene, GrilleMagiqueScene, NewGameScene, TrainScene, TurboPulseCardScene } from "./GameScenes";
 
 interface GameCardProps {
   game: GameCatalogueEntry;
@@ -22,6 +22,9 @@ function CardVisual({ game }: GameCardProps) {
   }
   if (game.sceneId === "turbo-pulse") {
     return <TurboPulseCardScene />;
+  }
+  if (game.sceneId === "flux-forge") {
+    return <FluxForgeScene />;
   }
   return <NewGameScene />;
 }

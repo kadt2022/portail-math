@@ -222,3 +222,39 @@ export function TurboPulseCardScene() {
     </svg>
   );
 }
+
+function FluxForgeHouse({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <rect x="-32" y="-2" width="64" height="46" fill="#c98a4c" stroke="#7a4c22" strokeWidth="3" />
+      <path d="M-40 0 L0 -32 L40 0 Z" fill="#c8533b" stroke="#7a2117" strokeWidth="3" strokeLinejoin="round" />
+      <rect x="-9" y="18" width="18" height="26" fill="#4b2a13" />
+    </g>
+  );
+}
+
+export function FluxForgeScene() {
+  return (
+    <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="fluxForgeSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8fd5ff" />
+          <stop offset="100%" stopColor="#c9e9f6" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#fluxForgeSky)" />
+      <path d="M0 172 Q100 148 200 168 T400 158 V240 H0 Z" fill="#8fc86d" />
+      <path d="M0 198 Q120 182 220 198 T400 190 V240 H0 Z" fill="#6fac57" />
+      <FluxForgeHouse x={92} y={158} scale={0.72} />
+      <FluxForgeHouse x={200} y={172} scale={1} />
+      <FluxForgeHouse x={312} y={160} scale={0.66} />
+      <g stroke="#17324a" strokeOpacity="0.5" strokeWidth="2" strokeDasharray="3 5">
+        <line x1="168" y1="150" x2="232" y2="150" />
+      </g>
+      <text x="200" y="140" textAnchor="middle" fontSize="13" fontWeight="900" fill="#17324a" opacity="0.75">4 m</text>
+      <g transform="translate(48 60)" fill="#e2762b">
+        <rect x="-14" y="-14" width="28" height="28" rx="6" transform="rotate(12)" />
+      </g>
+    </svg>
+  );
+}

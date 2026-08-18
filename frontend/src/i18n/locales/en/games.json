@@ -118,6 +118,78 @@
       }
     }
   },
+  "fluxForge": {
+    "name": "Flux Forge",
+    "description": "Become a little engineer and build the village's three houses.",
+    "cta": "Play",
+    "game": {
+      "title": "Flux Forge",
+      "subtitle": "Level 1 — Build the village",
+      "backToGames": "Back to games",
+      "canvasLabel": "Flux Forge village 3D scene",
+      "houseLabel": "House {{label}}",
+      "houseStatus": {
+        "locked": "Locked",
+        "active": "In progress",
+        "completed": "Done"
+      },
+      "stepLabel": {
+        "wall": "Wall",
+        "door": "Door",
+        "roof": "Roof",
+        "volume": "Volume",
+        "conversion": "Conversion"
+      },
+      "engagePrompt": {
+        "wall": "Touch the transparent wall in the scene to begin.",
+        "door": "Touch the transparent door in the scene to begin.",
+        "roof": "Touch the transparent roof in the scene to begin.",
+        "volume": "Touch the transparent block in the scene to begin.",
+        "conversion": "Touch the block in the scene to convert its volume."
+      },
+      "paletteLabel": {
+        "wall": "🧱 Wall",
+        "door": "🚪 Door",
+        "roof": "🏠 Roof",
+        "volume": "📦 Block",
+        "conversion": "💧 Block"
+      },
+      "dragHint": "Drag the piece onto the scene, or touch it directly in the 3D scene.",
+      "exercise": {
+        "wall": { "prompt": "What is the wall's surface area?", "formula": "{{length}} × {{height}} = ?" },
+        "door": { "prompt": "What is the door's surface area?", "formula": "{{width}} × {{height}} = ?" },
+        "roof": { "prompt": "What surface needs to be covered?", "formula": "{{length}} × {{width}} = ?" },
+        "volume": { "prompt": "What is the block's volume?", "formula": "{{length}} × {{width}} × {{height}} = ?" },
+        "conversion": { "prompt": "Convert this volume into litres.", "formula": "{{volume}} m³ = ? L", "hintRule": "Reminder: 1 m³ = 1000 L" }
+      },
+      "answerLabel": "Your answer",
+      "answerPlaceholder": "Answer",
+      "answerUnit": {
+        "surface": "m²",
+        "volume": "m³",
+        "conversion": "L"
+      },
+      "actions": {
+        "validate": "Check",
+        "hint": "Show the calculation",
+        "collapsePanel": "Show exercises",
+        "expandPanel": "Hide exercises"
+      },
+      "feedback": {
+        "correct": "Well done, it's built!",
+        "incorrect": "Try again: recalculate and check again.",
+        "invalidNumber": "Enter a number to check your answer."
+      },
+      "progress": "Village progress",
+      "villageComplete": {
+        "title": "LEVEL 1 COMPLETE",
+        "message": "Your village is built!",
+        "nextLevel": "Level 2",
+        "nextLevelLocked": "Coming soon",
+        "backToGames": "Back to games"
+      }
+    }
+  },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",
