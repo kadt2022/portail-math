@@ -1,16 +1,27 @@
 // Flux Forge — Niveau 1. Logique du prototype ARCHI MVP conservée (mêmes
-// IDs, même mécanique de mission), augmentée de trois systèmes réutilisables
-// et indépendants des exercices eux-mêmes :
-//   - Yamba (setYamba) : message affiché dans le bandeau du haut ;
-//   - la flèche contextuelle (guide/clearGuide) : une seule à la fois,
-//     repositionnée en continu (resize, rotation, défilement) tant qu'elle
-//     est visible, et qui disparaît sur l'action attendue ;
-//   - la règle animée (measureWithRuler) : la règle se déplace et s'aligne
-//     visuellement sur l'arête mesurée avant que le nombre n'apparaisse.
+// IDs, même mécanique de mission), augmentée de :
+//   - Yamba (setYamba), la flèche contextuelle (guide/clearGuide) et la
+//     règle animée (measureWithRuler) — INCHANGÉS dans ce correctif ;
+//   - i18n complète (fr/en) via game-i18n.js + flux-forge-i18n.js ;
+//   - un vrai bouton Quitter (avec confirmation) qui sort du jeu, pas
+//     seulement du plein écran ;
+//   - des sons courts (Web Audio, aucun fichier audio à héberger) avec
+//     bascule 🔊/🔇 ;
+//   - un pavé numérique embarqué qui remplace le clavier natif du téléphone
+//     pour le champ Réponse, réutilisant exactement la validation existante.
 (function () {
 "use strict";
 
 const $=id=>document.getElementById(id);
+
+// ---------- i18n ----------
+const gameI18n = window.GameI18n;
+const fluxForgeI18n = window.FluxForgeI18n;
+const lang = gameI18n.resolveLanguage();
+document.documentElement.lang = lang;
+gameI18n.applyStaticTranslations(document, fluxForgeI18n, lang);
+function t(key, params){ return gameI18n.translate(fluxForgeI18n, lang, key, params); }
+
 let mode='surface';
 let wallPlaced=false, measured=false, surfaceDone=false, roofPlaced=false;
 let volumeMeasured=false, volumeDone=false;
@@ -24,12 +35,135 @@ function setYamba(text){
   $('yambaMessage').textContent = text;
 }
 
+// ---------- Sons ----------
+// Web Audio générés à la volée (aucun fichier à héberger), volontairement
+// doux : sinusoïdales/triangles courtes, jamais de sawtooth agressif — en
+// particulier pour la mauvaise réponse, qui reste discrète et non punitive.
+let soundEnabled = true;
+let audioCtx = null;
+
+function ensureAudioContext(){
+  if(!audioCtx){
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtor) return null;
+    audioCtx = new AudioCtor();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  return audioCtx;
+}
+
+function playTone(frequency, duration, volume, type, delay){
+  if(!soundEnabled) return;
+  const ctx = ensureAudioContext();
+  if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const start = ctx.currentTime + (delay || 0);
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(frequency, start);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + duration + 0.04);
+}
+
+function playSequence(notes, gap, type, volume){
+  notes.forEach((note, index) => playTone(note, 0.14, volume, type, index * gap));
+}
+
+function soundBuild(){ playSequence([392, 494], 0.07, 'triangle', 0.05); }
+function soundRuler(){ playTone(660, 0.09, 0.03, 'sine', 0); }
+function soundCorrect(){ playSequence([523, 659, 784], 0.08, 'triangle', 0.06); }
+function soundWrong(){ playTone(233, 0.18, 0.028, 'sine', 0); }
+
+function updateSoundButton(){
+  const btn = $('soundToggle');
+  btn.textContent = soundEnabled ? '🔊' : '🔇';
+  btn.setAttribute('aria-pressed', String(soundEnabled));
+  btn.setAttribute('aria-label', soundEnabled ? t('soundOn') : t('soundOff'));
+}
+
+$('soundToggle').onclick = () => {
+  soundEnabled = !soundEnabled;
+  if(soundEnabled) ensureAudioContext();
+  updateSoundButton();
+};
+updateSoundButton();
+
+// ---------- Quitter ----------
+// Reprend le motif déjà utilisé par les autres jeux autonomes
+// (returnToCatalogue() dans multiplication-train.js/fraction-river.js) :
+// dans l'iframe du lanceur du catalogue, on prévient le parent qui gère
+// lui-même la sortie du plein écran ; sinon on navigue directement.
+function exitGame(){
+  if (window.parent && window.parent !== window) {
+    try {
+      window.parent.postMessage({ type: 'portal-game:exit' }, window.location.origin);
+      return;
+    } catch (error) {
+      // Origine différente ou parent inaccessible : on se rabat sur la
+      // navigation directe ci-dessous.
+    }
+  }
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+  window.location.assign('/app/jeux');
+}
+
+function openQuitModal(){ $('quitModal').hidden = false; }
+function closeQuitModal(){ $('quitModal').hidden = true; }
+
+$('quitBtn').onclick = openQuitModal;
+$('quitCancel').onclick = closeQuitModal;
+$('quitConfirm').onclick = exitGame;
+$('quitModal').addEventListener('click', (event) => {
+  if(event.target === $('quitModal')) closeQuitModal();
+});
+document.addEventListener('keydown', (event) => {
+  if(event.key === 'Escape' && !$('quitModal').hidden) closeQuitModal();
+});
+
+// ---------- Pavé numérique embarqué ----------
+// Le champ Réponse est readonly (voir flux-forge.html) : aucun clavier
+// natif ne doit plus apparaître. VALIDER du pavé appelle exactement la même
+// fonction handleValidate() que le bouton Valider existant — une seule
+// logique de correction.
+const keypad = $('keypad');
+const answerInput = $('answer');
+
+function openKeypad(){ keypad.hidden = false; }
+function closeKeypad(){ keypad.hidden = true; }
+
+answerInput.addEventListener('focus', openKeypad);
+answerInput.addEventListener('click', openKeypad);
+
+keypad.querySelectorAll('[data-digit]').forEach((key) => {
+  key.addEventListener('click', () => {
+    if(answerInput.value.length >= 6) return;
+    answerInput.value += key.dataset.digit;
+  });
+});
+$('keypadClear').onclick = () => { answerInput.value = ''; };
+$('keypadBackspace').onclick = () => { answerInput.value = answerInput.value.slice(0, -1); };
+$('keypadValidate').onclick = () => handleValidate();
+
+document.addEventListener('pointerdown', (event) => {
+  if(keypad.hidden) return;
+  if(keypad.contains(event.target) || answerInput.contains(event.target) || event.target === answerInput) return;
+  closeKeypad();
+});
+
 // ---------- Échelle du décor (maison / bloc volume / réservoir) ----------
 // --group-scale est calculée depuis les dimensions RÉELLEMENT rendues de
 // .scene (jamais les vw du viewport, ni des paliers CSS devinés à l'avance) :
 // reste juste quel que soit l'espace que prend l'habillage (en-tête, bandeau
-// Yamba) autour d'elle, en portrait comme en paysage (§1-4 du correctif).
-// Posée sur :root pour être héritée par les trois groupes graphiques.
+// Yamba) autour d'elle, en portrait comme en paysage (§1-4 du correctif
+// responsive précédent). Posée sur :root pour être héritée par les trois
+// groupes graphiques. INCHANGÉ dans ce correctif.
 const HOUSE_REF_WIDTH = 470;   // empreinte du toit à l'échelle 1 (élément le plus large)
 const HOUSE_REF_HEIGHT = 410;  // hauteur mur + toit à l'échelle 1
 const TARGET_WIDTH_RATIO = 0.66;  // vise ~66 % de la largeur utile de la scène
@@ -57,15 +191,16 @@ window.addEventListener('resize', scheduleGroupScaleUpdate);
 window.addEventListener('orientationchange', scheduleGroupScaleUpdate);
 scheduleGroupScaleUpdate();
 
-// ---------- Flèche contextuelle ----------
+// ---------- Flèche contextuelle ---------- (INCHANGÉ dans ce correctif)
 // Une seule flèche à la fois : appeler guide() en remplace toujours une
 // précédente. Jamais de coordonnées desktop figées : la position se
-// recalcule à chaque resize/orientationchange/scroll (§24 du correctif),
-// plus quelques passages différés juste après l'affichage pour absorber un
-// éventuel décalage de mise en page tardif (image/police qui finit de
-// charger). Volontairement PAS de boucle requestAnimationFrame perpétuelle :
-// rAF est mis en pause par le navigateur dès que l'onglet n'est plus au
-// premier plan/composité, ce qui figerait silencieusement la flèche.
+// recalcule à chaque resize/orientationchange/scroll (§24 du correctif
+// responsive précédent), plus quelques passages différés juste après
+// l'affichage pour absorber un éventuel décalage de mise en page tardif
+// (image/police qui finit de charger). Volontairement PAS de boucle
+// requestAnimationFrame perpétuelle : rAF est mis en pause par le
+// navigateur dès que l'onglet n'est plus au premier plan/composité, ce qui
+// figerait silencieusement la flèche.
 
 let guideTargetEl = null;
 let guideSettleTimers = [];
@@ -107,12 +242,13 @@ function say(message, target){
 }
 
 // Dès qu'un enfant touche le champ réponse, la flèche qui pointait dessus
-// n'a plus de raison d'y rester (voir critère §15 du correctif).
-$('answer').addEventListener('focus', () => {
-  if(guideTargetEl === $('answer')) guide($('validate'));
+// n'a plus de raison d'y rester (voir critère §15 du correctif responsive
+// précédent).
+answerInput.addEventListener('focus', () => {
+  if(guideTargetEl === answerInput) guide($('validate'));
 });
 
-// ---------- Règle animée ----------
+// ---------- Règle animée ---------- (INCHANGÉ dans ce correctif)
 // Ne révèle jamais un nombre avant que la règle ne se soit visuellement
 // alignée sur l'arête mesurée : apparition près de l'outil, déplacement
 // jusqu'à l'arête, puis alignement, puis seulement alors la mesure.
@@ -129,24 +265,24 @@ function measureWithRuler({ target, side, label, delay = 0 }){
       const rulerLabel = $('rulerLabel');
       const scene = document.querySelector('.ff-app .scene');
       const sceneR = scene.getBoundingClientRect();
-      const t = target.getBoundingClientRect();
+      const tr = target.getBoundingClientRect();
       const startR = $('rulerBtn').getBoundingClientRect();
       const OFFSET = 10;
       const isVertical = side !== 'bottom';
 
       let left, top, w, h;
       if(side === 'bottom'){
-        left = t.left - sceneR.left;
-        top = t.bottom - sceneR.top + OFFSET;
-        w = t.width; h = 6;
+        left = tr.left - sceneR.left;
+        top = tr.bottom - sceneR.top + OFFSET;
+        w = tr.width; h = 6;
       } else if(side === 'right'){
-        left = t.right - sceneR.left + OFFSET;
-        top = t.top - sceneR.top;
-        w = 6; h = t.height;
+        left = tr.right - sceneR.left + OFFSET;
+        top = tr.top - sceneR.top;
+        w = 6; h = tr.height;
       } else {
-        left = t.left - sceneR.left - OFFSET - 6;
-        top = t.top - sceneR.top;
-        w = 6; h = t.height;
+        left = tr.left - sceneR.left - OFFSET - 6;
+        top = tr.top - sceneR.top;
+        w = 6; h = tr.height;
       }
 
       ruler.hidden = false;
@@ -190,12 +326,11 @@ function hideRuler(){
   $('ruler').hidden = true;
 }
 
-// Évite qu'un double-clic sur "Règle" ne lance deux animations qui se
-// marchent dessus pendant la séquence (~700 ms par arête mesurée).
 let rulerBusy = false;
 async function runRulerSequence(steps){
   if(rulerBusy) return;
   rulerBusy = true;
+  soundRuler();
   for(const step of steps){
     await measureWithRuler(step);
   }
@@ -215,29 +350,29 @@ function showMode(next){
  $('tabSurface').classList.toggle('on',next==='surface');
  $('tabVolume').classList.toggle('on',next==='volume');
  $('tabWater').classList.toggle('on',next==='water');
- $('answer').value='';
+ answerInput.value='';
  hideRuler();
 
  if(next==='surface'){
-   $('badge').textContent='Mission 1 : surface';
-   if(roofPlaced) say('Bravo, ta première mission est réussie !');
-   else if(surfaceDone) say('Ajoutons maintenant le toit.', $('roofBtn'));
-   else if(measured) say('Le mur mesure 4 m sur 2 m. Calcule sa surface.', $('answer'));
-   else if(wallPlaced) say('Bien joué ! Prends la règle pour mesurer le mur.', $('rulerBtn'));
-   else say("Commençons par le mur ! Clique sur l'emplacement transparent.", $('slot'));
+   $('badge').textContent=t('badgeSurface');
+   if(roofPlaced) say(t('yambaSurfaceDone'));
+   else if(surfaceDone) say(t('yambaAddRoof'), $('roofBtn'));
+   else if(measured) say(t('yambaCalcWallSurface'), answerInput);
+   else if(wallPlaced) say(t('yambaMeasureWall'), $('rulerBtn'));
+   else say(t('yambaStartWall'), $('slot'));
  }else if(next==='volume'){
-   $('badge').textContent='Mission 2 : volume';
+   $('badge').textContent=t('badgeVolume');
    done('v1');
-   if(volumeDone) say('Volume réussi, bravo !');
-   else if(volumeMeasured) say('Le bloc mesure 4 × 2 × 2. Calcule son volume.', $('answer'));
-   else say('Regardons ce bloc : mesurons sa longueur, sa largeur et sa hauteur.', $('rulerBtn'));
+   if(volumeDone) say(t('yambaVolumeDone'));
+   else if(volumeMeasured) say(t('yambaCalcVolume'), answerInput);
+   else say(t('yambaStartVolume'), $('rulerBtn'));
  }else{
-   $('badge').textContent='Mission 3 : eau & pompe';
+   $('badge').textContent=t('badgeWater');
    done('w1');
-   if(pumpDone) say('Mission réussie : le réservoir est rempli !');
-   else if(timeDone) say('200 minutes ✓. Clique sur DÉMARRER pour lancer la pompe.', $('pumpStart'));
-   else if(litersDone) say('4000 L ✓. Maintenant, calcule le temps : 4000 ÷ 20.', $('answer'));
-   else say('Le réservoir est vide. Sa capacité est de 4 m³. Convertis-la en litres.', $('answer'));
+   if(pumpDone) say(t('yambaWaterDone'));
+   else if(timeDone) say(t('yambaPumpReady'), $('pumpStart'));
+   else if(litersDone) say(t('yambaCalcTime'), answerInput);
+   else say(t('yambaStartWater'), answerInput);
  }
 }
 
@@ -248,18 +383,20 @@ $('tabWater').onclick=()=>showMode('water');
 $('slot').onclick=()=>{
  if(mode!=='surface'||wallPlaced)return;
  wallPlaced=true;$('slot').style.display='none';$('wall').style.display='block';done('s1');
- say('Bien joué ! Prends la règle pour mesurer le mur.', $('rulerBtn'));
- status('Mur posé.','ok');
+ soundBuild();
+ say(t('yambaMeasureWall'), $('rulerBtn'));
+ status(t('statusWallPlaced'),'ok');
 };
 
 $('wallBtn').onclick=()=>{showMode('surface');select('wallBtn')};
 $('roofBtn').onclick=()=>{
  showMode('surface');select('roofBtn');
- if(!surfaceDone)return status('Calcule d’abord la surface.','bad');
+ if(!surfaceDone)return status(t('statusCalcSurfaceFirst'),'bad');
  if(!roofPlaced){
    roofPlaced=true;$('roof').style.display='block';done('s4');
-   say('Bravo ! Ta maison a un toit. Passe à la mission Volume.', $('blockBtn'));
-   status('Bravo !','ok');
+   soundBuild();
+   say(t('yambaRoofDone'), $('blockBtn'));
+   status(t('statusBravo'),'ok');
  }
 };
 $('blockBtn').onclick=()=>{showMode('volume');select('blockBtn')};
@@ -268,7 +405,7 @@ $('tankBtn').onclick=()=>{showMode('water');select('tankBtn')};
 $('rulerBtn').onclick=async ()=>{
  select('rulerBtn');
  if(mode==='surface'){
-   if(!wallPlaced)return status('Pose d’abord le mur.','bad');
+   if(!wallPlaced)return status(t('statusPlaceWallFirst'),'bad');
    if(measured || rulerBusy) return;
    clearGuide();
    await runRulerSequence([
@@ -276,8 +413,8 @@ $('rulerBtn').onclick=async ()=>{
      { target: $('wall'), side: 'right', label: '2 m', delay: 150 },
    ]);
    measured=true;done('s2');
-   say('Le mur mesure 4 m sur 2 m. Calcule sa surface.', $('answer'));
-   status('4 m × 2 m','ok');
+   say(t('yambaCalcWallSurface'), answerInput);
+   status(t('statusWallMeasured'),'ok');
  }else if(mode==='volume'){
    if(volumeMeasured || rulerBusy) return;
    clearGuide();
@@ -288,58 +425,64 @@ $('rulerBtn').onclick=async ()=>{
      { target: block, side: 'left', label: '2 m', delay: 150 },
    ]);
    volumeMeasured=true;done('v2');
-   say('Le bloc mesure 4 m × 2 m × 2 m. Calcule son volume.', $('answer'));
-   status('4 m × 2 m × 2 m','ok');
+   say(t('yambaCalcVolume'), answerInput);
+   status(t('statusVolumeMeasured'),'ok');
  }else{
-   status('Pour l’eau, la capacité est déjà connue : 4 m³.','ok');
+   status(t('statusWaterCapacityKnown'),'ok');
  }
 };
 
-$('calcBtn').onclick=()=>{select('calcBtn');$('answer').focus()};
+$('calcBtn').onclick=()=>{select('calcBtn');answerInput.focus()};
 
 $('hint').onclick=()=>{
- if(mode==='surface'){ $('answer').value=8;status('4 × 2 = 8 m²');guide($('validate')); }
- else if(mode==='volume'){ $('answer').value=16;status('4 × 2 × 2 = 16 m³');guide($('validate')); }
+ if(mode==='surface'){ answerInput.value=8;status(t('hintSurface'));guide($('validate')); }
+ else if(mode==='volume'){ answerInput.value=16;status(t('hintVolume'));guide($('validate')); }
  else{
-   if(!litersDone){$('answer').value=4000;status('Capacité : 4 × 1000 = 4000 L');guide($('validate'))}
-   else if(!timeDone){$('answer').value=200;status('4000 ÷ 20 = 200 min');guide($('validate'))}
-   else status('Active maintenant la pompe.')
+   if(!litersDone){answerInput.value=4000;status(t('hintLiters'));guide($('validate'))}
+   else if(!timeDone){answerInput.value=200;status(t('hintTime'));guide($('validate'))}
+   else status(t('statusActivatePump'))
  }
 };
 
-$('validate').onclick=()=>{
- const v=Number($('answer').value);
+function handleValidate(){
+ const v=Number(answerInput.value);
  clearGuide();
  if(mode==='surface'){
-   if(!measured)return status('Mesure d’abord le mur.','bad');
+   if(!measured)return status(t('statusMeasureWallFirst'),'bad');
    if(v===8){
      surfaceDone=true;done('s3');
-     say('Correct : 8 m² ! Pose maintenant le toit.', $('roofBtn'));
-     status('8 m² ✓','ok');
-   } else { status('Essaie : 4 × 2 = ?','bad'); guide($('answer')); }
+     soundCorrect();
+     say(t('yambaSurfaceCorrect'), $('roofBtn'));
+     status(t('statusSurfaceOk'),'ok');
+   } else { soundWrong(); status(t('statusTrySurface'),'bad'); guide(answerInput); }
  }else if(mode==='volume'){
-   if(!volumeMeasured)return status('Mesure les 3 dimensions.','bad');
+   if(!volumeMeasured)return status(t('statusMeasure3Dims'),'bad');
    if(v===16){
      volumeDone=true;done('v3');
-     say('Correct : 16 m³ ! Passe à la mission Eau.', $('tankBtn'));
-     status('16 m³ ✓','ok');
-   } else { status('Essaie : 4 × 2 × 2 = ?','bad'); guide($('answer')); }
+     soundCorrect();
+     say(t('yambaVolumeCorrect'), $('tankBtn'));
+     status(t('statusVolumeOk'),'ok');
+   } else { soundWrong(); status(t('statusTryVolume'),'bad'); guide(answerInput); }
  }else{
    if(!litersDone){
      if(v===4000){
-       litersDone=true;done('w2');$('answer').value='';
-       say('4000 L ✓. Maintenant, calcule le temps : 4000 ÷ 20.', $('answer'));
-       status('4000 L ✓ Maintenant : 4000 ÷ 20','ok');
-     } else { status('Rappel : 1 m³ = 1000 L. Donc 4 m³ = ?','bad'); guide($('answer')); }
+       litersDone=true;done('w2');answerInput.value='';
+       soundCorrect();
+       say(t('yambaCalcTime'), answerInput);
+       status(t('statusLitersOkNextTime'),'ok');
+     } else { soundWrong(); status(t('statusReminderM3'),'bad'); guide(answerInput); }
    } else if(!timeDone){
      if(v===200){
-       timeDone=true;done('w3');$('answer').value='';$('pumpStart').classList.remove('locked');
-       say('Correct : 200 minutes. Clique sur DÉMARRER directement sur la pompe.', $('pumpStart'));
-       status('200 minutes ✓','ok');
-     } else { status('Temps = 4000 ÷ 20','bad'); guide($('answer')); }
-   } else status('Clique sur Pompe pour remplir le réservoir.');
+       timeDone=true;done('w3');answerInput.value='';$('pumpStart').classList.remove('locked');
+       soundCorrect();
+       say(t('yambaPumpReady'), $('pumpStart'));
+       status(t('statusTimeOk'),'ok');
+     } else { soundWrong(); status(t('statusTimeFormula'),'bad'); guide(answerInput); }
+   } else status(t('statusClickPump'));
  }
-};
+}
+
+$('validate').onclick = handleValidate;
 
 
 function startPump(){
@@ -348,14 +491,14 @@ function startPump(){
 
  if(!timeDone){
    $('pumpStart').classList.add('locked');
-   say('🔒 La pompe est prête, mais il faut d’abord calculer le temps de remplissage.', $('answer'));
-   status('Calcule : 4000 L ÷ 20 L/min. Ensuite tu pourras démarrer la pompe.','bad');
+   say(t('yambaPumpLocked'), answerInput);
+   status(t('statusCalcBeforePump'),'bad');
    return;
  }
 
  $('pumpStart').classList.remove('locked');
  if(pumpDone){
-   status('Le réservoir est déjà rempli à 4000 L.','ok');
+   status(t('statusAlreadyFull'),'ok');
    return;
  }
 
@@ -365,9 +508,9 @@ function startPump(){
  $('flow').style.display='block';
  $('waterInPipe').style.width='100%';
  $('water').style.height='92%';
- $('pumpStart').textContent='⏹ EN MARCHE';
- setYamba('💧 Regarde : l’eau part de la source, traverse la pompe et monte dans le réservoir.');
- status('Pompe en marche : le réservoir se remplit.','ok');
+ $('pumpStart').textContent=t('pumpRunningLabel');
+ setYamba(t('yambaPumping'));
+ status(t('statusPumpRunning'),'ok');
 
  let litres=0;
  const duration=2400;
@@ -380,10 +523,11 @@ function startPump(){
      clearInterval(timer);
      $('levelText').textContent='4000 L';
      $('flow').style.display='none';
-     $('pumpStart').textContent='✓ REMPLI';
-     $('badge').textContent='ARCHI MVP terminé ✓';
-     say('🎉 Mission réussie : le réservoir est rempli de 4000 L !');
-     status('Mission réussie : la pompe a alimenté le réservoir.','ok');
+     $('pumpStart').textContent=t('pumpFilledLabel');
+     $('badge').textContent=t('badgeComplete');
+     soundCorrect();
+     say(t('yambaMissionComplete'));
+     status(t('statusMissionSuccess'),'ok');
    }
  }, stepMs);
 }
@@ -391,6 +535,6 @@ function startPump(){
 $('pumpBtn').onclick=startPump;
 $('pumpStart').onclick=(e)=>{e.stopPropagation(); startPump();};
 
-say("Commençons par le mur ! Clique sur l'emplacement transparent.", $('slot'));
+say(t('yambaStartWall'), $('slot'));
 
 })();
