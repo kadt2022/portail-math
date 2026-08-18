@@ -69,8 +69,8 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     nameKey: "fluxForge.name",
     descriptionKey: "fluxForge.description",
     ctaLabelKey: "fluxForge.cta",
-    href: "/jeux/flux-forge",
-    availability: "react",
+    href: "/games/flux-forge.html",
+    availability: "standalone",
     sceneId: "flux-forge",
   },
   {

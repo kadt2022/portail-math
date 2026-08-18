@@ -1,0 +1,743 @@
+/* Flux Forge — Niveau 1. Repris tel quel du prototype ARCHI MVP fourni par
+   l'équipe pédagogique (mêmes IDs/classes, même logique JS), puis rendu
+   responsive : empilement en portrait, grille compacte conservée en paysage
+   (le mode dans lequel le jeu s'ouvre depuis le catalogue, voir
+   fraction-river-launch.js), et remise à l'échelle du décor à pixels fixes
+   sur petit écran. Toutes les règles sont scoppées sous .ff-app pour ne
+   jamais déborder sur le reste du portail. */
+
+html.is-flux-forge-immersive,
+body.is-flux-forge-immersive {
+    overflow: hidden;
+    height: 100%;
+}
+
+body.is-flux-forge-immersive .page-shell {
+    min-height: 100vh;
+    margin-left: 0;
+}
+
+.page-content.flux-forge-page {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ff-app {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #17324a;
+    background: #eaf6ff;
+    overflow: hidden;
+}
+
+.ff-app *,
+.ff-app *::before,
+.ff-app *::after {
+    box-sizing: border-box;
+}
+
+.ff-app header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    padding: 0 20px;
+    background: #fff;
+    border-bottom: 1px solid #d7e4ee;
+}
+
+.ff-app .logo {
+    font-size: 26px;
+    font-weight: 900;
+    color: #e98b00;
+}
+
+.ff-app .logo span {
+    color: #17324a;
+}
+
+.ff-app .back-link {
+    padding: 6px 12px;
+    margin-left: 14px;
+    margin-right: auto;
+    border-radius: 999px;
+    color: #5a6c7b;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.ff-app .back-link:hover {
+    background: #f3f6f8;
+}
+
+.ff-app .badge {
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: #fff2c8;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.ff-app main {
+    display: grid;
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-columns: 210px 1fr 290px;
+    gap: 14px;
+    padding: 14px;
+}
+
+.ff-app .panel {
+    min-height: 0;
+    padding: 14px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(22, 50, 74, 0.09);
+}
+
+.ff-app .panel h3 {
+    margin: 0 0 12px;
+}
+
+.ff-app .tool {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    border: 2px solid #e1e8ee;
+    border-radius: 12px;
+    background: #f8fbfd;
+    font-weight: 800;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ff-app .tool.active {
+    background: #fff6d8;
+    border-color: #f5ad18;
+}
+
+.ff-app .scene {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    background: linear-gradient(#8fd5ff 0 58%, #8fc86d 58%);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(22, 50, 74, 0.09);
+}
+
+.ff-app .instruction {
+    position: absolute;
+    z-index: 30;
+    top: 18px;
+    left: 18px;
+    max-width: 460px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 13px;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.13);
+    font-weight: 800;
+}
+
+.ff-app .cloud {
+    position: absolute;
+    top: 60px;
+    left: 9%;
+    width: 100px;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 30px;
+}
+
+.ff-app .cloud::before,
+.ff-app .cloud::after {
+    content: "";
+    position: absolute;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+}
+
+.ff-app .cloud::before {
+    top: -19px;
+    left: 17px;
+    width: 42px;
+    height: 42px;
+}
+
+.ff-app .cloud::after {
+    top: -28px;
+    left: 45px;
+    width: 55px;
+    height: 55px;
+}
+
+.ff-app .ground {
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    width: 74%;
+    height: 60%;
+    transform: translateX(-50%);
+    perspective: 900px;
+}
+
+.ff-app .floor {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 430px;
+    height: 280px;
+    background: #9b663a;
+    border: 9px solid #70421f;
+    border-radius: 8px;
+    transform: translateX(-50%) rotateX(62deg);
+}
+
+.ff-app .post {
+    position: absolute;
+    bottom: 80px;
+    width: 18px;
+    height: 235px;
+    background: linear-gradient(90deg, #75451f, #b97837, #75451f);
+}
+
+.ff-app .p1 { left: calc(50% - 205px); }
+.ff-app .p2 { left: calc(50% + 187px); }
+
+.ff-app .wall-slot {
+    position: absolute;
+    left: 50%;
+    bottom: 80px;
+    width: 390px;
+    height: 210px;
+    background: rgba(255, 214, 107, 0.21);
+    border: 4px dashed rgba(255, 255, 255, 0.6);
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+
+.ff-app .wall {
+    position: absolute;
+    left: 50%;
+    bottom: 80px;
+    display: none;
+    width: 390px;
+    height: 210px;
+    background: repeating-linear-gradient(0deg, #b87538 0 28px, #9c5e2b 29px 33px);
+    border: 5px solid #75451f;
+    transform: translateX(-50%);
+}
+
+.ff-app .door {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 88px;
+    height: 145px;
+    background: #6c401f;
+    border: 6px solid #4b2a13;
+    transform: translateX(-50%);
+}
+
+.ff-app .roof {
+    position: absolute;
+    left: 50%;
+    bottom: 270px;
+    display: none;
+    width: 0;
+    height: 0;
+    border-right: 235px solid transparent;
+    border-bottom: 135px solid #c8533b;
+    border-left: 235px solid transparent;
+    transform: translateX(-50%);
+}
+
+.ff-app .measure {
+    position: absolute;
+    left: 50%;
+    bottom: 300px;
+    display: none;
+    width: 390px;
+    border-top: 3px dashed #fff;
+    transform: translateX(-50%);
+}
+
+.ff-app .measure::after {
+    content: "4 m";
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    padding: 4px 9px;
+    background: #fff;
+    border-radius: 8px;
+    font-weight: 900;
+    transform: translateX(-50%);
+}
+
+.ff-app .measureV {
+    position: absolute;
+    left: calc(50% + 210px);
+    bottom: 82px;
+    display: none;
+    height: 210px;
+    border-left: 3px dashed #fff;
+}
+
+.ff-app .measureV::after {
+    content: "2 m";
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    padding: 4px 9px;
+    background: #fff;
+    border-radius: 8px;
+    font-weight: 900;
+    transform: translateY(-50%);
+}
+
+.ff-app .volumeZone,
+.ff-app .waterZone {
+    position: absolute;
+    inset: 0;
+    display: none;
+}
+
+.ff-app .block3d {
+    position: absolute;
+    left: 50%;
+    bottom: 125px;
+    width: 220px;
+    height: 135px;
+    background: #d88d42;
+    border: 4px solid #74431f;
+    box-shadow: 28px -22px 0 #b06c31, 28px -22px 0 4px #74431f;
+    transform: translateX(-50%);
+}
+
+.ff-app .block3d::before {
+    content: "";
+    position: absolute;
+    top: -27px;
+    left: 15px;
+    width: 220px;
+    height: 28px;
+    background: #efb46f;
+    border: 4px solid #74431f;
+    border-bottom: 0;
+    transform: skewX(-45deg);
+    transform-origin: left bottom;
+}
+
+.ff-app .block3d::after {
+    content: "";
+    position: absolute;
+    top: -18px;
+    right: -32px;
+    width: 32px;
+    height: 135px;
+    background: #a65f2a;
+    border: 4px solid #74431f;
+    border-left: 0;
+    transform: skewY(-45deg);
+    transform-origin: left top;
+}
+
+.ff-app .dim {
+    position: absolute;
+    padding: 4px 8px;
+    background: #fff;
+    border-radius: 8px;
+    font-weight: 900;
+}
+
+.ff-app .dL { left: 50%; bottom: 88px; transform: translateX(-50%); }
+.ff-app .dW { left: calc(50% + 150px); bottom: 200px; }
+.ff-app .dH { left: calc(50% - 155px); bottom: 185px; }
+
+.ff-app .tankWrap {
+    position: absolute;
+    left: 50%;
+    bottom: 100px;
+    width: 230px;
+    height: 310px;
+    transform: translateX(-50%);
+}
+
+.ff-app .tank {
+    position: absolute;
+    left: 25px;
+    bottom: 0;
+    width: 180px;
+    height: 250px;
+    overflow: hidden;
+    background: #e7f2f8;
+    border: 8px solid #4d6475;
+    border-radius: 20px 20px 14px 14px;
+}
+
+.ff-app .water {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 0;
+    background: linear-gradient(#57c9f1, #238ac5);
+    transition: height 2.2s ease;
+}
+
+.ff-app .level {
+    position: absolute;
+    z-index: 3;
+    top: 8px;
+    right: 0;
+    left: 0;
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.38);
+}
+
+.ff-app .pipe {
+    position: absolute;
+    right: -120px;
+    bottom: 45px;
+    width: 135px;
+    height: 18px;
+    overflow: hidden;
+    background: #5a6c7b;
+    border-radius: 10px;
+}
+
+.ff-app .waterInPipe {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 0;
+    height: 10px;
+    background: #42c8f5;
+    border-radius: 8px;
+    transition: width 2.2s linear;
+}
+
+.ff-app .pipe::after {
+    content: "";
+    position: absolute;
+    top: -52px;
+    right: 0;
+    width: 18px;
+    height: 70px;
+    background: #5a6c7b;
+    border-radius: 10px;
+}
+
+.ff-app .pump {
+    position: absolute;
+    right: -188px;
+    bottom: 5px;
+    width: 78px;
+    height: 80px;
+    background: #f3a51a;
+    border: 6px solid #9b5b00;
+    border-radius: 16px;
+}
+
+.ff-app .pump::before {
+    content: "POMPE";
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.ff-app .pumpStart {
+    position: absolute;
+    right: 6px;
+    bottom: 7px;
+    left: 6px;
+    padding: 7px 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    background: #1f8f46;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.ff-app .pumpStart:active {
+    transform: scale(0.96);
+}
+
+.ff-app .pumpStart.locked {
+    background: #8c9aa5;
+}
+
+.ff-app .source {
+    position: absolute;
+    right: -245px;
+    bottom: -5px;
+    width: 58px;
+    height: 58px;
+    background: radial-gradient(circle at 35% 30%, #9befff, #2e9ed3 65%, #1b6f99);
+    border: 5px solid #17698f;
+    border-radius: 50%;
+}
+
+.ff-app .source::after {
+    content: "SOURCE";
+    position: absolute;
+    top: 64px;
+    left: -4px;
+    color: #17324a;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.ff-app .flow {
+    position: absolute;
+    right: -115px;
+    bottom: 110px;
+    display: none;
+    width: 12px;
+    height: 82px;
+    background: linear-gradient(#7ee8ff, #249ed3);
+    border-radius: 8px;
+    animation: ff-flow 0.6s linear infinite;
+}
+
+@keyframes ff-flow {
+    0% { opacity: 0.35; }
+    50% { opacity: 1; }
+    100% { opacity: 0.35; }
+}
+
+.ff-app .steps {
+    display: grid;
+    gap: 8px;
+}
+
+.ff-app .step {
+    padding: 10px;
+    background: #f5f8fa;
+    border-radius: 10px;
+}
+
+.ff-app .step.done {
+    background: #e4f6e9;
+    color: #166b31;
+}
+
+.ff-app input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #dce5eb;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.ff-app .btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.ff-app .green { color: #fff; background: #2a9d4b; }
+.ff-app .gray { background: #edf2f5; }
+
+.ff-app .status {
+    min-height: 45px;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f3f6f8;
+    border-radius: 10px;
+}
+
+.ff-app .status.ok { color: #166b31; background: #e4f6e9; }
+.ff-app .status.bad { color: #9a2929; background: #fdeaea; }
+
+.ff-app .tab {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ff-app .tab button {
+    flex: 1;
+    padding: 9px;
+    font-weight: 900;
+    border: 0;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.ff-app .tab .on {
+    color: #fff;
+    background: #17324a;
+}
+
+.ff-app .small {
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: 0.72;
+}
+
+/* ---------- Portrait sur petit écran : on invite à tourner le téléphone,
+   comme les autres jeux du portail (voir game-console.css/.game-console__rotate),
+   plutôt que de tasser la grille 3 colonnes en portrait. Les grands écrans en
+   portrait (tablette posée à plat, moniteur pivoté) gardent la grille normale
+   via l'exemption min-width ci-dessous. ---------- */
+
+.ff-app .rotate-hint {
+    display: none;
+}
+
+@media (orientation: portrait) and (max-width: 899px) {
+    .ff-app main {
+        display: none;
+    }
+
+    .ff-app .rotate-hint {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: #17324a;
+        text-align: center;
+    }
+
+    .ff-app .rotate-hint::before {
+        content: "↻";
+        color: #e2762b;
+        font-size: 54px;
+        line-height: 1;
+    }
+
+    .ff-app .rotate-hint strong {
+        font-size: clamp(18px, 5vw, 24px);
+    }
+
+    .ff-app .rotate-hint span {
+        color: #5a6c7b;
+    }
+}
+
+@media (orientation: portrait) and (min-width: 900px) {
+    .ff-app main {
+        display: grid;
+    }
+
+    .ff-app .rotate-hint {
+        display: none;
+    }
+}
+
+/* ---------- Paysage : on garde la grille 3 colonnes, mais compacte ---------- */
+
+@media (orientation: landscape) and (max-height: 520px) {
+    .ff-app header {
+        height: 52px;
+        padding: 0 12px;
+    }
+
+    .ff-app .logo {
+        font-size: 19px;
+    }
+
+    .ff-app .back-link {
+        padding: 4px 9px;
+        font-size: 12px;
+    }
+
+    .ff-app .badge {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .ff-app main {
+        grid-template-columns: 140px 1fr 220px;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .ff-app .panel {
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .ff-app .panel h3 {
+        margin: 0 0 6px;
+        font-size: 14px;
+    }
+
+    .ff-app .tool {
+        padding: 8px;
+        margin: 4px 0;
+        font-size: 13px;
+    }
+
+    .ff-app .instruction {
+        top: 10px;
+        left: 10px;
+        max-width: 60%;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .ff-app .floor { width: 300px; height: 195px; }
+    .ff-app .p1 { left: calc(50% - 143px); }
+    .ff-app .p2 { left: calc(50% + 130px); }
+    .ff-app .wall-slot,
+    .ff-app .wall { width: 272px; height: 146px; bottom: 56px; }
+    .ff-app .door { width: 62px; height: 101px; }
+    .ff-app .roof {
+        bottom: 190px;
+        border-right-width: 164px;
+        border-bottom-width: 94px;
+        border-left-width: 164px;
+    }
+    .ff-app .measure { bottom: 210px; width: 272px; }
+    .ff-app .measureV { left: calc(50% + 146px); bottom: 58px; height: 146px; }
+
+    .ff-app .block3d { bottom: 88px; width: 154px; height: 95px; }
+    .ff-app .block3d::before { width: 154px; height: 20px; left: 10px; top: -19px; }
+    .ff-app .block3d::after { width: 22px; height: 95px; right: -22px; top: -13px; }
+
+    .ff-app .tankWrap { bottom: 60px; width: 160px; height: 216px; }
+    .ff-app .tank { width: 126px; height: 175px; left: 17px; }
+    .ff-app .pipe { right: -84px; bottom: 32px; width: 94px; }
+    .ff-app .pump { right: -132px; width: 55px; height: 56px; }
+    .ff-app .source { right: -172px; width: 41px; height: 41px; }
+
+    .ff-app .steps { gap: 5px; }
+    .ff-app .step { padding: 7px; font-size: 13px; }
+    .ff-app input { padding: 9px; font-size: 16px; }
+    .ff-app .btn { padding: 9px; margin-top: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ff-app .flow {
+        animation: none;
+    }
+    .ff-app .water,
+    .ff-app .waterInPipe {
+        transition: none;
+    }
+}

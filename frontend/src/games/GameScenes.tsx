@@ -223,16 +223,6 @@ export function TurboPulseCardScene() {
   );
 }
 
-function FluxForgeHouse({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-32" y="-2" width="64" height="46" fill="#c98a4c" stroke="#7a4c22" strokeWidth="3" />
-      <path d="M-40 0 L0 -32 L40 0 Z" fill="#c8533b" stroke="#7a2117" strokeWidth="3" strokeLinejoin="round" />
-      <rect x="-9" y="18" width="18" height="26" fill="#4b2a13" />
-    </g>
-  );
-}
-
 export function FluxForgeScene() {
   return (
     <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
@@ -243,16 +233,17 @@ export function FluxForgeScene() {
         </linearGradient>
       </defs>
       <rect width="400" height="240" fill="url(#fluxForgeSky)" />
-      <path d="M0 172 Q100 148 200 168 T400 158 V240 H0 Z" fill="#8fc86d" />
-      <path d="M0 198 Q120 182 220 198 T400 190 V240 H0 Z" fill="#6fac57" />
-      <FluxForgeHouse x={92} y={158} scale={0.72} />
-      <FluxForgeHouse x={200} y={172} scale={1} />
-      <FluxForgeHouse x={312} y={160} scale={0.66} />
-      <g stroke="#17324a" strokeOpacity="0.5" strokeWidth="2" strokeDasharray="3 5">
-        <line x1="168" y1="150" x2="232" y2="150" />
+      <rect y="150" width="400" height="90" fill="#8fc86d" />
+      <ellipse cx="72" cy="52" rx="30" ry="14" fill="#ffffff" opacity="0.85" />
+      <ellipse cx="96" cy="44" rx="22" ry="12" fill="#ffffff" opacity="0.85" />
+      <g transform="translate(200 200)">
+        <rect x="-80" y="-90" width="160" height="90" fill="#9b663a" stroke="#70421f" strokeWidth="5" />
+        <path d="M-95 -90 L0 -170 L95 -90 Z" fill="#c8533b" stroke="#7a2117" strokeWidth="4" strokeLinejoin="round" />
+        <rect x="-18" y="-50" width="36" height="50" fill="#4b2a13" stroke="#3a2010" strokeWidth="3" />
+        <path d="M-72 -30 H72" stroke="#ffffff" strokeDasharray="4 5" strokeWidth="2" opacity="0.8" />
+        <text x="0" y="-38" textAnchor="middle" fontSize="15" fontWeight="900" fill="#17324a" opacity="0.85">4 m</text>
       </g>
-      <text x="200" y="140" textAnchor="middle" fontSize="13" fontWeight="900" fill="#17324a" opacity="0.75">4 m</text>
-      <g transform="translate(48 60)" fill="#e2762b">
+      <g transform="translate(60 60)" fill="#e2762b">
         <rect x="-14" y="-14" width="28" height="28" rx="6" transform="rotate(12)" />
       </g>
     </svg>

@@ -85,7 +85,7 @@ export function GameCard({ game }: GameCardProps) {
             onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : undefined}
             data-game-direct-launch
             data-game-title={name}
-            data-game-mark={game.id === "multiplication-train" ? "🚂" : "🏞️"}
+            data-game-mark={game.id === "multiplication-train" ? "🚂" : game.id === "flux-forge" ? "🏗️" : "🏞️"}
           >
             {ctaLabel}
           </a>

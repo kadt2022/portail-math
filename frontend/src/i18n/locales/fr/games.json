@@ -16,6 +16,11 @@
     "description": "Traverse la rivière en reconnaissant les bonnes fractions.",
     "cta": "Jouer"
   },
+  "fluxForge": {
+    "name": "Flux Forge",
+    "description": "Deviens un petit ingénieur et construis la cabane du village.",
+    "cta": "Jouer"
+  },
   "grilleMagique": {
     "name": "Les Tuiles magiques",
     "description": "Fais glisser les tuiles et pose la carte magique pour résoudre les égalités.",
@@ -115,78 +120,6 @@
         "resume": "Continuer",
         "fullscreenOn": "Plein écran",
         "fullscreenOff": "Quitter le plein écran"
-      }
-    }
-  },
-  "fluxForge": {
-    "name": "Flux Forge",
-    "description": "Deviens un petit ingénieur et construis les trois maisons du village.",
-    "cta": "Jouer",
-    "game": {
-      "title": "Flux Forge",
-      "subtitle": "Niveau 1 — Construire le village",
-      "backToGames": "Retour aux jeux",
-      "canvasLabel": "Scène 3D du village Flux Forge",
-      "houseLabel": "Maison {{label}}",
-      "houseStatus": {
-        "locked": "Verrouillée",
-        "active": "En cours",
-        "completed": "Terminée"
-      },
-      "stepLabel": {
-        "wall": "Mur",
-        "door": "Porte",
-        "roof": "Toit",
-        "volume": "Volume",
-        "conversion": "Conversion"
-      },
-      "engagePrompt": {
-        "wall": "Touche le mur transparent dans la scène pour commencer.",
-        "door": "Touche la porte transparente dans la scène pour commencer.",
-        "roof": "Touche le toit transparent dans la scène pour commencer.",
-        "volume": "Touche le bloc transparent dans la scène pour commencer.",
-        "conversion": "Touche le bloc dans la scène pour convertir son volume."
-      },
-      "paletteLabel": {
-        "wall": "🧱 Mur",
-        "door": "🚪 Porte",
-        "roof": "🏠 Toit",
-        "volume": "📦 Bloc",
-        "conversion": "💧 Bloc"
-      },
-      "dragHint": "Fais glisser la pièce sur la scène, ou touche-la directement dans la scène 3D.",
-      "exercise": {
-        "wall": { "prompt": "Quelle est la surface du mur ?", "formula": "{{length}} × {{height}} = ?" },
-        "door": { "prompt": "Quelle est la surface de la porte ?", "formula": "{{width}} × {{height}} = ?" },
-        "roof": { "prompt": "Quelle surface faut-il couvrir ?", "formula": "{{length}} × {{width}} = ?" },
-        "volume": { "prompt": "Quel est le volume du bloc ?", "formula": "{{length}} × {{width}} × {{height}} = ?" },
-        "conversion": { "prompt": "Convertis ce volume en litres.", "formula": "{{volume}} m³ = ? L", "hintRule": "Rappel : 1 m³ = 1000 L" }
-      },
-      "answerLabel": "Ta réponse",
-      "answerPlaceholder": "Réponse",
-      "answerUnit": {
-        "surface": "m²",
-        "volume": "m³",
-        "conversion": "L"
-      },
-      "actions": {
-        "validate": "Valider",
-        "hint": "Afficher le calcul",
-        "collapsePanel": "Voir les exercices",
-        "expandPanel": "Masquer les exercices"
-      },
-      "feedback": {
-        "correct": "Bravo, c'est construit !",
-        "incorrect": "Essaie encore : recalcule et valide à nouveau.",
-        "invalidNumber": "Entre un nombre pour valider."
-      },
-      "progress": "Progression du village",
-      "villageComplete": {
-        "title": "NIVEAU 1 TERMINÉ",
-        "message": "Ton village est construit !",
-        "nextLevel": "Niveau 2",
-        "nextLevelLocked": "Bientôt disponible",
-        "backToGames": "Retour aux jeux"
       }
     }
   },

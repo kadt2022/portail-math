@@ -33,13 +33,6 @@ const TurboPulsePage = lazy(() =>
   import("../games/turbo-pulse/TurboPulsePage").then((module) => ({ default: module.TurboPulsePage })),
 );
 
-// Même raisonnement pour Flux Forge, qui embarque Babylon.js (moteur 3D/WebGL
-// tout aussi lourd) : chargement paresseux uniquement à l'atteinte de la
-// route de jeu.
-const FluxForgePage = lazy(() =>
-  import("../games/flux-forge/FluxForgePage").then((module) => ({ default: module.FluxForgePage })),
-);
-
 // Le basename est fixé à /app : react-router-dom compose alors des chemins
 // absolus (/app/jeux, ...) sans qu'aucune route ne répète le préfixe.
 // Spring Boot sert déjà index.html pour toute URL sous /app/** qui ne
@@ -66,14 +59,6 @@ export function AppRouter() {
             element={
               <Suspense fallback={null}>
                 <TurboPulsePage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="jeux/flux-forge"
-            element={
-              <Suspense fallback={null}>
-                <FluxForgePage />
               </Suspense>
             }
           />

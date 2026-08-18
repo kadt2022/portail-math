@@ -1,5 +1,35 @@
 # RECIT-FLUX-FORGE-01 — Niveau 1 : Construire les 3 maisons
 
+## Mise à jour — portée réellement livrée
+
+Le récit ci-dessous décrivait l'ambition initiale (3 maisons A/B/C en
+React + TypeScript + Babylon.js, sans système d'eau). Après une première
+implémentation Babylon.js, le rendu 3D a été jugé moins clair et moins
+chaleureux que le prototype HTML/CSS fourni par l'équipe pédagogique
+(`ARCHI-MVP-POMPE-ANIMEE.html`).
+
+Décision produit : le Niveau 1 réellement livré reprend ce prototype tel
+quel (une seule cabane, 3 missions : Surface, Volume, Eau & Pompe — le
+mur/porte, le bloc de volume, puis le réservoir et la pompe), plutôt que
+la structure « 3 maisons sans eau » décrite plus bas. Techniquement,
+c'est un jeu HTML/CSS/JS autonome (comme le Train des multiplications ou
+la Rivière des fractions), pas une route React/Babylon.js :
+
+- `src/main/resources/static/games/flux-forge.html`
+- `src/main/resources/static/css/flux-forge.css`
+- `src/main/resources/static/js/flux-forge.js`
+
+rendu responsive (empilement + invitation à tourner le téléphone en
+portrait, grille compacte conservée en paysage) et enregistré dans
+`game-catalogue.ts` en `availability: "standalone"`, ce qui lui donne
+automatiquement le plein écran + verrouillage paysage au lancement
+depuis le catalogue (mécanisme partagé `fraction-river-launch.js`).
+
+Le reste de ce document (objectifs pédagogiques, structure "3 maisons",
+exigence Babylon.js) est conservé comme référence de l'intention
+d'origine, mais ne décrit plus l'implémentation actuelle. Un futur
+niveau pourra reprendre l'ambition 3D si besoin.
+
 ## Contexte
 
 Flux Forge est un jeu éducatif de Mbuyamba dans lequel l'enfant devient un petit ingénieur.

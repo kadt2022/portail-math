@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr" class="is-flux-forge-immersive">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Flux Forge — Niveau 1 : mesure, calcule et construis la cabane avec Mbuyamba Math.">
+<title>Flux Forge — Niveau 1 · Mbuyamba Math</title>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/flux-forge.css">
+</head>
+<body class="is-flux-forge-immersive">
+<div class="app-shell standalone-game-shell">
+<div class="page-shell">
+<div class="page-content flux-forge-page">
+<div class="ff-app">
+
+<header>
+<div class="logo">🏗️ ARCHI <span>MVP</span></div>
+<a class="back-link" href="/app/jeux" aria-label="Retour aux jeux">← Jeux</a>
+<div class="badge" id="badge">Mission 1 : surface</div>
+</header>
+
+<div class="rotate-hint" aria-hidden="true">
+  <strong>Tourne ton téléphone pour jouer</strong>
+  <span>Flux Forge se joue en mode paysage.</span>
+</div>
+
+<main>
+<aside class="panel">
+<h3>Construction</h3>
+<button class="tool active" id="wallBtn">🧱 Mur</button>
+<button class="tool" id="roofBtn">🏠 Toit</button>
+<button class="tool" id="blockBtn">📦 Bloc volume</button>
+<button class="tool" id="tankBtn">💧 Réservoir</button>
+<h3 style="margin-top:18px">Outils</h3>
+<button class="tool" id="rulerBtn">📏 Règle</button>
+<button class="tool" id="calcBtn">🧮 Calculette</button>
+<button class="tool" id="pumpBtn">⚙️ Pompe</button>
+</aside>
+
+<section class="scene">
+<div class="cloud"></div>
+<div class="instruction" id="instruction">1. Clique sur l'emplacement transparent pour poser le mur.</div>
+
+<div class="ground" id="cabinZone">
+  <div class="floor"></div><div class="post p1"></div><div class="post p2"></div>
+  <div class="wall-slot" id="slot"></div>
+  <div class="wall" id="wall"><div class="door"></div></div>
+  <div class="roof" id="roof"></div>
+  <div class="measure" id="measureH"></div>
+  <div class="measureV" id="measureV"></div>
+</div>
+
+<div class="volumeZone" id="volumeZone">
+  <div class="block3d"></div>
+  <div class="dim dL">4 m</div><div class="dim dW">2 m</div><div class="dim dH">2 m</div>
+</div>
+
+<div class="waterZone" id="waterZone">
+  <div class="tankWrap">
+    <div class="tank"><div class="level" id="levelText">0 L</div><div class="water" id="water"></div></div>
+    <div class="source" title="Source d'eau"></div>
+    <div class="pipe"><div class="waterInPipe" id="waterInPipe"></div></div><div class="flow" id="flow"></div><div class="pump"><button class="pumpStart" id="pumpStart">▶ DÉMARRER</button></div>
+  </div>
+</div>
+</section>
+
+<aside class="panel">
+<div class="tab">
+<button class="on" id="tabSurface">Surface</button>
+<button id="tabVolume">Volume</button>
+<button id="tabWater">Eau</button>
+</div>
+
+<div id="surfacePanel">
+<h3>Mission surface</h3>
+<div class="steps">
+<div class="step" id="s1">1. Poser le mur</div>
+<div class="step" id="s2">2. Mesurer</div>
+<div class="step" id="s3">3. Calculer 4 × 2</div>
+<div class="step" id="s4">4. Poser le toit</div>
+</div>
+</div>
+
+<div id="volumePanel" style="display:none">
+<h3>Mission volume</h3>
+<div class="steps">
+<div class="step" id="v1">1. Observer le bloc</div>
+<div class="step" id="v2">2. Mesurer 3 dimensions</div>
+<div class="step" id="v3">3. Calculer 4 × 2 × 2</div>
+</div>
+<div class="small">Volume = longueur × largeur × hauteur</div>
+</div>
+
+<div id="waterPanel" style="display:none">
+<h3>Mission eau &amp; pompe</h3>
+<div class="steps">
+<div class="step" id="w1">1. Calculer 4 m³</div>
+<div class="step" id="w2">2. Convertir en litres</div>
+<div class="step" id="w3">3. Calculer le temps</div>
+<div class="step" id="w4">4. Activer la pompe</div>
+</div>
+<div class="small">1 m³ = 1000 L • Débit : 20 L/min</div>
+</div>
+
+<h3 style="margin-top:18px">Calculette</h3>
+<input id="answer" type="number" placeholder="Réponse">
+<button class="btn green" id="validate">Valider</button>
+<button class="btn gray" id="hint">Afficher le calcul</button>
+<div class="status" id="status">Commence par poser le mur.</div>
+</aside>
+</main>
+
+</div>
+</div>
+</div>
+</div>
+<script src="/js/flux-forge.js"></script>
+</body>
+</html>
