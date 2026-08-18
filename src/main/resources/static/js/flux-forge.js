@@ -135,8 +135,35 @@ document.addEventListener('keydown', (event) => {
 const keypad = $('keypad');
 const answerInput = $('answer');
 
-function openKeypad(){ keypad.hidden = false; }
-function closeKeypad(){ keypad.hidden = true; }
+function openKeypad(){
+  // Un tap réel déclenche à la fois 'click' et 'focus' (les deux sont
+  // écoutés ci-dessous : un clic synthétique/programmatique ou un focus
+  // clavier/lecteur d'écran ne déclenchent pas forcément les deux) — sans
+  // cette garde, le calcul de défilement ci-dessous s'exécuterait deux fois
+  // de suite et se marcherait dessus.
+  if(!keypad.hidden) return;
+  keypad.hidden = false;
+  // Le champ Réponse est en pleine largeur en mode portrait : caler le pavé
+  // dans un coin ne suffit pas à lui seul à éviter le chevauchement. On
+  // calcule ici précisément le débordement entre le bas du champ (qui
+  // bouge avec le défilement) et le haut du pavé (position:fixed, donc
+  // toujours à la même hauteur d'écran), puis on fait défiler exactement
+  // de cette distance pour dégager le champ au-dessus du pavé — plus fiable
+  // qu'un scrollIntoView() générique, qui ne suffisait pas ici.
+  setTimeout(() => {
+    const keypadRect = keypad.getBoundingClientRect();
+    const inputRect = answerInput.getBoundingClientRect();
+    const overlap = inputRect.bottom - keypadRect.top;
+    if(overlap > 0){
+      window.scrollBy({ top: overlap + 16, left: 0, behavior: 'instant' });
+    } else if(inputRect.top < 0){
+      window.scrollBy({ top: inputRect.top - 16, left: 0, behavior: 'instant' });
+    }
+  }, 50);
+}
+function closeKeypad(){
+  keypad.hidden = true;
+}
 
 answerInput.addEventListener('focus', openKeypad);
 answerInput.addEventListener('click', openKeypad);
@@ -253,6 +280,31 @@ answerInput.addEventListener('focus', () => {
 // alignée sur l'arête mesurée : apparition près de l'outil, déplacement
 // jusqu'à l'arête, puis alignement, puis seulement alors la mesure.
 
+// Aucune mesure ne doit disparaître une fois posée : chaque appel crée sa
+// PROPRE règle + étiquette (jamais un seul élément réutilisé/déplacé), qui
+// reste affichée tant que la mission en cours ne change pas. activeRulers
+// garde la liste des règles de la mission courante pour pouvoir les
+// effacer d'un coup au moment — et seulement au moment — où l'on quitte
+// vraiment cette mission (voir clearAllRulers, appelée depuis showMode()).
+let activeRulers = [];
+
+function createRulerElement(){
+  const scene = document.querySelector('.ff-app .scene');
+  const ruler = document.createElement('div');
+  ruler.className = 'ruler';
+  const labelEl = document.createElement('span');
+  labelEl.className = 'ruler-label';
+  ruler.appendChild(labelEl);
+  scene.appendChild(ruler);
+  activeRulers.push(ruler);
+  return { ruler, labelEl };
+}
+
+function clearAllRulers(){
+  activeRulers.forEach((ruler) => ruler.remove());
+  activeRulers = [];
+}
+
 // side : "bottom" (longueur, règle horizontale sous l'objet), "right"
 // (largeur, règle verticale à droite) ou "left" (hauteur, règle verticale à
 // gauche) — reprend la disposition des anciennes étiquettes .dL/.dW/.dH,
@@ -261,8 +313,7 @@ answerInput.addEventListener('focus', () => {
 function measureWithRuler({ target, side, label, delay = 0 }){
   return new Promise((resolve) => {
     setTimeout(() => {
-      const ruler = $('ruler');
-      const rulerLabel = $('rulerLabel');
+      const { ruler, labelEl } = createRulerElement();
       const scene = document.querySelector('.ff-app .scene');
       const sceneR = scene.getBoundingClientRect();
       const tr = target.getBoundingClientRect();
@@ -285,11 +336,8 @@ function measureWithRuler({ target, side, label, delay = 0 }){
         w = 6; h = tr.height;
       }
 
-      ruler.hidden = false;
       ruler.classList.toggle('ruler-v', isVertical);
       ruler.classList.toggle('ruler-left', side === 'left');
-      ruler.classList.remove('ruler-visible');
-      rulerLabel.textContent = '';
 
       const startLeft = clamp(startR.left - sceneR.left, 0, scene.clientWidth - 20);
       const startTop = clamp(startR.top - sceneR.top, 0, scene.clientHeight - 20);
@@ -311,7 +359,7 @@ function measureWithRuler({ target, side, label, delay = 0 }){
         ruler.style.width = w + 'px';
         ruler.style.height = h + 'px';
         setTimeout(() => {
-          rulerLabel.textContent = label;
+          labelEl.textContent = label;
           ruler.classList.add('ruler-visible');
           resolve();
         }, 320);
@@ -321,10 +369,6 @@ function measureWithRuler({ target, side, label, delay = 0 }){
 }
 
 function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-
-function hideRuler(){
-  $('ruler').hidden = true;
-}
 
 let rulerBusy = false;
 async function runRulerSequence(steps){
@@ -340,6 +384,10 @@ async function runRulerSequence(steps){
 // ---------- Missions ----------
 
 function showMode(next){
+ // Rester dans la même mission (ex. re-cliquer un outil déjà actif) ne doit
+ // jamais effacer les règles/mesures déjà posées ni la réponse en cours de
+ // saisie : on ne réinitialise que lors d'un vrai changement de mission.
+ const changingMode = mode !== next;
  mode=next;
  $('cabinZone').style.display=next==='surface'?'block':'none';
  $('volumeZone').style.display=next==='volume'?'block':'none';
@@ -350,8 +398,10 @@ function showMode(next){
  $('tabSurface').classList.toggle('on',next==='surface');
  $('tabVolume').classList.toggle('on',next==='volume');
  $('tabWater').classList.toggle('on',next==='water');
- answerInput.value='';
- hideRuler();
+ if(changingMode){
+   answerInput.value='';
+   clearAllRulers();
+ }
 
  if(next==='surface'){
    $('badge').textContent=t('badgeSurface');
@@ -447,6 +497,10 @@ $('hint').onclick=()=>{
 function handleValidate(){
  const v=Number(answerInput.value);
  clearGuide();
+ // Le pavé ne doit rester ouvert qu'entre le moment où l'enfant touche le
+ // champ et celui où il valide : il se referme systématiquement ici, et ne
+ // réapparaît qu'en retouchant le champ (voir openKeypad ci-dessus).
+ closeKeypad();
  if(mode==='surface'){
    if(!measured)return status(t('statusMeasureWallFirst'),'bad');
    if(v===8){

@@ -67,8 +67,6 @@
     <div class="pipe"><div class="waterInPipe" id="waterInPipe"></div></div><div class="flow" id="flow"></div><div class="pump"><button class="pumpStart" id="pumpStart" data-i18n="pumpStartLabel">▶ DÉMARRER</button></div>
   </div>
 </div>
-
-<div class="ruler" id="ruler" hidden><span class="ruler-label" id="rulerLabel"></span></div>
 </section>
 
 <aside class="panel">
@@ -148,10 +146,11 @@
 
 <div class="quit-modal" id="quitModal" hidden>
   <div class="quit-modal-card" role="alertdialog" aria-modal="true" aria-labelledby="quitModalTitle">
+    <span class="quit-modal-icon" aria-hidden="true">👋</span>
     <p id="quitModalTitle" data-i18n="quitConfirmTitle">Quitter la partie ?</p>
     <div class="quit-modal-actions">
-      <button type="button" class="btn gray" id="quitCancel" data-i18n="quitConfirmContinue">Continuer</button>
-      <button type="button" class="btn quit-confirm" id="quitConfirm" data-i18n="quitConfirmQuit">Quitter</button>
+      <button type="button" class="quit-modal-btn quit-modal-btn--primary" id="quitCancel" data-i18n="quitConfirmContinue">Continuer</button>
+      <button type="button" class="quit-modal-btn quit-modal-btn--secondary" id="quitConfirm" data-i18n="quitConfirmQuit">Quitter</button>
     </div>
   </div>
 </div>

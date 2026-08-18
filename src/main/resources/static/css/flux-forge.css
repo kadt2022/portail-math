@@ -775,15 +775,22 @@ html[lang="en"] .ff-app .pump::before {
 
 /* ---------- Pavé numérique embarqué ---------- */
 
+/* Ancré en bas à GAUCHE, et volontairement compact (jamais plein écran/
+   pleine largeur) : un pavé qui couvrirait tout le bas de l'écran cache le
+   champ Réponse avec lui. Rester dans un coin laisse le reste de l'écran —
+   et donc le champ — visible ; voir aussi le scrollIntoView() dans
+   flux-forge.js qui ramène le champ dans la zone encore dégagée à
+   l'ouverture. */
 .keypad {
     position: fixed;
     z-index: 500;
-    right: 16px;
+    left: 16px;
     bottom: 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: 220px;
+    max-width: calc(100vw - 32px);
     padding: 12px;
     background: #fff;
     border-radius: 18px;
@@ -836,15 +843,11 @@ html[lang="en"] .ff-app .pump::before {
     cursor: pointer;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
     .keypad {
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        max-width: none;
-        border-radius: 20px 20px 0 0;
-        padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+        left: 8px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        width: 200px;
     }
 
     .keypad-grid {
@@ -862,7 +865,8 @@ html[lang="en"] .ff-app .pump::before {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 51, 43, 0.45);
+    background: rgba(23, 50, 74, 0.45);
+    backdrop-filter: blur(2px);
 }
 
 .quit-modal[hidden] {
@@ -871,32 +875,56 @@ html[lang="en"] .ff-app .pump::before {
 
 .quit-modal-card {
     width: min(100%, 340px);
-    padding: 24px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    padding: 30px 26px 26px;
+    background: linear-gradient(180deg, #fff 0%, #fff8ec 100%);
+    border: 3px solid #fce3cd;
+    border-radius: 26px 8px 26px 8px;
+    box-shadow: 0 24px 60px rgba(15, 51, 43, 0.3);
     text-align: center;
 }
 
+.quit-modal-icon {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 40px;
+    line-height: 1;
+}
+
 .quit-modal-card p {
-    margin: 0 0 18px;
-    font-size: 18px;
-    font-weight: 800;
+    margin: 0 0 22px;
+    font-size: 19px;
+    font-weight: 900;
     color: #17324a;
 }
 
 .quit-modal-actions {
     display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
-.quit-modal-actions .btn {
-    margin-top: 0;
+.quit-modal-btn {
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
 }
 
-.quit-confirm {
+.quit-modal-btn--primary {
+    order: -1;
+    border: 0;
+    background: #2a9d4b;
     color: #fff;
-    background: #c1392b;
+    box-shadow: 0 8px 18px rgba(42, 157, 75, 0.32);
+}
+
+.quit-modal-btn--secondary {
+    border: 2px solid #f3d9c4;
+    background: #fff;
+    color: #b85c1c;
 }
 
 /* ---------- Portrait / petit écran : empilement, palette en bandeau ----------
@@ -907,10 +935,24 @@ html[lang="en"] .ff-app .pump::before {
    du bloc "Paysage bas" plus bas, qui suppose main resté en display:grid. */
 
 @media (max-width: 900px) and (orientation: portrait) {
+    /* html/body restent en overflow:hidden + height:100% pour la mise en
+       page desktop à hauteur fixe (aucun contenu n'y dépasse jamais 100vh)
+       — mais en portrait empilé, le contenu dépasse légitimement un écran.
+       body garder height:100% en plus d'overflow-y:auto le transforme en
+       conteneur de défilement IMBRIQUÉ, distinct du scroll de la page :
+       window.scrollTo()/scrollIntoView() ciblent le scroller racine et ne
+       voient donc plus rien à faire défiler, et le bas de page devient
+       inatteignable. Laisser body grandir avec son contenu (height:auto)
+       remet le document lui-même comme seul et unique scroller. */
+    html.is-flux-forge-immersive,
+    body.is-flux-forge-immersive {
+        height: auto;
+        overflow-y: auto;
+    }
+
     .ff-app {
         height: auto;
         min-height: 100vh;
-        overflow-y: auto;
     }
 
     .ff-app main {
