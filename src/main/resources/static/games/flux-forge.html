@@ -20,9 +20,14 @@
 <div class="badge" id="badge">Mission 1 : surface</div>
 </header>
 
-<div class="rotate-hint" aria-hidden="true">
-  <strong>Tourne ton téléphone pour jouer</strong>
-  <span>Flux Forge se joue en mode paysage.</span>
+<div class="yamba-guide" id="yambaGuide" aria-live="polite">
+  <span class="yamba-medallion" aria-hidden="true">
+    <img class="yamba-portrait" src="/images/yamba-head.jpg" alt="">
+  </span>
+  <p class="yamba-bubble">
+    <strong class="yamba-name">Yamba</strong>
+    <span class="yamba-message" id="yambaMessage">Clique sur l'emplacement transparent pour poser le mur.</span>
+  </p>
 </div>
 
 <main>
@@ -40,20 +45,16 @@
 
 <section class="scene">
 <div class="cloud"></div>
-<div class="instruction" id="instruction">1. Clique sur l'emplacement transparent pour poser le mur.</div>
 
 <div class="ground" id="cabinZone">
   <div class="floor"></div><div class="post p1"></div><div class="post p2"></div>
   <div class="wall-slot" id="slot"></div>
   <div class="wall" id="wall"><div class="door"></div></div>
   <div class="roof" id="roof"></div>
-  <div class="measure" id="measureH"></div>
-  <div class="measureV" id="measureV"></div>
 </div>
 
 <div class="volumeZone" id="volumeZone">
-  <div class="block3d"></div>
-  <div class="dim dL">4 m</div><div class="dim dW">2 m</div><div class="dim dH">2 m</div>
+  <div class="block3d" id="block3d"></div>
 </div>
 
 <div class="waterZone" id="waterZone">
@@ -63,6 +64,8 @@
     <div class="pipe"><div class="waterInPipe" id="waterInPipe"></div></div><div class="flow" id="flow"></div><div class="pump"><button class="pumpStart" id="pumpStart">▶ DÉMARRER</button></div>
   </div>
 </div>
+
+<div class="ruler" id="ruler" hidden><span class="ruler-label" id="rulerLabel"></span></div>
 </section>
 
 <aside class="panel">
@@ -115,6 +118,13 @@
 </div>
 </div>
 </div>
+
+<div class="guide-arrow" id="guideArrow" hidden aria-hidden="true">
+  <svg viewBox="0 0 32 40" width="32" height="40">
+    <path d="M16 2 L16 28 M6 20 L16 32 L26 20" fill="none" stroke="#e2762b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+
 <script src="/js/flux-forge.js"></script>
 </body>
 </html>
