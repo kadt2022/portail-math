@@ -16,6 +16,11 @@
     "description": "Traverse la rivière en reconnaissant les bonnes fractions.",
     "cta": "Jouer"
   },
+  "fluxForge": {
+    "name": "Flux Forge",
+    "description": "Deviens un petit ingénieur et construis la cabane du village.",
+    "cta": "Jouer"
+  },
   "grilleMagique": {
     "name": "Les Tuiles magiques",
     "description": "Fais glisser les tuiles et pose la carte magique pour résoudre les égalités.",

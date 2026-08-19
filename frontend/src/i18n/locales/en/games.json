@@ -16,6 +16,11 @@
     "description": "Cross the river by picking the right fractions.",
     "cta": "Play"
   },
+  "fluxForge": {
+    "name": "Flux Forge",
+    "description": "Become a little engineer and build the village's cabin.",
+    "cta": "Play"
+  },
   "grilleMagique": {
     "name": "The Magic Tiles",
     "description": "Slide the tiles and place the magic card to solve the equations.",

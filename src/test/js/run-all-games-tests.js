@@ -10,3 +10,4 @@ require("./fraction-river-anchors.test.js");
 require("./game-i18n.test.js");
 require("./game-shell-i18n.test.js");
 require("./progress-store.test.js");
+require("./flux-forge.test.js");

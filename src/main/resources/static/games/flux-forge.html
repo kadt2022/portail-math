@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr" class="is-flux-forge-immersive">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Flux Forge — Niveau 1 : mesure, calcule et construis la cabane avec Mbuyamba Math." data-i18n-attr="content:metaDescription">
+<title data-i18n="documentTitle">Flux Forge — Niveau 1 · Mbuyamba Math</title>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/flux-forge.css">
+</head>
+<body class="is-flux-forge-immersive">
+<div class="app-shell standalone-game-shell">
+<div class="page-shell">
+<div class="page-content flux-forge-page">
+<div class="ff-app">
+
+<header>
+<div class="logo">🏗️ ARCHI <span>MVP</span></div>
+<div class="badge" id="badge">Mission 1 : surface</div>
+<div class="header-actions">
+  <button type="button" class="sound-toggle" id="soundToggle" aria-pressed="true" data-i18n-attr="aria-label:soundOn">🔊</button>
+  <button type="button" class="quit-btn" id="quitBtn" data-i18n="quitShort">Quitter</button>
+</div>
+</header>
+
+<div class="yamba-guide" id="yambaGuide" aria-live="polite">
+  <span class="yamba-medallion" aria-hidden="true">
+    <img class="yamba-portrait" src="/images/yamba-head.jpg" alt="">
+  </span>
+  <p class="yamba-bubble">
+    <strong class="yamba-name">Yamba</strong>
+    <span class="yamba-message" id="yambaMessage">Clique sur l'emplacement transparent pour poser le mur.</span>
+  </p>
+</div>
+
+<main>
+<aside class="panel">
+<h3 data-i18n="constructionHeading">Construction</h3>
+<button class="tool active" id="wallBtn" data-i18n="toolWall">🧱 Mur</button>
+<button class="tool" id="roofBtn" data-i18n="toolRoof">🏠 Toit</button>
+<button class="tool" id="blockBtn" data-i18n="toolBlock">📦 Bloc volume</button>
+<button class="tool" id="tankBtn" data-i18n="toolTank">💧 Réservoir</button>
+<h3 style="margin-top:18px" data-i18n="toolsHeading">Outils</h3>
+<button class="tool" id="rulerBtn" data-i18n="toolRuler">📏 Règle</button>
+<button class="tool" id="calcBtn" data-i18n="toolCalc">🧮 Calculette</button>
+<button class="tool" id="pumpBtn" data-i18n="toolPump">⚙️ Pompe</button>
+</aside>
+
+<section class="scene">
+<div class="cloud"></div>
+
+<div class="ground" id="cabinZone">
+  <div class="floor"></div><div class="post p1"></div><div class="post p2"></div>
+  <div class="wall-slot" id="slot"></div>
+  <div class="wall" id="wall"><div class="door"></div></div>
+  <div class="roof" id="roof"></div>
+</div>
+
+<div class="volumeZone" id="volumeZone">
+  <div class="block3d" id="block3d"></div>
+</div>
+
+<div class="waterZone" id="waterZone">
+  <div class="tankWrap">
+    <div class="tank"><div class="level" id="levelText">0 L</div><div class="water" id="water"></div></div>
+    <div class="source" title="Source d'eau"></div>
+    <div class="pipe"><div class="waterInPipe" id="waterInPipe"></div></div><div class="flow" id="flow"></div><div class="pump"><button class="pumpStart" id="pumpStart" data-i18n="pumpStartLabel">▶ DÉMARRER</button></div>
+  </div>
+</div>
+</section>
+
+<aside class="panel">
+<div class="tab">
+<button class="on" id="tabSurface" data-i18n="tabSurface">Surface</button>
+<button id="tabVolume" data-i18n="tabVolume">Volume</button>
+<button id="tabWater" data-i18n="tabWater">Eau</button>
+</div>
+
+<div id="surfacePanel">
+<h3 data-i18n="surfaceMissionHeading">Mission surface</h3>
+<div class="steps">
+<div class="step" id="s1" data-i18n="stepWall">1. Poser le mur</div>
+<div class="step" id="s2" data-i18n="stepMeasure">2. Mesurer</div>
+<div class="step" id="s3" data-i18n="stepCalcSurface">3. Calculer 4 × 2</div>
+<div class="step" id="s4" data-i18n="stepRoof">4. Poser le toit</div>
+</div>
+</div>
+
+<div id="volumePanel" style="display:none">
+<h3 data-i18n="volumeMissionHeading">Mission volume</h3>
+<div class="steps">
+<div class="step" id="v1" data-i18n="stepObserveBlock">1. Observer le bloc</div>
+<div class="step" id="v2" data-i18n="stepMeasure3">2. Mesurer 3 dimensions</div>
+<div class="step" id="v3" data-i18n="stepCalcVolume">3. Calculer 4 × 2 × 2</div>
+</div>
+<div class="small" data-i18n="volumeFormula">Volume = longueur × largeur × hauteur</div>
+</div>
+
+<div id="waterPanel" style="display:none">
+<h3 data-i18n="waterMissionHeading">Mission eau &amp; pompe</h3>
+<div class="steps">
+<div class="step" id="w1" data-i18n="stepCalcCapacity">1. Calculer 4 m³</div>
+<div class="step" id="w2" data-i18n="stepConvertLiters">2. Convertir en litres</div>
+<div class="step" id="w3" data-i18n="stepCalcTime">3. Calculer le temps</div>
+<div class="step" id="w4" data-i18n="stepStartPump">4. Activer la pompe</div>
+</div>
+<div class="small" data-i18n="waterRates">1 m³ = 1000 L • Débit : 20 L/min</div>
+</div>
+
+<h3 style="margin-top:18px" data-i18n="calculetteHeading">Calculette</h3>
+<input id="answer" type="number" inputmode="none" readonly placeholder="Réponse" data-i18n-attr="placeholder:answerPlaceholder, aria-label:answerLabel">
+<button class="btn green" id="validate" data-i18n="validate">Valider</button>
+<button class="btn gray" id="hint" data-i18n="hint">Afficher le calcul</button>
+<div class="status" id="status" data-i18n="statusInitial">Commence par poser le mur.</div>
+</aside>
+</main>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="guide-arrow" id="guideArrow" hidden aria-hidden="true">
+  <svg viewBox="0 0 32 40" width="32" height="40">
+    <path d="M16 2 L16 28 M6 20 L16 32 L26 20" fill="none" stroke="#e2762b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<div class="keypad" id="keypad" hidden>
+  <div class="keypad-grid">
+    <button type="button" class="keypad-key" data-digit="1">1</button>
+    <button type="button" class="keypad-key" data-digit="2">2</button>
+    <button type="button" class="keypad-key" data-digit="3">3</button>
+    <button type="button" class="keypad-key" data-digit="4">4</button>
+    <button type="button" class="keypad-key" data-digit="5">5</button>
+    <button type="button" class="keypad-key" data-digit="6">6</button>
+    <button type="button" class="keypad-key" data-digit="7">7</button>
+    <button type="button" class="keypad-key" data-digit="8">8</button>
+    <button type="button" class="keypad-key" data-digit="9">9</button>
+    <button type="button" class="keypad-key keypad-key--clear" id="keypadClear" data-i18n="keypadClear">C</button>
+    <button type="button" class="keypad-key" data-digit="0">0</button>
+    <button type="button" class="keypad-key keypad-key--back" id="keypadBackspace" data-i18n="keypadBackspace">⌫</button>
+  </div>
+  <button type="button" class="keypad-validate" id="keypadValidate" data-i18n="validate">Valider</button>
+</div>
+
+<div class="quit-modal" id="quitModal" hidden>
+  <div class="quit-modal-card" role="alertdialog" aria-modal="true" aria-labelledby="quitModalTitle">
+    <span class="quit-modal-icon" aria-hidden="true">👋</span>
+    <p id="quitModalTitle" data-i18n="quitConfirmTitle">Quitter la partie ?</p>
+    <div class="quit-modal-actions">
+      <button type="button" class="quit-modal-btn quit-modal-btn--primary" id="quitCancel" data-i18n="quitConfirmContinue">Continuer</button>
+      <button type="button" class="quit-modal-btn quit-modal-btn--secondary" id="quitConfirm" data-i18n="quitConfirmQuit">Quitter</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/game-i18n.js"></script>
+<script src="/js/game-shell-i18n.js"></script>
+<script src="/js/flux-forge-i18n.js"></script>
+<script src="/js/flux-forge.js"></script>
+</body>
+</html>

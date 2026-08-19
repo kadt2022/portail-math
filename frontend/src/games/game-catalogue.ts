@@ -9,7 +9,7 @@
 
 export type GameAvailability = "standalone" | "react" | "coming-soon";
 
-export type GameSceneId = "train" | "new-game" | "grille-magique" | "turbo-pulse";
+export type GameSceneId = "train" | "new-game" | "grille-magique" | "turbo-pulse" | "flux-forge";
 
 export interface GameCatalogueEntry {
   id: string;
@@ -63,6 +63,15 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/turbo-pulse",
     availability: "react",
     sceneId: "turbo-pulse",
+  },
+  {
+    id: "flux-forge",
+    nameKey: "fluxForge.name",
+    descriptionKey: "fluxForge.description",
+    ctaLabelKey: "fluxForge.cta",
+    href: "/games/flux-forge.html",
+    availability: "standalone",
+    sceneId: "flux-forge",
   },
   {
     id: "new-game",

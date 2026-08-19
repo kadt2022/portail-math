@@ -1,0 +1,8 @@
+{
+  "name": "portail-math-games-tests",
+  "private": true,
+  "description": "Dépendances de test pour les jeux statiques (src/main/resources/static/js) — le portail React a ses propres dépendances sous frontend/.",
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

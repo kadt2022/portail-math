@@ -222,3 +222,30 @@ export function TurboPulseCardScene() {
     </svg>
   );
 }
+
+export function FluxForgeScene() {
+  return (
+    <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="fluxForgeSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8fd5ff" />
+          <stop offset="100%" stopColor="#c9e9f6" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#fluxForgeSky)" />
+      <rect y="150" width="400" height="90" fill="#8fc86d" />
+      <ellipse cx="72" cy="52" rx="30" ry="14" fill="#ffffff" opacity="0.85" />
+      <ellipse cx="96" cy="44" rx="22" ry="12" fill="#ffffff" opacity="0.85" />
+      <g transform="translate(200 200)">
+        <rect x="-80" y="-90" width="160" height="90" fill="#9b663a" stroke="#70421f" strokeWidth="5" />
+        <path d="M-95 -90 L0 -170 L95 -90 Z" fill="#c8533b" stroke="#7a2117" strokeWidth="4" strokeLinejoin="round" />
+        <rect x="-18" y="-50" width="36" height="50" fill="#4b2a13" stroke="#3a2010" strokeWidth="3" />
+        <path d="M-72 -30 H72" stroke="#ffffff" strokeDasharray="4 5" strokeWidth="2" opacity="0.8" />
+        <text x="0" y="-38" textAnchor="middle" fontSize="15" fontWeight="900" fill="#17324a" opacity="0.85">4 m</text>
+      </g>
+      <g transform="translate(60 60)" fill="#e2762b">
+        <rect x="-14" y="-14" width="28" height="28" rx="6" transform="rotate(12)" />
+      </g>
+    </svg>
+  );
+}
