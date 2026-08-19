@@ -98,6 +98,16 @@ tasks.named('processResources') {
     }
 }
 
+tasks.register('gamesTestsInstall', Exec) {
+    description = 'Installe les dépendances de test des jeux (jsdom, voir package.json racine).'
+    // npm ci et non npm install : même raisonnement que frontendInstall,
+    // installation reproductible à partir du verrou.
+    commandLine npmExecutable, 'ci'
+    inputs.file(file('package.json'))
+    inputs.file(file('package-lock.json'))
+    outputs.dir(file('node_modules'))
+}
+
 tasks.register('testProgressStore', Exec) {
     commandLine 'node', 'src/test/js/progress-store.test.js'
 }
@@ -122,6 +132,11 @@ tasks.register('testGameShellI18n', Exec) {
     commandLine 'node', 'src/test/js/game-shell-i18n.test.js'
 }
 
+tasks.register('testFluxForge', Exec) {
+    dependsOn 'gamesTestsInstall'
+    commandLine 'node', 'src/test/js/flux-forge.test.js'
+}
+
 // Les tests ci-dessus (node direct) n'ont pas de couverture : ce jeu de jeux
 // n'a jamais fait remonter de couverture JS à Sonar. c8 (V8 coverage, aucune
 // instrumentation de build nécessaire) rejoue la même suite groupée pour
@@ -129,6 +144,7 @@ tasks.register('testGameShellI18n', Exec) {
 // frontendTest pour le même principe côté frontend React).
 tasks.register('testGamesCoverage', Exec) {
     description = 'Rejoue les tests des jeux sous c8 pour la couverture Sonar.'
+    dependsOn 'gamesTestsInstall'
     commandLine npxExecutable, '--yes', 'c8@10',
         '--reporter=lcov',
         '--report-dir=build/reports/coverage/games',
@@ -171,6 +187,7 @@ tasks.named('check') {
     dependsOn tasks.named('testFractionRiverAnchors')
     dependsOn tasks.named('testGameI18n')
     dependsOn tasks.named('testGameShellI18n')
+    dependsOn tasks.named('testFluxForge')
     dependsOn tasks.named('testGamesCoverage')
 }
 
@@ -197,7 +214,8 @@ sonar {
         property 'sonar.cpd.exclusions', [
             'src/main/resources/static/js/game-shell-i18n.js',
             'src/main/resources/static/js/fraction-river-i18n.js',
-            'src/main/resources/static/js/multiplication-train-i18n.js'
+            'src/main/resources/static/js/multiplication-train-i18n.js',
+            'src/main/resources/static/js/flux-forge-i18n.js'
         ].join(',')
         property 'sonar.java.binaries', 'build/classes/java/main'
         property 'sonar.java.test.binaries', 'build/classes/java/test'

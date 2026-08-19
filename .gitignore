@@ -11,6 +11,9 @@ out/
 frontend/node_modules/
 frontend/dist/
 
+# Dépendances de test des jeux statiques (racine du dépôt, voir package.json).
+/node_modules/
+
 # Maquettes de calibrage servies au prototype v2 de La Rivière. Ce sont des
 # images de travail, lourdes et destinées à être remplacées : elles ne partent
 # ni dans le dépôt, ni dans le paquet de production.
