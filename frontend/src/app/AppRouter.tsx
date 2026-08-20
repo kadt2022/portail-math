@@ -5,6 +5,9 @@ import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
 import { PrimaryOneCoursePage } from "../courses/primary-one/PrimaryOneCoursePage";
 import { PrimaryOneLessonPage } from "../courses/primary-one/PrimaryOneLessonPage";
 import { PrimaryOneModulePage } from "../courses/primary-one/PrimaryOneModulePage";
+import { PrimaryThreeCoursePage } from "../courses/primary-three/PrimaryThreeCoursePage";
+import { PrimaryThreeLessonPage } from "../courses/primary-three/PrimaryThreeLessonPage";
+import { PrimaryThreeModulePage } from "../courses/primary-three/PrimaryThreeModulePage";
 import { PrimaryTwoCoursePage } from "../courses/primary-two/PrimaryTwoCoursePage";
 import { PrimaryTwoLessonPage } from "../courses/primary-two/PrimaryTwoLessonPage";
 import { PrimaryTwoModulePage } from "../courses/primary-two/PrimaryTwoModulePage";
@@ -88,6 +91,18 @@ export function AppRouter() {
           <Route
             path="apprentissages/primaire/2/mathematiques/modules/:moduleId/lecons/:lessonId"
             element={<PrimaryTwoLessonPage />}
+          />
+          <Route
+            path="apprentissages/primaire/3/mathematiques"
+            element={<PrimaryThreeCoursePage />}
+          />
+          <Route
+            path="apprentissages/primaire/3/mathematiques/modules/:moduleId"
+            element={<PrimaryThreeModulePage />}
+          />
+          <Route
+            path="apprentissages/primaire/3/mathematiques/modules/:moduleId/lecons/:lessonId"
+            element={<PrimaryThreeLessonPage />}
           />
           {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route

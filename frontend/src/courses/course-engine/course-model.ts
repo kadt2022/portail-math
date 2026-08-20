@@ -2,12 +2,17 @@ export type PublicationState = "available" | "coming-soon";
 export type LearningState = "not-started" | "in-progress" | "completed";
 export type LearningItemKind = "lesson" | "evaluation";
 export type LessonStepKind =
+  | "situation"
   | "discover"
   | "manipulate"
   | "understand"
+  | "example"
   | "practice"
+  | "reflect"
   | "play"
-  | "remember";
+  | "remember"
+  | "check"
+  | "assess";
 
 export interface CourseStep {
   id: string;

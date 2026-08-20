@@ -7,6 +7,7 @@ import exetatEn from "./locales/en/exetat.json";
 import gamesEn from "./locales/en/games.json";
 import progressEn from "./locales/en/progress.json";
 import primaryOneEn from "./locales/en/primaryOne.json";
+import primaryThreeEn from "./locales/en/primaryThree.json";
 import primaryTwoEn from "./locales/en/primaryTwo.json";
 import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
@@ -14,6 +15,7 @@ import exetatFr from "./locales/fr/exetat.json";
 import gamesFr from "./locales/fr/games.json";
 import progressFr from "./locales/fr/progress.json";
 import primaryOneFr from "./locales/fr/primaryOne.json";
+import primaryThreeFr from "./locales/fr/primaryThree.json";
 import primaryTwoFr from "./locales/fr/primaryTwo.json";
 import { resolveInitialLanguage } from "./language-storage";
 import { FALLBACK_LANGUAGE, SUPPORTED_LANGUAGES } from "./supported-languages";
@@ -27,7 +29,7 @@ void i18next
     lng: resolveInitialLanguage(),
     fallbackLng: FALLBACK_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,
-    ns: ["common", "dashboard", "exetat", "games", "progress", "primaryOne", "primaryTwo"],
+    ns: ["common", "dashboard", "exetat", "games", "progress", "primaryOne", "primaryTwo", "primaryThree"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,
@@ -41,6 +43,7 @@ void i18next
         progress: progressFr,
         primaryOne: primaryOneFr,
         primaryTwo: primaryTwoFr,
+        primaryThree: primaryThreeFr,
       },
       en: {
         common: commonEn,
@@ -50,6 +53,7 @@ void i18next
         progress: progressEn,
         primaryOne: primaryOneEn,
         primaryTwo: primaryTwoEn,
+        primaryThree: primaryThreeEn,
       },
     },
   });
