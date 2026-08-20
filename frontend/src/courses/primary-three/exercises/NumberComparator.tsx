@@ -3,18 +3,10 @@ import { useTranslation } from "react-i18next";
 
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
-import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { Comparator, CompareNumbersExercise } from "./exercise-types";
+import { useRoundedExercise } from "./use-rounds";
+import type { Comparator, CompareNumbersExercise, ExerciseWidgetProps } from "./exercise-types";
 
-interface NumberComparatorProps {
-  exercise: CompareNumbersExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type NumberComparatorProps = ExerciseWidgetProps<CompareNumbersExercise>;
 
 function comparatorOf(left: number, right: number): Comparator {
   if (left > right) return ">";
@@ -34,28 +26,22 @@ export function NumberComparator({
   onValidated,
 }: NumberComparatorProps) {
   const { t } = useTranslation("primaryThree");
-  const [round, setRound] = useState(completed ? exercise.items.length - 1 : 0);
+  const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    roundCount: exercise.items.length,
+    completed,
+    hintKey,
+    strongHintKey,
+    onValidated,
+  });
   const [selected, setSelected] = useState<Comparator | null>(
     completed ? comparatorOf(exercise.items[exercise.items.length - 1].left, exercise.items[exercise.items.length - 1].right) : null,
   );
-  const { attempts, registerWrong, reset } = useAttempts();
 
   const item = exercise.items[round];
   const expected = comparatorOf(item.left, item.right);
-  const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
   const validate = () => {
-    if (selected === expected) {
-      if (round + 1 < exercise.items.length) {
-        setRound(round + 1);
-        setSelected(null);
-        reset();
-      } else {
-        onValidated();
-      }
-      return;
-    }
-    registerWrong();
+    submit(selected === expected, () => setSelected(null));
   };
 
   return (
@@ -65,11 +51,7 @@ export function NumberComparator({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
-      progressLabel={
-        exercise.items.length > 1
-          ? t("activity.progressRound", { current: round + 1, total: exercise.items.length })
-          : undefined
-      }
+      progressLabel={progressLabel}
     >
       <div className={styles.compareRow}>
         <span className={styles.compareNumber}>{item.left}</span>

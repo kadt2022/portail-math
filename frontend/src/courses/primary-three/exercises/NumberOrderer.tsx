@@ -4,17 +4,9 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { NumberOrderExercise } from "./exercise-types";
+import type { ExerciseWidgetProps, NumberOrderExercise } from "./exercise-types";
 
-interface NumberOrdererProps {
-  exercise: NumberOrderExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type NumberOrdererProps = ExerciseWidgetProps<NumberOrderExercise>;
 
 function expectedOrder(exercise: NumberOrderExercise): number[] {
   const sorted = [...exercise.values].sort((a, b) => a - b);

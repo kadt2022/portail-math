@@ -1,4 +1,4 @@
-import type { Exercise } from "./exercise-types";
+import type { Exercise, ExerciseWidgetProps } from "./exercise-types";
 import { NumberComparator } from "./NumberComparator";
 import { NumberInRange } from "./NumberInRange";
 import { NumberOrderer } from "./NumberOrderer";
@@ -8,15 +8,7 @@ import { PlaceValueBuilder } from "./PlaceValueBuilder";
 import { RoundToTen } from "./RoundToTen";
 import { SequenceFiller } from "./SequenceFiller";
 
-export interface InteractiveExerciseProps {
-  exercise: Exercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+export type InteractiveExerciseProps = ExerciseWidgetProps<Exercise>;
 
 // Répartiteur générique : une leçon ne fait jamais référence à un widget
 // concret, seulement à un Exercise (voir exercise-types.ts) que ce

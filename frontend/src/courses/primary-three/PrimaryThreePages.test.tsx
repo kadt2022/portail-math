@@ -44,6 +44,35 @@ describe("Pages du parcours de 3e primaire", () => {
     }
   });
 
+  it("affiche le module 2 comme à venir, sans aucune leçon accessible", () => {
+    renderAt("/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U02");
+
+    const articles = screen.getAllByRole("article");
+    expect(articles).toHaveLength(5);
+    for (const article of articles) {
+      expect(within(article).getAllByText("À venir").length).toBeGreaterThan(0);
+      expect(within(article).queryByRole("link")).not.toBeInTheDocument();
+    }
+  });
+
+  it("distingue À commencer, En cours et Terminé sur la page du module 1", () => {
+    const [l1, l2] = PRIMARY_THREE_MODULES[0].lessons;
+    let progress = l1.steps.reduce(
+      (current, step) => completeLearningStep(current, l1, step.id, true),
+      createEmptyCourseProgress(PRIMARY_THREE_COURSE.id),
+    );
+    progress = completeLearningStep(progress, l2, l2.steps[0].id, true);
+    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(progress);
+
+    renderAt("/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01");
+    const articles = screen.getAllByRole("article");
+    expect(within(articles[0]).getByText("Terminé")).toBeInTheDocument();
+    expect(within(articles[0]).getByRole("link", { name: /revoir/i })).toBeInTheDocument();
+    expect(within(articles[1]).getByText("En cours")).toBeInTheDocument();
+    expect(within(articles[1]).getByRole("link", { name: /reprendre/i })).toBeInTheDocument();
+    expect(within(articles[2]).getByText("À commencer")).toBeInTheDocument();
+  });
+
   it("termine la première leçon en résolvant chacune de ses neuf étapes", async () => {
     const user = userEvent.setup();
     renderAt(
@@ -156,6 +185,24 @@ describe("Pages du parcours de 3e primaire", () => {
     expect(within(screen.getAllByRole("article")[0]).getByText("1 / 4 leçons")).toBeInTheDocument();
   });
 
+  it("revoit une leçon déjà terminée avec les coches affichées, sans repasser par les activités", async () => {
+    const lesson = PRIMARY_THREE_MODULES[0].lessons[0];
+    const completed = lesson.steps.reduce(
+      (progress, step) => completeLearningStep(progress, lesson, step.id, true),
+      createEmptyCourseProgress(PRIMARY_THREE_COURSE.id),
+    );
+    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(completed);
+
+    renderAt(
+      "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01/lecons/MATH-3P-U01-L01",
+    );
+
+    expect(await screen.findByText(/246 graines/i)).toBeInTheDocument();
+    expect(screen.getByText("✓ Terminé")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /j.ai compris, je continue/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /continuer/i })).toBeInTheDocument();
+  });
+
   it("garde la zone interactive et les actions dans le DOM à 320 px", async () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 320 });
     window.dispatchEvent(new Event("resize"));
@@ -206,6 +253,166 @@ describe("Pages du parcours de 3e primaire", () => {
     expect(screen.getByText(/438 a 3 dizaines, 483 a 8 dizaines/i)).toBeInTheDocument();
   });
 
+  it(
+    "termine la leçon 3 (comparer, ranger avec retrait d'une carte, encadrer)",
+    async () => {
+      const user = userEvent.setup();
+      renderAt(
+        "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01/lecons/MATH-3P-U01-L03",
+      );
+
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+      await user.click(screen.getByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // Je manipule : construis 438 (avec une correction "-1" sur les unités), puis 483
+      expect(await screen.findByRole("heading", { name: /construis puis compare/i })).toBeInTheDocument();
+      for (let i = 0; i < 4; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à centaines/i }));
+      }
+      for (let i = 0; i < 3; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à dizaines/i }));
+      }
+      for (let i = 0; i < 9; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à unités/i }));
+      }
+      await user.click(screen.getByRole("button", { name: /enlever une plaque ou un bâtonnet de unités/i }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+      await screen.findByText("2 / 2");
+      for (let i = 0; i < 4; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à centaines/i }));
+      }
+      for (let i = 0; i < 8; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à dizaines/i }));
+      }
+      for (let i = 0; i < 3; i += 1) {
+        await user.click(screen.getByRole("button", { name: /ajouter une plaque ou un bâtonnet à unités/i }));
+      }
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Exemple guidé
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // À toi de jouer : 706 > 670 puis 438 < 483
+      expect(await screen.findByRole("heading", { name: /compare les nombres/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "plus grand que" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      await screen.findByText("2 / 2");
+      await user.click(screen.getByRole("button", { name: "plus petit que" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Je réfléchis : range 312, 132, 321, 213 (place d'abord 312 par erreur, puis corrige)
+      expect(await screen.findByRole("heading", { name: /range les nombres/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "Placer le nombre 312" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(screen.getByText(/commence par repérer le plus petit chiffre des centaines/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "Retirer le nombre 312 de la position 1" }));
+      for (const value of [132, 213, 312, 321]) {
+        await user.click(screen.getByRole("button", { name: `Placer le nombre ${value}` }));
+      }
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Mini-jeu : la course des pirogues
+      expect(await screen.findByRole("heading", { name: /la course des pirogues/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "plus grand que" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      await screen.findByText("2 / 2");
+      await user.click(screen.getByRole("button", { name: "plus petit que" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Je retiens
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // Je vérifie : un nombre entre 495 et 500
+      expect(await screen.findByText(/trouve un nombre compris entre 495 et 500/i)).toBeInTheDocument();
+      await user.type(screen.getByRole("spinbutton"), "497");
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
+      expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
+    },
+    20000,
+  );
+
+  it(
+    "termine la leçon 4 (suites et arrondis) en corrigeant une erreur d'arrondi",
+    async () => {
+      const user = userEvent.setup();
+      renderAt(
+        "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01/lecons/MATH-3P-U01-L04",
+      );
+
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+      await user.click(screen.getByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // Je manipule : 200, 250, 300, __ -> 350
+      expect(await screen.findByRole("heading", { name: /continue la suite/i })).toBeInTheDocument();
+      await user.type(screen.getByRole("spinbutton"), "350");
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Exemple guidé
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // À toi de jouer : 340, 350, __, 370 -> 360
+      expect(await screen.findByRole("heading", { name: /complète la suite/i })).toBeInTheDocument();
+      await user.type(screen.getByRole("spinbutton"), "360");
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Je réfléchis : arrondis 63 (essaie 70 d'abord, puis corrige avec 60)
+      expect(await screen.findByRole("heading", { name: /arrondis à la dizaine/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "70" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(screen.getByText(/regarde le chiffre des unités/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "60" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Mini-jeu : 500, 600, __, 800 -> 700
+      expect(await screen.findByRole("heading", { name: /répare le sentier numérique/i })).toBeInTheDocument();
+      await user.type(screen.getByRole("spinbutton"), "700");
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /continuer/i }));
+
+      // Je retiens
+      await user.click(await screen.findByRole("button", { name: /j.ai compris, je continue/i }));
+
+      // Je vérifie : la règle de 105, 205, 305, 405 -> pas de 100
+      expect(await screen.findByRole("heading", { name: /découvre la règle/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "100" }));
+      await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+      expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
+      expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
+    },
+    20000,
+  );
+
+  it("affiche une page d'erreur pour un module ou une leçon introuvable", () => {
+    renderAt("/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U99");
+    expect(screen.getByRole("heading", { name: /module n'existe pas/i })).toBeInTheDocument();
+
+    renderAt(
+      "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01/lecons/MATH-3P-U01-L99",
+    );
+    expect(screen.getByRole("heading", { name: /leçon n'est pas disponible/i })).toBeInTheDocument();
+  });
+
   it("complète l'évaluation de l'unité 1 puis enregistre l'auto-évaluation", async () => {
     const [l1, l2, l3, l4] = PRIMARY_THREE_MODULES[0].lessons;
     let progress = createEmptyCourseProgress(PRIMARY_THREE_COURSE.id);
@@ -251,6 +458,13 @@ describe("Pages du parcours de 3e primaire", () => {
     expect(await screen.findByRole("heading", { name: /évaluation réussie/i })).toBeInTheDocument();
     const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).load();
     expect(stored.items["MATH-3P-U01-EVAL"].completed).toBe(true);
+
+    // L'unité 1 est intégralement terminée : l'action principale propose le module suivant (pas de leçon suivante).
+    renderAt("/app/apprentissages/primaire/3/mathematiques");
+    expect(screen.getByRole("link", { name: /module suivant/i })).toHaveAttribute(
+      "href",
+      "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U02",
+    );
   });
 
   it("propose le module 3e primaire depuis le menu de navigation", async () => {

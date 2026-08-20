@@ -77,3 +77,15 @@ export type Exercise =
   | RoundToTenExercise
   | NumericQuestionExercise
   | NumberInRangeExercise;
+
+// Props communes à tous les widgets d'exercice (voir ActivityShell) : chacun
+// n'ajoute que la forme précise de son propre `exercise`.
+export interface ExerciseWidgetProps<TExercise extends Exercise> {
+  exercise: TExercise;
+  titleKey: string;
+  instructionKey: string;
+  hintKey: string;
+  strongHintKey: string;
+  completed: boolean;
+  onValidated: () => void;
+}

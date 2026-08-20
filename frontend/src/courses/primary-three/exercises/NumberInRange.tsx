@@ -4,17 +4,9 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { NumberInRangeExercise } from "./exercise-types";
+import type { ExerciseWidgetProps, NumberInRangeExercise } from "./exercise-types";
 
-interface NumberInRangeProps {
-  exercise: NumberInRangeExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type NumberInRangeProps = ExerciseWidgetProps<NumberInRangeExercise>;
 
 export function NumberInRange({
   exercise,

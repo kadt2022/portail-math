@@ -4,18 +4,10 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { NumericStepper } from "./NumericStepper";
-import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { PlaceValueBuildExercise } from "./exercise-types";
+import { useRoundedExercise } from "./use-rounds";
+import type { ExerciseWidgetProps, PlaceValueBuildExercise } from "./exercise-types";
 
-interface PlaceValueBuilderProps {
-  exercise: PlaceValueBuildExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type PlaceValueBuilderProps = ExerciseWidgetProps<PlaceValueBuildExercise>;
 
 function decompose(value: number) {
   return {
@@ -40,30 +32,26 @@ export function PlaceValueBuilder({
   const { t } = useTranslation("primaryThree");
   const lastTarget = exercise.targets[exercise.targets.length - 1];
   const lastExpected = decompose(lastTarget);
-  const [round, setRound] = useState(0);
   const [hundreds, setHundreds] = useState(completed ? lastExpected.hundreds : 0);
   const [tens, setTens] = useState(completed ? lastExpected.tens : 0);
   const [units, setUnits] = useState(completed ? lastExpected.units : 0);
-  const { attempts, registerWrong, reset } = useAttempts();
+  const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    roundCount: exercise.targets.length,
+    completed,
+    hintKey,
+    strongHintKey,
+    onValidated,
+  });
 
   const target = exercise.targets[round];
   const expected = decompose(target);
-  const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
   const validate = () => {
-    if (hundreds === expected.hundreds && tens === expected.tens && units === expected.units) {
-      if (round + 1 < exercise.targets.length) {
-        setRound(round + 1);
-        setHundreds(0);
-        setTens(0);
-        setUnits(0);
-        reset();
-      } else {
-        onValidated();
-      }
-      return;
-    }
-    registerWrong();
+    submit(hundreds === expected.hundreds && tens === expected.tens && units === expected.units, () => {
+      setHundreds(0);
+      setTens(0);
+      setUnits(0);
+    });
   };
 
   return (
@@ -73,11 +61,7 @@ export function PlaceValueBuilder({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
-      progressLabel={
-        exercise.targets.length > 1
-          ? t("activity.progressRound", { current: round + 1, total: exercise.targets.length })
-          : undefined
-      }
+      progressLabel={progressLabel}
     >
       <p className={styles.targetNumber} aria-live="polite">
         {t("exercise.placeValue.target", { number: target })}

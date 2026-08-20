@@ -4,18 +4,11 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { numberToWordsEn, numberToWordsFr } from "../number-words";
 import { ActivityShell } from "./ActivityShell";
-import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { NumberWordsMatchExercise } from "./exercise-types";
+import { ChoiceGroup } from "./ChoiceGroup";
+import { useRoundedExercise } from "./use-rounds";
+import type { ExerciseWidgetProps, NumberWordsMatchExercise } from "./exercise-types";
 
-interface NumberWordsMatcherProps {
-  exercise: NumberWordsMatchExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type NumberWordsMatcherProps = ExerciseWidgetProps<NumberWordsMatchExercise>;
 
 // Petit générateur pseudo-aléatoire déterministe (sans dépendance externe) :
 // mêmes choix affichés à chaque rendu tant que la graine ne change pas, pour
@@ -42,12 +35,16 @@ export function NumberWordsMatcher({
 }: NumberWordsMatcherProps) {
   const { t, i18n } = useTranslation("primaryThree");
   const wordsOf = (i18n.resolvedLanguage ?? i18n.language).startsWith("en") ? numberToWordsEn : numberToWordsFr;
-  const [round, setRound] = useState(completed ? exercise.items.length - 1 : 0);
+  const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    roundCount: exercise.items.length,
+    completed,
+    hintKey,
+    strongHintKey,
+    onValidated,
+  });
   const [selected, setSelected] = useState<number | null>(completed ? exercise.items[exercise.items.length - 1].value : null);
-  const { attempts, registerWrong, reset } = useAttempts();
 
   const item = exercise.items[round];
-  const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
   const choiceValues = useMemo(
     () => shuffle([item.value, ...item.distractors], round * 7 + item.value),
@@ -55,17 +52,7 @@ export function NumberWordsMatcher({
   );
 
   const validate = () => {
-    if (selected === item.value) {
-      if (round + 1 < exercise.items.length) {
-        setRound(round + 1);
-        setSelected(null);
-        reset();
-      } else {
-        onValidated();
-      }
-      return;
-    }
-    registerWrong();
+    submit(selected === item.value, () => setSelected(null));
   };
 
   return (
@@ -75,33 +62,18 @@ export function NumberWordsMatcher({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
-      progressLabel={
-        exercise.items.length > 1
-          ? t("activity.progressRound", { current: round + 1, total: exercise.items.length })
-          : undefined
-      }
+      progressLabel={progressLabel}
     >
       <p className={styles.wordsPrompt} aria-live="polite">
         {item.direction === "digits-to-words" ? item.value : wordsOf(item.value)}
       </p>
-      <div className={styles.wordsChoices} role="group" aria-label={t(instructionKey)}>
-        {choiceValues.map((value) => {
-          const label = item.direction === "digits-to-words" ? wordsOf(value) : String(value);
-          return (
-            <button
-              key={value}
-              type="button"
-              className={selected === value ? styles.selectedChoice : undefined}
-              aria-pressed={selected === value}
-              onClick={() => {
-                setSelected(value);
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <ChoiceGroup
+        choices={choiceValues}
+        selected={selected}
+        ariaLabel={t(instructionKey)}
+        onSelect={setSelected}
+        labelFor={(value) => (item.direction === "digits-to-words" ? wordsOf(value) : String(value))}
+      />
     </ActivityShell>
   );
 }

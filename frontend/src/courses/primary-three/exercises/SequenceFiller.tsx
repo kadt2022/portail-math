@@ -4,17 +4,9 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { SequenceFillExercise } from "./exercise-types";
+import type { ExerciseWidgetProps, SequenceFillExercise } from "./exercise-types";
 
-interface SequenceFillerProps {
-  exercise: SequenceFillExercise;
-  titleKey: string;
-  instructionKey: string;
-  hintKey: string;
-  strongHintKey: string;
-  completed: boolean;
-  onValidated: () => void;
-}
+type SequenceFillerProps = ExerciseWidgetProps<SequenceFillExercise>;
 
 export function SequenceFiller({
   exercise,
