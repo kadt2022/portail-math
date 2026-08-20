@@ -1,0 +1,381 @@
+{
+  "course": {
+    "eyebrow": "Mathematics learning path",
+    "title": "3rd grade",
+    "lead": "The numbers grow bigger, but you keep the same method: observe, represent, calculate, check, explain. Your progress is saved on this device.",
+    "published": "{{count}} lessons available today"
+  },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "Welcome to the middle grades! I'm staying right by your side, at your own pace.",
+    "lessonTip": "Take your time, use real objects if that helps. I'm staying close for this first step.",
+    "lessonComplete": "Well done! Your progress is saved, come back whenever you like."
+  },
+  "status": {
+    "not-started": "To start",
+    "in-progress": "In progress",
+    "completed": "Completed",
+    "coming-soon": "Coming soon"
+  },
+  "progress": {
+    "overall": "My overall progress",
+    "lessons": "{{completed}} / {{total}} lessons",
+    "moduleLessons": "{{completed}} / {{total}} lessons",
+    "plannedLessons": "{{total}} lessons planned",
+    "module": "Progress for module {{number}}",
+    "steps": "{{completed}} / {{total}} steps completed",
+    "item": "Progress for {{title}}"
+  },
+  "actions": {
+    "start": "Start my learning path",
+    "resume": "Resume the lesson",
+    "next-lesson": "Next lesson",
+    "next-module": "Next module",
+    "return-to-modules": "Back to my modules",
+    "review": "Review",
+    "backToCourse": "Back to the course"
+  },
+  "moduleActions": {
+    "not-started": "Start",
+    "in-progress": "Resume",
+    "completed": "Review",
+    "view": "View module"
+  },
+  "modules": {
+    "eyebrow": "10 modules · 40 lessons",
+    "title": "My 3rd grade learning path",
+    "orderHint": "A published lesson moves the counter forward on the 40 lessons planned.",
+    "number": "Module {{number}}",
+    "m1": { "title": "Numbers up to 1,000" },
+    "m2": { "title": "Adding with precision" },
+    "m3": { "title": "Subtracting and comparing" },
+    "m4": { "title": "Multiplying and sharing" },
+    "m5": { "title": "Everyday fractions" },
+    "m6": { "title": "Money and thoughtful purchases" },
+    "m7": { "title": "Useful measurements" },
+    "m8": { "title": "Geometry and location" },
+    "m9": { "title": "Time and organisation" },
+    "m10": { "title": "Data and problems" }
+  },
+  "module": {
+    "referenceLead": "This module's four lessons and evaluation are published: read, explore, then check your answers.",
+    "pendingLead": "This module is planned. Its activities will be added after pedagogical review.",
+    "pathEyebrow": "Small steps",
+    "pathTitle": "The module's lessons",
+    "pathHint": "Upcoming content never produces progress."
+  },
+  "lessons": {
+    "number": "Lesson {{number}}",
+    "plannedTitle": "Lesson title to be confirmed",
+    "l1": { "title": "Hundreds, tens and units" },
+    "l2": { "title": "Reading and writing numbers" },
+    "l3": { "title": "Comparing and ordering" },
+    "l4": { "title": "Number patterns and rounding" }
+  },
+  "evaluation": {
+    "label": "Module evaluation",
+    "title": "Evaluation - Unit 1"
+  },
+  "steps": {
+    "situation": "Starting situation",
+    "discover": "I discover",
+    "manipulate": "I explore",
+    "example": "Guided example",
+    "practice": "Your turn",
+    "reflect": "I think it through",
+    "play": "Mini-game",
+    "remember": "I remember",
+    "check": "I check",
+    "assess": "Self-assessment"
+  },
+  "breadcrumbs": {
+    "label": "Course breadcrumb",
+    "course": "3rd grade"
+  },
+  "lesson": {
+    "label": "Lesson",
+    "objectiveLabel": "My goal",
+    "duration": "About 30 minutes",
+    "stepProgress": "Step {{current}} of {{total}} — {{label}}",
+    "progressLabel": "Progress in this lesson",
+    "back": "Back to module",
+    "continue": "Continue",
+    "finish": "Finish the lesson",
+    "finishEvaluation": "Finish the evaluation"
+  },
+  "activity": {
+    "validate": "Check my answer",
+    "success": "Well done, this activity is complete!",
+    "progressRound": "{{current}} / {{total}}"
+  },
+  "blocks": {
+    "situation": { "eyebrow": "Starting situation" },
+    "discover": { "eyebrow": "I discover and understand" },
+    "example": { "eyebrow": "Guided example" },
+    "remember": { "eyebrow": "I remember" },
+    "confirmContinue": "Got it, let's continue",
+    "assess": {
+      "eyebrow": "Self-assessment",
+      "prompt": "How did this evaluation go for you?",
+      "options": {
+        "alone": "I succeeded on my own",
+        "withSupport": "I succeeded with a drawing",
+        "retry": "I need to redo this lesson"
+      },
+      "confirm": "Confirm my self-assessment"
+    }
+  },
+  "exercise": {
+    "placeValue": {
+      "target": "Build the number {{number}}",
+      "hundreds": "Hundreds",
+      "tens": "Tens",
+      "units": "Units",
+      "decrease": "Remove a block or a stick from {{label}}",
+      "increase": "Add a block or a stick to {{label}}",
+      "representation": "{{hundreds}} hundreds, {{tens}} tens and {{units}} units"
+    },
+    "compare": {
+      "chooseSymbol": "Choose the correct symbol",
+      "symbolLabel": {
+        "less": "less than",
+        "greater": "greater than",
+        "equal": "equal to"
+      }
+    },
+    "sequence": {
+      "blankLabel": "Missing number"
+    },
+    "order": {
+      "available": "Numbers to order",
+      "pick": "Place the number {{number}}",
+      "placed": "Numbers already ordered",
+      "removeFromPosition": "Remove the number {{number}} from position {{position}}"
+    },
+    "roundToTen": {
+      "question": "Round {{number}} to the nearest ten."
+    },
+    "numberInRange": {
+      "prompt": "Find a number between {{min}} and {{max}}."
+    }
+  },
+  "content": {
+    "method": [
+      "I represent the data.",
+      "I name the action.",
+      "I calculate step by step.",
+      "I check with another method or by estimating.",
+      "Finally, I write an answer sentence."
+    ],
+    "u01l01": {
+      "objective": "I can build a number using place value.",
+      "situation": "The class gathers 246 seeds to prepare small bags. How can they be counted quickly?",
+      "discover": "Ten units make a ten; ten tens make a hundred. In 246, the 2 is worth 200, the 4 is worth 40 and the 6 is worth 6.",
+      "manipulate": {
+        "title": "Build the number 324",
+        "instruction": "Build 324 using hundred blocks, ten sticks and single units.",
+        "hint": "Start with the hundreds: how many hundred blocks are needed?",
+        "strongHint": "324 is 3 hundred blocks, 2 ten sticks and 4 units. Adjust each counter one at a time."
+      },
+      "example": {
+        "easy": "Easy. Break down 572.",
+        "medium": "Intermediate. What number is made of 8 hundreds, 3 tens and 5 units?",
+        "reflection": "Reflection. In 609, what is the value of the digit 6?"
+      },
+      "practice": {
+        "title": "Break down 572",
+        "instruction": "Build 572 with blocks, sticks and units, just like in the guided example.",
+        "hint": "Look at each digit of 572: hundreds, then tens, then units.",
+        "strongHint": "572 is 5 hundreds, 7 tens and 2 units."
+      },
+      "reflect": {
+        "title": "Which number is it?",
+        "instruction": "Work out the number from its breakdown, then write it in digits.",
+        "hint": "Add the hundreds first, then the tens, then the units.",
+        "strongHint": "8 hundreds make 800, 3 tens make 30, and there are 5 units left: 800 + 30 + 5.",
+        "prompt": "What number is made of 8 hundreds, 3 tens and 5 units?"
+      },
+      "play": {
+        "title": "Deliver to the right depot",
+        "instruction": "Deliver the hundreds, tens and units of 463 to the right depot by building the number.",
+        "hint": "Place the hundred blocks first, then the ten sticks, then the units.",
+        "strongHint": "463 is 4 hundred blocks, 6 ten sticks and 3 units."
+      },
+      "remember": "Ten units make a ten; ten tens make a hundred.",
+      "check": {
+        "title": "What is the highlighted digit worth?",
+        "instruction": "Choose the exact value of the hundreds digit in 609.",
+        "hint": "This digit sits in the hundreds place: it isn't just worth itself.",
+        "strongHint": "In 609, the 6 is in the hundreds place, so it is worth 600.",
+        "prompt": "In 609, what is the value of the digit 6?"
+      }
+    },
+    "u01l02": {
+      "objective": "I can move from words to digits.",
+      "situation": "A card reads \"four hundred and thirty-two\" drawn bags.",
+      "discover": "We spot the hundreds, then the tens and the units. An empty place is written with 0: six hundred and five is written 605.",
+      "manipulate": {
+        "title": "Listen and build",
+        "instruction": "Build each number you are given, with blocks, sticks and units: 407, then 760, then 999.",
+        "hint": "An empty place is written with 0: don't add a ten stick if there isn't one.",
+        "strongHint": "407 = 4 hundreds, 0 tens, 7 units. Check each number digit by digit."
+      },
+      "example": {
+        "easy": "Easy. Write in digits: three hundred and twenty-eight.",
+        "medium": "Intermediate. Write 904 in words.",
+        "reflection": "Reflection. Write the number made of 5 hundreds and 7 units."
+      },
+      "practice": {
+        "title": "Words and digits",
+        "instruction": "Match each number to its correct word form, or each word form to its number.",
+        "hint": "Spot the hundreds first, in the words or in the digits.",
+        "strongHint": "Three hundred and twenty-eight = 3 hundreds, 2 tens and 8 units, so 328."
+      },
+      "reflect": {
+        "title": "Find the number",
+        "instruction": "Work out the number from its breakdown, then write it in digits.",
+        "hint": "5 hundreds and 7 units: there is no ten, so 0 tens.",
+        "strongHint": "5 hundreds make 500, 0 tens, and 7 units: 500 + 0 + 7 = 507.",
+        "prompt": "Write the number made of 5 hundreds and 7 units."
+      },
+      "play": {
+        "title": "Match the number card",
+        "instruction": "Match each word form to its number card, or each number card to its word form.",
+        "hint": "Count the hundreds in the word form before choosing.",
+        "strongHint": "Read the number digit by digit: hundreds, then tens, then units."
+      },
+      "remember": "We spot the hundreds, then the tens and the units.",
+      "check": {
+        "title": "Build the announced number",
+        "instruction": "Build 693 with blocks, sticks and units.",
+        "hint": "693: how many hundreds, tens and units?",
+        "strongHint": "693 is 6 hundreds, 9 tens and 3 units."
+      }
+    },
+    "u01l03": {
+      "objective": "I can compare several numbers.",
+      "situation": "Two storehouses show 487 and 509 bags. Which one has more?",
+      "discover": "We compare the hundreds first, then the tens, then the units.",
+      "manipulate": {
+        "title": "Build, then compare",
+        "instruction": "Build 438, then 483, and look at the first place where they differ.",
+        "hint": "The hundreds are the same: look at the tens.",
+        "strongHint": "438 has 3 tens, 483 has 8 tens: so 483 is bigger."
+      },
+      "example": {
+        "easy": "Easy. Complete: 706 __ 670.",
+        "medium": "Intermediate. Order 312, 132, 321, 213.",
+        "reflection": "Reflection. Find two numbers between 495 and 500."
+      },
+      "practice": {
+        "title": "Compare the numbers",
+        "instruction": "Choose the symbol that correctly compares each pair of numbers.",
+        "hint": "Compare the hundreds digit of each number first.",
+        "strongHint": "If the hundreds are equal, compare the tens, then the units."
+      },
+      "reflect": {
+        "title": "Order the numbers",
+        "instruction": "Place the four numbers from smallest to largest.",
+        "hint": "Start by spotting the smallest hundreds digit.",
+        "strongHint": "132 has 1 hundred, 213 has 2, 312 and 321 have 3: compare their tens next."
+      },
+      "play": {
+        "title": "The canoe race",
+        "instruction": "Move forward the canoe carrying the bigger number in each round.",
+        "hint": "Look at the hundreds of each number first.",
+        "strongHint": "Compare hundreds, then tens, then units to find the bigger number."
+      },
+      "remember": "We compare the hundreds first, then the tens, then the units.",
+      "check": {
+        "title": "Find a hidden number",
+        "instruction": "Write a whole number that is strictly between the two limits.",
+        "hint": "495 and 500 don't count: look for a number in between.",
+        "strongHint": "Between 495 and 500, you can choose 496, 497, 498 or 499."
+      }
+    },
+    "u01l04": {
+      "objective": "I can spot a pattern and estimate.",
+      "situation": "The markers along a path show 200, 250, 300, then one sign is missing.",
+      "discover": "A pattern moves forward following a rule. To round to the nearest ten, we choose the closest ten.",
+      "manipulate": {
+        "title": "Continue the pattern",
+        "instruction": "Continue the pattern counting up by 25 using place-value cards.",
+        "hint": "Look at how much the pattern moves forward each time.",
+        "strongHint": "The pattern moves forward by 50 each time: 200, 250, 300, then 350."
+      },
+      "example": {
+        "easy": "Easy. Complete: 340, 350, __, 370.",
+        "medium": "Intermediate. Round 63 to the nearest ten.",
+        "reflection": "Reflection. What rule does 105, 205, 305, 405 follow?"
+      },
+      "practice": {
+        "title": "Complete the pattern",
+        "instruction": "Find the missing number in the pattern.",
+        "hint": "Look at the gap between the numbers you already know.",
+        "strongHint": "The pattern moves forward by 10 each time: after 350 comes 360."
+      },
+      "reflect": {
+        "title": "Round to the nearest ten",
+        "instruction": "Choose the ten closest to the given number.",
+        "hint": "Look at the units digit: is it closer to 0 or to 10?",
+        "strongHint": "63 is closer to 60 than to 70, because 3 is closer to 0 than to 10."
+      },
+      "play": {
+        "title": "Repair the number path",
+        "instruction": "Repair the path by finding the missing number in the pattern.",
+        "hint": "Compare the two known numbers to find the pattern's step.",
+        "strongHint": "The path moves forward by 100 each time: after 600 comes 700."
+      },
+      "remember": "A pattern moves forward following a rule.",
+      "check": {
+        "title": "Discover the rule",
+        "instruction": "Choose the step that explains this number pattern.",
+        "hint": "Work out the gap between two neighbouring numbers in the pattern.",
+        "strongHint": "105, 205, 305, 405: each number moves forward by 100."
+      }
+    },
+    "u01eval": {
+      "intro": "Work on your own first. Use a drawing if you need to, and explain at least one answer.",
+      "q1": {
+        "title": "Question 1",
+        "instruction": "Work out the number from its breakdown.",
+        "hint": "Add the hundreds, the tens, then the units.",
+        "strongHint": "8 hundreds make 800, 3 tens make 30, and there are 5 units left: 800 + 30 + 5.",
+        "prompt": "What number is made of 8 hundreds, 3 tens and 5 units?"
+      },
+      "q2": {
+        "title": "Question 2",
+        "instruction": "Choose the word form that matches the number shown exactly.",
+        "hint": "Spot the hundreds first: nine hundred.",
+        "strongHint": "904 = nine hundred and four: there are no tens."
+      },
+      "q3": {
+        "title": "Question 3",
+        "instruction": "Place the four numbers from smallest to largest.",
+        "hint": "Compare the hundreds digit of each number first.",
+        "strongHint": "132 has 1 hundred, 213 has 2, 312 and 321 have 3: compare their tens next."
+      },
+      "q4": {
+        "title": "Question 4",
+        "instruction": "Choose the ten closest to the given number.",
+        "hint": "Look at the units digit: is it closer to 0 or to 10?",
+        "strongHint": "63 is closer to 60 than to 70."
+      }
+    }
+  },
+  "lessonComplete": {
+    "eyebrow": "Well done",
+    "title": "Lesson complete!",
+    "evaluationTitle": "Evaluation complete!",
+    "message": "Your progress is saved.",
+    "backToModule": "Back to module",
+    "nextLesson": "Next lesson",
+    "nextEvaluation": "Take the evaluation",
+    "nextModule": "Next module",
+    "backToCourse": "Back to my modules"
+  },
+  "errors": {
+    "moduleNotFound": "This module does not exist.",
+    "lessonNotFound": "This lesson is not available."
+  }
+}
