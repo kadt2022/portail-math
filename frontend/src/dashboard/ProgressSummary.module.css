@@ -51,7 +51,6 @@
 
 .value {
   margin: 0;
-  color: var(--pm-brand-dark);
   font-size: 24px;
   font-weight: 900;
   line-height: 1;
@@ -60,15 +59,9 @@
 }
 
 .label {
-  margin: 4px 0 0;
+  margin: 4px 0 8px;
   color: var(--pm-ink);
   font-size: 12px;
-  font-weight: 700;
-}
-
-.hint {
-  margin: 4px 0 8px;
-  font-size: 10px;
   font-weight: 700;
 }
 
@@ -91,8 +84,8 @@
   background: linear-gradient(145deg, #4fbd67, #2b9d4a);
 }
 
-.green .hint {
-  color: #2f9b4b;
+.green .value {
+  color: #34a853;
 }
 
 .green .trackReady {
@@ -103,7 +96,7 @@
   background: linear-gradient(145deg, #8b5cf6, #6f36d9);
 }
 
-.purple .hint {
+.purple .value {
   color: #7a43df;
 }
 
@@ -115,8 +108,8 @@
   background: linear-gradient(145deg, #ffbd35, #f39b12);
 }
 
-.gold .hint {
-  color: #e98b00;
+.gold .value {
+  color: #f4a019;
 }
 
 .gold .trackReady {
@@ -127,8 +120,8 @@
   background: linear-gradient(145deg, #ff4f78, #e92f61);
 }
 
-.pink .hint {
-  color: #e93666;
+.pink .value {
+  color: #ef3d6d;
 }
 
 .pink .trackReady {
@@ -145,16 +138,9 @@
 }
 
 .levelLabel {
-  margin: 0;
+  margin: 0 0 10px;
   color: rgb(15 51 43 / 62%);
   font-size: 10px;
-}
-
-.levelName {
-  margin: 2px 0 7px;
-  color: #278b49;
-  font-size: 17px;
-  font-weight: 900;
 }
 
 .levelTrack span {
@@ -167,8 +153,9 @@
 
 .xp {
   margin: 6px 0 0;
-  color: rgb(15 51 43 / 68%);
+  color: #38a85a;
   font-size: 10px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
