@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
+import styles from "./exercise-kit.module.css";
 
 export interface ActivityShellProps {
+  namespace: string;
   titleKey: string;
   instructionKey: string;
   completed: boolean;
@@ -15,9 +16,10 @@ export interface ActivityShellProps {
 
 // Coquille visuelle partagée par tous les widgets d'exercice : titre,
 // consigne, zone interactive fournie par l'appelant, puis retour immédiat
-// (succès ou indice) et bouton de validation. Voir ../blocks pour les
+// (succès ou indice) et bouton de validation. Voir InfoStepShell pour les
 // sections non interactives (situation, explication, résumé...).
 export function ActivityShell({
+  namespace,
   titleKey,
   instructionKey,
   completed,
@@ -26,7 +28,7 @@ export function ActivityShell({
   onValidate,
   children,
 }: ActivityShellProps) {
-  const { t } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   return (
     <section className={styles.activityPanel} aria-labelledby="activity-title">
       <div className={styles.activityHeading}>

@@ -1,14 +1,18 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber, numberToWordsEn, numberToWordsFr } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { ChoiceGroup } from "./ChoiceGroup";
+import type { NumberWordsMatchExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { useRoundedExercise } from "./use-rounds";
-import type { ExerciseWidgetProps, NumberWordsMatchExercise } from "./exercise-types";
 
-type NumberWordsMatcherProps = ExerciseWidgetProps<NumberWordsMatchExercise>;
+interface NumberWordsMatcherProps extends SharedExerciseWidgetProps<NumberWordsMatchExercise> {
+  // Chaque cours a sa propre étendue de nombres en toutes lettres (0-999 en
+  // 3e, 0-99 999 en 4e) : ce widget reste agnostique de cette règle de
+  // grammaire et reçoit la fonction déjà résolue pour la langue courante.
+  wordsOf: (value: number) => string;
+}
 
 // Petit générateur pseudo-aléatoire déterministe (sans dépendance externe) :
 // mêmes choix affichés à chaque rendu tant que la graine ne change pas, pour
@@ -32,10 +36,13 @@ export function NumberWordsMatcher({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
+  wordsOf,
 }: NumberWordsMatcherProps) {
-  const { t, i18n } = useTranslation("primaryFour");
-  const wordsOf = (i18n.resolvedLanguage ?? i18n.language).startsWith("en") ? numberToWordsEn : numberToWordsFr;
+  const { t } = useTranslation(namespace);
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    namespace,
     roundCount: exercise.items.length,
     completed,
     hintKey,
@@ -57,6 +64,7 @@ export function NumberWordsMatcher({
 
   return (
     <ActivityShell
+      namespace={namespace}
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -65,14 +73,14 @@ export function NumberWordsMatcher({
       progressLabel={progressLabel}
     >
       <p className={styles.wordsPrompt} aria-live="polite">
-        {item.direction === "digits-to-words" ? formatNumber(item.value, i18n.language) : wordsOf(item.value)}
+        {item.direction === "digits-to-words" ? formatNumber(item.value) : wordsOf(item.value)}
       </p>
       <ChoiceGroup
         choices={choiceValues}
         selected={selected}
         ariaLabel={t(instructionKey)}
         onSelect={setSelected}
-        labelFor={(value) => (item.direction === "digits-to-words" ? wordsOf(value) : formatNumber(value, i18n.language))}
+        labelFor={(value) => (item.direction === "digits-to-words" ? wordsOf(value) : formatNumber(value))}
       />
     </ActivityShell>
   );

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { ActivityShell } from "../../components/exercise-kit/ActivityShell";
+import { ChoiceGroup } from "../../components/exercise-kit/ChoiceGroup";
+import kitStyles from "../../components/exercise-kit/exercise-kit.module.css";
+import { useRoundedExercise } from "../../components/exercise-kit/use-rounds";
 import styles from "../PrimaryFourLesson.module.css";
 import { formatNumber, roundToNearest } from "../number-words";
-import { ActivityShell } from "./ActivityShell";
-import { ChoiceGroup } from "./ChoiceGroup";
-import { useRoundedExercise } from "./use-rounds";
 import type { ExerciseWidgetProps, RoundToTargetExercise } from "./exercise-types";
 
 type RoundToTargetProps = ExerciseWidgetProps<RoundToTargetExercise>;
@@ -20,7 +21,9 @@ const ROUND_TO_LABEL_KEY: Record<number, string> = {
 // « Estimer et arrondir » (§18 du récit : « atteins la borne la plus
 // proche ») : une ligne graduée place le nombre entre ses deux bornes de
 // l'unité de rang demandée (dizaine, centaine, millier ou dizaine de
-// mille), l'enfant choisit la borne la plus proche.
+// mille), l'enfant choisit la borne la plus proche. Widget propre à la 4e
+// primaire (l'arrondi à rang variable n'existe pas en 3e) ; réutilise
+// `ActivityShell` et `ChoiceGroup` du kit d'exercices partagé.
 export function RoundToTarget({
   exercise,
   titleKey,
@@ -32,6 +35,7 @@ export function RoundToTarget({
 }: RoundToTargetProps) {
   const { t, i18n } = useTranslation("primaryFour");
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    namespace: "primaryFour",
     roundCount: exercise.items.length,
     completed,
     hintKey,
@@ -57,6 +61,7 @@ export function RoundToTarget({
 
   return (
     <ActivityShell
+      namespace="primaryFour"
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -64,7 +69,7 @@ export function RoundToTarget({
       onValidate={validate}
       progressLabel={progressLabel}
     >
-      <p className={styles.wordsPrompt} aria-live="polite">
+      <p className={kitStyles.wordsPrompt} aria-live="polite">
         {t("exercise.roundToTarget.question", {
           number: formatNumber(item.value, i18n.language),
           unit: t(ROUND_TO_LABEL_KEY[item.roundTo]),

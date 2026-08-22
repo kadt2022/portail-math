@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
+import styles from "./exercise-kit.module.css";
 
 interface InfoStepShellProps {
+  namespace: string;
   eyebrowKey: string;
   completed: boolean;
   onValidated: () => void;
@@ -11,12 +12,12 @@ interface InfoStepShellProps {
   tone: "situation" | "discover" | "example" | "remember";
 }
 
-// Coquille commune aux quatre blocs non interactifs d'une leçon (situation,
+// Coquille commune aux blocs non interactifs d'une leçon (situation,
 // explication, exemple guidé, résumé) : ils n'ont rien à valider par
 // l'enfant, juste un « j'ai compris » qui fait avancer la leçon comme les
 // autres étapes.
-export function InfoStepShell({ eyebrowKey, completed, onValidated, children, tone }: InfoStepShellProps) {
-  const { t } = useTranslation("primaryFour");
+export function InfoStepShell({ namespace, eyebrowKey, completed, onValidated, children, tone }: InfoStepShellProps) {
+  const { t } = useTranslation(namespace);
   return (
     <section className={`${styles.infoPanel} ${styles[`infoPanel-${tone}`]}`} aria-labelledby="activity-title">
       <p className={styles.activityEyebrow} id="activity-title">

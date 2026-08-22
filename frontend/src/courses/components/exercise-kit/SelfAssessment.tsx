@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
+import styles from "./exercise-kit.module.css";
 
 interface SelfAssessmentProps {
+  namespace: string;
   completed: boolean;
   onValidated: () => void;
 }
@@ -12,8 +13,8 @@ const OPTIONS = ["alone", "withSupport", "retry"] as const;
 
 // « AUTOÉVALUATION » du livre : aucune bonne ou mauvaise réponse, l'enfant
 // choisit simplement comment il/elle a vécu l'évaluation avant de terminer.
-export function SelfAssessment({ completed, onValidated }: SelfAssessmentProps) {
-  const { t } = useTranslation("primaryFour");
+export function SelfAssessment({ namespace, completed, onValidated }: SelfAssessmentProps) {
+  const { t } = useTranslation(namespace);
   const [choice, setChoice] = useState<(typeof OPTIONS)[number] | null>(completed ? "alone" : null);
 
   return (

@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
+import type { Comparator, CompareNumbersExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { useRoundedExercise } from "./use-rounds";
-import type { Comparator, CompareNumbersExercise, ExerciseWidgetProps } from "./exercise-types";
 
-type NumberComparatorProps = ExerciseWidgetProps<CompareNumbersExercise>;
+type NumberComparatorProps = SharedExerciseWidgetProps<CompareNumbersExercise>;
 
 function comparatorOf(left: number, right: number): Comparator {
   if (left > right) return ">";
@@ -25,9 +24,12 @@ export function NumberComparator({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
 }: NumberComparatorProps) {
-  const { t, i18n } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    namespace,
     roundCount: exercise.items.length,
     completed,
     hintKey,
@@ -47,6 +49,7 @@ export function NumberComparator({
 
   return (
     <ActivityShell
+      namespace={namespace}
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -55,7 +58,7 @@ export function NumberComparator({
       progressLabel={progressLabel}
     >
       <div className={styles.compareRow}>
-        <span className={styles.compareNumber}>{formatNumber(item.left, i18n.language)}</span>
+        <span className={styles.compareNumber}>{formatNumber(item.left)}</span>
         <div className={styles.compareSymbols} role="group" aria-label={t("exercise.compare.chooseSymbol")}>
           {SYMBOLS.map((symbol) => (
             <button
@@ -70,7 +73,7 @@ export function NumberComparator({
             </button>
           ))}
         </div>
-        <span className={styles.compareNumber}>{formatNumber(item.right, i18n.language)}</span>
+        <span className={styles.compareNumber}>{formatNumber(item.right)}</span>
       </div>
     </ActivityShell>
   );

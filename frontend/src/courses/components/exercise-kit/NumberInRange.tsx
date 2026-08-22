@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
+import type { NumberInRangeExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { ExerciseWidgetProps, NumberInRangeExercise } from "./exercise-types";
 
-type NumberInRangeProps = ExerciseWidgetProps<NumberInRangeExercise>;
+type NumberInRangeProps = SharedExerciseWidgetProps<NumberInRangeExercise>;
 
 export function NumberInRange({
   exercise,
@@ -17,8 +16,10 @@ export function NumberInRange({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
 }: NumberInRangeProps) {
-  const { t, i18n } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   const [value, setValue] = useState(completed ? String(exercise.min + 1) : "");
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
@@ -32,23 +33,24 @@ export function NumberInRange({
     registerWrong();
   };
 
+  const prompt = t("exercise.numberInRange.prompt", { min: formatNumber(exercise.min), max: formatNumber(exercise.max) });
+
   return (
-    <ActivityShell titleKey={titleKey} instructionKey={instructionKey} completed={completed} feedback={feedback} onValidate={validate}>
-      <p className={styles.questionPrompt}>
-        {t("exercise.numberInRange.prompt", {
-          min: formatNumber(exercise.min, i18n.language),
-          max: formatNumber(exercise.max, i18n.language),
-        })}
-      </p>
+    <ActivityShell
+      namespace={namespace}
+      titleKey={titleKey}
+      instructionKey={instructionKey}
+      completed={completed}
+      feedback={feedback}
+      onValidate={validate}
+    >
+      <p className={styles.questionPrompt}>{prompt}</p>
       <input
         type="number"
         inputMode="numeric"
         className={styles.sequenceInput}
         value={value}
-        aria-label={t("exercise.numberInRange.prompt", {
-          min: formatNumber(exercise.min, i18n.language),
-          max: formatNumber(exercise.max, i18n.language),
-        })}
+        aria-label={prompt}
         onChange={(event) => {
           setValue(event.target.value);
           reset();

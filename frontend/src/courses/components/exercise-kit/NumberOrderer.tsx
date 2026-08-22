@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
+import type { NumberOrderExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { ExerciseWidgetProps, NumberOrderExercise } from "./exercise-types";
 
-type NumberOrdererProps = ExerciseWidgetProps<NumberOrderExercise>;
+type NumberOrdererProps = SharedExerciseWidgetProps<NumberOrderExercise>;
 
 function expectedOrder(exercise: NumberOrderExercise): number[] {
   const sorted = [...exercise.values].sort((a, b) => a - b);
@@ -22,8 +21,10 @@ export function NumberOrderer({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
 }: NumberOrdererProps) {
-  const { t, i18n } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   const [placed, setPlaced] = useState<number[]>(completed ? expectedOrder(exercise) : []);
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
@@ -40,6 +41,7 @@ export function NumberOrderer({
 
   return (
     <ActivityShell
+      namespace={namespace}
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -51,13 +53,13 @@ export function NumberOrderer({
           <button
             key={value}
             type="button"
-            aria-label={t("exercise.order.pick", { number: formatNumber(value, i18n.language) })}
+            aria-label={t("exercise.order.pick", { number: formatNumber(value) })}
             onClick={() => {
               setPlaced((current) => [...current, value]);
               reset();
             }}
           >
-            {formatNumber(value, i18n.language)}
+            {formatNumber(value)}
           </button>
         ))}
       </div>
@@ -67,7 +69,7 @@ export function NumberOrderer({
             <button
               type="button"
               aria-label={t("exercise.order.removeFromPosition", {
-                number: formatNumber(value, i18n.language),
+                number: formatNumber(value),
                 position: index + 1,
               })}
               onClick={() => {
@@ -75,7 +77,7 @@ export function NumberOrderer({
                 reset();
               }}
             >
-              {formatNumber(value, i18n.language)}
+              {formatNumber(value)}
             </button>
           </li>
         ))}

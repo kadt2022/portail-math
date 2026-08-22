@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
+import type { SequenceFillExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { ExerciseWidgetProps, SequenceFillExercise } from "./exercise-types";
 
-type SequenceFillerProps = ExerciseWidgetProps<SequenceFillExercise>;
+type SequenceFillerProps = SharedExerciseWidgetProps<SequenceFillExercise>;
 
 export function SequenceFiller({
   exercise,
@@ -17,8 +16,10 @@ export function SequenceFiller({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
 }: SequenceFillerProps) {
-  const { t, i18n } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   const answer = exercise.sequence[exercise.blankIndex];
   const [value, setValue] = useState(completed ? String(answer) : "");
   const { attempts, registerWrong, reset } = useAttempts();
@@ -34,6 +35,7 @@ export function SequenceFiller({
 
   return (
     <ActivityShell
+      namespace={namespace}
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -57,7 +59,7 @@ export function SequenceFiller({
             />
           ) : (
             <span key={index} className={styles.sequenceChip}>
-              {formatNumber(entry, i18n.language)}
+              {formatNumber(entry)}
             </span>
           ),
         )}

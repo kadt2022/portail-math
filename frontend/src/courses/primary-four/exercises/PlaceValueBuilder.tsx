@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { ActivityShell } from "../../components/exercise-kit/ActivityShell";
+import kitStyles from "../../components/exercise-kit/exercise-kit.module.css";
+import { NumericStepper } from "../../components/exercise-kit/NumericStepper";
+import { useRoundedExercise } from "../../components/exercise-kit/use-rounds";
 import styles from "../PrimaryFourLesson.module.css";
 import { formatNumber } from "../number-words";
-import { ActivityShell } from "./ActivityShell";
-import { NumericStepper } from "./NumericStepper";
-import { useRoundedExercise } from "./use-rounds";
 import type { ExerciseWidgetProps, PlaceValueBuildExercise } from "./exercise-types";
 
 type PlaceValueBuilderProps = ExerciseWidgetProps<PlaceValueBuildExercise>;
 
 // Rangs de la 4e primaire : dizaine de mille, unité de mille, centaine,
 // dizaine, unité (nombres jusqu'à 100 000) — deux rangs de plus que le
-// PlaceValueBuilder de la 3e primaire, qui s'arrête aux centaines.
+// PlaceValueBuilder de la 3e primaire, qui s'arrête aux centaines. Ce widget
+// reste propre à la 4e primaire (le nombre de rangs n'est pas partagé par le
+// kit d'exercices générique) ; il réutilise en revanche `ActivityShell` et
+// `NumericStepper` du kit.
 const PLACES = [
   { key: "dm", divisor: 10000 },
   { key: "um", divisor: 1000 },
@@ -48,6 +52,7 @@ export function PlaceValueBuilder({
   const lastExpected = decompose(lastTarget);
   const [digits, setDigits] = useState(completed ? lastExpected : decompose(0));
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
+    namespace: "primaryFour",
     roundCount: exercise.targets.length,
     completed,
     hintKey,
@@ -67,6 +72,7 @@ export function PlaceValueBuilder({
 
   return (
     <ActivityShell
+      namespace="primaryFour"
       titleKey={titleKey}
       instructionKey={instructionKey}
       completed={completed}
@@ -74,7 +80,7 @@ export function PlaceValueBuilder({
       onValidate={validate}
       progressLabel={progressLabel}
     >
-      <p className={styles.targetNumber} aria-live="polite">
+      <p className={kitStyles.targetNumber} aria-live="polite">
         {t("exercise.placeValue.target", { number: formatNumber(target, i18n.language) })}
       </p>
       <div className={styles.stickControls5}>
@@ -91,7 +97,7 @@ export function PlaceValueBuilder({
           />
         ))}
       </div>
-      <strong className={styles.placeValueRepresentation}>
+      <strong className={kitStyles.placeValueRepresentation}>
         {t("exercise.placeValue.representation", {
           dm: digits.dm,
           um: digits.um,

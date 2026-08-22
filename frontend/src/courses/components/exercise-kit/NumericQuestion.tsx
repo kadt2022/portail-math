@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "../PrimaryFourLesson.module.css";
-import { formatNumber } from "../number-words";
+import styles from "./exercise-kit.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { ChoiceGroup } from "./ChoiceGroup";
+import type { NumericQuestionExercise, SharedExerciseWidgetProps } from "./shared-exercise-types";
 import { hintForAttempts, useAttempts } from "./use-attempts";
-import type { ExerciseWidgetProps, NumericQuestionExercise } from "./exercise-types";
 
-type NumericQuestionProps = ExerciseWidgetProps<NumericQuestionExercise>;
+type NumericQuestionProps = SharedExerciseWidgetProps<NumericQuestionExercise>;
 
 export function NumericQuestion({
   exercise,
@@ -18,8 +17,10 @@ export function NumericQuestion({
   strongHintKey,
   completed,
   onValidated,
+  namespace,
+  formatNumber,
 }: NumericQuestionProps) {
-  const { t, i18n } = useTranslation("primaryFour");
+  const { t } = useTranslation(namespace);
   const [value, setValue] = useState(completed ? String(exercise.answer) : "");
   const [selected, setSelected] = useState<number | null>(completed ? exercise.answer : null);
   const { attempts, registerWrong, reset } = useAttempts();
@@ -35,7 +36,14 @@ export function NumericQuestion({
   };
 
   return (
-    <ActivityShell titleKey={titleKey} instructionKey={instructionKey} completed={completed} feedback={feedback} onValidate={validate}>
+    <ActivityShell
+      namespace={namespace}
+      titleKey={titleKey}
+      instructionKey={instructionKey}
+      completed={completed}
+      feedback={feedback}
+      onValidate={validate}
+    >
       <p className={styles.questionPrompt}>{t(exercise.promptKey, exercise.promptValues)}</p>
       {exercise.choices ? (
         <ChoiceGroup
@@ -46,7 +54,7 @@ export function NumericQuestion({
             setSelected(choice);
             reset();
           }}
-          labelFor={(value) => formatNumber(value, i18n.language)}
+          labelFor={formatNumber}
         />
       ) : (
         <input

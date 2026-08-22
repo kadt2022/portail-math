@@ -1,4 +1,4 @@
-import styles from "../PrimaryFourLesson.module.css";
+import styles from "./exercise-kit.module.css";
 
 interface ChoiceGroupProps<TValue extends string | number> {
   choices: readonly TValue[];

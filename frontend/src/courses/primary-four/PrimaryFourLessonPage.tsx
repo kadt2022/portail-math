@@ -3,16 +3,16 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { CourseActionIcon } from "../components/CourseActionIcon";
+import { ExplanationBlock } from "../components/exercise-kit/ExplanationBlock";
+import { GuidedExample } from "../components/exercise-kit/GuidedExample";
+import { LessonSummary } from "../components/exercise-kit/LessonSummary";
+import { SelfAssessment } from "../components/exercise-kit/SelfAssessment";
+import { SituationBlock } from "../components/exercise-kit/SituationBlock";
 import { YambaGuide } from "../components/YambaGuide";
 import { getModuleItems, isPublished } from "../course-engine/course-model";
 import { useCourseProgress } from "../course-engine/useCourseProgress";
 import baseStyles from "../primary-one/PrimaryOneCourse.module.css";
-import { ExplanationBlock } from "./blocks/ExplanationBlock";
-import { GuidedExample } from "./blocks/GuidedExample";
-import { LessonSummary } from "./blocks/LessonSummary";
 import { PlaceValueRevealBoard } from "./blocks/PlaceValueRevealBoard";
-import { SelfAssessment } from "./blocks/SelfAssessment";
-import { SituationBlock } from "./blocks/SituationBlock";
 import {
   getPrimaryFourItem,
   getPrimaryFourModule,
@@ -137,7 +137,7 @@ export function PrimaryFourLessonPage() {
   function renderStep() {
     if (evaluationContent) {
       if (step.kind === "assess") {
-        return <SelfAssessment completed={stepCompleted} onValidated={onInfoConfirmed} />;
+        return <SelfAssessment namespace="primaryFour" completed={stepCompleted} onValidated={onInfoConfirmed} />;
       }
       const question = evaluationContent.items[safeStepIndex];
       return <InteractiveExercise {...question} completed={stepCompleted} onValidated={onValidated} />;
@@ -149,10 +149,18 @@ export function PrimaryFourLessonPage() {
 
     switch (step.kind) {
       case "situation":
-        return <SituationBlock textKey={lessonContent.situationKey} completed={stepCompleted} onValidated={onInfoConfirmed} />;
+        return (
+          <SituationBlock
+            namespace="primaryFour"
+            textKey={lessonContent.situationKey}
+            completed={stepCompleted}
+            onValidated={onInfoConfirmed}
+          />
+        );
       case "discover":
         return (
           <ExplanationBlock
+            namespace="primaryFour"
             textKey={lessonContent.discoverKey}
             completed={stepCompleted}
             onValidated={onInfoConfirmed}
@@ -168,6 +176,7 @@ export function PrimaryFourLessonPage() {
       case "example":
         return (
           <GuidedExample
+            namespace="primaryFour"
             methodKey={lessonContent.exampleMethodKey}
             promptKeys={lessonContent.examplePromptKeys}
             completed={stepCompleted}
@@ -181,7 +190,14 @@ export function PrimaryFourLessonPage() {
       case "play":
         return <InteractiveExercise {...lessonContent.play} completed={stepCompleted} onValidated={onValidated} />;
       case "remember":
-        return <LessonSummary textKey={lessonContent.rememberKey} completed={stepCompleted} onValidated={onInfoConfirmed} />;
+        return (
+          <LessonSummary
+            namespace="primaryFour"
+            textKey={lessonContent.rememberKey}
+            completed={stepCompleted}
+            onValidated={onInfoConfirmed}
+          />
+        );
       case "check":
         return <InteractiveExercise {...lessonContent.check} completed={stepCompleted} onValidated={onValidated} />;
       default:
