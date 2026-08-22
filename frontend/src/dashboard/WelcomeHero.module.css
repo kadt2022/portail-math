@@ -139,7 +139,7 @@
 
 .childrenCard {
   display: grid;
-  grid-template-rows: 205px auto;
+  grid-template-rows: 250px auto;
   background: #fff;
   color: var(--pm-brand-dark);
   border: 1px solid rgb(31 65 56 / 8%);
@@ -147,7 +147,7 @@
 
 .imageWrap {
   position: relative;
-  min-height: 205px;
+  min-height: 250px;
   overflow: hidden;
   background: linear-gradient(135deg, #3428a8, #0da7b5);
 }
@@ -156,9 +156,9 @@
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 205px;
+  min-height: 250px;
   object-fit: cover;
-  object-position: center 34%;
+  object-position: center 42%;
 }
 
 .photoGlow {
@@ -196,8 +196,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 18px;
-  padding: 18px 20px;
+  gap: 16px;
+  padding: 14px 18px;
   background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
 }
 
@@ -259,12 +259,12 @@
   }
 
   .childrenCard {
-    grid-template-rows: 220px auto;
+    grid-template-rows: 270px auto;
   }
 
   .imageWrap,
   .photo {
-    min-height: 220px;
+    min-height: 270px;
   }
 }
 
@@ -284,11 +284,15 @@
   }
 
   .childrenCard {
-    grid-template-rows: 215px auto;
+    grid-template-rows: 255px auto;
   }
 
   .imageWrap,
   .photo {
-    min-height: 215px;
+    min-height: 255px;
+  }
+
+  .photo {
+    object-position: center 45%;
   }
 }
