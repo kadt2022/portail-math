@@ -6,34 +6,13 @@ type IconName = "book" | "target" | "star" | "close" | "trophy";
 
 const STAT_ITEMS: Array<{
   key: string;
-  hintKey: string;
   icon: IconName;
   tone: "green" | "purple" | "gold" | "pink";
 }> = [
-  {
-    key: "progress.gamesStarted",
-    hintKey: "progress.gamesStartedHint",
-    icon: "book",
-    tone: "green",
-  },
-  {
-    key: "progress.challengesCompleted",
-    hintKey: "progress.challengesCompletedHint",
-    icon: "target",
-    tone: "purple",
-  },
-  {
-    key: "progress.firstTrySuccesses",
-    hintKey: "progress.firstTrySuccessesHint",
-    icon: "star",
-    tone: "gold",
-  },
-  {
-    key: "progress.correctedErrors",
-    hintKey: "progress.correctedErrorsHint",
-    icon: "close",
-    tone: "pink",
-  },
+  { key: "progress.gamesStarted", icon: "book", tone: "green" },
+  { key: "progress.challengesCompleted", icon: "target", tone: "purple" },
+  { key: "progress.firstTrySuccesses", icon: "star", tone: "gold" },
+  { key: "progress.correctedErrors", icon: "close", tone: "pink" },
 ];
 
 function StatIcon({ name }: { name: IconName }) {
@@ -97,8 +76,6 @@ function StatIcon({ name }: { name: IconName }) {
   );
 }
 
-// Les valeurs sont volontairement laissées à "—" pour ne pas inventer de
-// progression. La structure est prête à recevoir les vraies données plus tard.
 export function ProgressSummary() {
   const { t } = useTranslation("dashboard");
 
@@ -116,7 +93,6 @@ export function ProgressSummary() {
             <div className={styles.statBody}>
               <p className={styles.value}>—</p>
               <p className={styles.label}>{t(item.key)}</p>
-              <p className={styles.hint}>{t(item.hintKey)}</p>
               <div className={styles.track} aria-hidden="true">
                 <span className={styles.trackReady} />
               </div>
@@ -130,7 +106,6 @@ export function ProgressSummary() {
           </div>
           <div className={styles.statBody}>
             <p className={styles.levelLabel}>{t("progress.currentLevel")}</p>
-            <p className={styles.levelName}>{t("progress.levelName")}</p>
             <div className={styles.levelTrack} aria-hidden="true">
               <span />
             </div>
