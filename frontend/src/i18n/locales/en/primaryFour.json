@@ -1,0 +1,394 @@
+{
+  "course": {
+    "eyebrow": "Mathematics learning path",
+    "title": "4th grade",
+    "lead": "This year, the numbers grow bigger and the problems richer. Observe, represent, estimate, calculate and check your answers. Your progress is saved on this device.",
+    "published": "{{count}} lessons available today"
+  },
+  "yamba": {
+    "name": "Yamba",
+    "courseWelcome": "Welcome to 4th grade! I'm staying close by, but I'll let you search before I help.",
+    "lessonTip": "Before you calculate, try to estimate the result. I'm staying close for this first step.",
+    "lessonComplete": "Well done! Your progress is saved, come back whenever you like."
+  },
+  "status": {
+    "not-started": "To start",
+    "in-progress": "In progress",
+    "completed": "Completed",
+    "coming-soon": "Coming soon"
+  },
+  "progress": {
+    "overall": "My overall progress",
+    "lessons": "{{completed}} / {{total}} lessons",
+    "moduleLessons": "{{completed}} / {{total}} lessons",
+    "plannedLessons": "{{total}} lessons planned",
+    "module": "Progress for module {{number}}",
+    "steps": "{{completed}} / {{total}} steps completed",
+    "item": "Progress for {{title}}"
+  },
+  "actions": {
+    "start": "Start my learning path",
+    "resume": "Resume the lesson",
+    "next-lesson": "Next lesson",
+    "next-module": "Next module",
+    "return-to-modules": "Back to my modules",
+    "review": "Review",
+    "backToCourse": "Back to the course"
+  },
+  "moduleActions": {
+    "not-started": "Start",
+    "in-progress": "Resume",
+    "completed": "Review",
+    "view": "View module"
+  },
+  "modules": {
+    "eyebrow": "10 modules · 40 lessons",
+    "title": "My 4th grade learning path",
+    "orderHint": "A published lesson moves the counter forward on the 40 lessons planned.",
+    "number": "Module {{number}}",
+    "m1": { "title": "Numbers up to 100,000" },
+    "m2": { "title": "Adding and subtracting" },
+    "m3": { "title": "Multiplying efficiently" },
+    "m4": { "title": "Dividing and interpreting" },
+    "m5": { "title": "Fractions and decimals" },
+    "m6": { "title": "Measuring and converting" },
+    "m7": { "title": "Perimeter and area" },
+    "m8": { "title": "Geometry and location" },
+    "m9": { "title": "Time and money" },
+    "m10": { "title": "Data and problems" }
+  },
+  "module": {
+    "referenceLead": "This module's four lessons and evaluation are published: observe, explore, then check your answers.",
+    "pendingLead": "This module is planned. Its activities will be added after pedagogical review.",
+    "pathEyebrow": "Small steps",
+    "pathTitle": "The module's lessons",
+    "pathHint": "Upcoming content never produces progress."
+  },
+  "lessons": {
+    "number": "Lesson {{number}}",
+    "plannedTitle": "Lesson title to be confirmed",
+    "l1": { "title": "Place value" },
+    "l2": { "title": "Reading and writing numbers" },
+    "l3": { "title": "Comparing and ordering" },
+    "l4": { "title": "Estimating and rounding" }
+  },
+  "evaluation": {
+    "label": "Module evaluation",
+    "title": "Evaluation - Unit 1"
+  },
+  "steps": {
+    "situation": "Starting situation",
+    "discover": "I discover",
+    "manipulate": "I explore",
+    "example": "Guided example",
+    "practice": "I practise",
+    "reflect": "I think it through",
+    "play": "Mini-game",
+    "remember": "I remember",
+    "check": "I check",
+    "assess": "Self-assessment"
+  },
+  "breadcrumbs": {
+    "label": "Course breadcrumb",
+    "course": "4th grade"
+  },
+  "lesson": {
+    "label": "Lesson",
+    "objectiveLabel": "My goal",
+    "duration": "About 30 minutes",
+    "stepProgress": "Step {{current}} of {{total}} — {{label}}",
+    "progressLabel": "Progress in this lesson",
+    "back": "Back to module",
+    "continue": "Continue",
+    "finish": "Finish the lesson",
+    "finishEvaluation": "Finish the evaluation"
+  },
+  "activity": {
+    "validate": "Check my answer",
+    "success": "Well done, this activity is complete!",
+    "progressRound": "{{current}} / {{total}}"
+  },
+  "blocks": {
+    "situation": { "eyebrow": "Starting situation" },
+    "discover": {
+      "eyebrow": "I discover and understand",
+      "figureHint": "Tap a digit of the number to discover its value.",
+      "figurePrompt": "Tap a digit to see its value.",
+      "figureReveal": "{{digit}} = {{value}}"
+    },
+    "example": { "eyebrow": "Guided example" },
+    "remember": { "eyebrow": "I remember" },
+    "confirmContinue": "Got it, let's continue",
+    "assess": {
+      "eyebrow": "Self-assessment",
+      "prompt": "How did this evaluation go for you?",
+      "options": {
+        "alone": "I succeeded on my own",
+        "withSupport": "I succeeded with a drawing",
+        "retry": "I need to redo this lesson"
+      },
+      "confirm": "Confirm my self-assessment"
+    }
+  },
+  "exercise": {
+    "placeValue": {
+      "target": "Build the number {{number}}",
+      "dm": "TTh",
+      "um": "Th",
+      "c": "H",
+      "d": "T",
+      "u": "U",
+      "decrease": "Remove a counter from {{label}}",
+      "increase": "Add a counter to {{label}}",
+      "representation": "{{dm}} TTh, {{um}} Th, {{c}} H, {{d}} T and {{u}} U"
+    },
+    "compare": {
+      "chooseSymbol": "Choose the correct symbol",
+      "symbolLabel": {
+        "less": "less than",
+        "greater": "greater than",
+        "equal": "equal to"
+      }
+    },
+    "sequence": {
+      "blankLabel": "Missing number"
+    },
+    "order": {
+      "available": "Numbers to order",
+      "pick": "Place the number {{number}}",
+      "placed": "Numbers already ordered",
+      "removeFromPosition": "Remove the number {{number}} from position {{position}}"
+    },
+    "roundToTarget": {
+      "question": "Round {{number}} to the nearest {{unit}}.",
+      "unit": {
+        "ten": "ten",
+        "hundred": "hundred",
+        "thousand": "thousand",
+        "tenThousand": "ten thousand"
+      }
+    },
+    "numberInRange": {
+      "prompt": "Find a number between {{min}} and {{max}}."
+    }
+  },
+  "content": {
+    "method": [
+      "I represent the data.",
+      "I estimate the result.",
+      "I calculate step by step.",
+      "I check with another method or by estimating.",
+      "I explain my answer in a sentence."
+    ],
+    "u01l01": {
+      "objective": "I can build and explain a number up to the ten thousands.",
+      "situation": "A cooperative counts 24,638 selected seeds. How can they be counted easily?",
+      "discover": "In a number, each place is worth ten times the place to its right. In 24,638, the 2 sits in the ten thousands place and is worth 20,000, the 4 sits in the thousands place and is worth 4,000, the 6 sits in the hundreds place and is worth 600.",
+      "manipulate": {
+        "title": "Build the number 24,638",
+        "instruction": "Build 24,638 by setting the ten thousands, thousands, hundreds, tens and units counters.",
+        "hint": "Start with the ten thousands: how many groups of 10,000 are needed?",
+        "strongHint": "24,638 is 2 TTh, 4 Th, 6 H, 3 T and 8 U. Adjust each counter one at a time."
+      },
+      "example": {
+        "easy": "Easy. Break down 53,207.",
+        "medium": "Intermediate. What number is made of 4 ten thousands, 0 thousands, 9 hundreds, 1 ten and 6 units?",
+        "reflection": "Reflection. In 90,305, what is the value of the digit 3?"
+      },
+      "practice": {
+        "title": "Break down 40,916",
+        "instruction": "Build 40,916 by setting the five counters, just like in the guided example.",
+        "hint": "Look at each digit of 40,916: ten thousands, then thousands, hundreds, tens and units.",
+        "strongHint": "40,916 is 4 TTh, 0 Th, 9 H, 1 T and 6 U."
+      },
+      "reflect": {
+        "title": "Which number is it?",
+        "instruction": "Work out the number from its breakdown, then write it in digits.",
+        "hint": "Add the ten thousands first, then the thousands, then the rest.",
+        "strongHint": "2 ten thousands make 20,000, 7 thousands make 7,000, 5 tens make 50 and 3 units make 3: 20,000 + 7,000 + 50 + 3.",
+        "prompt": "What number is made of 2 ten thousands, 7 thousands, 0 hundreds, 5 tens and 3 units?"
+      },
+      "play": {
+        "title": "Deliver each digit to its place",
+        "instruction": "Deliver the ten thousands, thousands, hundreds, tens and units of 78,402 to the right depot by building the number.",
+        "hint": "Place the ten thousands first, then the thousands, then the rest.",
+        "strongHint": "78,402 is 7 TTh, 8 Th, 4 H, 0 T and 2 U."
+      },
+      "remember": "Each place is worth ten times the place to its right: ten thousands, thousands, hundreds, tens, units.",
+      "check": {
+        "title": "What is the highlighted digit worth?",
+        "instruction": "Choose the exact value of the thousands digit in 63,020.",
+        "hint": "This digit sits in the thousands place: it isn't just worth itself.",
+        "strongHint": "In 63,020, the 3 is in the thousands place, so it is worth 3,000.",
+        "prompt": "In 63,020, what is the value of the digit 3?"
+      }
+    },
+    "u01l02": {
+      "objective": "I can move from words to digits for numbers up to 100,000.",
+      "situation": "A sign at the big market reads \"sixty-three thousand and twenty\" bags of flour. How can this be written in digits?",
+      "discover": "We spot the thousands first, then the hundreds, tens and units. An empty place is always written with 0: sixty-three thousand and twenty is written 63,020, because there are no hundreds.",
+      "manipulate": {
+        "title": "Listen and build",
+        "instruction": "Build each number you are given, using the five counters: 40,005, then 76,000, then 99,999.",
+        "hint": "An empty place is written with 0: don't set that counter if there is nothing at that place.",
+        "strongHint": "40,005 = 4 TTh, 0 Th, 0 H, 0 T, 5 U. Check each number place by place."
+      },
+      "example": {
+        "easy": "Easy. Write in digits: forty-five thousand two hundred and ten.",
+        "medium": "Intermediate. Write 63,020 in words.",
+        "reflection": "Reflection. Write the number made of 8 thousands and 7 hundreds."
+      },
+      "practice": {
+        "title": "Words and digits",
+        "instruction": "Match each number to its correct word form, or each word form to its number.",
+        "hint": "Spot the thousands first, in the words or in the digits.",
+        "strongHint": "Forty-five thousand two hundred and ten = 45 thousands, then 2 hundreds and 1 ten, so 45,210."
+      },
+      "reflect": {
+        "title": "Find the number",
+        "instruction": "Work out the number from its breakdown, then write it in digits.",
+        "hint": "8 thousands and 7 hundreds: there is no ten, so 0 tens.",
+        "strongHint": "8 thousands make 8,000, and 7 hundreds make 700: 8,000 + 700 = 8,700.",
+        "prompt": "Write the number made of 8 thousands and 7 hundreds."
+      },
+      "play": {
+        "title": "Match the number card",
+        "instruction": "Match each word form to its number card, or each number card to its word form.",
+        "hint": "Count the thousands in the word form before choosing.",
+        "strongHint": "Read the number place by place: thousands, then hundreds, tens and units."
+      },
+      "remember": "We spot the thousands first, then the hundreds, tens and units; an empty place is always written with 0.",
+      "check": {
+        "title": "Build the announced number",
+        "instruction": "Build 40,005 with the five counters.",
+        "hint": "40,005: how many ten thousands, thousands, hundreds, tens and units?",
+        "strongHint": "40,005 is 4 TTh, 0 Th, 0 H, 0 T and 5 U."
+      }
+    },
+    "u01l03": {
+      "objective": "I can compare and order numbers up to 100,000.",
+      "situation": "Two cooperatives show 47,350 and 47,530 bags of maize. Which one has more?",
+      "discover": "We compare the ten thousands first, then the thousands, then the hundreds, the tens and finally the units, place by place from the left.",
+      "manipulate": {
+        "title": "Build, then compare",
+        "instruction": "Build 47,350, then 47,530, and look at the first place where they differ.",
+        "hint": "The ten thousands and thousands are the same: look at the hundreds.",
+        "strongHint": "47,350 has 3 hundreds, 47,530 has 5 hundreds: so 47,530 is bigger."
+      },
+      "example": {
+        "easy": "Easy. Complete: 52,400 __ 52,040.",
+        "medium": "Intermediate. Order 81,250, 18,520, 80,125, 81,025.",
+        "reflection": "Reflection. Find two numbers between 9,995 and 10,005."
+      },
+      "practice": {
+        "title": "Compare the numbers",
+        "instruction": "Choose the symbol that correctly compares each pair of numbers.",
+        "hint": "Compare the ten thousands and thousands of each number first.",
+        "strongHint": "If the thousands are equal, compare the hundreds, then the tens, then the units."
+      },
+      "reflect": {
+        "title": "Order the numbers",
+        "instruction": "Place the four numbers from smallest to largest.",
+        "hint": "Start by spotting the smallest ten thousands digit.",
+        "strongHint": "18,520 has 1 ten thousand, the other three have 8: compare their thousands and hundreds next."
+      },
+      "play": {
+        "title": "Build the biggest reserve",
+        "instruction": "In each round, choose the bigger of the two numbers shown.",
+        "hint": "Look at the ten thousands and thousands of each number first.",
+        "strongHint": "Compare place by place, starting from the left, to find the bigger number."
+      },
+      "remember": "We compare numbers place by place, starting from the ten thousands: as soon as a place differs, it gives the answer.",
+      "check": {
+        "title": "Find a hidden number",
+        "instruction": "Write a whole number that is strictly between the two limits.",
+        "hint": "9,995 and 10,005 don't count: look for a number in between.",
+        "strongHint": "Between 9,995 and 10,005, you can choose for example 9,996, 10,000 or 10,004."
+      }
+    },
+    "u01l04": {
+      "objective": "I can estimate a result and round a number to the requested place.",
+      "situation": "Along the market road, the markers show 15,000, 20,000, 25,000, then one marker is missing.",
+      "discover": "A pattern moves forward following a regular step. To round a number, we choose the requested place (ten, hundred, thousand or ten thousand) and look at the digit right after it to know whether to round up or stay.",
+      "manipulate": {
+        "title": "Continue the pattern",
+        "instruction": "Continue the pattern counting up by 5,000 using road markers.",
+        "hint": "Look at how much the pattern moves forward each time.",
+        "strongHint": "The pattern moves forward by 5,000 each time: 15,000, 20,000, 25,000, then 30,000."
+      },
+      "example": {
+        "easy": "Easy. Complete: 4,000, 6,000, __, 10,000.",
+        "medium": "Intermediate. Round 24,638 to the nearest hundred.",
+        "reflection": "Reflection. Round 24,638 to the nearest thousand."
+      },
+      "practice": {
+        "title": "Complete the pattern",
+        "instruction": "Find the missing number in the pattern.",
+        "hint": "Look at the gap between the numbers you already know.",
+        "strongHint": "The pattern moves forward by 500 each time: after 3,500 comes 4,000."
+      },
+      "reflect": {
+        "title": "Round to the nearest thousand",
+        "instruction": "Choose the thousand closest to the given number.",
+        "hint": "Look at the hundreds digit: is it closer to 0 or to 10?",
+        "strongHint": "24,638 is closer to 25,000 than to 24,000, because 638 is closer to 1,000 than to 0."
+      },
+      "play": {
+        "title": "Reach the closest marker",
+        "instruction": "Choose the ten thousand closest to the given number on the number line.",
+        "hint": "Look at the thousands digit: is it closer to 0 or to 10?",
+        "strongHint": "47,350 is closer to 50,000 than to 40,000."
+      },
+      "remember": "To round a number, I look at the requested place and the digit right after it: if it is 5 or more, the place goes up by one, otherwise it stays the same.",
+      "check": {
+        "title": "Round to the nearest hundred",
+        "instruction": "Choose the hundred closest to the given number.",
+        "hint": "Look at the tens digit: is it closer to 0 or to 10?",
+        "strongHint": "63,020 is closer to 63,000 than to 63,100."
+      }
+    },
+    "u01eval": {
+      "intro": "Work on your own first. Use a drawing if you need to, and explain at least one answer.",
+      "q1": {
+        "title": "Question 1",
+        "instruction": "Work out the number from its breakdown.",
+        "hint": "Add the ten thousands, the thousands, then the rest.",
+        "strongHint": "3 ten thousands make 30,000, 5 thousands make 5,000, 2 tens make 20 and 7 units make 7: 30,000 + 5,000 + 20 + 7.",
+        "prompt": "What number is made of 3 ten thousands, 5 thousands, 0 hundreds, 2 tens and 7 units?"
+      },
+      "q2": {
+        "title": "Question 2",
+        "instruction": "Choose the word form that matches the number shown exactly.",
+        "hint": "Spot the thousands first: forty-five thousand.",
+        "strongHint": "45,210 = forty-five thousand two hundred and ten."
+      },
+      "q3": {
+        "title": "Question 3",
+        "instruction": "Place the four numbers from smallest to largest.",
+        "hint": "Compare the ten thousands and thousands of each number first.",
+        "strongHint": "18,520 has 1 ten thousand, the other three have 8: compare their thousands and hundreds next."
+      },
+      "q4": {
+        "title": "Question 4",
+        "instruction": "Choose the thousand closest to the given number.",
+        "hint": "Look at the hundreds digit: is it closer to 0 or to 10?",
+        "strongHint": "24,638 is closer to 25,000 than to 24,000."
+      }
+    }
+  },
+  "lessonComplete": {
+    "eyebrow": "Well done",
+    "title": "Lesson complete!",
+    "evaluationTitle": "Evaluation complete!",
+    "message": "Your progress is saved.",
+    "backToModule": "Back to module",
+    "nextLesson": "Next lesson",
+    "nextEvaluation": "Take the evaluation",
+    "nextModule": "Next module",
+    "backToCourse": "Back to my modules"
+  },
+  "errors": {
+    "moduleNotFound": "This module does not exist.",
+    "lessonNotFound": "This lesson is not available."
+  }
+}

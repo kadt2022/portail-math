@@ -1,0 +1,186 @@
+/*
+ * Classes propres à la 4e primaire uniquement. Les classes génériques du
+ * moteur de leçon (blocs non interactifs, ActivityShell, widgets
+ * d'exercice communs) vivent dans
+ * `../components/exercise-kit/exercise-kit.module.css`, importé par les
+ * composants concernés — voir `exercises/PlaceValueBuilder.tsx` et
+ * `exercises/RoundToTarget.tsx` pour un exemple d'utilisation conjointe des
+ * deux fichiers.
+ */
+
+.duration {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--pm-line);
+  border-radius: 999px;
+  color: var(--pm-ink-soft);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lessonContext {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.lessonContext p {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--pm-radius-sm);
+  background: #f7f3eb;
+  color: var(--pm-ink-soft);
+  font-size: 14px;
+}
+
+.lessonActions a,
+.lessonActions button {
+  min-height: 48px;
+}
+
+/* Valeur de position (compteurs numériques à 5 rangs) */
+
+.stickControls5 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* Figure tactile « Je découvre » (valeur de position) */
+
+.revealBoard {
+  display: grid;
+  gap: 14px;
+}
+
+.revealHint {
+  margin: 0;
+  color: var(--pm-ink-soft);
+  font-size: 14px;
+}
+
+.revealRow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.revealDigit {
+  display: grid;
+  gap: 4px;
+  min-height: 64px;
+  padding: 10px 6px;
+  border: 2px solid var(--pm-accent);
+  border-radius: var(--pm-radius-sm);
+  background: #fff7ec;
+  color: var(--pm-accent-dark);
+  font: inherit;
+  cursor: pointer;
+  place-items: center;
+}
+
+.revealDigitActive {
+  border-color: var(--pm-brand);
+  background: var(--pm-success-soft);
+  color: var(--pm-brand);
+}
+
+.revealPlaceLabel {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.revealDigitValue {
+  font-size: clamp(20px, 5vw, 26px);
+  font-weight: 900;
+}
+
+.revealOutput {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--pm-radius-sm);
+  background: #fff;
+  border: 1px solid var(--pm-line);
+  color: var(--pm-brand-dark);
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: 900;
+  text-align: center;
+}
+
+/* Ligne graduée d'arrondi */
+
+.numberLine {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.numberLineBound {
+  flex: 0 0 auto;
+  color: var(--pm-ink-soft);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.numberLineTrack {
+  position: relative;
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pm-line);
+}
+
+.numberLineMarker {
+  position: absolute;
+  top: -22px;
+  transform: translateX(-50%);
+  color: var(--pm-brand-dark);
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.numberLineMarker::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 3px;
+  height: 12px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--pm-brand);
+}
+
+@media (max-width: 760px) {
+  .lessonContext {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stickControls5,
+  .revealRow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .lessonActions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .lessonActions > * {
+    width: 100%;
+  }
+
+  .stickControls5,
+  .revealRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
