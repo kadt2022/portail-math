@@ -1,79 +1,103 @@
-.hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 340px;
+.heroGrid {
   display: grid;
-  align-items: end;
-  padding: clamp(28px, 5vw, 56px);
+  grid-template-columns: 1fr;
+  gap: 16px;
   margin: 20px 0;
+}
+
+.welcomeCard,
+.childrenCard {
+  overflow: hidden;
   border-radius: 28px;
-  background: var(--pm-brand-dark);
-  color: #fff8ee;
   box-shadow: var(--pm-shadow-lg);
 }
 
-/* Mobile-first : la photo couvre tout le bandeau derrière le texte. Sur un
-   écran étroit, la carte elle-même est étroite (proche du carré) : `cover`
-   n'a presque rien à recadrer, contrairement au bandeau très large du
-   bureau — donc pas d'effet zoomé ici. */
-.photo {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 26%;
+.welcomeCard {
+  display: grid;
+  grid-template-rows: auto auto;
+  min-height: 320px;
+  background: var(--pm-brand-dark);
+  color: #fff8ee;
 }
 
-/* Deux voiles superposés. Le premier pose l'aplat vert de la marque tout en
-   haut de la carte, puis s'évanouit avant d'atteindre les visages des
-   enfants (~29 % de la photo) : la couleur reste visible même sur petit
-   téléphone, sans jamais les couvrir. Le second, inchangé, protège le texte
-   en bas. */
-.scrim {
+.welcomeMain {
+  position: relative;
+  display: grid;
+  align-items: center;
+  padding: clamp(28px, 4vw, 42px);
+  background:
+    radial-gradient(circle at 82% 18%, rgb(255 255 255 / 5%) 0 7%, transparent 8%),
+    linear-gradient(145deg, #123f35 0%, var(--pm-brand-dark) 58%, #0d3029 100%);
+  isolation: isolate;
+}
+
+.welcomeMain::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  bottom: -90px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(235 117 40 / 10%) 0%, rgb(235 117 40 / 0%) 72%);
+  z-index: 0;
+}
+
+.welcomeFooter {
+  display: flex;
+  align-items: center;
+  padding: 18px clamp(28px, 4vw, 42px);
+  background: linear-gradient(180deg, #174f43 0%, #15483d 100%);
+  border-top: 1px solid rgb(255 255 255 / 7%);
+}
+
+.decorations,
+.imageDecorations {
+  pointer-events: none;
+}
+
+.decorations span {
   position: absolute;
   z-index: 1;
-  inset: 0;
-  background:
-    linear-gradient(180deg, var(--pm-brand-dark) 0%, rgb(15 51 43 / 0%) 22%),
-    linear-gradient(
-      0deg,
-      rgb(15 51 43 / 88%) 0%,
-      rgb(15 51 43 / 60%) 45%,
-      rgb(15 51 43 / 38%) 100%
-    );
+  color: rgb(255 248 238 / 8%);
+  font-weight: 900;
+  user-select: none;
+}
+
+.decorPlus {
+  top: 17%;
+  right: 28%;
+  font-size: 2rem;
+}
+
+.decorCircle {
+  top: 14%;
+  right: 15%;
+  font-size: 2.2rem;
+}
+
+.decorTriangle {
+  top: 34%;
+  right: 8%;
+  font-size: 2rem;
+}
+
+.decorCube {
+  right: 17%;
+  bottom: 24%;
+  font-size: 2rem;
+}
+
+.decorBars {
+  right: 29%;
+  bottom: 12%;
+  font-size: 1.8rem;
 }
 
 .content {
   position: relative;
   z-index: 2;
-  max-width: 420px;
-}
-
-/* À partir de la tablette, la carte s'élargit bien plus vite que haut :
-   la photo repasse en panneau à droite, avec un voile calé en pixels sur
-   la largeur réelle du texte plutôt qu'en dégradé vertical. */
-@media (min-width: 640px) {
-  .photo {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: auto;
-    width: 58%;
-    height: 100%;
-    object-position: center 32%;
-  }
-
-  .scrim {
-    background: linear-gradient(
-      100deg,
-      var(--pm-brand-dark) 0,
-      var(--pm-brand-dark) 500px,
-      rgb(15 51 43 / 60%) 580px,
-      rgb(15 51 43 / 22%) 680px
-    );
-  }
+  max-width: 430px;
 }
 
 .eyebrow {
@@ -83,48 +107,238 @@
   font-weight: 850;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  text-shadow: 0 1px 6px rgb(15 51 43 / 55%);
 }
 
 .title {
-  margin: 12px 0 16px;
-  font-size: clamp(2.4rem, 6.4vw, 4.4rem);
-  line-height: 0.92;
-  letter-spacing: -0.045em;
+  margin: 10px 0 14px;
+  font-size: clamp(2.35rem, 4.8vw, 3.55rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
   text-wrap: balance;
-  text-shadow: 0 2px 12px rgb(15 51 43 / 55%);
 }
 
 .title span {
   display: block;
-  color: var(--pm-accent);
+  color: #e2762b;
 }
 
 .lead {
-  max-width: 46ch;
+  max-width: 42ch;
   margin: 0;
   color: rgb(255 250 238 / 86%);
-  font-size: 17px;
-  line-height: 1.6;
-  text-shadow: 0 1px 4px rgb(15 51 43 / 40%);
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 46px;
-  margin-top: 26px;
-  padding: 0 20px;
+  min-height: 44px;
+  padding: 0 18px;
   border-radius: 12px;
-  background: #fffaf2;
-  color: var(--pm-brand-dark);
-  font-weight: 800;
+  background: #e2762b;
+  color: #fff;
+  font-weight: 850;
   text-decoration: none;
-  transition: transform 160ms ease, background 160ms ease;
+  box-shadow: 0 6px 14px rgb(226 118 43 / 18%);
+  transition: transform 160ms ease, filter 160ms ease;
 }
 
 .cta:hover {
-  background: var(--pm-accent-soft);
   transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+.childrenCard {
+  display: grid;
+  grid-template-rows: auto auto;
+  background: #fff;
+  color: var(--pm-brand-dark);
+  border: 1px solid rgb(31 65 56 / 8%);
+}
+
+.imageWrap {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3428a8, #0da7b5);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.photoGlow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0%) 65%, rgb(6 45 60 / 12%) 100%);
+}
+
+.imageDecorations span {
+  position: absolute;
+  z-index: 2;
+  color: rgb(255 255 255 / 11%);
+  font-weight: 900;
+}
+
+.imageDecorations span:nth-child(1) {
+  top: 12%;
+  left: 12%;
+  font-size: 2rem;
+}
+
+.imageDecorations span:nth-child(2) {
+  top: 10%;
+  right: 18%;
+  font-size: 1.9rem;
+}
+
+.imageDecorations span:nth-child(3) {
+  top: 20%;
+  right: 7%;
+  font-size: 1.7rem;
+}
+
+.learningContent {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
+}
+
+.learningEyebrow {
+  margin: 0 0 3px;
+  color: #e2762b;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.learningTitle {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.12;
+}
+
+.learningDescription {
+  margin: 5px 0 0;
+  color: rgb(15 51 43 / 70%);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.courseCta {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: #e2762b;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 850;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgb(226 118 43 / 18%);
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.courseCta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+@media (min-width: 768px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .welcomeCard,
+  .childrenCard {
+    height: 380px;
+    min-height: 380px;
+  }
+
+  .welcomeCard,
+  .childrenCard {
+    grid-template-rows: 270px 110px;
+  }
+
+  .welcomeMain,
+  .imageWrap {
+    min-height: 270px;
+  }
+
+  .welcomeFooter,
+  .learningContent {
+    min-height: 110px;
+    box-sizing: border-box;
+  }
+
+  .photo {
+    width: 100%;
+    height: 270px;
+    object-fit: cover;
+    object-position: center 52%;
+  }
+}
+
+@media (max-width: 900px) {
+  .learningContent {
+    grid-template-columns: 1fr;
+  }
+
+  .courseCta {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 767px) {
+  .heroGrid {
+    gap: 14px;
+  }
+
+  .welcomeCard,
+  .childrenCard {
+    min-height: 0;
+  }
+
+  .welcomeMain {
+    min-height: 260px;
+  }
+
+  .welcomeFooter {
+    min-height: 84px;
+  }
+
+  .childrenCard {
+    grid-template-rows: auto auto;
+  }
+
+  .imageWrap {
+    min-height: 0;
+  }
+
+  .photo {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .learningContent {
+    padding: 16px 18px 18px;
+  }
 }

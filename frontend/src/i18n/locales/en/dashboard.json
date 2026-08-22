@@ -6,17 +6,24 @@
     "description": "Continue your journey or choose a new adventure.",
     "exploreGames": "Explore games"
   },
+  "learning": {
+    "eyebrow": "Discover",
+    "title": "Learn while having fun",
+    "description": "Courses, games and challenges to grow your math skills.",
+    "exploreCourses": "View courses"
+  },
   "continuePlaying": {
     "heading": "Continue playing",
-    "message": "Choose your first adventure among the games available.",
-    "cta": "Choose a game"
+    "message": "Ready for a new challenge? Take it on and earn rewards!",
+    "cta": "Discover challenges"
   },
   "progress": {
     "heading": "Your progress",
     "gamesStarted": "Games started",
     "challengesCompleted": "Challenges completed",
     "firstTrySuccesses": "First-try successes",
-    "correctedErrors": "Corrected mistakes"
+    "correctedErrors": "Mistakes to revisit",
+    "currentLevel": "Current level"
   },
   "availableGames": {
     "heading": "Available games"
