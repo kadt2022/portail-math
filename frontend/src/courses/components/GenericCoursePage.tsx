@@ -54,7 +54,13 @@ export function GenericCoursePage({
   const { progress } = useCourseProgress(course.id);
   const summary = getCourseProgress(progress, course);
   const primaryAction = getCoursePrimaryAction(progress, course);
-  const publishedCount = modules.reduce((total, module) => total + getPublishedModuleItems(module).length, 0);
+  // Le compteur « leçons disponibles » ne doit annoncer que des leçons : une
+  // évaluation publiée ne doit pas se compter comme une leçon en plus (sinon
+  // le module 1 affiche « 5 leçons » pour 4 leçons + 1 évaluation).
+  const publishedCount = modules.reduce(
+    (total, module) => total + getPublishedModuleItems(module).filter((item) => item.kind === "lesson").length,
+    0,
+  );
 
   return (
     <div className={baseStyles.page}>

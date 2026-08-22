@@ -83,7 +83,16 @@ export function numberToWordsFr(value: number): string {
   const parts: string[] = [];
 
   if (thousands > 0) {
-    parts.push(thousands === 1 ? "mille" : `${frBelowThousand(thousands)} mille`);
+    // « vingt » ne prend jamais de s lorsqu'il est suivi d'un autre nombre :
+    // 80 000 s'écrit "quatre-vingt mille", pas "quatre-vingts mille". Comme
+    // `thousands` est toujours < 100 (5 chiffres au maximum, jamais de
+    // centaine dans ce groupe), seule la valeur exacte 80 déclenche ce "s"
+    // dans `frBelowThousand` (voir le cas `tensDigit === 8` de
+    // `frTensAndUnits`) : on le retire uniquement dans ce cas précis, plutôt
+    // qu'avec une regex qui couperait aussi le "s" final de mots comme
+    // "trois" (63, 83...).
+    const thousandsWord = thousands === 80 ? "quatre-vingt" : frBelowThousand(thousands);
+    parts.push(thousands === 1 ? "mille" : `${thousandsWord} mille`);
   }
   if (rest > 0) {
     parts.push(frBelowThousand(rest));

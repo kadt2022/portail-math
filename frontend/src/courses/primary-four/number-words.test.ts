@@ -20,6 +20,11 @@ describe("numberToWordsFr", () => {
     expect(numberToWordsFr(90000)).toBe("quatre-vingt-dix mille");
   });
 
+  it("n'accorde pas « quatre-vingt » au pluriel quand il précède mille", () => {
+    expect(numberToWordsFr(80000)).toBe("quatre-vingt mille");
+    expect(numberToWordsFr(80638)).toBe("quatre-vingt mille six cent trente-huit");
+  });
+
   it("refuse une valeur hors de 0-99 999", () => {
     expect(() => numberToWordsFr(100000)).toThrow(RangeError);
   });
