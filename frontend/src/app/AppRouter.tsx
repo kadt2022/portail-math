@@ -2,6 +2,9 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
+import { PrimaryFourCoursePage } from "../courses/primary-four/PrimaryFourCoursePage";
+import { PrimaryFourLessonPage } from "../courses/primary-four/PrimaryFourLessonPage";
+import { PrimaryFourModulePage } from "../courses/primary-four/PrimaryFourModulePage";
 import { PrimaryOneCoursePage } from "../courses/primary-one/PrimaryOneCoursePage";
 import { PrimaryOneLessonPage } from "../courses/primary-one/PrimaryOneLessonPage";
 import { PrimaryOneModulePage } from "../courses/primary-one/PrimaryOneModulePage";
@@ -103,6 +106,18 @@ export function AppRouter() {
           <Route
             path="apprentissages/primaire/3/mathematiques/modules/:moduleId/lecons/:lessonId"
             element={<PrimaryThreeLessonPage />}
+          />
+          <Route
+            path="apprentissages/primaire/4/mathematiques"
+            element={<PrimaryFourCoursePage />}
+          />
+          <Route
+            path="apprentissages/primaire/4/mathematiques/modules/:moduleId"
+            element={<PrimaryFourModulePage />}
+          />
+          <Route
+            path="apprentissages/primaire/4/mathematiques/modules/:moduleId/lecons/:lessonId"
+            element={<PrimaryFourLessonPage />}
           />
           {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route
