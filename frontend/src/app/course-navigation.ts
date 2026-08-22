@@ -43,7 +43,7 @@ export const PRIMARY_COURSES: readonly CourseNavigationItem[] = [
     cycle: "primary",
     level: 4,
     route: "/apprentissages/primaire/4/mathematiques",
-    availability: "coming-soon",
+    availability: "available",
   },
   {
     id: "primary-5",

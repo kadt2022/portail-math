@@ -211,11 +211,24 @@ sonar {
         // se ressemblent structurellement. Cible uniquement la détection de
         // duplication (les fichiers restent analysés pour tout le reste :
         // couverture, bugs, failles).
+        // Exclusion ciblée (pas tout frontend/src/courses/**) : uniquement le
+        // socle générique du moteur de leçon (PR #33, récit 4e primaire),
+        // volontairement identique d'un cours à l'autre par construction
+        // (course-scaffold, number-words-base, exercise-kit,
+        // GenericLessonPage). Un détecteur de copier-coller compare ce
+        // nouveau socle à la 3e primaire (non migrée, laissée intacte) et
+        // signale à tort une resemblance structurelle voulue comme
+        // duplication. Les fichiers propres à chaque cours (course-catalogue,
+        // number-words, PrimaryFourLessonPage, content/, blocks/) restent
+        // scannés normalement.
         property 'sonar.cpd.exclusions', [
             'src/main/resources/static/js/game-shell-i18n.js',
             'src/main/resources/static/js/fraction-river-i18n.js',
             'src/main/resources/static/js/multiplication-train-i18n.js',
-            'src/main/resources/static/js/flux-forge-i18n.js'
+            'src/main/resources/static/js/flux-forge-i18n.js',
+            'frontend/src/courses/components/GenericLessonPage.tsx',
+            'frontend/src/courses/course-engine/number-words-base.ts',
+            'frontend/src/courses/components/exercise-kit/**'
         ].join(',')
         property 'sonar.java.binaries', 'build/classes/java/main'
         property 'sonar.java.test.binaries', 'build/classes/java/test'
