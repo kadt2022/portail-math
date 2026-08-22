@@ -6,6 +6,12 @@
     "description": "Continue your journey or choose a new adventure.",
     "exploreGames": "Explore games"
   },
+  "learning": {
+    "eyebrow": "Discover",
+    "title": "Learn while having fun",
+    "description": "Courses, games and challenges to grow your math skills.",
+    "exploreCourses": "View courses"
+  },
   "continuePlaying": {
     "heading": "Continue playing",
     "message": "Choose your first adventure among the games available.",
