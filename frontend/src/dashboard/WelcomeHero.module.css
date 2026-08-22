@@ -13,19 +13,25 @@
 }
 
 .welcomeCard {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 320px;
+  background: var(--pm-brand-dark);
+  color: #fff8ee;
+}
+
+.welcomeMain {
   position: relative;
   display: grid;
   align-items: center;
-  min-height: 320px;
   padding: clamp(28px, 4vw, 42px);
   background:
     radial-gradient(circle at 82% 18%, rgb(255 255 255 / 5%) 0 7%, transparent 8%),
     linear-gradient(145deg, #123f35 0%, var(--pm-brand-dark) 58%, #0d3029 100%);
-  color: #fff8ee;
   isolation: isolate;
 }
 
-.welcomeCard::after {
+.welcomeMain::after {
   content: "";
   position: absolute;
   right: -70px;
@@ -35,6 +41,15 @@
   border-radius: 50%;
   background: radial-gradient(circle, rgb(235 117 40 / 10%) 0%, rgb(235 117 40 / 0%) 72%);
   z-index: 0;
+}
+
+.welcomeFooter {
+  display: flex;
+  align-items: center;
+  min-height: 92px;
+  padding: 18px clamp(28px, 4vw, 42px);
+  background: linear-gradient(180deg, #174f43 0%, #15483d 100%);
+  border-top: 1px solid rgb(255 255 255 / 7%);
 }
 
 .decorations,
@@ -121,20 +136,19 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  margin-top: 22px;
   padding: 0 18px;
   border-radius: 12px;
-  background: #fffaf2;
-  color: var(--pm-brand-dark);
-  font-weight: 800;
+  background: var(--pm-accent);
+  color: #fff;
+  font-weight: 850;
   text-decoration: none;
-  box-shadow: 0 6px 14px rgb(0 0 0 / 8%);
-  transition: transform 160ms ease, background 160ms ease;
+  box-shadow: 0 6px 14px rgb(235 117 40 / 18%);
+  transition: transform 160ms ease, filter 160ms ease;
 }
 
 .cta:hover {
-  background: var(--pm-accent-soft);
   transform: translateY(-2px);
+  filter: brightness(1.04);
 }
 
 .childrenCard {
@@ -254,8 +268,9 @@
     align-items: stretch;
   }
 
-  .welcomeCard {
-    min-height: 330px;
+  .welcomeCard,
+  .childrenCard {
+    min-height: 380px;
   }
 
   .childrenCard {
@@ -280,7 +295,7 @@
 
 @media (max-width: 767px) {
   .welcomeCard {
-    min-height: 300px;
+    min-height: 330px;
   }
 
   .childrenCard {
