@@ -91,7 +91,6 @@ export function ProgressSummary() {
               <StatIcon name={item.icon} />
             </div>
             <div className={styles.statBody}>
-              <p className={styles.value}>—</p>
               <p className={styles.label}>{t(item.key)}</p>
               <div className={styles.track} aria-hidden="true">
                 <span className={styles.trackReady} />
@@ -109,7 +108,6 @@ export function ProgressSummary() {
             <div className={styles.levelTrack} aria-hidden="true">
               <span />
             </div>
-            <p className={styles.xp}>— / — XP</p>
           </div>
         </article>
       </div>
