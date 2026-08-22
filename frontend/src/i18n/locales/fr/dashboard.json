@@ -20,9 +20,15 @@
   "progress": {
     "heading": "Ta progression",
     "gamesStarted": "Jeux commencés",
+    "gamesStartedHint": "Continue comme ça !",
     "challengesCompleted": "Défis terminés",
+    "challengesCompletedHint": "Bravo champion !",
     "firstTrySuccesses": "Réussites au premier essai",
-    "correctedErrors": "Erreurs corrigées"
+    "firstTrySuccessesHint": "Excellent travail !",
+    "correctedErrors": "Erreurs à retravailler",
+    "correctedErrorsHint": "On y arrive !",
+    "currentLevel": "Niveau actuel",
+    "levelName": "Explorateur"
   },
   "availableGames": {
     "heading": "Jeux disponibles"
