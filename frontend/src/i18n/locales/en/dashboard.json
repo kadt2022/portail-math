@@ -20,9 +20,15 @@
   "progress": {
     "heading": "Your progress",
     "gamesStarted": "Games started",
+    "gamesStartedHint": "Keep it up!",
     "challengesCompleted": "Challenges completed",
+    "challengesCompletedHint": "Great job, champion!",
     "firstTrySuccesses": "First-try successes",
-    "correctedErrors": "Corrected mistakes"
+    "firstTrySuccessesHint": "Excellent work!",
+    "correctedErrors": "Mistakes to revisit",
+    "correctedErrorsHint": "You're getting there!",
+    "currentLevel": "Current level",
+    "levelName": "Explorer"
   },
   "availableGames": {
     "heading": "Available games"
