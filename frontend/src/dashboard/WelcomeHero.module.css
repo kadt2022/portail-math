@@ -16,7 +16,9 @@
   display: grid;
   grid-template-rows: auto auto;
   min-height: 320px;
-  background: var(--pm-brand-dark);
+  background:
+    var(--pm-brand-dark)
+    url("../assets/turbo-pulse/welcome-hero.webp") center 48% / cover no-repeat;
   color: #fff8ee;
 }
 
@@ -25,9 +27,12 @@
   display: grid;
   align-items: center;
   padding: clamp(28px, 4vw, 42px);
-  background:
-    radial-gradient(circle at 82% 18%, rgb(255 255 255 / 5%) 0 7%, transparent 8%),
-    linear-gradient(145deg, #123f35 0%, var(--pm-brand-dark) 58%, #0d3029 100%);
+  background: linear-gradient(
+    90deg,
+    rgb(7 48 40 / 97%) 0%,
+    rgb(7 48 40 / 92%) 48%,
+    rgb(7 48 40 / 54%) 100%
+  );
   isolation: isolate;
 }
 
@@ -47,51 +52,17 @@
   display: flex;
   align-items: center;
   padding: 18px clamp(28px, 4vw, 42px);
-  background: linear-gradient(180deg, #174f43 0%, #15483d 100%);
+  background: linear-gradient(
+    90deg,
+    rgb(23 79 67 / 97%) 0%,
+    rgb(21 72 61 / 94%) 55%,
+    rgb(21 72 61 / 76%) 100%
+  );
   border-top: 1px solid rgb(255 255 255 / 7%);
 }
 
-.decorations,
 .imageDecorations {
   pointer-events: none;
-}
-
-.decorations span {
-  position: absolute;
-  z-index: 1;
-  color: rgb(255 248 238 / 8%);
-  font-weight: 900;
-  user-select: none;
-}
-
-.decorPlus {
-  top: 17%;
-  right: 28%;
-  font-size: 2rem;
-}
-
-.decorCircle {
-  top: 14%;
-  right: 15%;
-  font-size: 2.2rem;
-}
-
-.decorTriangle {
-  top: 34%;
-  right: 8%;
-  font-size: 2rem;
-}
-
-.decorCube {
-  right: 17%;
-  bottom: 24%;
-  font-size: 2rem;
-}
-
-.decorBars {
-  right: 29%;
-  bottom: 12%;
-  font-size: 1.8rem;
 }
 
 .content {
@@ -259,7 +230,7 @@
 
 @media (min-width: 768px) {
   .heroGrid {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     gap: 24px;
     align-items: stretch;
   }
@@ -316,6 +287,12 @@
 
   .welcomeMain {
     min-height: 260px;
+    background: linear-gradient(
+      90deg,
+      rgb(7 48 40 / 97%) 0%,
+      rgb(7 48 40 / 91%) 62%,
+      rgb(7 48 40 / 62%) 100%
+    );
   }
 
   .welcomeFooter {

@@ -7,32 +7,6 @@ export function WelcomeHero() {
 
   return (
     <section className={styles.heroGrid} aria-label={t("welcome.eyebrow")}>
-      <div className={styles.welcomeCard}>
-        <div className={styles.welcomeMain}>
-          <div className={styles.decorations} aria-hidden="true">
-            <span className={styles.decorPlus}>+</span>
-            <span className={styles.decorCircle}>◔</span>
-            <span className={styles.decorTriangle}>△</span>
-            <span className={styles.decorCube}>◇</span>
-            <span className={styles.decorBars}>▥</span>
-          </div>
-
-          <div className={styles.content}>
-            <p className={styles.eyebrow}>{t("welcome.eyebrow")}</p>
-            <h1 className={styles.title}>
-              {t("welcome.titleLine1")} <span>{t("welcome.titleLine2")}</span>
-            </h1>
-            <p className={styles.lead}>{t("welcome.description")}</p>
-          </div>
-        </div>
-
-        <div className={styles.welcomeFooter}>
-          <a className={styles.cta} href="#jeux-disponibles">
-            {t("welcome.exploreGames")} <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </div>
-
       <article className={styles.childrenCard}>
         <div className={styles.imageWrap}>
           <img className={styles.photo} src="/images/enfants-revision.webp" alt="" />
@@ -54,6 +28,24 @@ export function WelcomeHero() {
           </a>
         </div>
       </article>
+
+      <div className={styles.welcomeCard}>
+        <div className={styles.welcomeMain}>
+          <div className={styles.content}>
+            <p className={styles.eyebrow}>{t("welcome.eyebrow")}</p>
+            <h1 className={styles.title}>
+              {t("welcome.titleLine1")} <span>{t("welcome.titleLine2")}</span>
+            </h1>
+            <p className={styles.lead}>{t("welcome.description")}</p>
+          </div>
+        </div>
+
+        <div className={styles.welcomeFooter}>
+          <a className={styles.cta} href="#jeux-disponibles">
+            {t("welcome.exploreGames")} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
