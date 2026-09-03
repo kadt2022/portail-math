@@ -2,20 +2,17 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  /* Pas de marge en bas : la présentation qui suit doit toucher les cartes,
-     pas flotter après un vide qui casse la continuité. */
   margin: 20px 0 0;
 }
 
 .welcomeCard,
 .childrenCard {
   overflow: hidden;
+  box-sizing: border-box;
   border-radius: 28px;
   box-shadow: var(--pm-shadow-lg);
 }
 
-/* Mouvement volontairement discret au survol de la carte photo : elle
-   grandit à peine (1.5 %), presque imperceptible, plutôt que l'image seule. */
 .childrenCard {
   transition: transform 220ms ease;
 }
@@ -26,7 +23,7 @@
 
 .welcomeCard {
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   min-height: 320px;
   background:
     var(--pm-brand-dark)
@@ -37,8 +34,11 @@
 .welcomeMain {
   position: relative;
   display: grid;
+  min-width: 0;
+  min-height: 0;
   align-items: center;
-  padding: clamp(28px, 4vw, 42px);
+  box-sizing: border-box;
+  padding: clamp(24px, 2.6vw, 34px);
   background: linear-gradient(
     90deg,
     rgb(7 48 40 / 97%) 0%,
@@ -61,9 +61,14 @@
 }
 
 .welcomeFooter {
+  position: relative;
+  z-index: 3;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  padding: 18px clamp(28px, 4vw, 42px);
+  min-height: 88px;
+  box-sizing: border-box;
+  padding: 16px clamp(24px, 2.6vw, 34px);
   background: linear-gradient(
     90deg,
     rgb(23 79 67 / 97%) 0%,
@@ -80,7 +85,8 @@
 .content {
   position: relative;
   z-index: 2;
-  max-width: 430px;
+  min-width: 0;
+  max-width: 460px;
 }
 
 .eyebrow {
@@ -93,8 +99,8 @@
 }
 
 .title {
-  margin: 10px 0 14px;
-  font-size: clamp(2.35rem, 4.8vw, 3.55rem);
+  margin: 8px 0 12px;
+  font-size: clamp(2.2rem, 3.5vw, 3.2rem);
   line-height: 0.98;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -108,13 +114,15 @@
 .lead {
   max-width: 42ch;
   margin: 0;
-  color: rgb(255 250 238 / 86%);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgb(255 250 238 / 88%);
+  font-size: 15px;
+  line-height: 1.42;
+  overflow-wrap: break-word;
 }
 
 .cta {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 8px;
   min-height: 44px;
@@ -144,6 +152,7 @@
 .imageWrap {
   position: relative;
   overflow: hidden;
+  min-width: 0;
   background: linear-gradient(135deg, #3428a8, #0da7b5);
 }
 
@@ -189,8 +198,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
+  gap: 18px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 16px 20px;
   background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
 }
 
@@ -219,6 +230,7 @@
 
 .courseCta {
   display: inline-flex;
+  flex: 0 0 auto;
   justify-content: center;
   align-items: center;
   gap: 7px;
@@ -240,7 +252,7 @@
   filter: brightness(1.04);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 901px) {
   .heroGrid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px;
@@ -249,64 +261,91 @@
 
   .welcomeCard,
   .childrenCard {
-    height: 320px;
-    min-height: 320px;
+    height: 380px;
+    min-height: 380px;
   }
 
-  .welcomeCard,
   .childrenCard {
-    grid-template-rows: 160px 160px;
+    grid-template-rows: 270px 110px;
   }
 
-  .welcomeMain,
+  .welcomeCard {
+    grid-template-rows: 292px 88px;
+  }
+
   .imageWrap {
-    min-height: 160px;
-  }
-
-  .welcomeFooter,
-  .learningContent {
-    min-height: 110px;
-    box-sizing: border-box;
+    min-height: 270px;
   }
 
   .photo {
     width: 100%;
-    height: 160px;
+    height: 270px;
     object-fit: cover;
     object-position: center 52%;
   }
+
+  .learningContent {
+    min-height: 110px;
+  }
 }
 
-@media (max-width: 900px) {
+@media (min-width: 768px) and (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .welcomeCard,
+  .childrenCard {
+    height: 410px;
+    min-height: 410px;
+  }
+
+  .childrenCard {
+    grid-template-rows: 240px 170px;
+  }
+
+  .welcomeCard {
+    grid-template-rows: 322px 88px;
+  }
+
+  .imageWrap {
+    min-height: 240px;
+  }
+
+  .photo {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    object-position: center 52%;
+  }
+
   .learningContent {
     grid-template-columns: 1fr;
+    align-content: center;
+    gap: 12px;
+    min-height: 170px;
   }
 
   .courseCta {
     justify-self: start;
   }
-}
 
-/* Entre 768 et 900px, le pied de la carte photo passe sur une colonne
-   (règle ci-dessus) : le texte plus le bouton empilés dépassent les 110px
-   fixés pour l'écran large, et « Voir les cours » se retrouvait coupé. On
-   agrandit donc le second rang des deux cartes ensemble, pour qu'elles
-   restent de même hauteur. */
-@media (min-width: 768px) and (max-width: 900px) {
-  .welcomeCard,
-  .childrenCard {
-    height: 330px;
-    min-height: 330px;
+  .welcomeMain {
+    padding: 22px 24px;
   }
 
-  .welcomeCard,
-  .childrenCard {
-    grid-template-rows: 160px 170px;
+  .title {
+    font-size: clamp(2rem, 4.2vw, 2.55rem);
   }
 
-  .welcomeFooter,
-  .learningContent {
-    min-height: 170px;
+  .lead {
+    font-size: 14px;
+  }
+
+  .welcomeFooter {
+    padding-inline: 24px;
   }
 }
 
@@ -322,6 +361,7 @@
 
   .welcomeMain {
     min-height: 260px;
+    padding: 26px 22px;
     background: linear-gradient(
       90deg,
       rgb(7 48 40 / 97%) 0%,
@@ -330,8 +370,13 @@
     );
   }
 
+  .title {
+    font-size: clamp(2.1rem, 11vw, 3rem);
+  }
+
   .welcomeFooter {
-    min-height: 84px;
+    min-height: 78px;
+    padding: 14px 22px;
   }
 
   .childrenCard {
@@ -351,6 +396,26 @@
   }
 
   .learningContent {
+    grid-template-columns: 1fr;
+    gap: 12px;
     padding: 16px 18px 18px;
+  }
+
+  .courseCta {
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .childrenCard,
+  .cta,
+  .courseCta {
+    transition: none;
+  }
+
+  .childrenCard:hover,
+  .cta:hover,
+  .courseCta:hover {
+    transform: none;
   }
 }

@@ -77,17 +77,6 @@ export function AboutMbuyamba() {
           <p className={styles.yambaText}>{t("about.yamba.text")}</p>
         </div>
       </article>
-
-      <p className={styles.conclusion}>{t("about.conclusion")}</p>
-
-      <div className={styles.ctas}>
-        <a className={`${styles.cta} ${styles.ctaPrimary}`} href="/app/apprentissages/primaire/1/mathematiques">
-          {t("about.ctaCourses")} <span aria-hidden="true">→</span>
-        </a>
-        <a className={`${styles.cta} ${styles.ctaSecondary}`} href="#jeux-disponibles">
-          {t("about.ctaGames")} <span aria-hidden="true">→</span>
-        </a>
-      </div>
     </section>
   );
 }
