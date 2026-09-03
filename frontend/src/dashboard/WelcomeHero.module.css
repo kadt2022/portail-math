@@ -140,6 +140,14 @@
   width: 100%;
   height: auto;
   object-fit: contain;
+  transition: transform 220ms ease;
+}
+
+/* Léger gonflement au survol de la carte, comme sur les vignettes de jeux :
+   la photo réagit même si elle ne mène nulle part directement, ce qui rend
+   la carte plus vivante au passage de la souris. */
+.childrenCard:hover .photo {
+  transform: scale(1.05);
 }
 
 .photoGlow {

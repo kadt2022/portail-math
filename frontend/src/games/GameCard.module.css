@@ -26,6 +26,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 220ms ease;
+}
+
+/* L'image gonfle légèrement au survol de la carte entière : un repère de
+   plus, en plus de l'ombre et du décollement, pour signaler qu'elle est
+   cliquable. */
+.card:hover .illustration svg,
+.card:hover .photo {
+  transform: scale(1.06);
 }
 
 .badge {
