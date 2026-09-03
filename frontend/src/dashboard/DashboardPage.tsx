@@ -2,9 +2,9 @@ import { useTranslation } from "react-i18next";
 
 import { gameCatalogue } from "../games/game-catalogue";
 import { GameCard } from "../games/GameCard";
+import { AboutMbuyamba } from "./AboutMbuyamba";
 import { ContinuePlaying } from "./ContinuePlaying";
 import styles from "./DashboardPage.module.css";
-import { LearningJourney } from "./LearningJourney";
 import { ProgressSummary } from "./ProgressSummary";
 import { UpcomingGames } from "./UpcomingGames";
 import { WelcomeHero } from "./WelcomeHero";
@@ -15,7 +15,7 @@ export function DashboardPage() {
   return (
     <div className={styles.page}>
       <WelcomeHero />
-      <LearningJourney />
+      <AboutMbuyamba />
       <ProgressSummary />
       <ContinuePlaying />
 

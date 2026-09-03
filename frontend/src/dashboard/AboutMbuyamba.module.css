@@ -1,0 +1,263 @@
+/* Prolongement du hero, pas une section à part : pas de fond ni de bordure
+   propres à `.about` — tout repose sur le crème de la page, comme les deux
+   cartes juste au-dessus. */
+.about {
+  position: relative;
+  margin: 10px 0 40px;
+}
+
+.signs {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.signs span {
+  position: absolute;
+  color: rgb(23 73 63 / 8%);
+  font-weight: 900;
+}
+
+.signs span:nth-child(1) {
+  top: 0;
+  right: 60px;
+  font-size: 2.6rem;
+}
+
+.signs span:nth-child(2) {
+  top: 70px;
+  right: 0;
+  font-size: 2rem;
+  color: rgb(226 118 43 / 12%);
+}
+
+.signs span:nth-child(3) {
+  top: 130px;
+  right: 90px;
+  font-size: 1.6rem;
+}
+
+.intro {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+}
+
+.title {
+  margin: 0 0 8px;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.tagline {
+  max-width: 46ch;
+  margin: 0 0 14px;
+  color: var(--pm-accent-dark);
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.description {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--pm-ink-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.features {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 28px 0 16px;
+}
+
+.feature {
+  padding: 20px 22px;
+  border-radius: 24px 8px 24px 8px;
+}
+
+.featureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  border-radius: var(--pm-radius-signature);
+  font-size: 21px;
+}
+
+.featureTitle {
+  margin: 0 0 6px;
+  color: var(--pm-brand-dark);
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+}
+
+.featureText {
+  margin: 0;
+  color: rgb(15 51 43 / 68%);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.featureLevel {
+  background: linear-gradient(150deg, #fff 0%, var(--pm-accent-soft) 140%);
+}
+
+.featureLevel .featureIcon {
+  background: linear-gradient(145deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
+}
+
+.featurePlay {
+  background: linear-gradient(150deg, #fff 0%, var(--pm-success-soft) 140%);
+}
+
+.featurePlay .featureIcon {
+  background: linear-gradient(145deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+}
+
+.featureProgress {
+  background: linear-gradient(150deg, #fff 0%, var(--pm-surface-warm) 140%);
+}
+
+.featureProgress .featureIcon {
+  background: linear-gradient(145deg, #ffbd35 0%, #f39b12 100%);
+}
+
+/* Yamba n'est pas un quatrième avantage comme les autres : une bande à part,
+   plus large, dans une couleur qui n'appartient qu'à lui. */
+.yamba {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 26px;
+  padding: 20px 24px;
+  border-radius: 30px 10px 30px 10px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7a43df 55%, #5f2fc4 100%);
+  box-shadow: 0 14px 30px rgb(101 40 201 / 22%);
+}
+
+.yamba .featureTitle {
+  color: #fff;
+}
+
+.yamba .featureText {
+  color: rgb(255 255 255 / 82%);
+}
+
+.yambaAvatar {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 30%);
+}
+
+.conclusion {
+  max-width: 52ch;
+  margin: 0 0 24px;
+  color: var(--pm-brand-dark);
+  font-size: 18px;
+  font-weight: 750;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.ctas {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cta span {
+  transition: transform 180ms ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+}
+
+.cta:hover span {
+  transform: translateX(4px);
+}
+
+.ctaPrimary {
+  background: linear-gradient(140deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
+  box-shadow: 0 10px 22px rgb(226 118 43 / 26%);
+}
+
+.ctaSecondary {
+  background: linear-gradient(140deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+  box-shadow: 0 10px 22px rgb(23 73 63 / 26%);
+}
+
+@media (min-width: 700px) {
+  .features {
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 18px;
+  }
+
+  /* Le carré « jouer » respire un peu plus : c'est ce qui distingue
+     Mbuyamba d'un simple recueil de cours. */
+  .featurePlay {
+    margin-top: -12px;
+    padding: 24px 24px 28px;
+  }
+}
+
+@media (max-width: 699px) {
+  .yamba {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .conclusion {
+    font-size: 16px;
+  }
+
+  .cta {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .signs span:nth-child(1) {
+    right: 10px;
+    font-size: 2rem;
+  }
+
+  .signs span:nth-child(2),
+  .signs span:nth-child(3) {
+    display: none;
+  }
+}

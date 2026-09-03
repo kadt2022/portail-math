@@ -12,22 +12,31 @@
     "description": "Cours, jeux et défis pour progresser en mathématiques.",
     "exploreCourses": "Voir les cours"
   },
-  "journey": {
-    "heading": "De l’apprentissage au jeu, avec Yamba",
-    "learn": {
-      "label": "Apprendre",
-      "step1": "Découvrir une notion",
-      "step2": "S’entraîner"
+  "about": {
+    "title": "Mbuyamba Education, c’est quoi ?",
+    "tagline": "Une plateforme éducative interactive qui transforme l’apprentissage en expérience.",
+    "description": "Mbuyamba Education réunit des cours structurés, des exercices interactifs, des jeux pédagogiques et un suivi de progression dans un même espace. L’élève apprend une notion, la met en pratique, joue pour la renforcer et voit ses progrès au fil du temps.",
+    "features": {
+      "level": {
+        "title": "Apprendre à son niveau",
+        "text": "Des parcours organisés par classe pour avancer progressivement et consolider les notions essentielles."
+      },
+      "play": {
+        "title": "Apprendre aussi en jouant",
+        "text": "Les mathématiques deviennent des aventures, des défis et des situations à résoudre plutôt qu’une succession d’exercices."
+      },
+      "progress": {
+        "title": "Comprendre ses progrès",
+        "text": "L’élève voit ce qu’il a commencé, ce qu’il maîtrise et les difficultés qu’il doit encore retravailler."
+      }
     },
-    "play": {
-      "label": "Jouer",
-      "step1": "Choisir un jeu",
-      "step2": "Mettre en pratique"
+    "yamba": {
+      "title": "Être accompagné",
+      "text": "Yamba guide, encourage et aide l’élève lorsqu’il en a besoin."
     },
-    "convergence": {
-      "text": "Les deux chemins mènent au même endroit : ta progression, suivie par Yamba.",
-      "cta": "Voir ma progression"
-    }
+    "conclusion": "Chez Mbuyamba, apprendre, pratiquer et jouer font partie de la même aventure.",
+    "ctaCourses": "Découvrir les cours",
+    "ctaGames": "Découvrir les défis"
   },
   "continuePlaying": {
     "heading": "Continuer à jouer",
