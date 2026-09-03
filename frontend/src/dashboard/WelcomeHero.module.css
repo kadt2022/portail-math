@@ -60,11 +60,8 @@
 
 .welcomeFooter {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 10px;
-  padding: 16px clamp(28px, 4vw, 42px);
+  align-items: center;
+  padding: 18px clamp(28px, 4vw, 42px);
   background: linear-gradient(
     90deg,
     rgb(23 79 67 / 97%) 0%,
@@ -72,17 +69,6 @@
     rgb(21 72 61 / 76%) 100%
   );
   border-top: 1px solid rgb(255 255 255 / 7%);
-}
-
-/* Court argumentaire au-dessus du bouton : ce que Mbuyamba Education
-   apporte vraiment (cours qui suivent le niveau, jeux qui donnent envie de
-   continuer), pas un slogan vide. */
-.pitch {
-  max-width: 46ch;
-  margin: 0;
-  color: rgb(255 250 238 / 78%);
-  font-size: 13px;
-  line-height: 1.45;
 }
 
 .imageDecorations {
@@ -200,10 +186,7 @@
 .learningContent {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  /* Aligné en bas plutôt qu'au centre : avec les repères en plus, le bloc de
-     texte est maintenant plus haut que le bouton, qui flottait sinon au
-     milieu au lieu de suivre la dernière ligne. */
-  align-items: end;
+  align-items: center;
   gap: 16px;
   padding: 14px 18px;
   background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
@@ -230,27 +213,6 @@
   color: rgb(15 51 43 / 70%);
   font-size: 13px;
   line-height: 1.4;
-}
-
-/* Trois repères concrets plutôt qu'un slogan : ce que la carte promet, la
-   carte le tient (cours réels par niveau, jeux réels, progression réelle). */
-.featureList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.featureList li {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--pm-success-soft);
-  color: var(--pm-brand-dark);
-  font-size: 11px;
-  font-weight: 750;
-  white-space: nowrap;
 }
 
 .courseCta {
@@ -285,13 +247,13 @@
 
   .welcomeCard,
   .childrenCard {
-    height: 440px;
-    min-height: 440px;
+    height: 380px;
+    min-height: 380px;
   }
 
   .welcomeCard,
   .childrenCard {
-    grid-template-rows: 270px 170px;
+    grid-template-rows: 270px 110px;
   }
 
   .welcomeMain,
@@ -301,7 +263,7 @@
 
   .welcomeFooter,
   .learningContent {
-    min-height: 170px;
+    min-height: 110px;
     box-sizing: border-box;
   }
 
@@ -324,24 +286,25 @@
 }
 
 /* Entre 768 et 900px, le pied de la carte photo passe sur une colonne
-   (règle ci-dessus) : le texte, les repères et le bouton empilés dépassent
-   le rang fixé pour l'écran large. On agrandit donc le second rang des
-   deux cartes ensemble, pour qu'elles restent de même hauteur. */
+   (règle ci-dessus) : le texte plus le bouton empilés dépassent les 110px
+   fixés pour l'écran large, et « Voir les cours » se retrouvait coupé. On
+   agrandit donc le second rang des deux cartes ensemble, pour qu'elles
+   restent de même hauteur. */
 @media (min-width: 768px) and (max-width: 900px) {
   .welcomeCard,
   .childrenCard {
-    height: 500px;
-    min-height: 500px;
+    height: 420px;
+    min-height: 420px;
   }
 
   .welcomeCard,
   .childrenCard {
-    grid-template-rows: 270px 230px;
+    grid-template-rows: 270px 150px;
   }
 
   .welcomeFooter,
   .learningContent {
-    min-height: 230px;
+    min-height: 150px;
   }
 }
 

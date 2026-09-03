@@ -4,18 +4,12 @@
     "titleLine1": "Welcome,",
     "titleLine2": "explorer!",
     "description": "Continue your journey or choose a new adventure.",
-    "pitch": "Built for primary school: courses that follow your child's level, games that make them want to keep going.",
     "exploreGames": "Explore games"
   },
   "learning": {
     "eyebrow": "Discover",
     "title": "Learn while having fun",
     "description": "Courses, games and challenges to grow your math skills.",
-    "features": {
-      "courses": "Courses by grade",
-      "games": "Interactive games",
-      "progress": "Progress tracking"
-    },
     "exploreCourses": "View courses"
   },
   "continuePlaying": {
