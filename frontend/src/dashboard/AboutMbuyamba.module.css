@@ -1,63 +1,29 @@
 /* Prolongement du hero, pas une section à part : pas de fond ni de bordure
    propres à `.about` — tout repose sur le crème de la page, comme les deux
-   cartes juste au-dessus. */
+   cartes juste au-dessus. Deux couleurs seulement (vert et orange, celles du
+   hero) : pas de troisième ou quatrième teinte ajoutée pour faire varier les
+   blocs. */
 .about {
   position: relative;
-  /* Aucun espace au-dessus : cette zone doit toucher les deux cartes du
-     hero, pas flotter en dessous après un vide. */
   margin: 0 0 40px;
-  padding-top: 22px;
-}
-
-/* Nappe chaude très douce derrière l'intro : un dégradé, pas un rectangle —
-   aucun bord visible, elle se fond dans le crème de la page. */
-.wash {
-  position: absolute;
-  top: -20px;
-  right: 0;
-  left: 0;
-  z-index: 0;
-  height: 320px;
-  background: radial-gradient(60% 100% at 22% 0%, rgb(252 227 205 / 75%) 0%, rgb(252 227 205 / 0%) 100%);
-  pointer-events: none;
-}
-
-.doodleArrow,
-.doodleStar,
-.doodlePlus {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
+  padding-top: 26px;
 }
 
 .doodleArrow {
-  top: -4px;
+  position: absolute;
+  z-index: 0;
+  top: 2px;
   left: 2px;
-  width: 46px;
-  height: 46px;
-}
-
-.doodleStar {
-  top: 108px;
-  right: 6%;
-  width: 26px;
-  height: 26px;
-  opacity: 0.85;
-}
-
-.doodlePlus {
-  top: 40px;
-  right: 20%;
-  width: 20px;
-  height: 20px;
-  opacity: 0.8;
+  width: 42px;
+  height: 42px;
+  pointer-events: none;
 }
 
 .intro {
   position: relative;
   z-index: 1;
   max-width: 640px;
-  padding-left: 56px;
+  padding-left: 54px;
 }
 
 .title {
@@ -87,33 +53,54 @@
   line-height: 1.6;
 }
 
+/* Une liste, pas une grille de cartes colorées : les trois avantages
+   partagent le même fond (transparent) et ne se distinguent que par leur
+   icône. Un filet ténu les sépare au lieu d'une mosaïque de blocs. */
 .features {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
-  margin: 28px 0 16px;
+  gap: 22px;
+  margin: 32px 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--pm-line);
+  border-bottom: 1px solid var(--pm-line);
+  list-style: none;
 }
 
 .feature {
-  padding: 20px 22px;
-  border-radius: 24px 8px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .featureIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 12px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--pm-radius-signature);
-  font-size: 21px;
+  color: #fff;
+}
+
+.featureIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.orange {
+  background: linear-gradient(145deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
+}
+
+.green {
+  background: linear-gradient(145deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
 }
 
 .featureTitle {
-  margin: 0 0 6px;
+  margin: 0;
   color: var(--pm-brand-dark);
   font-size: 16px;
   font-weight: 850;
@@ -122,37 +109,13 @@
 
 .featureText {
   margin: 0;
-  color: rgb(15 51 43 / 68%);
+  color: var(--pm-ink-soft);
   font-size: 13.5px;
   line-height: 1.5;
 }
 
-.featureLevel {
-  background: linear-gradient(150deg, #fff 0%, var(--pm-accent-soft) 140%);
-}
-
-.featureLevel .featureIcon {
-  background: linear-gradient(145deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
-}
-
-.featurePlay {
-  background: linear-gradient(150deg, #fff 0%, var(--pm-success-soft) 140%);
-}
-
-.featurePlay .featureIcon {
-  background: linear-gradient(145deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
-}
-
-.featureProgress {
-  background: linear-gradient(150deg, #fff 0%, var(--pm-surface-warm) 140%);
-}
-
-.featureProgress .featureIcon {
-  background: linear-gradient(145deg, #ffbd35 0%, #f39b12 100%);
-}
-
-/* Yamba n'est pas un quatrième avantage comme les autres : une bande à part,
-   plus large, dans une couleur qui n'appartient qu'à lui. */
+/* Yamba prolonge la carte verte du hero, pas une couleur inventée pour
+   l'occasion. */
 .yamba {
   position: relative;
   z-index: 1;
@@ -161,26 +124,32 @@
   gap: 18px;
   margin: 0 0 26px;
   padding: 20px 24px;
-  border-radius: 30px 10px 30px 10px;
-  background: linear-gradient(135deg, #8b5cf6 0%, #7a43df 55%, #5f2fc4 100%);
-  box-shadow: 0 14px 30px rgb(101 40 201 / 22%);
-}
-
-.yamba .featureTitle {
-  color: #fff;
-}
-
-.yamba .featureText {
-  color: rgb(255 255 255 / 82%);
+  border-radius: 28px 10px 28px 10px;
+  background: linear-gradient(120deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+  box-shadow: 0 14px 30px rgb(15 51 43 / 20%);
 }
 
 .yambaAvatar {
   flex: 0 0 auto;
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 0 3px rgb(255 255 255 / 30%);
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 24%);
+}
+
+.yambaTitle {
+  margin: 0 0 3px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.yambaText {
+  margin: 0;
+  color: rgb(255 255 255 / 78%);
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 
 .conclusion {
@@ -238,23 +207,14 @@
 
 @media (min-width: 700px) {
   .features {
-    grid-template-columns: 1fr 1.15fr 1fr;
-    gap: 18px;
-  }
-
-  /* Le carré « jouer » respire un peu plus : c'est ce qui distingue
-     Mbuyamba d'un simple recueil de cours. */
-  .featurePlay {
-    margin-top: -12px;
-    padding: 24px 24px 28px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
   }
 }
 
 @media (max-width: 699px) {
-  .yamba {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+  .intro {
+    padding-left: 44px;
   }
 
   .conclusion {
@@ -264,26 +224,5 @@
   .cta {
     flex: 1 1 auto;
     justify-content: center;
-  }
-
-  .intro {
-    padding-left: 44px;
-  }
-
-  .doodleArrow {
-    width: 36px;
-    height: 36px;
-  }
-
-  .doodlePlus {
-    display: none;
-  }
-
-  /* `top` fixe plutôt que `bottom` : `.about` inclut toute la section (bien
-     plus haute que l'intro sur mobile) — ancrer par le bas plaçait l'étoile
-     près des CTA, hors de vue au bon endroit. */
-  .doodleStar {
-    top: 300px;
-    right: 8%;
   }
 }

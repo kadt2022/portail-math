@@ -12,39 +12,48 @@ function ArrowDoodle() {
   );
 }
 
-function StarDoodle() {
+function BookIcon() {
   return (
-    <svg className={styles.doodleStar} viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M12 2 L14.4 8.6 L21.5 9.2 L16 13.8 L17.8 20.8 L12 16.9 L6.2 20.8 L8 13.8 L2.5 9.2 L9.6 8.6 Z"
-        fill="#f4a019"
-      />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17H7.5A2.5 2.5 0 0 0 5 21.5z" />
+      <path d="M5 4.5v17" />
+      <path d="M9 7h6" />
     </svg>
   );
 }
 
-function PlusDoodle() {
+function ControllerIcon() {
   return (
-    <svg className={styles.doodlePlus} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z" fill="#4f8fe0" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2.5" y="8" width="19" height="10" rx="5" />
+      <path d="M7 11v4" />
+      <path d="M5 13h4" />
+      <circle cx="15.5" cy="11.5" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="14" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function TrendIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 17 9 11 13 15 21 6" />
+      <path d="M15 6h6v6" />
     </svg>
   );
 }
 
 // Présentation du produit, pas une fiche technique : ce que Mbuyamba
 // Education est et pourquoi un élève a envie d'y rester. Prolonge
-// visuellement les deux cartes du hero (mêmes couleurs, mêmes rayons
-// asymétriques) sans reprendre leur forme — pas de rectangle blanc
-// centré, pas de grille de quatre cases identiques.
+// visuellement les deux cartes du hero : mêmes deux couleurs (vert et
+// orange, rien d'autre), même rayon asymétrique — pas une mosaïque de
+// cartes de couleurs différentes.
 export function AboutMbuyamba() {
   const { t } = useTranslation("dashboard");
 
   return (
     <section className={styles.about} aria-labelledby="a-propos-titre">
-      <div className={styles.wash} aria-hidden="true" />
       <ArrowDoodle />
-      <StarDoodle />
-      <PlusDoodle />
 
       <div className={styles.intro}>
         <h2 id="a-propos-titre" className={styles.title}>
@@ -54,37 +63,37 @@ export function AboutMbuyamba() {
         <p className={styles.description}>{t("about.description")}</p>
       </div>
 
-      <div className={styles.features}>
-        <article className={`${styles.feature} ${styles.featureLevel}`}>
-          <span className={styles.featureIcon} aria-hidden="true">
-            📚
+      <ul className={styles.features}>
+        <li className={styles.feature}>
+          <span className={`${styles.featureIcon} ${styles.orange}`} aria-hidden="true">
+            <BookIcon />
           </span>
           <h3 className={styles.featureTitle}>{t("about.features.level.title")}</h3>
           <p className={styles.featureText}>{t("about.features.level.text")}</p>
-        </article>
+        </li>
 
-        <article className={`${styles.feature} ${styles.featurePlay}`}>
-          <span className={styles.featureIcon} aria-hidden="true">
-            🎮
+        <li className={styles.feature}>
+          <span className={`${styles.featureIcon} ${styles.green}`} aria-hidden="true">
+            <ControllerIcon />
           </span>
           <h3 className={styles.featureTitle}>{t("about.features.play.title")}</h3>
           <p className={styles.featureText}>{t("about.features.play.text")}</p>
-        </article>
+        </li>
 
-        <article className={`${styles.feature} ${styles.featureProgress}`}>
-          <span className={styles.featureIcon} aria-hidden="true">
-            📈
+        <li className={styles.feature}>
+          <span className={`${styles.featureIcon} ${styles.orange}`} aria-hidden="true">
+            <TrendIcon />
           </span>
           <h3 className={styles.featureTitle}>{t("about.features.progress.title")}</h3>
           <p className={styles.featureText}>{t("about.features.progress.text")}</p>
-        </article>
-      </div>
+        </li>
+      </ul>
 
       <article className={styles.yamba}>
         <img className={styles.yambaAvatar} src={yambaHead} alt="" />
         <div>
-          <h3 className={styles.featureTitle}>{t("about.yamba.title")}</h3>
-          <p className={styles.featureText}>{t("about.yamba.text")}</p>
+          <h3 className={styles.yambaTitle}>{t("about.yamba.title")}</h3>
+          <p className={styles.yambaText}>{t("about.yamba.text")}</p>
         </div>
       </article>
 
