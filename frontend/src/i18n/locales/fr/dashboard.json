@@ -1,10 +1,11 @@
 {
   "welcome": {
-    "eyebrow": "Mbuyamba Math",
+    "eyebrow": "Mbuyamba Education",
     "titleLine1": "Bonjour,",
     "titleLine2": "explorateur !",
     "description": "Choisis une aventure ou continue celle que tu as déjà commencée.",
-    "exploreGames": "Voir les jeux"
+    "exploreGames": "Découvrir les défis",
+    "yambaTip": "Yamba est là pour t’accompagner !"
   },
   "learning": {
     "eyebrow": "À découvrir",
