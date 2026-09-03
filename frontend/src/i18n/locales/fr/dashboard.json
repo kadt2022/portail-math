@@ -1,10 +1,21 @@
 {
   "welcome": {
     "eyebrow": "Mbuyamba Math",
-    "titleLine1": "Bonjour,",
+    "greeting": {
+      "morning": "Bonjour,",
+      "afternoon": "Bon après-midi,",
+      "evening": "Bonsoir,"
+    },
     "titleLine2": "explorateur !",
     "description": "Choisis une aventure ou continue celle que tu as déjà commencée.",
-    "exploreGames": "Voir les jeux"
+    "exploreGames": "Voir les jeux",
+    "yambaTip": "Yamba t’accompagne, un défi à la fois."
+  },
+  "quickAccess": {
+    "heading": "Aller directement à",
+    "courses": "Les cours",
+    "games": "Les jeux",
+    "progress": "Ma progression"
   },
   "learning": {
     "eyebrow": "À découvrir",
@@ -12,13 +23,28 @@
     "description": "Cours, jeux et défis pour progresser en mathématiques.",
     "exploreCourses": "Voir les cours"
   },
+  "dailyChallenge": {
+    "kicker": "Défi du jour",
+    "heading": "Ton calcul éclair",
+    "hint": "Un nouveau calcul chaque jour. Rien n’est noté : réessaie autant de fois que tu veux.",
+    "inputLabel": "Ta réponse",
+    "check": "Vérifier",
+    "retry": "Réessayer",
+    "correct": "Bravo, c’est exact !",
+    "wrong": "Presque ! Recompte doucement, puis retente.",
+    "empty": "Écris d’abord ta réponse."
+  },
   "continuePlaying": {
+    "kicker": "Reprendre l’aventure",
     "heading": "Continuer à jouer",
     "message": "Prêt pour un nouveau défi ? Relève-le et gagne des récompenses !",
+    "submessage": "Chaque partie t’entraîne à calculer plus vite, sans t’en rendre compte.",
     "cta": "Découvrir les défis"
   },
   "progress": {
+    "kicker": "Ton carnet",
     "heading": "Ta progression",
+    "empty": "Tes compteurs se remplissent dès ta première partie.",
     "gamesStarted": "Jeux commencés",
     "challengesCompleted": "Défis terminés",
     "firstTrySuccesses": "Réussites au premier essai",
@@ -26,9 +52,12 @@
     "currentLevel": "Niveau actuel"
   },
   "availableGames": {
+    "kicker": "Prêts à jouer",
     "heading": "Jeux disponibles"
   },
   "upcomingGames": {
-    "heading": "À découvrir bientôt"
+    "kicker": "En préparation",
+    "heading": "À découvrir bientôt",
+    "badge": "Bientôt"
   }
 }

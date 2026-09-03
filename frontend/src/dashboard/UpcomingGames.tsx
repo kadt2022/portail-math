@@ -19,6 +19,7 @@ export function UpcomingGames() {
 
   return (
     <section className={styles.section} aria-labelledby="futures-aventures-titre">
+      <p className={styles.kicker}>{tDashboard("upcomingGames.kicker")}</p>
       <h2 id="futures-aventures-titre" className={styles.heading}>
         {tDashboard("upcomingGames.heading")}
       </h2>
@@ -32,6 +33,7 @@ export function UpcomingGames() {
               <span className={styles.name}>{tGames(game.nameKey)}</span>
               <span className={styles.description}>{tGames(game.descriptionKey)}</span>
             </span>
+            <span className={styles.badge}>{tDashboard("upcomingGames.badge")}</span>
           </div>
         ))}
       </div>

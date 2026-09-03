@@ -2,13 +2,37 @@
   margin: 10px 0 30px;
 }
 
-.heading {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 0.04em;
+.headingRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-bottom: 14px;
+}
+
+.kicker {
+  margin: 0 0 2px;
+  color: var(--pm-accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.heading {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.empty {
+  margin: 0;
   color: var(--pm-ink-soft);
+  font-size: 13px;
+  font-weight: 650;
 }
 
 .grid {
@@ -18,26 +42,56 @@
 }
 
 .tile {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  min-height: 104px;
+  min-height: 106px;
+  overflow: hidden;
   padding: 14px;
   border: 1px solid color-mix(in srgb, var(--pm-line) 78%, transparent);
-  border-radius: 18px;
+  border-radius: 20px;
   background: linear-gradient(180deg, #fff 0%, #fffdf9 100%);
   box-shadow: 0 8px 22px rgb(21 58 49 / 7%);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+/* Voile de couleur qui monte au survol : la tuile s'anime dans SA couleur, ce
+   qui la distingue de ses voisines au lieu d'un effet gris uniforme. */
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 0;
+  background: currentcolor;
+  opacity: 0.06;
+  transition: height 220ms ease;
+}
+
+.tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 30px rgb(21 58 49 / 12%);
+}
+
+.tile:hover::after {
+  height: 100%;
 }
 
 .iconBadge {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--pm-radius-signature);
   color: #fff;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%);
+  transition: transform 220ms ease;
+}
+
+.tile:hover .iconBadge {
+  transform: rotate(-6deg) scale(1.06);
 }
 
 .iconBadge svg {
@@ -46,92 +100,95 @@
 }
 
 .statBody {
+  position: relative;
+  z-index: 1;
   min-width: 0;
 }
 
-.value {
-  margin: 0;
-  font-size: 23px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-
 .label {
-  margin: 4px 0 8px;
+  margin: 0 0 10px;
   color: var(--pm-ink);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
   line-height: 1.25;
 }
 
 .track,
 .levelTrack {
+  position: relative;
   overflow: hidden;
-  height: 5px;
+  height: 6px;
   border-radius: 999px;
   background: rgb(20 60 50 / 9%);
 }
 
-.trackReady {
-  display: block;
-  width: 0;
-  height: 100%;
+/* Barre encore vide (aucune progression n'est lue par ce composant), mais
+   parcourue par une lueur : elle annonce qu'elle attend une première partie
+   au lieu d'avoir l'air cassée. */
+.track::after,
+.levelTrack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%) 0%,
+    currentcolor 50%,
+    rgb(255 255 255 / 0%) 100%
+  );
+  opacity: 0.5;
+  transform: translateX(-100%);
+  animation: sweep 3.6s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.green {
+  color: #2b9d4a;
 }
 
 .green .iconBadge {
   background: linear-gradient(145deg, #4fbd67, #2b9d4a);
 }
 
-.green .value {
-  color: #34a853;
-}
-
-.green .trackReady {
-  background: #34a853;
+.purple {
+  color: #7a43df;
 }
 
 .purple .iconBadge {
   background: linear-gradient(145deg, #8b5cf6, #6f36d9);
 }
 
-.purple .value {
-  color: #7a43df;
-}
-
-.purple .trackReady {
-  background: #7a43df;
+.gold {
+  color: #e08c0a;
 }
 
 .gold .iconBadge {
   background: linear-gradient(145deg, #ffbd35, #f39b12);
 }
 
-.gold .value {
-  color: #f4a019;
-}
-
-.gold .trackReady {
-  background: #f4a019;
+.pink {
+  color: #e92f61;
 }
 
 .pink .iconBadge {
   background: linear-gradient(145deg, #ff4f78, #e92f61);
 }
 
-.pink .value {
-  color: #ef3d6d;
-}
-
-.pink .trackReady {
-  background: #ef3d6d;
-}
-
 .levelTile {
-  background: linear-gradient(135deg, #effaf1 0%, #e5f5e8 100%);
-  border-color: rgb(54 145 80 / 12%);
+  color: #2f8f4f;
+  border-color: rgb(54 145 80 / 16%);
+  background: linear-gradient(140deg, #effaf1 0%, #e3f4e7 100%);
 }
 
 .levelTile .iconBadge {
@@ -140,24 +197,27 @@
 
 .levelLabel {
   margin: 0 0 10px;
-  color: rgb(15 51 43 / 62%);
-  font-size: 10px;
+  color: rgb(15 51 43 / 70%);
+  font-size: 12px;
+  font-weight: 750;
 }
 
-.levelTrack span {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: #38a85a;
+/* Décalage des lueurs : sans lui, les cinq barres balaient à l'unisson et
+   l'ensemble clignote comme une alarme. */
+.tile:nth-child(2) .track::after {
+  animation-delay: 0.45s;
 }
 
-.xp {
-  margin: 6px 0 0;
-  color: #38a85a;
-  font-size: 10px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+.tile:nth-child(3) .track::after {
+  animation-delay: 0.9s;
+}
+
+.tile:nth-child(4) .track::after {
+  animation-delay: 1.35s;
+}
+
+.tile:nth-child(5) .levelTrack::after {
+  animation-delay: 1.8s;
 }
 
 @media (min-width: 720px) {
@@ -183,14 +243,13 @@
     grid-template-columns: 1fr;
     align-items: start;
     gap: 10px;
-    min-height: 154px;
+    min-height: 148px;
     padding: 14px;
   }
 
   .iconBadge {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
+    width: 44px;
+    height: 44px;
   }
 
   .iconBadge svg {
@@ -198,13 +257,8 @@
     height: 22px;
   }
 
-  .value {
-    font-size: 21px;
-  }
-
   .label {
     min-height: 30px;
-    margin-bottom: 10px;
     font-size: 11px;
   }
 
@@ -212,11 +266,7 @@
     grid-column: 1 / -1;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    min-height: 96px;
-  }
-
-  .levelLabel {
-    margin-bottom: 8px;
+    min-height: 92px;
   }
 }
 

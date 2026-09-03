@@ -1,34 +1,104 @@
 .page {
-  padding-bottom: 40px;
+  position: relative;
+  padding-bottom: 48px;
 }
 
-.heading {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--pm-ink-soft);
+/* Nappes de couleur très diluées, fixées derrière la page : elles réchauffent
+   le fond crème et donnent de la profondeur sans ajouter une seule image. */
+.aurora {
+  position: absolute;
+  inset: -40px -6vw;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60ch 40ch at 8% 0%, rgb(226 118 43 / 10%) 0%, rgb(226 118 43 / 0%) 100%),
+    radial-gradient(70ch 46ch at 92% 12%, rgb(23 73 63 / 10%) 0%, rgb(23 73 63 / 0%) 100%),
+    radial-gradient(56ch 40ch at 50% 96%, rgb(122 67 223 / 8%) 0%, rgb(122 67 223 / 0%) 100%);
+}
+
+/* Le fond décoratif est un frère des sections, pas un calque en z-index
+   négatif : celui-ci passerait derrière le fond crème de `.pm-root`. */
+.page > *:not(.aurora) {
+  position: relative;
+  z-index: 1;
+}
+
+.duo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0 0 30px;
 }
 
 .gamesSection {
-  margin: 8px 0 32px;
+  margin: 18px 0 36px;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid rgb(31 65 56 / 8%);
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fffdf9 0%, #fff7ef 100%);
+  box-shadow: 0 14px 36px rgb(21 58 49 / 8%);
+}
+
+.sectionHeader {
+  margin-bottom: 18px;
+}
+
+.kicker {
+  margin: 0 0 2px;
+  color: var(--pm-accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heading {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
 .gamesGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 18px;
 }
 
-@media (min-width: 620px) {
+@media (min-width: 560px) {
   .gamesGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1040px) {
+@media (min-width: 900px) {
+  .duo {
+    /* La reprise de partie porte l'illustration, elle a droit à plus de
+       largeur ; le défi reste lisible à partir de 380 px environ. */
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1180px) {
   .gamesGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .duo {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 559px) {
+  .gamesSection {
+    border-radius: 22px;
+  }
+
+  .duo {
+    gap: 14px;
+    margin-bottom: 24px;
   }
 }
