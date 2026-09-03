@@ -9,43 +9,55 @@
   padding-top: 22px;
 }
 
-.signs {
+/* Nappe chaude très douce derrière l'intro : un dégradé, pas un rectangle —
+   aucun bord visible, elle se fond dans le crème de la page. */
+.wash {
   position: absolute;
-  top: -6px;
+  top: -20px;
   right: 0;
+  left: 0;
+  z-index: 0;
+  height: 320px;
+  background: radial-gradient(60% 100% at 22% 0%, rgb(252 227 205 / 75%) 0%, rgb(252 227 205 / 0%) 100%);
+  pointer-events: none;
+}
+
+.doodleArrow,
+.doodleStar,
+.doodlePlus {
+  position: absolute;
   z-index: 0;
   pointer-events: none;
 }
 
-.signs span {
-  position: absolute;
-  color: rgb(23 73 63 / 8%);
-  font-weight: 900;
+.doodleArrow {
+  top: -4px;
+  left: 2px;
+  width: 46px;
+  height: 46px;
 }
 
-.signs span:nth-child(1) {
-  top: 0;
-  right: 60px;
-  font-size: 2.6rem;
+.doodleStar {
+  top: 108px;
+  right: 6%;
+  width: 26px;
+  height: 26px;
+  opacity: 0.85;
 }
 
-.signs span:nth-child(2) {
-  top: 70px;
-  right: 0;
-  font-size: 2rem;
-  color: rgb(226 118 43 / 12%);
-}
-
-.signs span:nth-child(3) {
-  top: 130px;
-  right: 90px;
-  font-size: 1.6rem;
+.doodlePlus {
+  top: 40px;
+  right: 20%;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
 }
 
 .intro {
   position: relative;
   z-index: 1;
   max-width: 640px;
+  padding-left: 56px;
 }
 
 .title {
@@ -254,13 +266,24 @@
     justify-content: center;
   }
 
-  .signs span:nth-child(1) {
-    right: 10px;
-    font-size: 2rem;
+  .intro {
+    padding-left: 44px;
   }
 
-  .signs span:nth-child(2),
-  .signs span:nth-child(3) {
+  .doodleArrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .doodlePlus {
     display: none;
+  }
+
+  /* `top` fixe plutôt que `bottom` : `.about` inclut toute la section (bien
+     plus haute que l'intro sur mobile) — ancrer par le bas plaçait l'étoile
+     près des CTA, hors de vue au bon endroit. */
+  .doodleStar {
+    top: 300px;
+    right: 8%;
   }
 }
