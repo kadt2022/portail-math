@@ -240,7 +240,7 @@
 
 @media (min-width: 768px) {
   .heroGrid {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px;
     align-items: stretch;
   }
@@ -282,6 +282,29 @@
 
   .courseCta {
     justify-self: start;
+  }
+}
+
+/* Entre 768 et 900px, le pied de la carte photo passe sur une colonne
+   (règle ci-dessus) : le texte plus le bouton empilés dépassent les 110px
+   fixés pour l'écran large, et « Voir les cours » se retrouvait coupé. On
+   agrandit donc le second rang des deux cartes ensemble, pour qu'elles
+   restent de même hauteur. */
+@media (min-width: 768px) and (max-width: 900px) {
+  .welcomeCard,
+  .childrenCard {
+    height: 420px;
+    min-height: 420px;
+  }
+
+  .welcomeCard,
+  .childrenCard {
+    grid-template-rows: 270px 150px;
+  }
+
+  .welcomeFooter,
+  .learningContent {
+    min-height: 150px;
   }
 }
 
