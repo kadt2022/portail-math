@@ -14,8 +14,11 @@
     "exploreCourses": "View courses"
   },
   "continuePlaying": {
+    "kicker": "Your adventure continues",
     "heading": "Continue playing",
     "message": "Ready for a new challenge? Take it on and earn rewards!",
+    "submessage": "Choose an adventure and jump back in whenever you want.",
+    "reward": "★ Daily challenge",
     "cta": "Discover challenges"
   },
   "progress": {
@@ -27,7 +30,9 @@
     "currentLevel": "Current level"
   },
   "availableGames": {
-    "heading": "Available games"
+    "kicker": "Time to play",
+    "heading": "Challenges to explore",
+    "viewAll": "View all games"
   },
   "upcomingGames": {
     "heading": "Coming soon"
