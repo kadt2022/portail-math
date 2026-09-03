@@ -12,6 +12,23 @@
     "description": "Courses, games and challenges to grow your math skills.",
     "exploreCourses": "View courses"
   },
+  "journey": {
+    "heading": "From learning to playing, with Yamba",
+    "learn": {
+      "label": "Learn",
+      "step1": "Discover a concept",
+      "step2": "Practice"
+    },
+    "play": {
+      "label": "Play",
+      "step1": "Pick a game",
+      "step2": "Put it into practice"
+    },
+    "convergence": {
+      "text": "Both paths lead to the same place: your progress, watched over by Yamba.",
+      "cta": "See my progress"
+    }
+  },
   "continuePlaying": {
     "heading": "Continue playing",
     "message": "Ready for a new challenge? Take it on and earn rewards!",

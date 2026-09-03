@@ -4,6 +4,7 @@ import { gameCatalogue } from "../games/game-catalogue";
 import { GameCard } from "../games/GameCard";
 import { ContinuePlaying } from "./ContinuePlaying";
 import styles from "./DashboardPage.module.css";
+import { LearningJourney } from "./LearningJourney";
 import { ProgressSummary } from "./ProgressSummary";
 import { UpcomingGames } from "./UpcomingGames";
 import { WelcomeHero } from "./WelcomeHero";
@@ -14,6 +15,7 @@ export function DashboardPage() {
   return (
     <div className={styles.page}>
       <WelcomeHero />
+      <LearningJourney />
       <ProgressSummary />
       <ContinuePlaying />
 

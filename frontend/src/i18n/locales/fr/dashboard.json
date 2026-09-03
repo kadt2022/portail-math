@@ -12,6 +12,23 @@
     "description": "Cours, jeux et défis pour progresser en mathématiques.",
     "exploreCourses": "Voir les cours"
   },
+  "journey": {
+    "heading": "De l’apprentissage au jeu, avec Yamba",
+    "learn": {
+      "label": "Apprendre",
+      "step1": "Découvrir une notion",
+      "step2": "S’entraîner"
+    },
+    "play": {
+      "label": "Jouer",
+      "step1": "Choisir un jeu",
+      "step2": "Mettre en pratique"
+    },
+    "convergence": {
+      "text": "Les deux chemins mènent au même endroit : ta progression, suivie par Yamba.",
+      "cta": "Voir ma progression"
+    }
+  },
   "continuePlaying": {
     "heading": "Continuer à jouer",
     "message": "Prêt pour un nouveau défi ? Relève-le et gagne des récompenses !",
