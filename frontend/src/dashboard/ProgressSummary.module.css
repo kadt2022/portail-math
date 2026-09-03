@@ -132,45 +132,66 @@
     gap: 10px;
   }
 
-  .tile {
+  .tile,
+  .levelTile {
+    grid-column: auto;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 9px;
-    min-height: 92px;
-    padding: 12px;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 88px;
+    padding: 11px;
+    border-radius: 16px;
   }
 
   .iconBadge {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
   }
 
   .iconBadge svg {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
   }
 
   .label,
   .levelLabel {
-    font-size: 10.5px;
+    margin-bottom: 8px;
+    font-size: 10px;
+    line-height: 1.2;
   }
 
-  .levelTile {
-    grid-column: 1 / -1;
+  .track,
+  .levelTrack {
+    height: 4px;
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 390px) {
   .grid {
     gap: 8px;
   }
 
-  .tile {
-    padding: 10px;
+  .tile,
+  .levelTile {
+    gap: 7px;
+    min-height: 82px;
+    padding: 9px;
+  }
+
+  .iconBadge {
+    width: 26px;
+    height: 26px;
+  }
+
+  .iconBadge svg {
+    width: 14px;
+    height: 14px;
   }
 
   .label,
   .levelLabel {
-    font-size: 10px;
+    font-size: 9.5px;
   }
 }
