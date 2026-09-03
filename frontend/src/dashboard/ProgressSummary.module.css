@@ -1,14 +1,13 @@
 .section {
-  margin: 10px 0 30px;
+  margin: 16px 0 34px;
 }
 
 .heading {
   margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--pm-ink-soft);
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
 .grid {
@@ -18,34 +17,58 @@
 }
 
 .tile {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  min-height: 104px;
-  padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--pm-line) 78%, transparent);
-  border-radius: 18px;
+  min-height: 112px;
+  padding: 15px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--pm-line) 76%, transparent);
+  border-radius: 20px;
   background: linear-gradient(180deg, #fff 0%, #fffdf9 100%);
-  box-shadow: 0 8px 22px rgb(21 58 49 / 7%);
+  box-shadow: 0 10px 24px rgb(21 58 49 / 7%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.tile::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -32px;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.035;
+}
+
+.tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgb(21 58 49 / 11%);
 }
 
 .iconBadge {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
   color: #fff;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%), 0 8px 16px rgb(21 58 49 / 10%);
 }
 
 .iconBadge svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
 }
 
 .statBody {
+  position: relative;
+  z-index: 1;
   min-width: 0;
 }
 
@@ -59,19 +82,19 @@
 }
 
 .label {
-  margin: 4px 0 8px;
+  margin: 2px 0 10px;
   color: var(--pm-ink);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 780;
   line-height: 1.25;
 }
 
 .track,
 .levelTrack {
   overflow: hidden;
-  height: 5px;
+  height: 6px;
   border-radius: 999px;
-  background: rgb(20 60 50 / 9%);
+  background: rgb(20 60 50 / 8%);
 }
 
 .trackReady {
@@ -81,56 +104,31 @@
   border-radius: inherit;
 }
 
-.green .iconBadge {
-  background: linear-gradient(145deg, #4fbd67, #2b9d4a);
-}
+.green { color: #34a853; }
+.green .iconBadge { background: linear-gradient(145deg, #4fbd67, #2b9d4a); }
+.green .value { color: #34a853; }
+.green .trackReady { background: #34a853; }
 
-.green .value {
-  color: #34a853;
-}
+.purple { color: #7a43df; }
+.purple .iconBadge { background: linear-gradient(145deg, #8b5cf6, #6f36d9); }
+.purple .value { color: #7a43df; }
+.purple .trackReady { background: #7a43df; }
 
-.green .trackReady {
-  background: #34a853;
-}
+.gold { color: #f4a019; }
+.gold .iconBadge { background: linear-gradient(145deg, #ffbd35, #f39b12); }
+.gold .value { color: #f4a019; }
+.gold .trackReady { background: #f4a019; }
 
-.purple .iconBadge {
-  background: linear-gradient(145deg, #8b5cf6, #6f36d9);
-}
-
-.purple .value {
-  color: #7a43df;
-}
-
-.purple .trackReady {
-  background: #7a43df;
-}
-
-.gold .iconBadge {
-  background: linear-gradient(145deg, #ffbd35, #f39b12);
-}
-
-.gold .value {
-  color: #f4a019;
-}
-
-.gold .trackReady {
-  background: #f4a019;
-}
-
-.pink .iconBadge {
-  background: linear-gradient(145deg, #ff4f78, #e92f61);
-}
-
-.pink .value {
-  color: #ef3d6d;
-}
-
-.pink .trackReady {
-  background: #ef3d6d;
-}
+.pink { color: #ef3d6d; }
+.pink .iconBadge { background: linear-gradient(145deg, #ff4f78, #e92f61); }
+.pink .value { color: #ef3d6d; }
+.pink .trackReady { background: #ef3d6d; }
 
 .levelTile {
-  background: linear-gradient(135deg, #effaf1 0%, #e5f5e8 100%);
+  color: #1f8e4b;
+  background:
+    radial-gradient(circle at 90% 10%, rgb(56 168 90 / 12%) 0%, transparent 34%),
+    linear-gradient(135deg, #effaf1 0%, #e5f5e8 100%);
   border-color: rgb(54 145 80 / 12%);
 }
 
@@ -140,8 +138,9 @@
 
 .levelLabel {
   margin: 0 0 10px;
-  color: rgb(15 51 43 / 62%);
-  font-size: 10px;
+  color: rgb(15 51 43 / 66%);
+  font-size: 11px;
+  font-weight: 750;
 }
 
 .levelTrack span {
@@ -188,8 +187,8 @@
   }
 
   .iconBadge {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 14px;
   }
 
@@ -221,15 +220,12 @@
 }
 
 @media (max-width: 360px) {
-  .grid {
-    gap: 8px;
-  }
+  .grid { gap: 8px; }
+  .tile { padding: 12px; }
+  .label { font-size: 10px; }
+}
 
-  .tile {
-    padding: 12px;
-  }
-
-  .label {
-    font-size: 10px;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .tile { transition: none; }
+  .tile:hover { transform: none; }
 }
