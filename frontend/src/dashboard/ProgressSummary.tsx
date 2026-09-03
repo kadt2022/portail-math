@@ -81,9 +81,15 @@ export function ProgressSummary() {
 
   return (
     <section className={styles.section} aria-labelledby="progression-titre">
-      <h2 id="progression-titre" className={styles.heading}>
-        {t("progress.heading")}
-      </h2>
+      <div className={styles.headingRow}>
+        <div>
+          <p className={styles.kicker}>{t("progress.kicker")}</p>
+          <h2 id="progression-titre" className={styles.heading}>
+            {t("progress.heading")}
+          </h2>
+        </div>
+        <p className={styles.empty}>{t("progress.empty")}</p>
+      </div>
       <div className={styles.grid}>
         {STAT_ITEMS.map((item) => (
           <article className={`${styles.tile} ${styles[item.tone]}`} key={item.key}>
@@ -92,9 +98,7 @@ export function ProgressSummary() {
             </div>
             <div className={styles.statBody}>
               <p className={styles.label}>{t(item.key)}</p>
-              <div className={styles.track} aria-hidden="true">
-                <span className={styles.trackReady} />
-              </div>
+              <div className={styles.track} aria-hidden="true" />
             </div>
           </article>
         ))}
@@ -105,9 +109,7 @@ export function ProgressSummary() {
           </div>
           <div className={styles.statBody}>
             <p className={styles.levelLabel}>{t("progress.currentLevel")}</p>
-            <div className={styles.levelTrack} aria-hidden="true">
-              <span />
-            </div>
+            <div className={styles.levelTrack} aria-hidden="true" />
           </div>
         </article>
       </div>

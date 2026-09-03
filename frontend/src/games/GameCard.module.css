@@ -1,17 +1,19 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--pm-line);
-  border-radius: var(--pm-radius-lg);
+  border-radius: 24px;
   background: var(--pm-surface);
   box-shadow: var(--pm-shadow-sm);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
 }
 
 .card:hover {
-  box-shadow: var(--pm-shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--pm-accent) 45%, transparent);
+  box-shadow: 0 20px 40px rgb(21 58 49 / 14%);
 }
 
 .illustration {
@@ -26,19 +28,44 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 420ms ease;
+}
+
+/* L'illustration avance légèrement au survol : la carte réagit avant même le
+   clic, ce qui la rend « attrapable » au lieu d'être une vignette figée. */
+.card:hover .illustration svg,
+.card:hover .photo {
+  transform: scale(1.05);
+}
+
+/* Voile chaud qui se lève au survol, pour relier l'image au corps de la carte
+   sans assombrir la scène au repos. */
+.illustration::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(15 51 43 / 0%) 55%, rgb(15 51 43 / 26%) 100%);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.card:hover .illustration::after {
+  opacity: 1;
 }
 
 .badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  padding: 5px 12px;
+  z-index: 1;
+  padding: 6px 13px;
   border-radius: var(--pm-radius-signature);
   background: var(--pm-accent);
   color: #fff;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.02em;
+  box-shadow: 0 8px 16px rgb(226 118 43 / 32%);
 }
 
 .body {
@@ -47,12 +74,15 @@
   flex-direction: column;
   gap: 10px;
   padding: 18px 20px 20px;
+  background: linear-gradient(180deg, #fff 0%, #fffaf4 100%);
 }
 
 .name {
   margin: 0;
+  color: var(--pm-brand-dark);
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 850;
+  letter-spacing: -0.02em;
 }
 
 .description {
@@ -60,38 +90,42 @@
   margin: 0;
   color: var(--pm-ink-soft);
   font-size: 14px;
+  line-height: 1.45;
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 46px;
   padding: 10px 18px;
   border: 0;
   border-radius: 999px;
-  background: var(--pm-accent);
+  background: linear-gradient(140deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
   color: #fff;
   font: inherit;
-  font-weight: 750;
+  font-weight: 800;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 8px 18px rgb(226 118 43 / 24%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .cta:hover {
-  background: var(--pm-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgb(226 118 43 / 34%);
 }
 
 .ctaDisabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 46px;
   padding: 10px 18px;
-  border: 1px dashed var(--pm-line);
+  border: 1px dashed color-mix(in srgb, var(--pm-line) 90%, var(--pm-ink-soft));
   border-radius: 999px;
   background: transparent;
   color: var(--pm-ink-soft);
-  font-weight: 700;
+  font-weight: 750;
   cursor: default;
 }

@@ -19,11 +19,15 @@ describe("Changement de langue dans l'application", () => {
     const user = userEvent.setup();
     renderAt("/app");
 
-    expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
+    // Seule la fin du titre est vérifiée : le début salue selon l'heure
+    // (« Bonjour » / « Bon après-midi » / « Bonsoir »), ce qui rendrait
+    // l'assertion dépendante du moment où la suite tourne. Le choix de la
+    // salutation est couvert par WelcomeHero.test.tsx, à heure figée.
+    expect(screen.getByRole("heading", { level: 1, name: /explorateur !$/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /^english$/i }));
 
-    await screen.findByRole("heading", { level: 1, name: /welcome, explorer/i });
+    await screen.findByRole("heading", { level: 1, name: /explorer!$/i });
     expect(window.location.pathname).toBe("/app");
   });
 

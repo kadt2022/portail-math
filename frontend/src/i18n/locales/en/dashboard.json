@@ -1,10 +1,21 @@
 {
   "welcome": {
     "eyebrow": "Mbuyamba Math",
-    "titleLine1": "Welcome,",
+    "greeting": {
+      "morning": "Good morning,",
+      "afternoon": "Good afternoon,",
+      "evening": "Good evening,"
+    },
     "titleLine2": "explorer!",
     "description": "Continue your journey or choose a new adventure.",
-    "exploreGames": "Explore games"
+    "exploreGames": "Explore games",
+    "yambaTip": "Yamba is with you, one challenge at a time."
+  },
+  "quickAccess": {
+    "heading": "Jump straight to",
+    "courses": "Courses",
+    "games": "Games",
+    "progress": "My progress"
   },
   "learning": {
     "eyebrow": "Discover",
@@ -12,13 +23,28 @@
     "description": "Courses, games and challenges to grow your math skills.",
     "exploreCourses": "View courses"
   },
+  "dailyChallenge": {
+    "kicker": "Challenge of the day",
+    "heading": "Your quick calculation",
+    "hint": "A new calculation every day. Nothing is scored: try as often as you like.",
+    "inputLabel": "Your answer",
+    "check": "Check",
+    "retry": "Try again",
+    "correct": "Well done, that's right!",
+    "wrong": "Almost! Count again slowly, then retry.",
+    "empty": "Write your answer first."
+  },
   "continuePlaying": {
+    "kicker": "Back to the adventure",
     "heading": "Continue playing",
     "message": "Ready for a new challenge? Take it on and earn rewards!",
+    "submessage": "Every round trains you to calculate faster, without even noticing.",
     "cta": "Discover challenges"
   },
   "progress": {
+    "kicker": "Your logbook",
     "heading": "Your progress",
+    "empty": "Your counters fill up as soon as you play your first round.",
     "gamesStarted": "Games started",
     "challengesCompleted": "Challenges completed",
     "firstTrySuccesses": "First-try successes",
@@ -26,9 +52,12 @@
     "currentLevel": "Current level"
   },
   "availableGames": {
+    "kicker": "Ready to play",
     "heading": "Available games"
   },
   "upcomingGames": {
-    "heading": "Coming soon"
+    "kicker": "In the works",
+    "heading": "Coming soon",
+    "badge": "Soon"
   }
 }
