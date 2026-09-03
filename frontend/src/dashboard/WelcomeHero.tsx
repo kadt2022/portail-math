@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import yambaHead from "../assets/yamba-head.jpg";
 import styles from "./WelcomeHero.module.css";
 
 export function WelcomeHero() {
@@ -16,6 +17,10 @@ export function WelcomeHero() {
             <span>△</span>
             <span>◇</span>
           </div>
+          <div className={styles.yambaBubble}>
+            <img src={yambaHead} alt="" />
+            <span>{t("welcome.yambaTip")}</span>
+          </div>
         </div>
         <div className={styles.learningContent}>
           <div>
@@ -31,6 +36,12 @@ export function WelcomeHero() {
 
       <div className={styles.welcomeCard}>
         <div className={styles.welcomeMain}>
+          <div className={styles.mathOrbits} aria-hidden="true">
+            <span>9</span>
+            <span>3+6</span>
+            <span>12</span>
+            <span>×</span>
+          </div>
           <div className={styles.content}>
             <p className={styles.eyebrow}>{t("welcome.eyebrow")}</p>
             <h1 className={styles.title}>
