@@ -2,76 +2,144 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  margin: 20px 0;
+  margin: 22px 0 26px;
 }
 
 .welcomeCard,
 .childrenCard {
+  position: relative;
   overflow: hidden;
   border-radius: 28px;
   box-shadow: var(--pm-shadow-lg);
 }
 
+/* ---------- Carte d'accueil ---------- */
+
 .welcomeCard {
   display: grid;
-  grid-template-rows: auto auto;
-  min-height: 320px;
+  grid-template-rows: 1fr auto;
+  min-height: 340px;
   background:
     var(--pm-brand-dark)
-    url("../assets/turbo-pulse/welcome-hero.webp") center 48% / cover no-repeat;
+    url("../assets/turbo-pulse/welcome-hero.webp") center 46% / cover no-repeat;
   color: #fff8ee;
 }
 
 .welcomeMain {
   position: relative;
   display: grid;
-  align-items: center;
-  padding: clamp(28px, 4vw, 42px);
+  align-content: center;
+  gap: 18px;
+  padding: clamp(26px, 4vw, 44px);
   background: linear-gradient(
-    90deg,
+    100deg,
     rgb(7 48 40 / 97%) 0%,
-    rgb(7 48 40 / 92%) 48%,
-    rgb(7 48 40 / 54%) 100%
+    rgb(7 48 40 / 90%) 46%,
+    rgb(7 48 40 / 48%) 100%
   );
   isolation: isolate;
 }
 
+/* Halo chaud qui respire derrière le titre : le seul mouvement continu de la
+   carte, assez lent pour ne jamais capter le regard pendant la lecture. */
 .welcomeMain::after {
   content: "";
   position: absolute;
-  right: -70px;
-  bottom: -90px;
-  width: 190px;
-  height: 190px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(235 117 40 / 10%) 0%, rgb(235 117 40 / 0%) 72%);
+  right: -80px;
+  bottom: -110px;
   z-index: 0;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(235 117 40 / 26%) 0%, rgb(235 117 40 / 0%) 70%);
+  animation: breathe 9s ease-in-out infinite;
 }
 
-.welcomeFooter {
-  display: flex;
-  align-items: center;
-  padding: 18px clamp(28px, 4vw, 42px);
-  background: linear-gradient(
-    90deg,
-    rgb(23 79 67 / 97%) 0%,
-    rgb(21 72 61 / 94%) 55%,
-    rgb(21 72 61 / 76%) 100%
-  );
-  border-top: 1px solid rgb(255 255 255 / 7%);
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
 }
 
-.imageDecorations {
+.signs {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
+}
+
+.signs span {
+  position: absolute;
+  color: rgb(255 236 205 / 16%);
+  font-size: clamp(1.6rem, 3.4vw, 2.9rem);
+  font-weight: 900;
+  animation: drift 11s ease-in-out infinite;
+}
+
+.sign1 {
+  top: 14%;
+  right: 30%;
+  animation-delay: -0.5s;
+}
+
+.sign2 {
+  top: 8%;
+  right: 12%;
+  animation-delay: -2.4s;
+}
+
+.sign3 {
+  top: 46%;
+  right: 6%;
+  animation-delay: -4.1s;
+}
+
+.sign4 {
+  bottom: 14%;
+  right: 24%;
+  animation-delay: -6.3s;
+}
+
+.sign5 {
+  bottom: 30%;
+  right: 40%;
+  animation-delay: -8.2s;
+}
+
+.sign6 {
+  top: 28%;
+  right: 46%;
+  animation-delay: -9.6s;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-4deg);
+  }
+
+  50% {
+    transform: translate3d(0, -16px, 0) rotate(6deg);
+  }
 }
 
 .content {
   position: relative;
   z-index: 2;
-  max-width: 430px;
+  max-width: 44ch;
 }
 
 .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   color: var(--pm-accent-soft);
   font-size: 12px;
@@ -80,9 +148,31 @@
   text-transform: uppercase;
 }
 
+/* Point qui clignote comme un voyant « en ligne » : signale que le portail est
+   vivant, sans un mot de plus. */
+.eyebrowDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb066;
+  box-shadow: 0 0 0 0 rgb(255 176 102 / 55%);
+  animation: pulseDot 2.6s ease-out infinite;
+}
+
+@keyframes pulseDot {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 176 102 / 55%);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 12px rgb(255 176 102 / 0%);
+  }
+}
+
 .title {
-  margin: 10px 0 14px;
-  font-size: clamp(2.35rem, 4.8vw, 3.55rem);
+  margin: 12px 0 14px;
+  font-size: clamp(2.3rem, 4.9vw, 3.6rem);
   line-height: 0.98;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -90,43 +180,145 @@
 
 .title span {
   display: block;
-  color: #e2762b;
+  background: linear-gradient(94deg, #ffb066 0%, #e2762b 55%, #ffcf9a 100%);
+  background-clip: text;
+  color: transparent;
 }
 
 .lead {
   max-width: 42ch;
   margin: 0;
-  color: rgb(255 250 238 / 86%);
+  color: rgb(255 250 238 / 88%);
   font-size: 16px;
   line-height: 1.5;
+}
+
+.yambaBubble {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 7px 16px 7px 7px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 10%);
+  backdrop-filter: blur(6px);
+  color: rgb(255 250 238 / 92%);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.yambaBubble img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px rgb(226 118 43 / 70%);
+}
+
+.welcomeFooter {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 16px clamp(22px, 4vw, 44px);
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: linear-gradient(
+    100deg,
+    rgb(19 68 58 / 97%) 0%,
+    rgb(19 68 58 / 92%) 55%,
+    rgb(19 68 58 / 72%) 100%
+  );
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: 12px;
-  background: #e2762b;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
   color: #fff;
   font-weight: 850;
   text-decoration: none;
-  box-shadow: 0 6px 14px rgb(226 118 43 / 18%);
-  transition: transform 160ms ease, filter 160ms ease;
+  box-shadow: 0 10px 22px rgb(226 118 43 / 30%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cta span {
+  transition: transform 180ms ease;
 }
 
 .cta:hover {
   transform: translateY(-2px);
-  filter: brightness(1.04);
+  box-shadow: 0 14px 28px rgb(226 118 43 / 38%);
 }
+
+.cta:hover span {
+  transform: translateX(4px);
+}
+
+.quickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quickLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: rgb(255 250 238 / 92%);
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.quickLink::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 2px 6px 2px 6px;
+}
+
+.quickLink:hover {
+  transform: translateY(-2px);
+  border-color: rgb(255 255 255 / 34%);
+  background: rgb(255 255 255 / 16%);
+}
+
+.brand::before {
+  background: #6fd6a8;
+}
+
+.accent::before {
+  background: #ffb066;
+}
+
+.violet::before {
+  background: #b79bff;
+}
+
+/* ---------- Carte apprentissage ---------- */
 
 .childrenCard {
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: 1fr auto;
+  border: 1px solid rgb(31 65 56 / 8%);
   background: #fff;
   color: var(--pm-brand-dark);
-  border: 1px solid rgb(31 65 56 / 8%);
 }
 
 .imageWrap {
@@ -138,39 +330,60 @@
 .photo {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: contain;
+  /* Zoom très lent façon documentaire : la photo n'est plus figée, mais le
+     mouvement reste sous le seuil de la distraction. */
+  animation: slowZoom 26s ease-in-out infinite alternate;
+}
+
+@keyframes slowZoom {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.06);
+  }
 }
 
 .photoGlow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0%) 65%, rgb(6 45 60 / 12%) 100%);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0%) 58%, rgb(6 45 60 / 20%) 100%);
+}
+
+.imageDecorations {
+  pointer-events: none;
 }
 
 .imageDecorations span {
   position: absolute;
   z-index: 2;
-  color: rgb(255 255 255 / 11%);
+  color: rgb(255 255 255 / 18%);
   font-weight: 900;
+  animation: drift 13s ease-in-out infinite;
 }
 
 .imageDecorations span:nth-child(1) {
   top: 12%;
   left: 12%;
   font-size: 2rem;
+  animation-delay: -1.7s;
 }
 
 .imageDecorations span:nth-child(2) {
   top: 10%;
   right: 18%;
   font-size: 1.9rem;
+  animation-delay: -5.9s;
 }
 
 .imageDecorations span:nth-child(3) {
   top: 20%;
   right: 7%;
   font-size: 1.7rem;
+  animation-delay: -9.3s;
 }
 
 .learningContent {
@@ -178,12 +391,12 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
-  padding: 14px 18px;
-  background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
+  padding: 16px 20px;
+  background: linear-gradient(180deg, #fff 0%, #fff6ec 100%);
 }
 
 .learningEyebrow {
-  margin: 0 0 3px;
+  margin: 0 0 4px;
   color: #e2762b;
   font-size: 10px;
   font-weight: 850;
@@ -207,65 +420,68 @@
 
 .courseCta {
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-  gap: 7px;
-  min-height: 42px;
-  padding: 0 16px;
-  border-radius: 12px;
-  background: #e2762b;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: var(--pm-brand);
   color: #fff;
   font-size: 14px;
   font-weight: 850;
   white-space: nowrap;
   text-decoration: none;
-  box-shadow: 0 6px 14px rgb(226 118 43 / 18%);
-  transition: transform 160ms ease, filter 160ms ease;
+  box-shadow: 0 8px 18px rgb(23 73 63 / 24%);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.courseCta span {
+  transition: transform 180ms ease;
 }
 
 .courseCta:hover {
   transform: translateY(-2px);
-  filter: brightness(1.04);
+  background: var(--pm-brand-dark);
 }
 
-@media (min-width: 768px) {
+.courseCta:hover span {
+  transform: translateX(4px);
+}
+
+/* ---------- Tablette et ordinateur ---------- */
+
+@media (min-width: 760px) {
   .heroGrid {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 24px;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: 20px;
     align-items: stretch;
   }
 
   .welcomeCard,
   .childrenCard {
-    height: 380px;
-    min-height: 380px;
+    min-height: 396px;
+  }
+
+  .photo {
+    height: 100%;
+    object-fit: cover;
+    object-position: center 48%;
+  }
+}
+
+@media (min-width: 1100px) {
+  .heroGrid {
+    gap: 24px;
   }
 
   .welcomeCard,
   .childrenCard {
-    grid-template-rows: 270px 110px;
-  }
-
-  .welcomeMain,
-  .imageWrap {
-    min-height: 270px;
-  }
-
-  .welcomeFooter,
-  .learningContent {
-    min-height: 110px;
-    box-sizing: border-box;
-  }
-
-  .photo {
-    width: 100%;
-    height: 270px;
-    object-fit: cover;
-    object-position: center 52%;
+    min-height: 424px;
   }
 }
 
-@media (max-width: 900px) {
+@media (min-width: 760px) and (max-width: 980px) {
   .learningContent {
     grid-template-columns: 1fr;
   }
@@ -273,49 +489,68 @@
   .courseCta {
     justify-self: start;
   }
+
+  .yambaBubble {
+    font-size: 12px;
+  }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 759px) {
   .heroGrid {
     gap: 14px;
+    margin: 16px 0 22px;
   }
 
-  .welcomeCard,
-  .childrenCard {
+  .welcomeCard {
     min-height: 0;
   }
 
   .welcomeMain {
-    min-height: 260px;
+    gap: 16px;
+    padding: 26px 20px 24px;
     background: linear-gradient(
-      90deg,
+      160deg,
       rgb(7 48 40 / 97%) 0%,
-      rgb(7 48 40 / 91%) 62%,
-      rgb(7 48 40 / 62%) 100%
+      rgb(7 48 40 / 92%) 58%,
+      rgb(7 48 40 / 74%) 100%
     );
   }
 
+  /* Sur téléphone, la moitié des symboles suffit : au-delà, ils se
+     superposent au titre au lieu de l'entourer. */
+  .signs span:nth-child(n + 4) {
+    display: none;
+  }
+
   .welcomeFooter {
-    min-height: 84px;
+    padding: 14px 20px 16px;
   }
 
-  .childrenCard {
-    grid-template-rows: auto auto;
+  .cta {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 
-  .imageWrap {
-    min-height: 0;
+  .quickLinks {
+    width: 100%;
+  }
+
+  .quickLink {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   .photo {
-    width: 100%;
     height: auto;
-    min-height: 0;
     object-fit: contain;
-    object-position: center;
   }
 
   .learningContent {
+    grid-template-columns: 1fr;
     padding: 16px 18px 18px;
+  }
+
+  .courseCta {
+    justify-self: stretch;
   }
 }
