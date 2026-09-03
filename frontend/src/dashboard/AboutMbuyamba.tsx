@@ -52,34 +52,7 @@ export function AboutMbuyamba() {
   const { t } = useTranslation("dashboard");
 
   return (
-    <section className={styles.about} aria-labelledby="a-propos-titre">
-      <div className={styles.introCard}>
-        <ArrowDoodle />
-
-        <div className={styles.intro}>
-          <h2 id="a-propos-titre" className={styles.title}>
-            {t("about.title")}
-          </h2>
-          <p className={styles.tagline}>{t("about.tagline")}</p>
-          <p className={styles.description}>{t("about.description")}</p>
-        </div>
-
-        {/* Aperçu des trois avantages détaillés juste en dessous : la carte
-            garde une raison d'être sur toute sa largeur au lieu de laisser un
-            vide à droite du texte. */}
-        <div className={styles.introVisual} aria-hidden="true">
-          <span className={`${styles.visualBadge} ${styles.visualBook} ${styles.orange}`}>
-            <BookIcon />
-          </span>
-          <span className={`${styles.visualBadge} ${styles.visualController} ${styles.green}`}>
-            <ControllerIcon />
-          </span>
-          <span className={`${styles.visualBadge} ${styles.visualTrend} ${styles.orange}`}>
-            <TrendIcon />
-          </span>
-        </div>
-      </div>
-
+    <section className={styles.about}>
       <ul className={styles.features}>
         <li className={styles.feature}>
           <span className={`${styles.featureIcon} ${styles.orange}`} aria-hidden="true">
