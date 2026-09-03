@@ -1,34 +1,95 @@
 .page {
-  padding-bottom: 40px;
-}
-
-.heading {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--pm-ink-soft);
+  padding-bottom: 48px;
 }
 
 .gamesSection {
-  margin: 8px 0 32px;
+  margin: 18px 0 36px;
+  padding: 24px;
+  border: 1px solid rgb(31 65 56 / 8%);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #fffdf9 0%, #fff8f1 100%);
+  box-shadow: 0 12px 34px rgb(21 58 49 / 7%);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.kicker {
+  margin: 0 0 4px;
+  color: var(--pm-accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heading {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.sectionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgb(15 51 43 / 12%);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pm-brand-dark);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.sectionLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgb(21 58 49 / 9%);
 }
 
 .gamesGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 18px;
 }
 
-@media (min-width: 620px) {
+@media (min-width: 700px) {
   .gamesGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1040px) {
-  .gamesGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 699px) {
+  .gamesSection {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+  }
+
+  .sectionLink {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionHeader {
+    flex-direction: column;
+  }
+
+  .sectionLink {
+    align-self: flex-start;
   }
 }
