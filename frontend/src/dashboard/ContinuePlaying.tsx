@@ -10,15 +10,23 @@ export function ContinuePlaying() {
 
   return (
     <section className={styles.section} aria-labelledby="continuer-titre">
-      <h2 id="continuer-titre" className={styles.heading}>
-        {t("continuePlaying.heading")}
-      </h2>
+      <div className={styles.headingRow}>
+        <div>
+          <p className={styles.kicker}>{t("continuePlaying.kicker")}</p>
+          <h2 id="continuer-titre" className={styles.heading}>
+            {t("continuePlaying.heading")}
+          </h2>
+        </div>
+        <span className={styles.rewardPill}>{t("continuePlaying.reward")}</span>
+      </div>
       <div className={styles.card}>
         <div className={styles.illustration}>
           <ExploreScene />
+          <div className={styles.playBadge} aria-hidden="true">▶</div>
         </div>
         <div className={styles.content}>
           <p className={styles.message}>{t("continuePlaying.message")}</p>
+          <p className={styles.submessage}>{t("continuePlaying.submessage")}</p>
           <a className={styles.cta} href="#jeux-disponibles">
             {t("continuePlaying.cta")} <span aria-hidden="true">→</span>
           </a>
