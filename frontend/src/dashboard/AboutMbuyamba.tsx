@@ -3,15 +3,6 @@ import { useTranslation } from "react-i18next";
 import yambaHead from "../assets/yamba-head.jpg";
 import styles from "./AboutMbuyamba.module.css";
 
-function ArrowDoodle() {
-  return (
-    <svg className={styles.doodleArrow} viewBox="0 0 60 60" aria-hidden="true">
-      <path d="M6 42 C10 16, 34 8, 50 18" fill="none" stroke="#e2762b" strokeWidth="2.5" strokeDasharray="1 7" strokeLinecap="round" />
-      <path d="M40 9 L54 15 L45 26 Z" fill="#e2762b" />
-    </svg>
-  );
-}
-
 function BookIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
