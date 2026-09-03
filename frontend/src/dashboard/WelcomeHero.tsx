@@ -22,6 +22,11 @@ export function WelcomeHero() {
             <p className={styles.learningEyebrow}>{t("learning.eyebrow")}</p>
             <h2 className={styles.learningTitle}>{t("learning.title")}</h2>
             <p className={styles.learningDescription}>{t("learning.description")}</p>
+            <ul className={styles.featureList}>
+              <li>{t("learning.features.courses")}</li>
+              <li>{t("learning.features.games")}</li>
+              <li>{t("learning.features.progress")}</li>
+            </ul>
           </div>
           <a className={styles.courseCta} href="/app/apprentissages/primaire/1/mathematiques">
             {t("learning.exploreCourses")} <span aria-hidden="true">→</span>
@@ -41,6 +46,7 @@ export function WelcomeHero() {
         </div>
 
         <div className={styles.welcomeFooter}>
+          <p className={styles.pitch}>{t("welcome.pitch")}</p>
           <a className={styles.cta} href="#jeux-disponibles">
             {t("welcome.exploreGames")} <span aria-hidden="true">→</span>
           </a>

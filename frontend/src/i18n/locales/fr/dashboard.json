@@ -4,12 +4,18 @@
     "titleLine1": "Bonjour,",
     "titleLine2": "explorateur !",
     "description": "Choisis une aventure ou continue celle que tu as déjà commencée.",
+    "pitch": "Pensé pour le primaire : des cours qui suivent le niveau de ton enfant, des jeux qui donnent envie de continuer.",
     "exploreGames": "Voir les jeux"
   },
   "learning": {
     "eyebrow": "À découvrir",
     "title": "Apprendre en s’amusant",
     "description": "Cours, jeux et défis pour progresser en mathématiques.",
+    "features": {
+      "courses": "Cours par niveau",
+      "games": "Jeux interactifs",
+      "progress": "Suivi de progression"
+    },
     "exploreCourses": "Voir les cours"
   },
   "continuePlaying": {
