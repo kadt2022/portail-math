@@ -3,7 +3,10 @@
    cartes juste au-dessus. */
 .about {
   position: relative;
-  margin: 10px 0 40px;
+  /* Aucun espace au-dessus : cette zone doit toucher les deux cartes du
+     hero, pas flotter en dessous après un vide. */
+  margin: 0 0 40px;
+  padding-top: 22px;
 }
 
 .signs {

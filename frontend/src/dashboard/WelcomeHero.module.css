@@ -2,7 +2,9 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  margin: 20px 0;
+  /* Pas de marge en bas : la présentation qui suit doit toucher les cartes,
+     pas flotter après un vide qui casse la continuité. */
+  margin: 20px 0 0;
 }
 
 .welcomeCard,
