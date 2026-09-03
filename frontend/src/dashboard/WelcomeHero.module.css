@@ -249,18 +249,18 @@
 
   .welcomeCard,
   .childrenCard {
-    height: 380px;
-    min-height: 380px;
+    height: 310px;
+    min-height: 310px;
   }
 
   .welcomeCard,
   .childrenCard {
-    grid-template-rows: 270px 110px;
+    grid-template-rows: 200px 110px;
   }
 
   .welcomeMain,
   .imageWrap {
-    min-height: 270px;
+    min-height: 200px;
   }
 
   .welcomeFooter,
@@ -271,7 +271,7 @@
 
   .photo {
     width: 100%;
-    height: 270px;
+    height: 200px;
     object-fit: cover;
     object-position: center 52%;
   }
@@ -295,13 +295,13 @@
 @media (min-width: 768px) and (max-width: 900px) {
   .welcomeCard,
   .childrenCard {
-    height: 420px;
-    min-height: 420px;
+    height: 350px;
+    min-height: 350px;
   }
 
   .welcomeCard,
   .childrenCard {
-    grid-template-rows: 270px 150px;
+    grid-template-rows: 200px 150px;
   }
 
   .welcomeFooter,
