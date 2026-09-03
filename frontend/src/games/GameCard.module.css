@@ -9,9 +9,12 @@
   transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
+/* Mouvement volontairement discret : la carte entière se soulève et grandit
+   à peine (1.5 %), presque imperceptible, plutôt que de faire gonfler
+   seulement l'image. */
 .card:hover {
   box-shadow: var(--pm-shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.015);
 }
 
 .illustration {
@@ -26,15 +29,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 220ms ease;
-}
-
-/* L'image gonfle légèrement au survol de la carte entière : un repère de
-   plus, en plus de l'ombre et du décollement, pour signaler qu'elle est
-   cliquable. */
-.card:hover .illustration svg,
-.card:hover .photo {
-  transform: scale(1.06);
 }
 
 .badge {
