@@ -14,8 +14,11 @@
     "exploreCourses": "Voir les cours"
   },
   "continuePlaying": {
+    "kicker": "Ton aventure continue",
     "heading": "Continuer à jouer",
     "message": "Prêt pour un nouveau défi ? Relève-le et gagne des récompenses !",
+    "submessage": "Choisis une aventure et reprends ton élan quand tu veux.",
+    "reward": "★ Défi du jour",
     "cta": "Découvrir les défis"
   },
   "progress": {
@@ -27,7 +30,9 @@
     "currentLevel": "Niveau actuel"
   },
   "availableGames": {
-    "heading": "Jeux disponibles"
+    "kicker": "À toi de jouer",
+    "heading": "Des défis à explorer",
+    "viewAll": "Voir tous les jeux"
   },
   "upcomingGames": {
     "heading": "À découvrir bientôt"
