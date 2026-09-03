@@ -1,29 +1,43 @@
-/* Prolongement du hero, pas une section à part : pas de fond ni de bordure
-   propres à `.about` — tout repose sur le crème de la page, comme les deux
-   cartes juste au-dessus. Deux couleurs seulement (vert et orange, celles du
-   hero) : pas de troisième ou quatrième teinte ajoutée pour faire varier les
-   blocs. */
+/* Prolongement du hero : même rythme d'espacement que les deux cartes du
+   haut (qui ont elles-mêmes 16-24px entre elles), pas un vide qui casse la
+   continuité. Deux couleurs seulement (vert et orange, celles du hero) :
+   pas de troisième ou quatrième teinte ajoutée pour faire varier les blocs. */
 .about {
   position: relative;
-  margin: 0 0 40px;
-  padding-top: 26px;
+  margin: 18px 0 40px;
+}
+
+/* La carte d'intro a son propre fond (comme les deux cartes du hero
+   au-dessus), assez large pour que le texte ne semble jamais coincé contre
+   un vide : un visuel occupe l'espace à droite plutôt que de le laisser nu. */
+.introCard {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  padding: 30px clamp(24px, 4vw, 44px);
+  border-radius: 32px 12px 32px 12px;
+  background: linear-gradient(120deg, #fff 0%, var(--pm-accent-soft) 150%);
+  box-shadow: var(--pm-shadow-lg);
 }
 
 .doodleArrow {
   position: absolute;
   z-index: 0;
-  top: 2px;
-  left: 2px;
-  width: 42px;
-  height: 42px;
+  top: 14px;
+  left: 18px;
+  width: 40px;
+  height: 40px;
   pointer-events: none;
 }
 
 .intro {
   position: relative;
   z-index: 1;
-  max-width: 640px;
-  padding-left: 54px;
+  max-width: 560px;
+  padding-left: 50px;
 }
 
 .title {
@@ -51,6 +65,56 @@
   color: var(--pm-ink-soft);
   font-size: 15px;
   line-height: 1.6;
+}
+
+/* Trois pastilles qui s'empilent en éventail : un aperçu des avantages
+   détaillés juste en dessous, pas une illustration gratuite. Masqué sur
+   petit écran, où la carte redevient un simple bloc de texte. */
+.introVisual {
+  position: relative;
+  z-index: 1;
+  display: none;
+  width: 100%;
+  height: 168px;
+}
+
+.visualBadge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: var(--pm-radius-signature);
+  color: #fff;
+  box-shadow: 0 14px 26px rgb(15 51 43 / 16%), inset 0 1px 0 rgb(255 255 255 / 30%);
+}
+
+.visualBadge svg {
+  width: 46%;
+  height: 46%;
+}
+
+.visualBook {
+  top: 6px;
+  left: 6px;
+  width: 76px;
+  height: 76px;
+  transform: rotate(-8deg);
+}
+
+.visualController {
+  top: 46px;
+  left: 70px;
+  z-index: 1;
+  width: 92px;
+  height: 92px;
+  transform: rotate(5deg);
+}
+
+.visualTrend {
+  right: 4px;
+  bottom: 2px;
+  width: 64px;
+  height: 64px;
+  transform: rotate(10deg);
 }
 
 /* Une liste, pas une grille de cartes colorées : les trois avantages
@@ -209,6 +273,17 @@
   .features {
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
+  }
+
+  /* La carte ne se resserre plus sur le texte seul : la pastille prend la
+     place qui restait vide à droite. */
+  .introCard {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+  }
+
+  .introVisual {
+    display: block;
   }
 }
 
