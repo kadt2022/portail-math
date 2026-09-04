@@ -120,7 +120,7 @@
 }
 
 .body {
-  padding-top: calc(var(--pm-topbar) + var(--pm-course-nav-height));
+  padding-top: var(--pm-topbar);
 }
 
 .main {
