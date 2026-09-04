@@ -59,6 +59,7 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
             <button
               type="button"
               className={`${styles.link} ${styles.courseMenuButton}${primaryActive ? ` ${styles.linkActive}` : ""}`}
+              aria-label={t("courseNavigation.primaryLevels")}
               aria-expanded={primaryOpen}
               onClick={() => setPrimaryOpen((value) => !value)}
             >
@@ -99,6 +100,7 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
             <button
               type="button"
               className={`${styles.link} ${styles.courseMenuButton}`}
+              aria-label={t("courseNavigation.secondaryInformation")}
               aria-expanded={secondaryOpen}
               onClick={() => setSecondaryOpen((value) => !value)}
             >
