@@ -79,7 +79,6 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
                       aria-current={selected ? "page" : undefined}
                       onClick={onNavigate}
                     >
-                      <span className={styles.levelNumber} aria-hidden="true">{course.level}</span>
                       <span className={styles.levelText}>
                         <span>{t(course.labelKey)}</span>
                         {course.availability === "coming-soon" ? (
