@@ -76,7 +76,10 @@
   font-weight: 850;
 }
 
-/* Mobile : la sidebar devient un tiroir plein hauteur, caché par défaut. */
+.mobileCourses {
+  display: none;
+}
+
 .backdrop {
   display: none;
 }
@@ -86,9 +89,6 @@
     top: var(--pm-topbar);
     box-shadow: var(--pm-shadow-lg);
     transform: translateX(-105%);
-    /* Une sidebar hors champ ne doit pas rester focusable ni annoncée par un
-       lecteur d'écran : `transform` seul la déplace visuellement, mais ses
-       liens resteraient atteignables au clavier sans ce `visibility`. */
     visibility: hidden;
   }
 
@@ -102,13 +102,179 @@
     z-index: 44;
     display: block;
     inset: var(--pm-topbar) 0 0;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: 0;
     background: rgb(15 24 20 / 45%);
+  }
+
+  .mobileCourses {
+    display: grid;
+    gap: 8px;
+    margin: 10px 0 12px;
+    padding: 12px;
+    border: 1px solid rgb(23 73 63 / 10%);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgb(247 251 248 / 95%), rgb(255 250 244 / 95%));
+  }
+
+  .mobileSectionLabel {
+    margin: 0 2px 2px;
+    color: var(--pm-ink-soft);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .courseGroup {
+    display: grid;
+    gap: 6px;
+  }
+
+  .courseTrigger {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--pm-brand-dark);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+    box-shadow: 0 4px 14px rgb(21 58 49 / 6%);
+    cursor: pointer;
+  }
+
+  .courseIcon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .courseIcon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .primaryIcon {
+    background: #ecf7ef;
+    color: #258b4a;
+  }
+
+  .secondaryIcon {
+    background: #f4efff;
+    color: #7046d9;
+  }
+
+  .courseTriggerText {
+    min-width: 0;
+  }
+
+  .courseChevron {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 150ms ease;
+  }
+
+  .courseTrigger[aria-expanded="true"] .courseChevron {
+    transform: translateY(2px) rotate(225deg);
+  }
+
+  .coursePanel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 2px 0 4px 44px;
+  }
+
+  .levelLink {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 42px;
+    padding: 7px 8px;
+    border: 1px solid var(--pm-line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--pm-ink);
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .levelLinkActive {
+    border-color: var(--pm-brand);
+    background: var(--pm-success-soft);
+    color: var(--pm-brand);
+  }
+
+  .levelDot {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    background: var(--pm-surface-warm);
+    color: var(--pm-accent-dark);
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .levelText {
+    display: grid;
+    min-width: 0;
+    gap: 1px;
+  }
+
+  .levelText small {
+    color: var(--pm-ink-soft);
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .secondaryNotice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-left: 44px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--pm-ink-soft);
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .secondaryNotice strong {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: var(--pm-surface-warm);
+    color: var(--pm-accent-dark);
+    font-size: 8px;
+    text-transform: uppercase;
   }
 }
 
 @media (max-width: 767px) {
   .sidebar {
-    width: min(var(--pm-sidebar), calc(100vw - 24px));
+    width: min(330px, calc(100vw - 20px));
     padding: 12px 12px 20px;
     background: var(--pm-surface);
   }
@@ -122,11 +288,30 @@
   }
 
   .link {
-    min-height: 52px;
+    min-height: 48px;
     white-space: nowrap;
   }
 
   .sidebarOpen .backdrop {
     background: rgb(15 24 20 / 62%);
+  }
+}
+
+@media (max-width: 390px) {
+  .sidebar {
+    width: calc(100vw - 14px);
+  }
+
+  .mobileCourses {
+    padding: 10px;
+  }
+
+  .coursePanel {
+    padding-left: 38px;
+    grid-template-columns: 1fr;
+  }
+
+  .secondaryNotice {
+    margin-left: 38px;
   }
 }
