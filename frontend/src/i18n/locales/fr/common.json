@@ -16,6 +16,7 @@
   },
   "courseNavigation": {
     "label": "Navigation des cours",
+    "mobileSectionLabel": "Parcours scolaires",
     "primary": "Cours primaires",
     "secondary": "Cours secondaires",
     "exetat": "Préparation EXETAT",
