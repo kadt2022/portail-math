@@ -12,7 +12,6 @@ export function AboutPage() {
     <div className={styles.page}>
       <section className={styles.hero} aria-labelledby="about-story-title">
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>{t("about.storyEyebrow")}</p>
           <h1 id="about-story-title">{t("about.storyTitle")}</h1>
           <p className={styles.lead}>{t("about.storyLead")}</p>
           <p>{t("about.storyParagraphOne")}</p>

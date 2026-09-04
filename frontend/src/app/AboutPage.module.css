@@ -28,10 +28,17 @@
   text-transform: uppercase;
 }
 
+.hero h1,
+.vision h2 {
+  padding-left: clamp(20px, 2.5vw, 30px);
+  border-left: 4px solid var(--pm-accent);
+  color: var(--pm-brand-dark);
+  font-weight: 800;
+}
 .hero h1 {
   max-width: 760px;
   margin: 10px 0 18px;
-  font-size: clamp(38px, 5.8vw, 68px);
+  font-size: clamp(38px, 4vw, 52px);
   line-height: 1.02;
 }
 
