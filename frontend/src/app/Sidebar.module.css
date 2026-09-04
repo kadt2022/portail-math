@@ -87,9 +87,23 @@
   grid-template-columns: 30px minmax(0, 1fr) auto;
   border: 0;
   background: transparent;
-  font: inherit;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+  color: var(--pm-ink-soft);
   text-align: left;
   cursor: pointer;
+}
+
+.courseMenuButton.linkActive {
+  background: transparent;
+  color: var(--pm-ink-soft);
+}
+
+.courseMenuButton.linkActive .num {
+  background: var(--pm-surface-warm);
+  color: var(--pm-accent-dark);
 }
 
 .chevron {
@@ -108,22 +122,35 @@
 
 .coursePanel {
   display: grid;
-  gap: 2px;
-  padding: 2px 4px 4px 46px;
+  gap: 4px;
+  margin: 0 0 6px;
+  padding: 8px;
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-bg);
+  box-shadow: var(--pm-shadow-sm);
 }
 
 .levelLink {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
+  grid-template-columns: 16px minmax(0, 1fr);
   align-items: center;
-  gap: 7px;
-  min-height: 28px;
-  padding: 3px 6px;
-  border-radius: 8px;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px 10px 36px;
+  border-radius: 12px;
   color: var(--pm-ink-soft);
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
   text-decoration: none;
+}
+
+.levelBullet {
+  color: var(--pm-accent);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
 }
 
 .levelLink:hover {
@@ -157,7 +184,7 @@
 
 .levelText small {
   color: var(--pm-ink-soft);
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -168,21 +195,24 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 2px 4px 4px 46px;
-  padding: 3px 6px;
-  border-radius: 8px;
+  margin: 0 0 6px;
+  padding: 10px 12px 10px 36px;
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-bg);
+  box-shadow: var(--pm-shadow-sm);
   color: var(--pm-ink-soft);
-  font-size: 9px;
-  line-height: 1.25;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .secondaryNotice strong {
   flex: 0 0 auto;
-  padding: 3px 6px;
+  padding: 4px 7px;
   border-radius: 999px;
   background: #fff;
   color: var(--pm-accent-dark);
-  font-size: 7px;
+  font-size: 8px;
   text-transform: uppercase;
 }
 
@@ -196,14 +226,17 @@
     box-shadow: var(--pm-shadow-lg);
     transform: translateX(-105%);
     visibility: hidden;
+    will-change: transform;
+    transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 450ms;
   }
 
   .sidebarOpen .sidebar {
     transform: translateX(0);
     visibility: visible;
+    transition-delay: 0s, 0s;
   }
 
-  .sidebarOpen .backdrop {
+  .backdrop {
     position: fixed;
     z-index: 44;
     display: block;
@@ -213,12 +246,20 @@
     padding: 0;
     border: 0;
     background: rgb(15 24 20 / 45%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 350ms ease;
+  }
+
+  .sidebarOpen .backdrop {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
 @media (max-width: 767px) {
   .sidebar {
-    width: min(330px, calc(100vw - 20px));
+    width: min(260px, calc(100vw - 64px));
     padding: 12px 12px 20px;
     background: var(--pm-surface);
   }
@@ -237,16 +278,18 @@
   }
 
   .coursePanel {
-    padding-left: 42px;
+    margin-left: 0;
+    padding: 8px;
   }
 
   .levelLink {
-    min-height: 38px;
-    font-size: 11px;
+    min-height: 48px;
+    font-size: 14px;
   }
 
   .secondaryNotice {
-    margin-left: 42px;
+    margin-left: 0;
+    padding-left: 36px;
   }
 
   .sidebarOpen .backdrop {
@@ -256,14 +299,16 @@
 
 @media (max-width: 390px) {
   .sidebar {
-    width: calc(100vw - 14px);
+    width: calc(100vw - 64px);
   }
 
   .coursePanel {
-    padding-left: 38px;
+    margin-left: 0;
+    padding: 8px;
   }
 
   .secondaryNotice {
-    margin-left: 38px;
+    margin-left: 0;
+    padding-left: 36px;
   }
 }
