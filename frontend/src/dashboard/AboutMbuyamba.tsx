@@ -43,7 +43,11 @@ export function AboutMbuyamba() {
   const { t } = useTranslation("dashboard");
 
   return (
-    <section className={styles.about}>
+    <section className={styles.about} aria-labelledby="about-mbuyamba-heading">
+      <h2 id="about-mbuyamba-heading" className={styles.visuallyHidden}>
+        {t("about.title")}
+      </h2>
+
       <ul className={styles.features}>
         <li className={styles.feature}>
           <span className={`${styles.featureIcon} ${styles.orange}`} aria-hidden="true">
