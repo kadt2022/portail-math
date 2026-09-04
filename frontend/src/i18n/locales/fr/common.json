@@ -50,18 +50,53 @@
     "back": "Retour au tableau de bord"
   },
   "about": {
-    "eyebrow": "Notre mission",
-    "title": "À propos de Mbuyamba Maths RDC",
-    "lead": "Rendre les mathématiques plus claires, plus proches et plus accessibles à chaque élève.",
-    "descriptionOne": "Mbuyamba Maths RDC est un portail éducatif indépendant destiné à aider les élèves à apprendre et à réviser les mathématiques.",
-    "descriptionTwo": "Il propose un parcours de préparation à l'EXETAT et des jeux d'apprentissage pour le primaire.",
-    "noticeTitle": "Information importante",
-    "notice": "Ce portail n'est pas une plateforme officielle du ministère de l'Éducation.",
-    "valuesLabel": "Valeurs du portail",
-    "valuesTitle": "Apprendre. S'exercer. Réussir.",
-    "valueSimple": "Des explications simples",
-    "valuePaths": "Deux parcours adaptés",
-    "valueFree": "Un accès gratuit",
-    "discover": "Découvrir le portail"
+    "storyEyebrow": "Notre histoire",
+    "storyTitle": "Une autre façon d'apprendre",
+    "storyLead": "L'école ne s'arrête pas à la porte de la classe.",
+    "storyParagraphOne": "Chaque élève apprend différemment. Certains comprennent en lisant. D'autres ont besoin de voir, d'essayer, de recommencer, de jouer ou simplement d'entendre une explication présentée autrement.",
+    "storyParagraphTwo": "Mbuyamba est né de cette idée : créer un espace éducatif numérique où un élève peut retrouver ce qu'il apprend à l'école, explorer une notion à son rythme, s'exercer, se tromper sans crainte et recommencer jusqu'à comprendre.",
+    "storyParagraphThree": "Notre ambition n'est pas de remplacer l'école, les enseignants ou les livres. Elle est de leur donner un prolongement : cours, exercices interactifs, jeux éducatifs, défis, révisions et préparation aux examens, avec une attention particulière aux réalités scolaires de la République démocratique du Congo.",
+    "storyQuote": "Apprendre peut être sérieux sans être ennuyeux.",
+    "imageAlt": "Une enseignante accompagne des élèves utilisant des tablettes et des ordinateurs dans une classe moderne.",
+    "imageCaption": "Le numérique comme outil d'apprentissage, au service de l'élève et de l'enseignant.",
+    "howEyebrow": "Mode d'emploi",
+    "howTitle": "Comment utiliser Mbuyamba ?",
+    "howLead": "Ton parcours commence là où tu en as besoin. Tu peux venir pour découvrir, revoir, t'entraîner ou apprendre en jouant.",
+    "steps": {
+      "choose": {
+        "title": "Choisis ton parcours",
+        "description": "Sélectionne ta classe, une activité, un jeu éducatif ou la préparation à l'EXETAT selon ton objectif du moment."
+      },
+      "learn": {
+        "title": "Découvre et comprends",
+        "description": "Explore les notions étape par étape, avec des exemples et des situations pensées pour rendre l'apprentissage plus concret."
+      },
+      "practice": {
+        "title": "Exerce-toi et joue",
+        "description": "Teste ce que tu as compris avec des exercices interactifs et des défis. Ici, le jeu fait partie de l'apprentissage."
+      },
+      "progress": {
+        "title": "Progresse à ton rythme",
+        "description": "Reviens sur une difficulté, recommence une activité et suis progressivement ton parcours. L'objectif n'est pas d'aller vite, mais de comprendre."
+      }
+    },
+    "paceTitle": "À ton rythme",
+    "paceText": "Il n'est pas nécessaire de tout faire dans un ordre précis : suis un cours, exerce-toi, joue pour consolider une notion, puis reviens là où tu en as besoin.",
+    "visionEyebrow": "Notre vision",
+    "visionTitle": "Construire l'école de demain, aujourd'hui",
+    "visionLead": "Mbuyamba commence avec des contenus éducatifs, les mathématiques, le primaire et la préparation à l'EXETAT. Mais ce n'est que le début.",
+    "visionParagraphOne": "Nous voulons construire progressivement un véritable environnement d'apprentissage où un enfant peut passer naturellement d'une leçon à une expérience interactive, à un jeu, à un exercice, puis à un nouveau défi.",
+    "visionParagraphTwo": "Plusieurs disciplines pourront progressivement trouver leur place. Les personnages, les situations et les histoires peuvent rester proches du quotidien des élèves tout en les ouvrant au reste du monde.",
+    "technologyTitle": "Une technologie qui reste à sa place",
+    "technologyText": "Une tablette ne remplace pas la curiosité d'un enfant et un ordinateur ne remplace pas un bon enseignant. La technologie est utile lorsqu'elle aide à mieux comprendre, mieux pratiquer et donner envie de continuer.",
+    "rootsTitle": "Pensé ici. Ouvert sur le monde.",
+    "rootsText": "Mbuyamba accorde une attention particulière à la République démocratique du Congo, à son école et à ses élèves, sans renoncer à une ambition universelle : apprendre, créer et réussir dans le monde de demain.",
+    "promiseLabel": "Notre promesse",
+    "promiseEyebrow": "Notre promesse",
+    "promiseTitle": "Et ce n'est que le début.",
+    "promiseText": "Nous continuerons à enrichir les cours, créer de nouvelles aventures, ajouter des activités et étendre progressivement les matières en écoutant les élèves, les parents et les enseignants.",
+    "promiseQuote": "Chaque enfant capable d'être curieux est capable d'apprendre. Notre travail est de lui donner envie de continuer.",
+    "welcome": "Bienvenue sur Mbuyamba.",
+    "closing": "Apprends. Explore. Essaie. Recommence. Progresse."
   }
 }
