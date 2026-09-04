@@ -2,17 +2,16 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./ProgressSummary.module.css";
 
-type IconName = "book" | "target" | "star" | "close" | "trophy";
+type IconName = "gamepad" | "target" | "retry" | "trophy";
 
 const STAT_ITEMS: Array<{
   key: string;
   icon: IconName;
-  tone: "green" | "purple" | "gold" | "pink";
+  tone: "green" | "purple" | "pink";
 }> = [
-  { key: "progress.gamesStarted", icon: "book", tone: "green" },
+  { key: "progress.gamesStarted", icon: "gamepad", tone: "green" },
   { key: "progress.challengesCompleted", icon: "target", tone: "purple" },
-  { key: "progress.firstTrySuccesses", icon: "star", tone: "gold" },
-  { key: "progress.correctedErrors", icon: "close", tone: "pink" },
+  { key: "progress.correctedErrors", icon: "retry", tone: "pink" },
 ];
 
 function StatIcon({ name }: { name: IconName }) {
@@ -26,12 +25,14 @@ function StatIcon({ name }: { name: IconName }) {
     "aria-hidden": true,
   };
 
-  if (name === "book") {
+  if (name === "gamepad") {
     return (
       <svg {...common}>
-        <path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v17H7.5A2.5 2.5 0 0 0 5 21.5z" />
-        <path d="M5 4.5v17" />
-        <path d="M9 7h6" />
+        <path d="M8 8h8a5 5 0 0 1 4.8 6.5l-1 3a2.4 2.4 0 0 1-4.1 1l-1.4-1.6H9.7l-1.4 1.6a2.4 2.4 0 0 1-4.1-1l-1-3A5 5 0 0 1 8 8Z" />
+        <path d="M7 12v4" />
+        <path d="M5 14h4" />
+        <circle cx="16.5" cy="13" r="0.8" fill="currentColor" stroke="none" />
+        <circle cx="18.5" cy="15" r="0.8" fill="currentColor" stroke="none" />
       </svg>
     );
   }
@@ -47,20 +48,13 @@ function StatIcon({ name }: { name: IconName }) {
     );
   }
 
-  if (name === "star") {
+  if (name === "retry") {
     return (
       <svg {...common}>
-        <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2-4.6-4.4 6.3-.9z" />
-      </svg>
-    );
-  }
-
-  if (name === "close") {
-    return (
-      <svg {...common}>
-        <circle cx="12" cy="12" r="8" />
-        <path d="m9 9 6 6" />
-        <path d="m15 9-6 6" />
+        <path d="M20 7v5h-5" />
+        <path d="M4.8 9a7.5 7.5 0 0 1 12.3-2.5L20 9" />
+        <path d="M4 17v-5h5" />
+        <path d="M19.2 15a7.5 7.5 0 0 1-12.3 2.5L4 15" />
       </svg>
     );
   }

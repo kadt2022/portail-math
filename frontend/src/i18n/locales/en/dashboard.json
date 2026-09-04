@@ -12,6 +12,32 @@
     "description": "Courses, games and challenges to grow your math skills.",
     "exploreCourses": "View courses"
   },
+  "about": {
+    "title": "What is Mbuyamba Education?",
+    "tagline": "An interactive learning platform that turns studying into an experience.",
+    "description": "Mbuyamba Education brings together structured courses, interactive exercises, educational games and progress tracking in one place. A student learns a concept, practices it, plays to reinforce it, and watches their progress build over time.",
+    "features": {
+      "level": {
+        "title": "Learn at your level",
+        "text": "Paths organized by grade to move forward step by step and lock in the essentials."
+      },
+      "play": {
+        "title": "Learn by playing too",
+        "text": "Math becomes adventures, challenges and situations to solve, rather than a string of exercises."
+      },
+      "progress": {
+        "title": "Understand your progress",
+        "text": "The student sees what they've started, what they've mastered, and what still needs work."
+      }
+    },
+    "yamba": {
+      "title": "Never alone",
+      "text": "Yamba guides, encourages and helps the student whenever they need it."
+    },
+    "conclusion": "At Mbuyamba, learning, practicing and playing are all part of the same adventure.",
+    "ctaCourses": "Discover the courses",
+    "ctaGames": "Discover the challenges"
+  },
   "continuePlaying": {
     "heading": "Continue playing",
     "message": "Ready for a new challenge? Take it on and earn rewards!",

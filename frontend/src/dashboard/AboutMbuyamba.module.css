@@ -1,0 +1,318 @@
+/* Prolongement du hero : même rythme d'espacement que les deux cartes du
+   haut (qui ont elles-mêmes 16-24px entre elles), pas un vide qui casse la
+   continuité. Deux couleurs seulement (vert et orange, celles du hero) :
+   pas de troisième ou quatrième teinte ajoutée pour faire varier les blocs. */
+.about {
+  position: relative;
+  margin: 18px 0 40px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* La carte d'intro a son propre fond (comme les deux cartes du hero
+   au-dessus), assez large pour que le texte ne semble jamais coincé contre
+   un vide : un visuel occupe l'espace à droite plutôt que de le laisser nu.
+   La bordure s'enfonce dans le background de la page avec la même couleur,
+   créant une transition douce plutôt qu'une séparation nette. */
+.introCard {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  padding: 30px clamp(24px, 4vw, 44px);
+  border: 1px solid rgb(252 240 225 / 60%);
+  border-radius: 32px 12px 32px 12px;
+  background: linear-gradient(120deg, #fff 0%, var(--pm-accent-soft) 150%);
+  box-shadow: var(--pm-shadow-lg);
+}
+
+.doodleArrow {
+  position: absolute;
+  z-index: 0;
+  top: 14px;
+  left: 18px;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+}
+
+.intro {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  padding-left: 50px;
+}
+
+.title {
+  margin: 0 0 8px;
+  color: var(--pm-brand-dark);
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.tagline {
+  max-width: 46ch;
+  margin: 0 0 14px;
+  color: var(--pm-accent-dark);
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.description {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--pm-ink-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Trois pastilles qui s'empilent en éventail : un aperçu des avantages
+   détaillés juste en dessous, pas une illustration gratuite. Masqué sur
+   petit écran, où la carte redevient un simple bloc de texte. */
+.introVisual {
+  position: relative;
+  z-index: 1;
+  display: none;
+  width: 100%;
+  height: 168px;
+}
+
+.visualBadge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: var(--pm-radius-signature);
+  color: #fff;
+  box-shadow: 0 14px 26px rgb(15 51 43 / 16%), inset 0 1px 0 rgb(255 255 255 / 30%);
+}
+
+.visualBadge svg {
+  width: 46%;
+  height: 46%;
+}
+
+.visualBook {
+  top: 6px;
+  left: 6px;
+  width: 76px;
+  height: 76px;
+  transform: rotate(-8deg);
+}
+
+.visualController {
+  top: 46px;
+  left: 70px;
+  z-index: 1;
+  width: 92px;
+  height: 92px;
+  transform: rotate(5deg);
+}
+
+.visualTrend {
+  right: 4px;
+  bottom: 2px;
+  width: 64px;
+  height: 64px;
+  transform: rotate(10deg);
+}
+
+/* Une liste, pas une grille de cartes colorées : les trois avantages
+   partagent le même fond (transparent) et ne se distinguent que par leur
+   icône. Un filet ténu les sépare au lieu d'une mosaïque de blocs. */
+.features {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin: 32px 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--pm-line);
+  border-bottom: 1px solid var(--pm-line);
+  list-style: none;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.featureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--pm-radius-signature);
+  color: #fff;
+}
+
+.featureIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.orange {
+  background: linear-gradient(145deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
+}
+
+.green {
+  background: linear-gradient(145deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+}
+
+.featureTitle {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+}
+
+.featureText {
+  margin: 0;
+  color: var(--pm-ink-soft);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* Yamba prolonge la carte verte du hero, pas une couleur inventée pour
+   l'occasion. */
+.yamba {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 26px;
+  padding: 20px 24px;
+  border-radius: 28px 10px 28px 10px;
+  background: linear-gradient(120deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+  box-shadow: 0 14px 30px rgb(15 51 43 / 20%);
+}
+
+.yambaAvatar {
+  flex: 0 0 auto;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 24%);
+}
+
+.yambaTitle {
+  margin: 0 0 3px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.yambaText {
+  margin: 0;
+  color: rgb(255 255 255 / 78%);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.conclusion {
+  max-width: 52ch;
+  margin: 0 0 24px;
+  color: var(--pm-brand-dark);
+  font-size: 18px;
+  font-weight: 750;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.ctas {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cta span {
+  transition: transform 180ms ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+}
+
+.cta:hover span {
+  transform: translateX(4px);
+}
+
+.ctaPrimary {
+  background: linear-gradient(140deg, #f2883a 0%, #e2762b 60%, #cf6620 100%);
+  box-shadow: 0 10px 22px rgb(226 118 43 / 26%);
+}
+
+.ctaSecondary {
+  background: linear-gradient(140deg, #1c5747 0%, #17493f 55%, #0f332b 100%);
+  box-shadow: 0 10px 22px rgb(23 73 63 / 26%);
+}
+
+@media (min-width: 700px) {
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  /* La carte ne se resserre plus sur le texte seul : la pastille prend la
+     place qui restait vide à droite. */
+  .introCard {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+  }
+
+  .introVisual {
+    display: block;
+  }
+}
+
+@media (max-width: 699px) {
+  .intro {
+    padding-left: 44px;
+  }
+
+  .conclusion {
+    font-size: 16px;
+  }
+
+  .cta {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

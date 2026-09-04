@@ -16,6 +16,7 @@
   },
   "courseNavigation": {
     "label": "Course navigation",
+    "mobileSectionLabel": "Learning paths",
     "primary": "Primary courses",
     "secondary": "Secondary courses",
     "exetat": "EXETAT preparation",

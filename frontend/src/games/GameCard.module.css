@@ -9,9 +9,12 @@
   transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
+/* Mouvement volontairement discret : la carte entière se soulève et grandit
+   à peine (1.5 %), presque imperceptible, plutôt que de faire gonfler
+   seulement l'image. */
 .card:hover {
   box-shadow: var(--pm-shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.015);
 }
 
 .illustration {
