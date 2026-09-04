@@ -84,6 +84,168 @@
   display: none;
 }
 
+@media (min-width: 900px) {
+  .mobileCourses {
+    display: grid;
+    gap: 8px;
+    margin: 10px 0 12px;
+    padding: 10px;
+    border: 1px solid rgb(23 73 63 / 10%);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgb(247 251 248 / 95%), rgb(255 250 244 / 95%));
+  }
+
+  .mobileSectionLabel {
+    margin: 0 2px 2px;
+    color: var(--pm-ink-soft);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .courseGroup {
+    display: grid;
+    gap: 6px;
+  }
+
+  .courseTrigger {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 11px;
+    background: #fff;
+    color: var(--pm-brand-dark);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: left;
+    box-shadow: 0 4px 14px rgb(21 58 49 / 6%);
+    cursor: pointer;
+  }
+
+  .courseIcon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+  }
+
+  .courseIcon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .primaryIcon {
+    background: #ecf7ef;
+    color: #258b4a;
+  }
+
+  .secondaryIcon {
+    background: #f4efff;
+    color: #7046d9;
+  }
+
+  .courseTriggerText {
+    min-width: 0;
+  }
+
+  .courseChevron {
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 150ms ease;
+  }
+
+  .courseTrigger[aria-expanded="true"] .courseChevron {
+    transform: translateY(2px) rotate(225deg);
+  }
+
+  .coursePanel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 2px 0 4px 36px;
+  }
+
+  .levelLink {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 6px 7px;
+    border: 1px solid var(--pm-line);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--pm-ink);
+    font-size: 10px;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .levelLinkActive {
+    border-color: var(--pm-brand);
+    background: var(--pm-success-soft);
+    color: var(--pm-brand);
+  }
+
+  .levelDot {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 7px;
+    background: var(--pm-surface-warm);
+    color: var(--pm-accent-dark);
+    font-size: 9px;
+    font-weight: 900;
+  }
+
+  .levelText {
+    display: grid;
+    min-width: 0;
+    gap: 1px;
+  }
+
+  .levelText small {
+    color: var(--pm-ink-soft);
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .secondaryNotice {
+    display: grid;
+    gap: 5px;
+    margin-left: 36px;
+    padding: 8px;
+    border-radius: 9px;
+    background: #fff;
+    color: var(--pm-ink-soft);
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  .secondaryNotice strong {
+    justify-self: start;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: var(--pm-surface-warm);
+    color: var(--pm-accent-dark);
+    font-size: 7px;
+    text-transform: uppercase;
+  }
+}
+
 @media (max-width: 899px) {
   .sidebar {
     top: var(--pm-topbar);
