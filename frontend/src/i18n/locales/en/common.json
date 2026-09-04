@@ -50,18 +50,53 @@
     "back": "Back to dashboard"
   },
   "about": {
-    "eyebrow": "Our mission",
-    "title": "About Mbuyamba Maths RDC",
-    "lead": "Make mathematics clearer, more relatable and more accessible to every student.",
-    "descriptionOne": "Mbuyamba Maths RDC is an independent educational portal designed to help students learn and review mathematics.",
-    "descriptionTwo": "It provides an EXETAT preparation path and primary-level learning games.",
-    "noticeTitle": "Important information",
-    "notice": "This portal is not an official platform of the Ministry of Education.",
-    "valuesLabel": "Portal values",
-    "valuesTitle": "Learn. Practice. Succeed.",
-    "valueSimple": "Simple explanations",
-    "valuePaths": "Two tailored learning paths",
-    "valueFree": "Free access",
-    "discover": "Explore the portal"
+    "storyEyebrow": "Our story",
+    "storyTitle": "A different way to learn",
+    "storyLead": "School does not stop at the classroom door.",
+    "storyParagraphOne": "Every student learns differently. Some understand by reading. Others need to see, try, start again, play, or simply hear an explanation presented in another way.",
+    "storyParagraphTwo": "Mbuyamba was born from that idea: creating a digital learning space where a student can reconnect with what is taught at school, explore a concept at their own pace, practise, make mistakes without fear, and try again until it makes sense.",
+    "storyParagraphThree": "Our ambition is not to replace schools, teachers, or books. It is to extend them through lessons, interactive exercises, educational games, challenges, revision, and exam preparation, with special attention to the realities of education in the Democratic Republic of the Congo.",
+    "storyQuote": "Learning can be serious without being boring.",
+    "imageAlt": "A teacher supports students using tablets and computers in a modern classroom.",
+    "imageCaption": "Digital tools used to support students and teachers, not replace them.",
+    "howEyebrow": "How it works",
+    "howTitle": "How do you use Mbuyamba?",
+    "howLead": "Your path starts wherever you need it to. Come to discover something new, review, practise, or learn through play.",
+    "steps": {
+      "choose": {
+        "title": "Choose your path",
+        "description": "Pick your grade, an activity, an educational game, or EXETAT preparation depending on your goal for the day."
+      },
+      "learn": {
+        "title": "Discover and understand",
+        "description": "Explore concepts step by step, with examples and situations designed to make learning more concrete."
+      },
+      "practice": {
+        "title": "Practise and play",
+        "description": "Test what you understand with interactive exercises and challenges. Here, play is part of learning."
+      },
+      "progress": {
+        "title": "Progress at your own pace",
+        "description": "Return to a difficult idea, repeat an activity, and gradually build your learning journey. The goal is not to go fast, but to understand."
+      }
+    },
+    "paceTitle": "At your own pace",
+    "paceText": "You do not have to do everything in a fixed order: follow a lesson, practise, use a game to strengthen an idea, then return wherever you need to.",
+    "visionEyebrow": "Our vision",
+    "visionTitle": "Building tomorrow's school today",
+    "visionLead": "Mbuyamba begins with educational content, mathematics, primary school, and EXETAT preparation. But this is only the beginning.",
+    "visionParagraphOne": "We want to gradually build a real learning environment where a child can move naturally from a lesson to an interactive experience, to a game, to an exercise, and then to a new challenge.",
+    "visionParagraphTwo": "More subjects can progressively find their place. Characters, situations, and stories can remain close to students' daily lives while opening a window to the wider world.",
+    "technologyTitle": "Technology that knows its place",
+    "technologyText": "A tablet does not replace a child's curiosity, and a computer does not replace a good teacher. Technology matters when it helps students understand, practise, and want to keep going.",
+    "rootsTitle": "Designed here. Open to the world.",
+    "rootsText": "Mbuyamba pays special attention to the Democratic Republic of the Congo, its schools, and its students, without giving up a universal ambition: to learn, create, and succeed in tomorrow's world.",
+    "promiseLabel": "Our promise",
+    "promiseEyebrow": "Our promise",
+    "promiseTitle": "And this is only the beginning.",
+    "promiseText": "We will continue to enrich lessons, create new adventures, add activities, and gradually expand the subjects available while listening to students, parents, and teachers.",
+    "promiseQuote": "Every child who can be curious can learn. Our job is to make them want to keep going.",
+    "welcome": "Welcome to Mbuyamba.",
+    "closing": "Learn. Explore. Try. Try again. Progress."
   }
 }
