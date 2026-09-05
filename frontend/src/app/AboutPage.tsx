@@ -4,6 +4,7 @@ import aboutClassroom from "../assets/about-classroom.webp";
 import styles from "./AboutPage.module.css";
 
 const STEP_KEYS = ["choose", "learn", "practice", "progress"] as const;
+const ACTOR_KEYS = ["teacher", "student", "parent"] as const;
 
 export function AboutPage() {
   const { t } = useTranslation("common");
@@ -57,18 +58,17 @@ export function AboutPage() {
           <h2 id="about-vision-title">{t("about.visionTitle")}</h2>
           <p className={styles.visionLead}>{t("about.visionLead")}</p>
           <p>{t("about.visionParagraphOne")}</p>
-          <p>{t("about.visionParagraphTwo")}</p>
 
-          <div className={styles.principles}>
-            <div>
-              <h3>{t("about.technologyTitle")}</h3>
-              <p>{t("about.technologyText")}</p>
-            </div>
-            <div>
-              <h3>{t("about.rootsTitle")}</h3>
-              <p>{t("about.rootsText")}</p>
-            </div>
-          </div>
+          <ul className={styles.actorList}>
+            {ACTOR_KEYS.map((key) => (
+              <li key={key}>
+                <strong>{t(`about.actors.${key}.title`)}</strong>
+                <span>{t(`about.actors.${key}.description`)}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p className={styles.visionConclusion}>{t("about.visionConclusion")}</p>
         </div>
 
         <aside className={styles.promise} aria-label={t("about.promiseLabel")}>
