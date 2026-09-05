@@ -13,6 +13,7 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const currentYear = new Date().getFullYear();
 
   useSyncDocumentLanguage();
 
@@ -85,6 +86,23 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerInner}>
+          <div className={styles.footerBrand}>
+            <strong>{t("appName")}</strong>
+            <span>{t("tagline")}</span>
+          </div>
+
+          <div className={styles.footerMeta}>
+            <Link to="/a-propos" className={styles.footerLink}>
+              {t("nav.about")}
+            </Link>
+            <span className={styles.footerDot} aria-hidden="true">·</span>
+            <span>© {currentYear} {t("appName")}</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
