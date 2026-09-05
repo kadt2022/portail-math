@@ -81,11 +81,6 @@ export function AboutPage() {
           <strong>{t("about.promiseQuote")}</strong>
         </aside>
       </section>
-
-      <footer className={styles.closing}>
-        <p>{t("about.welcome")}</p>
-        <strong>{t("about.closing")}</strong>
-      </footer>
     </div>
   );
 }
