@@ -3,10 +3,6 @@
   min-width: 0;
 }
 
-.navigationConcealed {
-  visibility: hidden;
-}
-
 .track {
   display: flex;
   align-items: center;
@@ -221,4 +217,32 @@
   .secondaryPanel {
     width: calc(100vw - 24px);
   }
+}
+
+@media (max-width: 899px) {
+  .track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+    padding: 0;
+    gap: 4px;
+  }
+  .trigger, .directLink {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+  .panel {
+    top: calc(var(--pm-header-height, 156px) + 4px);
+    max-height: calc(100dvh - var(--pm-header-height, 156px) - 16px);
+    overflow-y: auto;
+  }
+  .courseLink { white-space: normal; }
+}
+
+@media (max-width: 480px) {
+  .track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
