@@ -52,13 +52,13 @@
   "about": {
     "storyEyebrow": "Our story",
     "storyTitle": "A different way to learn",
-    "storyLead": "School does not stop at the classroom door.",
-    "storyParagraphOne": "Every student learns differently. Some understand by reading. Others need to see, try, start again, play, or simply hear an explanation presented in another way.",
-    "storyParagraphTwo": "Mbuyamba was born from that idea: creating a digital learning space where a student can reconnect with what is taught at school, explore a concept at their own pace, practise, make mistakes without fear, and try again until it makes sense.",
-    "storyParagraphThree": "Our ambition is not to replace schools, teachers, or books. It is to extend them through lessons, interactive exercises, educational games, challenges, revision, and exam preparation, with special attention to the realities of education in the Democratic Republic of the Congo.",
+    "storyLead": "Mbuyamba Education is a digital learning environment designed to make learning clearer, more concrete, and more engaging.",
+    "storyParagraphOne": "The platform brings together lessons, interactive activities, exercises, educational games, challenges, and revision paths in one experience. Students can discover a concept, explore it in different ways, practise, try again when needed, and progress step by step.",
+    "storyParagraphTwo": "Mbuyamba favours active and progressive learning. Reading an explanation is only the beginning: students are encouraged to observe, think, manipulate, try, and apply what they have just understood. The same concept can be approached in several ways to support understanding and memory.",
+    "storyParagraphThree": "Each learning path also leaves room for autonomy. Students can move at their own pace, return to a difficulty, go deeper into a concept, or choose another activity to keep learning. Our ambition is to create a space where understanding matters as much as getting the right answer, where mistakes become opportunities to try differently, and where progress remains visible and encouraging.",
     "storyQuote": "Learning can be serious without being boring.",
     "imageAlt": "A teacher supports students using tablets and computers in a modern classroom.",
-    "imageCaption": "Digital tools used to support students and teachers, not replace them.",
+    "imageCaption": "Digital tools used to support students and teachers.",
     "howEyebrow": "How it works",
     "howTitle": "How do you use Mbuyamba?",
     "howLead": "Your path starts wherever you need it to. Come to discover something new, review, practise, or learn through play.",
@@ -84,18 +84,28 @@
     "paceText": "You do not have to do everything in a fixed order: follow a lesson, practise, use a game to strengthen an idea, then return wherever you need to.",
     "visionEyebrow": "Our vision",
     "visionTitle": "Building tomorrow's school today",
-    "visionLead": "Mbuyamba begins with educational content, mathematics, primary school, and EXETAT preparation. But this is only the beginning.",
-    "visionParagraphOne": "We want to gradually build a real learning environment where a child can move naturally from a lesson to an interactive experience, to a game, to an exercise, and then to a new challenge.",
-    "visionParagraphTwo": "More subjects can progressively find their place. Characters, situations, and stories can remain close to students' daily lives while opening a window to the wider world.",
-    "technologyTitle": "Technology that knows its place",
-    "technologyText": "A tablet does not replace a child's curiosity, and a computer does not replace a good teacher. Technology matters when it helps students understand, practise, and want to keep going.",
-    "rootsTitle": "Designed here. Open to the world.",
-    "rootsText": "Mbuyamba pays special attention to the Democratic Republic of the Congo, its schools, and its students, without giving up a universal ambition: to learn, create, and succeed in tomorrow's world.",
-    "promiseLabel": "Our promise",
-    "promiseEyebrow": "Our promise",
-    "promiseTitle": "And this is only the beginning.",
-    "promiseText": "We will continue to enrich lessons, create new adventures, add activities, and gradually expand the subjects available while listening to students, parents, and teachers.",
-    "promiseQuote": "Every child who can be curious can learn. Our job is to make them want to keep going.",
+    "visionLead": "In a school, Mbuyamba can be used in different ways depending on available equipment and the teacher's choices. An activity can be presented to the whole class on a screen or interactive board, completed in small groups on tablets, or assigned individually on a computer.",
+    "visionParagraphOne": "But Mbuyamba is more than a place to display content. It creates one shared working environment around the teacher, the student, and the family.",
+    "actors": {
+      "teacher": {
+        "title": "The teacher",
+        "description": "can organise students into groups, assign an activity to a whole class, a group, or an individual student, then follow results and progress from their own space."
+      },
+      "student": {
+        "title": "The student",
+        "description": "sees assigned activities, knows what work needs to be completed, can resume an activity, and follows progress in the same place as lessons, exercises, and games."
+      },
+      "parent": {
+        "title": "The parent",
+        "description": "can view their child's progress, see completed activities, and better understand the concepts that still need attention."
+      }
+    },
+    "visionConclusion": "At school and at home, the student therefore finds the same learning environment and the same familiar reference points.",
+    "promiseLabel": "Learning continuity",
+    "promiseEyebrow": "School and home",
+    "promiseTitle": "The same learning space",
+    "promiseText": "An activity started in class can be found again at home. Students keep their activities, assigned work, and progress in a familiar environment, while teachers and parents each have a view suited to their role.",
+    "promiseQuote": "One environment to learn in class, continue at home, and follow the student's progress.",
     "welcome": "Welcome to Mbuyamba.",
     "closing": "Learn. Explore. Try. Try again. Progress."
   }
