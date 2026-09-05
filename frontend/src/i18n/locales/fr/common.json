@@ -85,16 +85,26 @@
     "visionEyebrow": "Notre vision",
     "visionTitle": "Construire l'école de demain, aujourd'hui",
     "visionLead": "Dans une école, Mbuyamba peut être utilisé de plusieurs façons selon les équipements disponibles et les choix de l’enseignant. Une activité peut être présentée à toute la classe sur un écran ou un tableau numérique, réalisée en petits groupes sur des tablettes, ou proposée individuellement aux élèves sur un ordinateur.",
-    "visionParagraphOne": "Mais Mbuyamba ne se limite pas à afficher des contenus.",
-    "visionParagraphTwo": "Un enseignant peut organiser ses élèves en groupes, leur proposer directement des exercices ou des activités et suivre leurs résultats depuis son espace. Une même activité peut être donnée à toute une classe, à un groupe particulier ou seulement à un élève qui a besoin de travailler une notion précise.",
-    "technologyTitle": "L’élève retrouve ses activités",
-    "technologyText": "De son côté, l’élève retrouve dans son espace les activités qui lui sont proposées. Il sait ce qu’il doit réaliser, peut reprendre son travail et retrouve au même endroit ses cours, ses exercices, ses jeux et sa progression.",
-    "rootsTitle": "Le même espace d’apprentissage",
-    "rootsText": "Cette continuité se prolonge à la maison. L’élève n’a pas besoin de découvrir un nouvel environnement : il retrouve le même espace d’apprentissage, avec ses activités, son travail à faire et son parcours.",
-    "promiseLabel": "Notre promesse",
-    "promiseEyebrow": "Notre promesse",
-    "promiseTitle": "Suivre les progrès de l’élève",
-    "promiseText": "L’enseignant peut suivre l’évolution de ses élèves et identifier plus facilement les notions qui nécessitent encore du travail. Le parent peut également disposer d’une vue sur la progression de son enfant et mieux comprendre ce qu’il apprend et les domaines dans lesquels il avance. Ainsi, Mbuyamba peut relier l’école, l’enseignant, l’élève et la famille autour d’un même parcours d’apprentissage.",
+    "visionParagraphOne": "Mais Mbuyamba ne se limite pas à afficher des contenus. Il crée un même espace de travail autour de l’enseignant, de l’élève et de la famille.",
+    "actors": {
+      "teacher": {
+        "title": "L’enseignant",
+        "description": "peut organiser ses élèves en groupes, attribuer une activité à toute une classe, à un groupe ou à un élève en particulier, puis suivre les résultats et la progression depuis son espace."
+      },
+      "student": {
+        "title": "L’élève",
+        "description": "retrouve les activités qui lui sont proposées, voit le travail à réaliser, peut reprendre une activité et suivre sa progression au même endroit que ses cours, exercices et jeux."
+      },
+      "parent": {
+        "title": "Le parent",
+        "description": "peut consulter la progression de son enfant, voir les activités réalisées et mieux comprendre les notions qui demandent encore de l’attention."
+      }
+    },
+    "visionConclusion": "À l’école comme à la maison, l’élève retrouve ainsi le même environnement d’apprentissage et les mêmes repères.",
+    "promiseLabel": "Continuité de l’apprentissage",
+    "promiseEyebrow": "École et maison",
+    "promiseTitle": "Le même espace d’apprentissage",
+    "promiseText": "Une activité commencée en classe peut être retrouvée à la maison. L’élève garde ses activités, son travail à faire et sa progression dans un environnement familier, tandis que l’enseignant et le parent disposent chacun d’une vue adaptée à leur rôle.",
     "promiseQuote": "Un seul environnement pour apprendre en classe, continuer à la maison et suivre les progrès de l’élève.",
     "welcome": "Bienvenue sur Mbuyamba.",
     "closing": "Apprends. Explore. Essaie. Recommence. Progresse."
