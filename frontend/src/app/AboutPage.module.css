@@ -68,7 +68,8 @@
 }
 
 .heroVisual {
-  margin: 0;
+  align-self: start;
+  margin: clamp(76px, 5.5vw, 88px) 0 0;
 }
 
 .heroVisual img {
@@ -273,6 +274,7 @@
 
   .heroVisual {
     order: -1;
+    margin-top: 0;
   }
 
   .heroVisual img {
