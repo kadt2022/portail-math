@@ -12,6 +12,25 @@
   align-items: center;
 }
 
+.hero {
+  grid-template-areas:
+    "title title"
+    "copy visual";
+  row-gap: 18px;
+}
+
+.heroTitle {
+  grid-area: title;
+}
+
+.heroCopy {
+  grid-area: copy;
+}
+
+.heroVisual {
+  grid-area: visual;
+}
+
 .heroCopy,
 .visionCopy,
 .heroVisual {
@@ -69,7 +88,7 @@
 
 .heroVisual {
   align-self: start;
-  margin: clamp(76px, 5.5vw, 88px) 0 0;
+  margin: 0;
 }
 
 .heroVisual img {
@@ -171,8 +190,6 @@
   background: transparent;
 }
 
-/* La section vision reprend exactement la même hiérarchie éditoriale que
-   la première section : même fond, même titre, mêmes tailles de paragraphes. */
 .vision > .visionCopy > .eyebrow {
   display: none;
 }
@@ -272,9 +289,11 @@
     grid-template-columns: 1fr;
   }
 
-  .heroVisual {
-    order: -1;
-    margin-top: 0;
+  .hero {
+    grid-template-areas:
+      "title"
+      "visual"
+      "copy";
   }
 
   .heroVisual img {
