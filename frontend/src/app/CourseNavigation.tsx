@@ -7,11 +7,7 @@ import styles from "./CourseNavigation.module.css";
 
 type OpenMenu = "primary" | "secondary" | null;
 
-interface CourseNavigationProps {
-  concealed?: boolean;
-}
-
-export function CourseNavigation({ concealed = false }: CourseNavigationProps) {
+export function CourseNavigation() {
   const { t, i18n } = useTranslation("common");
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
@@ -112,9 +108,8 @@ export function CourseNavigation({ concealed = false }: CourseNavigationProps) {
   return (
     <nav
       ref={rootRef}
-      className={`${styles.navigation}${concealed ? ` ${styles.navigationConcealed}` : ""}`}
+      className={styles.navigation}
       aria-label={t("courseNavigation.label")}
-      aria-hidden={concealed || undefined}
     >
       <div ref={trackRef} className={styles.track}>
         <div className={styles.item}>

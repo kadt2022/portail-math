@@ -50,18 +50,63 @@
     "back": "Retour au tableau de bord"
   },
   "about": {
-    "eyebrow": "Notre mission",
-    "title": "À propos de Mbuyamba Maths RDC",
-    "lead": "Rendre les mathématiques plus claires, plus proches et plus accessibles à chaque élève.",
-    "descriptionOne": "Mbuyamba Maths RDC est un portail éducatif indépendant destiné à aider les élèves à apprendre et à réviser les mathématiques.",
-    "descriptionTwo": "Il propose un parcours de préparation à l'EXETAT et des jeux d'apprentissage pour le primaire.",
-    "noticeTitle": "Information importante",
-    "notice": "Ce portail n'est pas une plateforme officielle du ministère de l'Éducation.",
-    "valuesLabel": "Valeurs du portail",
-    "valuesTitle": "Apprendre. S'exercer. Réussir.",
-    "valueSimple": "Des explications simples",
-    "valuePaths": "Deux parcours adaptés",
-    "valueFree": "Un accès gratuit",
-    "discover": "Découvrir le portail"
+    "storyEyebrow": "Notre histoire",
+    "storyTitle": "Une autre façon d'apprendre",
+    "storyLead": "Mbuyamba Education est un environnement éducatif numérique conçu pour rendre l’apprentissage plus clair, plus concret et plus engageant.",
+    "storyParagraphOne": "La plateforme réunit cours, activités interactives, exercices, jeux éducatifs, défis et parcours de révision dans une même expérience. L’élève peut découvrir une notion, l’explorer de différentes façons, s’exercer, recommencer lorsqu’il en a besoin et progresser étape après étape.",
+    "storyParagraphTwo": "Mbuyamba privilégie un apprentissage actif et progressif. Lire une explication n’est qu’un début : l’élève est invité à observer, réfléchir, manipuler, essayer et appliquer ce qu’il vient de comprendre. Une même notion peut ainsi être abordée sous plusieurs formes afin de faciliter sa compréhension et sa mémorisation.",
+    "storyParagraphThree": "Chaque parcours laisse également une place importante à l’autonomie. L’élève peut avancer à son rythme, revenir sur une difficulté, approfondir une notion ou choisir une activité différente pour continuer à apprendre. Notre ambition est de créer un espace où comprendre compte autant que réussir, où l’erreur devient une occasion d’essayer autrement et où la progression reste visible et encourageante.",
+    "storyQuote": "Apprendre peut être sérieux sans être ennuyeux.",
+    "imageAlt": "Une enseignante accompagne des élèves utilisant des tablettes et des ordinateurs dans une classe moderne.",
+    "imageCaption": "Le numérique comme outil d'apprentissage, au service de l'élève et de l'enseignant.",
+    "howEyebrow": "Mode d'emploi",
+    "howTitle": "Comment utiliser Mbuyamba ?",
+    "howLead": "Ton parcours commence là où tu en as besoin. Tu peux venir pour découvrir, revoir, t'entraîner ou apprendre en jouant.",
+    "steps": {
+      "choose": {
+        "title": "Choisis ton parcours",
+        "description": "Sélectionne ta classe, une activité, un jeu éducatif ou la préparation à l'EXETAT selon ton objectif du moment."
+      },
+      "learn": {
+        "title": "Découvre et comprends",
+        "description": "Explore les notions étape par étape, avec des exemples et des situations pensées pour rendre l'apprentissage plus concret."
+      },
+      "practice": {
+        "title": "Exerce-toi et joue",
+        "description": "Teste ce que tu as compris avec des exercices interactifs et des défis. Ici, le jeu fait partie de l'apprentissage."
+      },
+      "progress": {
+        "title": "Progresse à ton rythme",
+        "description": "Reviens sur une difficulté, recommence une activité et suis progressivement ton parcours. L'objectif n'est pas d'aller vite, mais de comprendre."
+      }
+    },
+    "paceTitle": "À ton rythme",
+    "paceText": "Il n'est pas nécessaire de tout faire dans un ordre précis : suis un cours, exerce-toi, joue pour consolider une notion, puis reviens là où tu en as besoin.",
+    "visionEyebrow": "Notre vision",
+    "visionTitle": "Construire l'école de demain, aujourd'hui",
+    "visionLead": "Dans une école, Mbuyamba peut être utilisé de plusieurs façons selon les équipements disponibles et les choix de l’enseignant. Une activité peut être présentée à toute la classe sur un écran ou un tableau numérique, réalisée en petits groupes sur des tablettes, ou proposée individuellement aux élèves sur un ordinateur.",
+    "visionParagraphOne": "Mais Mbuyamba ne se limite pas à afficher des contenus. Il crée un même espace de travail autour de l’enseignant, de l’élève et de la famille.",
+    "actors": {
+      "teacher": {
+        "title": "L’enseignant",
+        "description": "peut organiser ses élèves en groupes, attribuer une activité à toute une classe, à un groupe ou à un élève en particulier, puis suivre les résultats et la progression depuis son espace."
+      },
+      "student": {
+        "title": "L’élève",
+        "description": "retrouve les activités qui lui sont proposées, voit le travail à réaliser, peut reprendre une activité et suivre sa progression au même endroit que ses cours, exercices et jeux."
+      },
+      "parent": {
+        "title": "Le parent",
+        "description": "peut consulter la progression de son enfant, voir les activités réalisées et mieux comprendre les notions qui demandent encore de l’attention."
+      }
+    },
+    "visionConclusion": "À l’école comme à la maison, l’élève retrouve ainsi le même environnement d’apprentissage et les mêmes repères.",
+    "promiseLabel": "Continuité de l’apprentissage",
+    "promiseEyebrow": "École et maison",
+    "promiseTitle": "Le même espace d’apprentissage",
+    "promiseText": "Une activité commencée en classe peut être retrouvée à la maison. L’élève garde ses activités, son travail à faire et sa progression dans un environnement familier, tandis que l’enseignant et le parent disposent chacun d’une vue adaptée à leur rôle.",
+    "promiseQuote": "Un seul environnement pour apprendre en classe, continuer à la maison et suivre les progrès de l’élève.",
+    "welcome": "Bienvenue sur Mbuyamba.",
+    "closing": "Apprends. Explore. Essaie. Recommence. Progresse."
   }
 }

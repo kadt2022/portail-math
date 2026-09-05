@@ -50,18 +50,63 @@
     "back": "Back to dashboard"
   },
   "about": {
-    "eyebrow": "Our mission",
-    "title": "About Mbuyamba Maths RDC",
-    "lead": "Make mathematics clearer, more relatable and more accessible to every student.",
-    "descriptionOne": "Mbuyamba Maths RDC is an independent educational portal designed to help students learn and review mathematics.",
-    "descriptionTwo": "It provides an EXETAT preparation path and primary-level learning games.",
-    "noticeTitle": "Important information",
-    "notice": "This portal is not an official platform of the Ministry of Education.",
-    "valuesLabel": "Portal values",
-    "valuesTitle": "Learn. Practice. Succeed.",
-    "valueSimple": "Simple explanations",
-    "valuePaths": "Two tailored learning paths",
-    "valueFree": "Free access",
-    "discover": "Explore the portal"
+    "storyEyebrow": "Our story",
+    "storyTitle": "A different way to learn",
+    "storyLead": "Mbuyamba Education is a digital learning environment designed to make learning clearer, more concrete, and more engaging.",
+    "storyParagraphOne": "The platform brings together lessons, interactive activities, exercises, educational games, challenges, and revision paths in one experience. Students can discover a concept, explore it in different ways, practise, try again when needed, and progress step by step.",
+    "storyParagraphTwo": "Mbuyamba favours active and progressive learning. Reading an explanation is only the beginning: students are encouraged to observe, think, manipulate, try, and apply what they have just understood. The same concept can be approached in several ways to support understanding and memory.",
+    "storyParagraphThree": "Each learning path also leaves room for autonomy. Students can move at their own pace, return to a difficulty, go deeper into a concept, or choose another activity to keep learning. Our ambition is to create a space where understanding matters as much as getting the right answer, where mistakes become opportunities to try differently, and where progress remains visible and encouraging.",
+    "storyQuote": "Learning can be serious without being boring.",
+    "imageAlt": "A teacher supports students using tablets and computers in a modern classroom.",
+    "imageCaption": "Digital tools used to support students and teachers.",
+    "howEyebrow": "How it works",
+    "howTitle": "How do you use Mbuyamba?",
+    "howLead": "Your path starts wherever you need it to. Come to discover something new, review, practise, or learn through play.",
+    "steps": {
+      "choose": {
+        "title": "Choose your path",
+        "description": "Pick your grade, an activity, an educational game, or EXETAT preparation depending on your goal for the day."
+      },
+      "learn": {
+        "title": "Discover and understand",
+        "description": "Explore concepts step by step, with examples and situations designed to make learning more concrete."
+      },
+      "practice": {
+        "title": "Practise and play",
+        "description": "Test what you understand with interactive exercises and challenges. Here, play is part of learning."
+      },
+      "progress": {
+        "title": "Progress at your own pace",
+        "description": "Return to a difficult idea, repeat an activity, and gradually build your learning journey. The goal is not to go fast, but to understand."
+      }
+    },
+    "paceTitle": "At your own pace",
+    "paceText": "You do not have to do everything in a fixed order: follow a lesson, practise, use a game to strengthen an idea, then return wherever you need to.",
+    "visionEyebrow": "Our vision",
+    "visionTitle": "Building tomorrow's school today",
+    "visionLead": "In a school, Mbuyamba can be used in different ways depending on available equipment and the teacher's choices. An activity can be presented to the whole class on a screen or interactive board, completed in small groups on tablets, or assigned individually on a computer.",
+    "visionParagraphOne": "But Mbuyamba is more than a place to display content. It creates one shared working environment around the teacher, the student, and the family.",
+    "actors": {
+      "teacher": {
+        "title": "The teacher",
+        "description": "can organise students into groups, assign an activity to a whole class, a group, or an individual student, then follow results and progress from their own space."
+      },
+      "student": {
+        "title": "The student",
+        "description": "sees assigned activities, knows what work needs to be completed, can resume an activity, and follows progress in the same place as lessons, exercises, and games."
+      },
+      "parent": {
+        "title": "The parent",
+        "description": "can view their child's progress, see completed activities, and better understand the concepts that still need attention."
+      }
+    },
+    "visionConclusion": "At school and at home, the student therefore finds the same learning environment and the same familiar reference points.",
+    "promiseLabel": "Learning continuity",
+    "promiseEyebrow": "School and home",
+    "promiseTitle": "The same learning space",
+    "promiseText": "An activity started in class can be found again at home. Students keep their activities, assigned work, and progress in a familiar environment, while teachers and parents each have a view suited to their role.",
+    "promiseQuote": "One environment to learn in class, continue at home, and follow the student's progress.",
+    "welcome": "Welcome to Mbuyamba.",
+    "closing": "Learn. Explore. Try. Try again. Progress."
   }
 }

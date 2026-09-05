@@ -529,8 +529,10 @@ describe("scène Turbo Pulse", () => {
 
     // Le fruit ciblé n'existe plus parmi les fruits présents : ensureTarget()
     // doit constater l'absence et retargeter dès le prochain update().
-    internals.fruits = internals.fruits.filter((fruit) => fruit.spec.number !== ancienResultat);
-    internals.fruits.push(fakeFruit(ancienResultat + 37));
+    // Deux fruits garantissent le stock minimal : avec un seul fruit,
+    // ensureSafetyStock() pouvait recréer aléatoirement l'ancien résultat,
+    // annulant la disparition que ce test cherche à vérifier.
+    internals.fruits = [fakeFruit(ancienResultat + 1), fakeFruit(ancienResultat + 2)];
 
     scene.update(1000, 16);
 

@@ -8,7 +8,7 @@
 
 .sidebar {
   position: fixed;
-  inset: var(--pm-topbar) auto 0 0;
+  inset: var(--pm-header-height, var(--pm-topbar)) auto 0 0;
   z-index: 45;
   display: flex;
   flex-direction: column;
@@ -222,7 +222,7 @@
 
 @media (max-width: 899px) {
   .sidebar {
-    top: var(--pm-topbar);
+    top: var(--pm-header-height, var(--pm-topbar));
     box-shadow: var(--pm-shadow-lg);
     transform: translateX(-105%);
     visibility: hidden;
@@ -240,7 +240,7 @@
     position: fixed;
     z-index: 44;
     display: block;
-    inset: var(--pm-topbar) 0 0;
+    inset: var(--pm-header-height, var(--pm-topbar)) 0 0;
     width: auto;
     height: auto;
     padding: 0;

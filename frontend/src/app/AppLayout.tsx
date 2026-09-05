@@ -12,9 +12,24 @@ export function AppLayout() {
   const { t } = useTranslation("common");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navId = useId();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const currentYear = new Date().getFullYear();
 
   useSyncDocumentLanguage();
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const updateHeight = () => {
+      shellRef.current?.style.setProperty("--pm-header-height", `${header.getBoundingClientRect().height}px`);
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   // La sidebar mobile se referme avec Échap et rend le focus au bouton qui
   // l'a ouverte : sans ça, un utilisateur au clavier perdrait sa position.
@@ -47,12 +62,12 @@ export function AppLayout() {
   }, [sidebarOpen]);
 
   return (
-    <div className={styles.shell}>
+    <div ref={shellRef} className={styles.shell}>
       <a className={styles.skipLink} href="#contenu">
         {t("skipToContent")}
       </a>
 
-      <header className={styles.header}>
+      <header ref={headerRef} className={styles.header}>
         <Link to="/" className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true" />
           <span className={styles.brandText}>
@@ -61,7 +76,7 @@ export function AppLayout() {
           </span>
         </Link>
 
-        <CourseNavigation concealed={sidebarOpen} />
+        <CourseNavigation />
 
         <LanguageSwitcher />
 
@@ -85,6 +100,23 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerInner}>
+          <div className={styles.footerBrand}>
+            <strong>{t("appName")}</strong>
+            <span>{t("tagline")}</span>
+          </div>
+
+          <div className={styles.footerMeta}>
+            <Link to="/a-propos" className={styles.footerLink}>
+              {t("nav.about")}
+            </Link>
+            <span className={styles.footerDot} aria-hidden="true">·</span>
+            <span>© {currentYear} {t("appName")}</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

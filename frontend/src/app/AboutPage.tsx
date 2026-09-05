@@ -1,37 +1,86 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 
+import aboutClassroom from "../assets/about-classroom.webp";
 import styles from "./AboutPage.module.css";
+
+const STEP_KEYS = ["choose", "learn", "practice", "progress"] as const;
+const ACTOR_KEYS = ["teacher", "student", "parent"] as const;
 
 export function AboutPage() {
   const { t } = useTranslation("common");
 
   return (
     <div className={styles.page}>
-      <p className={styles.eyebrow}>{t("about.eyebrow")}</p>
-      <h1>{t("about.title")}</h1>
-      <p className={styles.lead}>{t("about.lead")}</p>
-      <div className={styles.grid}>
-        <section className={styles.card}>
-          <p>{t("about.descriptionOne")}</p>
-          <p>{t("about.descriptionTwo")}</p>
-          <div className={styles.notice}>
-            <strong>{t("about.noticeTitle")}</strong>
-            <p>{t("about.notice")}</p>
-          </div>
-        </section>
-        <aside className={styles.values} aria-label={t("about.valuesLabel")}>
-          <h2>{t("about.valuesTitle")}</h2>
-          <ul>
-            <li>{t("about.valueSimple")}</li>
-            <li>{t("about.valuePaths")}</li>
-            <li>{t("about.valueFree")}</li>
+      <section className={styles.hero} aria-labelledby="about-story-title">
+        <h1 id="about-story-title" className={styles.heroTitle}>
+          {t("about.storyTitle")}
+        </h1>
+
+        <div className={styles.heroCopy}>
+          <p className={styles.lead}>{t("about.storyLead")}</p>
+          <p>{t("about.storyParagraphOne")}</p>
+          <p>{t("about.storyParagraphTwo")}</p>
+          <p>{t("about.storyParagraphThree")}</p>
+          <blockquote>{t("about.storyQuote")}</blockquote>
+        </div>
+
+        <figure className={styles.heroVisual}>
+          <img src={aboutClassroom} alt={t("about.imageAlt")} />
+          <figcaption>{t("about.imageCaption")}</figcaption>
+        </figure>
+      </section>
+
+      <section className={styles.howTo} aria-labelledby="about-how-title">
+        <div className={styles.sectionHeading}>
+          <p className={styles.eyebrow}>{t("about.howEyebrow")}</p>
+          <h2 id="about-how-title">{t("about.howTitle")}</h2>
+          <p>{t("about.howLead")}</p>
+        </div>
+
+        <div className={styles.steps}>
+          {STEP_KEYS.map((key, index) => (
+            <article className={styles.step} key={key}>
+              <span className={styles.stepNumber} aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3>{t(`about.steps.${key}.title`)}</h3>
+              <p>{t(`about.steps.${key}.description`)}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className={styles.paceNote}>
+          <strong>{t("about.paceTitle")}</strong>
+          <p>{t("about.paceText")}</p>
+        </div>
+      </section>
+
+      <section className={styles.vision} aria-labelledby="about-vision-title">
+        <div className={styles.visionCopy}>
+          <p className={styles.eyebrow}>{t("about.visionEyebrow")}</p>
+          <h2 id="about-vision-title">{t("about.visionTitle")}</h2>
+          <p className={styles.visionLead}>{t("about.visionLead")}</p>
+          <p>{t("about.visionParagraphOne")}</p>
+
+          <ul className={styles.actorList}>
+            {ACTOR_KEYS.map((key) => (
+              <li key={key}>
+                <strong>{t(`about.actors.${key}.title`)}</strong>
+                <span>{t(`about.actors.${key}.description`)}</span>
+              </li>
+            ))}
           </ul>
-          <Link to="/" className={styles.link}>
-            {t("about.discover")}
-          </Link>
+
+          <p className={styles.visionConclusion}>{t("about.visionConclusion")}</p>
+        </div>
+
+        <aside className={styles.promise} aria-label={t("about.promiseLabel")}>
+          <p className={styles.promiseEyebrow}>{t("about.promiseEyebrow")}</p>
+          <h3>{t("about.promiseTitle")}</h3>
+          <p>{t("about.promiseText")}</p>
+          <strong>{t("about.promiseQuote")}</strong>
         </aside>
-      </div>
+      </section>
     </div>
   );
 }
