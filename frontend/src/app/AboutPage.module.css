@@ -171,20 +171,20 @@
   line-height: 1.08;
 }
 
-.visionLead {
-  max-width: 62ch;
-  margin: 0 0 24px;
+.visionLead,
+.visionCopy > p:not(.eyebrow):not(.visionLead) {
+  max-width: 68ch;
   color: var(--pm-ink-soft);
-  font-size: clamp(18px, 1.8vw, 20px);
+  font-size: clamp(17px, 1.4vw, 19px);
   line-height: 1.65;
 }
 
+.visionLead {
+  margin: 0 0 20px;
+}
+
 .visionCopy > p:not(.eyebrow):not(.visionLead) {
-  max-width: 68ch;
-  margin: 18px 0 0;
-  color: var(--pm-ink-soft);
-  font-size: 17px;
-  line-height: 1.65;
+  margin: 16px 0 0;
 }
 
 .principles {
@@ -296,12 +296,9 @@
     font-size: clamp(30px, 9vw, 38px);
   }
 
-  .visionLead {
-    font-size: 18px;
-  }
-
+  .visionLead,
   .visionCopy > p:not(.eyebrow):not(.visionLead) {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .heroVisual img {
