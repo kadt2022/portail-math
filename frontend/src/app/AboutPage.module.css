@@ -78,8 +78,7 @@
 }
 
 .heroVisual figcaption {
-  max-width: 62ch;
-  margin: 12px 10px 0;
+  margin: 12px 0 0;
   color: var(--pm-ink-soft);
   font-size: 13px;
 }
@@ -181,7 +180,6 @@
 
 .principles > div {
   padding: 22px;
-  border-top: 3px solid var(--pm-accent);
   border-radius: 0 0 var(--pm-radius-md) var(--pm-radius-md);
   background: var(--pm-surface);
   box-shadow: var(--pm-shadow-sm);

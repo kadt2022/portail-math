@@ -550,6 +550,7 @@ jobs:
       cancel-in-progress: true
     env:
       OPENSHIFT_SERVER: ${{ vars.OPENSHIFT_SERVER }}
+
       OPENSHIFT_NAMESPACE: ${{ vars.OPENSHIFT_NAMESPACE }}
       OPENSHIFT_ROUTE_HOST: ${{ vars.OPENSHIFT_ROUTE_HOST }}
 
