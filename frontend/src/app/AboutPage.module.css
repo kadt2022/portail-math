@@ -30,28 +30,32 @@
 
 .hero h1,
 .vision h2 {
+  max-width: 760px;
+  margin: 10px 0 18px;
   padding-left: clamp(20px, 2.5vw, 30px);
   border-left: 4px solid var(--pm-accent);
   color: var(--pm-brand-dark);
-  font-weight: 800;
-}
-
-.hero h1 {
-  max-width: 760px;
-  margin: 10px 0 18px;
   font-size: clamp(38px, 4vw, 52px);
+  font-weight: 800;
   line-height: 1.02;
 }
 
-.lead {
+.lead,
+.visionLead {
+  max-width: 68ch;
+  margin: 0 0 20px;
   color: var(--pm-ink-soft);
   font-size: clamp(18px, 2vw, 22px);
   line-height: 1.55;
 }
 
-.heroCopy > p:not(.eyebrow):not(.lead) {
+.heroCopy > p:not(.eyebrow):not(.lead),
+.visionCopy > p:not(.eyebrow):not(.visionLead):not(.visionConclusion) {
   max-width: 68ch;
+  margin: 16px 0 0;
   color: var(--pm-ink-soft);
+  font-size: 18px;
+  line-height: 1.65;
 }
 
 .heroCopy blockquote {
@@ -163,34 +167,19 @@
 
 .vision {
   align-items: start;
+  background: transparent;
 }
 
-.vision h2 {
-  margin: 8px 0 20px;
-  font-size: clamp(30px, 3.2vw, 42px);
-  line-height: 1.08;
-}
-
-.visionLead,
-.visionCopy > p:not(.eyebrow):not(.visionLead):not(.visionConclusion) {
-  max-width: 68ch;
-  color: var(--pm-ink-soft);
-  font-size: clamp(17px, 1.4vw, 19px);
-  line-height: 1.65;
-}
-
-.visionLead {
-  margin: 0 0 20px;
-}
-
-.visionCopy > p:not(.eyebrow):not(.visionLead):not(.visionConclusion) {
-  margin: 16px 0 0;
+/* La section vision reprend exactement la même hiérarchie éditoriale que
+   la première section : même fond, même titre, mêmes tailles de paragraphes. */
+.vision > .visionCopy > .eyebrow {
+  display: none;
 }
 
 .actorList {
   display: grid;
-  gap: 14px;
-  max-width: 72ch;
+  gap: 0;
+  max-width: 68ch;
   margin: 26px 0 0;
   padding: 0;
   list-style: none;
@@ -198,9 +187,9 @@
 
 .actorList li {
   display: grid;
-  grid-template-columns: minmax(110px, 0.32fr) minmax(0, 1fr);
-  gap: 16px;
-  padding: 16px 0;
+  grid-template-columns: minmax(135px, 0.32fr) minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
   border-top: 1px solid var(--pm-line);
 }
 
@@ -211,19 +200,20 @@
 .actorList strong {
   color: var(--pm-brand-dark);
   font-size: 18px;
+  line-height: 1.65;
 }
 
 .actorList span {
   color: var(--pm-ink-soft);
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.65;
 }
 
 .visionConclusion {
   max-width: 68ch;
   margin: 24px 0 0;
   color: var(--pm-brand-dark);
-  font-size: clamp(18px, 1.6vw, 20px);
+  font-size: clamp(18px, 2vw, 22px);
   font-weight: 750;
   line-height: 1.55;
 }
@@ -304,28 +294,27 @@
     padding-top: 20px;
   }
 
-  .hero h1 {
+  .hero h1,
+  .vision h2 {
+    padding-left: 16px;
     font-size: clamp(34px, 11vw, 48px);
   }
 
-  .vision h2 {
-    padding-left: 16px;
-    font-size: clamp(30px, 9vw, 38px);
+  .lead,
+  .visionLead {
+    font-size: 18px;
   }
 
-  .visionLead,
-  .visionCopy > p:not(.eyebrow):not(.visionLead):not(.visionConclusion) {
+  .heroCopy > p:not(.eyebrow):not(.lead),
+  .visionCopy > p:not(.eyebrow):not(.visionLead):not(.visionConclusion),
+  .actorList strong,
+  .actorList span {
     font-size: 17px;
   }
 
   .actorList li {
     grid-template-columns: 1fr;
     gap: 6px;
-  }
-
-  .actorList strong,
-  .actorList span {
-    font-size: 17px;
   }
 
   .heroVisual img {
