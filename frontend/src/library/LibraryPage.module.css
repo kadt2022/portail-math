@@ -195,39 +195,82 @@
 }
 
 @media (max-width: 680px) {
-  .titleBlock { padding-left: 16px; }
+  .page { padding: clamp(20px, 3vw, 32px) 0 36px; }
+
+  .titleBlock { padding-left: 12px; }
   .titleBlock::before { width: 3px; }
+
+  .heading h1 { font-size: clamp(24px, 3vw, 32px); margin-top: 6px; }
+
+  .catalogue { margin-top: clamp(20px, 4vw, 32px); }
 
   .sectionHeading {
     align-items: flex-start;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .bookGrid { grid-template-columns: 1fr; }
+  .sectionHeading h2 { font-size: clamp(18px, 2.5vw, 24px); }
+
+  .bookGrid { grid-template-columns: 1fr; gap: 16px; }
 
   .book {
     display: grid;
-    grid-template-columns: minmax(120px, 38%) minmax(0, 1fr);
+    grid-template-columns: minmax(100px, 32%) minmax(0, 1fr);
+    gap: 0;
   }
 
   .coverWrap {
     display: flex;
-    padding: 16px;
+    padding: 12px;
     align-items: flex-start;
+    justify-content: center;
+    background: var(--pm-surface-warm);
   }
 
-  .bookDetails { padding: 18px 16px 18px 0; }
-  .bookDetails h3 { font-size: clamp(20px, 6vw, 26px); }
+  .cover {
+    width: min(100%, 140px);
+  }
+
+  .bookDetails {
+    padding: 14px 12px 14px 8px;
+    gap: 8px;
+  }
+
+  .bookDetails h3 {
+    font-size: clamp(16px, 5vw, 22px);
+    margin: 0 0 6px;
+    line-height: 1.2;
+  }
+
+  .collection { font-size: 10px; }
+
   .description,
   .readerNote { display: none; }
-  .metadata { margin-top: 12px; }
+
+  .metadata {
+    margin: 8px 0 0;
+    gap: 5px;
+  }
+
+  .metadata > div {
+    padding: 5px 7px;
+    font-size: 11px;
+  }
 
   .actions {
     grid-template-columns: 1fr;
-    padding-top: 16px;
+    gap: 6px;
+    padding-top: 10px;
+    margin-top: auto;
+  }
+
+  .actions a {
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 12px;
   }
 
   .downloadButton { font-size: 0 !important; }
-  .downloadButton span { font-size: 16px; }
+  .downloadButton span { font-size: 14px; }
 }
