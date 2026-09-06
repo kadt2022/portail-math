@@ -229,7 +229,7 @@
   }
 
   .cover {
-    width: min(100%, 140px);
+    width: min(100%, 200px);
   }
 
   .bookDetails {
@@ -248,7 +248,7 @@
   .description {
     font-size: 13px;
     line-height: 1.4;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     margin: 6px 0 0;
   }
 
