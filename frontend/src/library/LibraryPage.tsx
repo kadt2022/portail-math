@@ -34,7 +34,6 @@ export function LibraryPage() {
                   src={book.cover}
                   alt={t("book.coverAlt", { title: t(book.titleKey) })}
                 />
-                <span className={styles.freeBadge}>{t("book.free")}</span>
               </div>
 
               <div className={styles.bookDetails}>
