@@ -14,6 +14,7 @@ export interface NavigationLink {
 export const navigationLinks: NavigationLink[] = [
   { to: "/", labelKey: "nav.dashboard" },
   { to: "/exetat", labelKey: "nav.exetat" },
+  { to: "/bibliotheque", labelKey: "nav.library" },
   { to: "/jeux", labelKey: "nav.games" },
   { to: "/progression", labelKey: "nav.progress" },
   { to: "/a-propos", labelKey: "nav.about" },

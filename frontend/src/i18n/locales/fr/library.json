@@ -1,0 +1,43 @@
+{
+  "page": {
+    "eyebrow": "Bibliothèque Mbuyamba",
+    "title": "Des livres pour apprendre autrement",
+    "description": "Retrouve des livres éducatifs conçus pour observer, manipuler, comprendre et progresser à ton rythme."
+  },
+  "selection": {
+    "eyebrow": "À découvrir",
+    "title": "Notre sélection",
+    "count_one": "{{count}} livre",
+    "count_other": "{{count}} livres"
+  },
+  "book": {
+    "collection": "Collection Mbuyamba Education",
+    "free": "Édition gratuite",
+    "coverAlt": "Couverture du livre {{title}}",
+    "level": "Niveau",
+    "subject": "Matière",
+    "length": "Longueur",
+    "format": "Format",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "read": "Lire le livre",
+    "download": "Télécharger",
+    "readerNote": "La lecture s’ouvre dans le lecteur PDF de ton navigateur."
+  },
+  "books": {
+    "mathPrimaryOne": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "Un parcours concret en dix unités pour compter, comparer, additionner, soustraire, mesurer et reconnaître les formes, avec des activités, des évaluations et leurs corrigés.",
+      "level": "1re primaire",
+      "subject": "Mathématiques",
+      "format": "PDF"
+    },
+    "mathPrimaryTwo": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "Un parcours progressif en dix unités pour approfondir les nombres jusqu’à 100, calculer avec des stratégies, découvrir la multiplication, partager, utiliser l’argent, mesurer et résoudre des problèmes.",
+      "level": "2e primaire",
+      "subject": "Mathématiques",
+      "format": "PDF"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "page": {
+    "eyebrow": "Mbuyamba Library",
+    "title": "Books for a different way to learn",
+    "description": "Discover educational books designed to help you observe, explore, understand, and progress at your own pace."
+  },
+  "selection": {
+    "eyebrow": "Featured",
+    "title": "Our selection",
+    "count_one": "{{count}} book",
+    "count_other": "{{count}} books"
+  },
+  "book": {
+    "collection": "Mbuyamba Education Collection",
+    "free": "Free edition",
+    "coverAlt": "Cover of {{title}}",
+    "level": "Level",
+    "subject": "Subject",
+    "length": "Length",
+    "format": "Format",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "read": "Read the book",
+    "download": "Download",
+    "readerNote": "The book opens in your browser's PDF reader."
+  },
+  "books": {
+    "mathPrimaryOne": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "A practical ten-unit journey through counting, comparing, addition, subtraction, measurement, and shapes, complete with activities, assessments, and answer keys.",
+      "level": "1st year of primary",
+      "subject": "Mathematics",
+      "format": "PDF"
+    },
+    "mathPrimaryTwo": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "A progressive ten-unit journey through numbers to 100, calculation strategies, early multiplication, sharing, money, measurement, and problem solving.",
+      "level": "2nd year of primary",
+      "subject": "Mathematics",
+      "format": "PDF"
+    }
+  }
+}
