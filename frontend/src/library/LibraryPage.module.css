@@ -245,7 +245,13 @@
 
   .collection { font-size: 10px; }
 
-  .description,
+  .description {
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
+    margin: 6px 0 0;
+  }
+
   .readerNote { display: none; }
 
   .metadata {
