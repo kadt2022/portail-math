@@ -5,6 +5,7 @@ import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import exetatEn from "./locales/en/exetat.json";
 import gamesEn from "./locales/en/games.json";
+import libraryEn from "./locales/en/library.json";
 import progressEn from "./locales/en/progress.json";
 import primaryFourEn from "./locales/en/primaryFour.json";
 import primaryOneEn from "./locales/en/primaryOne.json";
@@ -14,6 +15,7 @@ import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
 import exetatFr from "./locales/fr/exetat.json";
 import gamesFr from "./locales/fr/games.json";
+import libraryFr from "./locales/fr/library.json";
 import progressFr from "./locales/fr/progress.json";
 import primaryFourFr from "./locales/fr/primaryFour.json";
 import primaryOneFr from "./locales/fr/primaryOne.json";
@@ -36,6 +38,7 @@ void i18next
       "dashboard",
       "exetat",
       "games",
+      "library",
       "progress",
       "primaryOne",
       "primaryTwo",
@@ -52,6 +55,7 @@ void i18next
         dashboard: dashboardFr,
         exetat: exetatFr,
         games: gamesFr,
+        library: libraryFr,
         progress: progressFr,
         primaryOne: primaryOneFr,
         primaryTwo: primaryTwoFr,
@@ -63,6 +67,7 @@ void i18next
         dashboard: dashboardEn,
         exetat: exetatEn,
         games: gamesEn,
+        library: libraryEn,
         progress: progressEn,
         primaryOne: primaryOneEn,
         primaryTwo: primaryTwoEn,
