@@ -29,7 +29,7 @@ describe("Routeur du portail React", () => {
   it("affiche la bibliothèque et son premier livre", () => {
     renderAt("/app/bibliotheque");
     expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { name: /je découvre les maths autour de moi/i })).toHaveLength(2);
+    expect(screen.getAllByRole("heading", { name: /je découvre les maths autour de moi/i })).toHaveLength(3);
     expect(screen.getAllByRole("link", { name: /lire le livre/i })[0].getAttribute("href")).toMatch(
       /\/books\/mbuyamba-1re-primaire-livre-complet\.pdf$/,
     );
