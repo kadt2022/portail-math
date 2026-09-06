@@ -1,10 +1,5 @@
-.page {
-  padding: clamp(32px, 5vw, 64px) 0 72px;
-}
-
-.heading {
-  max-width: 760px;
-}
+.page { padding: clamp(32px, 5vw, 64px) 0 72px; }
+.heading { max-width: 760px; }
 
 .eyebrow,
 .sectionHeading p,
@@ -20,7 +15,7 @@
 .heading h1 {
   margin: 8px 0 12px;
   color: var(--pm-brand-dark);
-  font-size: clamp(36px, 6vw, 64px);
+  font-size: clamp(36px, 5vw, 58px);
 }
 
 .heading > p:last-child {
@@ -30,9 +25,7 @@
   font-size: clamp(17px, 2vw, 20px);
 }
 
-.catalogue {
-  margin-top: clamp(36px, 6vw, 64px);
-}
+.catalogue { margin-top: clamp(36px, 6vw, 64px); }
 
 .sectionHeading {
   display: flex;
@@ -58,129 +51,132 @@
   font-weight: 850;
 }
 
-.book {
+.bookGrid {
   display: grid;
-  grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
-  gap: clamp(28px, 5vw, 68px);
-  max-width: 1120px;
-  padding: clamp(22px, 4vw, 44px);
-  border: 1px solid var(--pm-line);
-  border-radius: 32px 10px 32px 10px;
-  background:
-    radial-gradient(circle at 94% 10%, rgb(226 118 43 / 10%), transparent 28%),
-    var(--pm-surface);
-  box-shadow: var(--pm-shadow-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
 }
 
-.book + .book {
-  margin-top: 24px;
+.book {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid var(--pm-line);
+  border-radius: 24px 8px 24px 8px;
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-sm);
 }
 
 .coverWrap {
   position: relative;
-  align-self: start;
-  max-width: 340px;
+  padding: 24px 24px 0;
+  background:
+    radial-gradient(circle at 90% 8%, rgb(226 118 43 / 12%), transparent 30%),
+    var(--pm-surface-warm);
 }
 
 .cover {
   display: block;
-  width: 100%;
+  width: min(100%, 230px);
+  margin: 0 auto;
   aspect-ratio: 595 / 842;
   object-fit: cover;
-  border-radius: 18px 6px 18px 6px;
-  box-shadow: 0 20px 44px rgb(15 51 43 / 24%);
+  border-radius: 14px 5px 14px 5px;
+  box-shadow: 0 16px 34px rgb(15 51 43 / 20%);
 }
 
 .freeBadge {
   position: absolute;
-  right: -10px;
-  bottom: 20px;
-  padding: 8px 12px;
-  border-radius: 12px 4px 12px 4px;
+  right: 14px;
+  bottom: 16px;
+  padding: 7px 10px;
+  border-radius: 10px 4px 10px 4px;
   background: var(--pm-accent);
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
 }
 
 .bookDetails {
-  align-self: center;
+  display: flex;
+  flex: 1;
   min-width: 0;
+  padding: 22px;
+  flex-direction: column;
 }
 
 .bookDetails h3 {
-  max-width: 720px;
-  margin: 10px 0 16px;
+  margin: 8px 0 12px;
   color: var(--pm-brand-dark);
-  font-size: clamp(30px, 4.3vw, 52px);
-  line-height: 1.04;
+  font-size: clamp(23px, 2.2vw, 30px);
+  line-height: 1.08;
 }
 
 .description {
-  max-width: 68ch;
+  display: -webkit-box;
+  overflow: hidden;
   margin: 0;
   color: var(--pm-ink-soft);
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 
 .metadata {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin: 28px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 20px 0 0;
 }
 
 .metadata > div {
-  min-width: 0;
-  padding: 14px;
-  border-radius: var(--pm-radius-md);
+  padding: 7px 9px;
+  border-radius: 10px;
   background: var(--pm-surface-warm);
 }
 
 .metadata dt {
-  color: var(--pm-ink-soft);
-  font-size: 11px;
-  font-weight: 750;
-  text-transform: uppercase;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .metadata dd {
-  margin: 3px 0 0;
+  margin: 0;
   color: var(--pm-brand-dark);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 850;
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
 }
 
 .actions a {
   display: inline-flex;
-  min-height: 48px;
-  padding: 11px 18px;
+  min-height: 44px;
+  padding: 9px 12px;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   border: 2px solid var(--pm-brand);
-  border-radius: 14px 5px 14px 5px;
+  border-radius: 12px 4px 12px 4px;
+  font-size: 13px;
   font-weight: 850;
   text-decoration: none;
 }
 
-.readButton {
-  background: var(--pm-brand);
-  color: #fff;
-}
-
-.downloadButton {
-  background: transparent;
-  color: var(--pm-brand);
-}
+.readButton { background: var(--pm-brand); color: #fff; }
+.downloadButton { background: transparent; color: var(--pm-brand); }
 
 .actions a:hover,
 .actions a:focus-visible {
@@ -189,52 +185,46 @@
 }
 
 .readerNote {
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   color: var(--pm-ink-soft);
-  font-size: 12px;
+  font-size: 11px;
 }
 
-@media (max-width: 820px) {
-  .book {
-    grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
-    gap: 28px;
-  }
-
-  .metadata {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+@media (max-width: 1180px) {
+  .bookGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 680px) {
   .sectionHeading {
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
   }
 
+  .bookGrid { grid-template-columns: 1fr; }
+
   .book {
-    grid-template-columns: 1fr;
-    padding: 20px;
-    border-radius: 24px 8px 24px 8px;
+    display: grid;
+    grid-template-columns: minmax(120px, 38%) minmax(0, 1fr);
   }
 
   .coverWrap {
-    width: min(78vw, 280px);
-    margin: 0 auto;
+    display: flex;
+    padding: 16px;
+    align-items: flex-start;
   }
 
-  .bookDetails h3 {
-    font-size: clamp(28px, 9vw, 40px);
-  }
+  .bookDetails { padding: 18px 16px 18px 0; }
+  .bookDetails h3 { font-size: clamp(20px, 6vw, 26px); }
+  .description,
+  .readerNote { display: none; }
+  .metadata { margin-top: 12px; }
 
   .actions {
-    display: grid;
     grid-template-columns: 1fr;
+    padding-top: 16px;
   }
-}
 
-@media (max-width: 390px) {
-  .metadata {
-    grid-template-columns: 1fr;
-  }
+  .downloadButton { font-size: 0 !important; }
+  .downloadButton span { font-size: 16px; }
 }

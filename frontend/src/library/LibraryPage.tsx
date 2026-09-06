@@ -23,7 +23,8 @@ export function LibraryPage() {
           <span>{t("selection.count", { count: libraryCatalogue.length })}</span>
         </div>
 
-        {libraryCatalogue.map((book) => (
+        <div className={styles.bookGrid}>
+          {libraryCatalogue.map((book) => (
           <article className={styles.book} key={book.id}>
             <div className={styles.coverWrap}>
               <img
@@ -70,8 +71,9 @@ export function LibraryPage() {
               </div>
               <p className={styles.readerNote}>{t("book.readerNote")}</p>
             </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );
