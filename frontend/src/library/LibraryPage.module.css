@@ -215,47 +215,42 @@
   .bookGrid { grid-template-columns: 1fr; gap: 16px; }
 
   .book {
-    display: grid;
-    grid-template-columns: minmax(100px, 32%) minmax(0, 1fr);
-    gap: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .coverWrap {
-    display: flex;
-    padding: 12px;
-    align-items: flex-start;
-    justify-content: center;
-    background: var(--pm-surface-warm);
+    padding: 16px 16px 0;
   }
 
   .cover {
-    width: min(100%, 200px);
+    width: min(60%, 190px);
   }
 
   .bookDetails {
-    padding: 14px 12px 14px 8px;
+    padding: 16px;
     gap: 8px;
   }
 
   .bookDetails h3 {
-    font-size: clamp(16px, 5vw, 22px);
-    margin: 0 0 6px;
+    font-size: clamp(18px, 5vw, 22px);
+    margin: 0 0 8px;
     line-height: 1.2;
   }
 
   .collection { font-size: 10px; }
 
   .description {
-    font-size: 13px;
-    line-height: 1.4;
-    -webkit-line-clamp: 3;
-    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-line-clamp: unset;
+    margin: 0;
   }
 
   .readerNote { display: none; }
 
   .metadata {
-    margin: 8px 0 0;
+    margin: 12px 0 0;
     gap: 5px;
   }
 
