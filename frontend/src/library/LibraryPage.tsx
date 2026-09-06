@@ -65,10 +65,6 @@ export function LibraryPage() {
                     {t("book.read")}
                     <span aria-hidden="true">↗</span>
                   </a>
-                  <a className={styles.downloadButton} href={book.pdfPath} download>
-                    {t("book.download")}
-                    <span aria-hidden="true">↓</span>
-                  </a>
                 </div>
                 <p className={styles.readerNote}>{t("book.readerNote")}</p>
               </div>

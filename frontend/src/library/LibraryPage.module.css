@@ -155,7 +155,7 @@
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   gap: 8px;
   margin-top: auto;
   padding-top: 22px;
@@ -176,7 +176,6 @@
 }
 
 .readButton { background: var(--pm-brand); color: #fff; }
-.downloadButton { background: transparent; color: var(--pm-brand); }
 
 .actions a:hover,
 .actions a:focus-visible {
@@ -260,7 +259,6 @@
   }
 
   .actions {
-    grid-template-columns: 1fr;
     gap: 6px;
     padding-top: 10px;
     margin-top: auto;
@@ -271,7 +269,4 @@
     padding: 8px 10px;
     font-size: 12px;
   }
-
-  .downloadButton { font-size: 0 !important; }
-  .downloadButton span { font-size: 14px; }
 }
