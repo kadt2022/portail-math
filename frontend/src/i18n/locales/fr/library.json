@@ -38,6 +38,13 @@
       "level": "2e primaire",
       "subject": "Mathématiques",
       "format": "PDF"
+    },
+    "mathPrimaryThree": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "Un parcours enrichissant en dix unités pour explorer les nombres jusqu’à 1000, maîtriser la multiplication et la division, approfondir les fractions, calculer les périmètres et surfaces, et résoudre des problèmes complexes.",
+      "level": "3e primaire",
+      "subject": "Mathématiques",
+      "format": "PDF"
     }
   }
 }

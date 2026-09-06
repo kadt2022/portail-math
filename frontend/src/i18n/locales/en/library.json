@@ -38,6 +38,13 @@
       "level": "2nd year of primary",
       "subject": "Mathematics",
       "format": "PDF"
+    },
+    "mathPrimaryThree": {
+      "title": "Je découvre les maths autour de moi",
+      "description": "An enriching ten-unit journey through numbers to 1000, multiplication and division mastery, fraction understanding, calculating perimeters and areas, and solving complex problems.",
+      "level": "3rd year of primary",
+      "subject": "Mathematics",
+      "format": "PDF"
     }
   }
 }

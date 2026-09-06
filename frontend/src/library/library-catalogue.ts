@@ -1,5 +1,6 @@
 import mathPrimaryOneCover from "../assets/library-math-primary-one-cover.webp";
 import mathPrimaryTwoCover from "../assets/library-math-primary-two-cover.webp";
+import mathPrimaryThreeCover from "../assets/library-math-primary-three-cover.webp";
 
 export interface LibraryBook {
   id: string;
@@ -35,5 +36,16 @@ export const libraryCatalogue: LibraryBook[] = [
     pages: 75,
     cover: mathPrimaryTwoCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-2e-primaire-livre-complet.pdf`,
+  },
+  {
+    id: "math-primary-three",
+    titleKey: "books.mathPrimaryThree.title",
+    descriptionKey: "books.mathPrimaryThree.description",
+    levelKey: "books.mathPrimaryThree.level",
+    subjectKey: "books.mathPrimaryThree.subject",
+    formatKey: "books.mathPrimaryThree.format",
+    pages: 75,
+    cover: mathPrimaryThreeCover,
+    pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-3e-primaire-livre-complet.pdf`,
   },
 ];
