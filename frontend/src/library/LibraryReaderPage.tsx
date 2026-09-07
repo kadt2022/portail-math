@@ -14,7 +14,10 @@ export function LibraryReaderPage() {
   const labels: PdfReaderLabels = {
     loading: t("reader.loading"), error: t("reader.error"), previous: t("reader.previous"),
     next: t("reader.next"), page: t("reader.page"), of: t("reader.of"),
-    zoomOut: t("reader.zoomOut"), zoomIn: t("reader.zoomIn"), download: t("reader.download"),
+    zoomOut: t("reader.zoomOut"), zoomIn: t("reader.zoomIn"), contents: t("reader.contents"),
+    closeContents: t("reader.closeContents"), fullscreen: t("reader.fullscreen"), exitFullscreen: t("reader.exitFullscreen"),
+    pageMode: t("reader.pageMode"), continuousMode: t("reader.continuousMode"), fitPage: t("reader.fitPage"),
+    fitWidth: t("reader.fitWidth"), zoom: t("reader.zoom"),
   };
   return (
     <div className={styles.page}>

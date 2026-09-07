@@ -57,6 +57,14 @@
     "of": "of",
     "zoomOut": "Zoom out",
     "zoomIn": "Zoom in",
-    "download": "Download the book"
+    "contents": "Contents",
+    "closeContents": "Close contents",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen",
+    "pageMode": "Page",
+    "continuousMode": "Continuous",
+    "fitPage": "Fit page",
+    "fitWidth": "Fit width",
+    "zoom": "Zoom"
   }
 }
