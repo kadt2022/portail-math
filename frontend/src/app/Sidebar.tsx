@@ -50,8 +50,6 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
       />
 
       <aside id={navId} className={styles.sidebar}>
-        <p className={styles.navLabel}>{t("navSectionLabel")}</p>
-
         <nav className={styles.nav} aria-label={t("mainNavigation")}>
           {renderPortalLink(dashboardLink, 1)}
 
