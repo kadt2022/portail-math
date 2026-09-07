@@ -71,8 +71,8 @@
   width: 28px;
   height: 28px;
   border-radius: var(--pm-radius-signature);
-  background: var(--pm-surface-warm);
-  color: var(--pm-accent-dark);
+  background: #fff1e6;
+  color: #c95f1b;
   font-size: 11px;
   font-weight: 850;
 }
@@ -102,8 +102,8 @@
 }
 
 .courseMenuButton.linkActive .num {
-  background: var(--pm-surface-warm);
-  color: var(--pm-accent-dark);
+  background: #fff1e6;
+  color: #c95f1b;
 }
 
 .chevron {
