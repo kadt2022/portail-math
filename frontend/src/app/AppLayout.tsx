@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -10,6 +10,8 @@ import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
   const { t } = useTranslation("common");
+  const location = useLocation();
+  const isLibraryReader = /^\/bibliotheque\/[^/]+$/.test(location.pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navId = useId();
   const shellRef = useRef<HTMLDivElement>(null);
@@ -60,6 +62,15 @@ export function AppLayout() {
       document.body.style.overflow = previousOverflow;
     };
   }, [sidebarOpen]);
+
+  if (isLibraryReader) {
+    return (
+      <div ref={shellRef} className={`${styles.shell} ${styles.readerShell}`}>
+        <a className={styles.skipLink} href="#contenu">{t("skipToContent")}</a>
+        <main id="contenu" className={styles.readerMain}><Outlet /></main>
+      </div>
+    );
+  }
 
   return (
     <div ref={shellRef} className={styles.shell}>

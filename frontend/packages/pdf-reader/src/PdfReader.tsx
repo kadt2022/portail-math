@@ -17,7 +17,14 @@ export interface PdfReaderLabels {
   zoom: string;
 }
 
-export interface PdfReaderProps { url: string; title: string; labels: PdfReaderLabels; }
+export interface PdfReaderProps {
+  url: string;
+  title: string;
+  subtitle?: string;
+  backLabel?: string;
+  onBack?: () => void;
+  labels: PdfReaderLabels;
+}
 
 function clampPage(value: number, pageCount: number) {
   return Math.min(Math.max(Math.trunc(value) || 1, 1), Math.max(pageCount, 1));
@@ -71,7 +78,7 @@ function OutlineList({ nodes, currentPage, onSelect }: { nodes: OutlineNode[]; c
   ))}</ul>;
 }
 
-export function PdfReader({ url, title, labels }: PdfReaderProps) {
+export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: PdfReaderProps) {
   const readerRef = useRef<HTMLElement>(null);
   const targetPageRef = useRef(1);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -215,6 +222,12 @@ export function PdfReader({ url, title, labels }: PdfReaderProps) {
   return (
     <section ref={readerRef} className={styles.reader} aria-label={title}>
       <div className={styles.toolbar}>
+        {onBack && backLabel ? (
+          <div className={styles.identity}>
+            <button type="button" className={styles.backButton} onClick={onBack} aria-label={backLabel}>← <span>{backLabel}</span></button>
+            <div className={styles.bookTitle}><strong>{title}</strong>{subtitle ? <span>{subtitle}</span> : null}</div>
+          </div>
+        ) : null}
         <button type="button" title={outlineOpen ? labels.closeContents : labels.contents} aria-label={outlineOpen ? labels.closeContents : labels.contents} aria-expanded={outlineOpen} onClick={() => setOutlineOpen((value) => !value)}>☰ <span>{labels.contents}</span></button>
         <div className={styles.pageControls}>
           <button type="button" title={labels.previous} aria-label={labels.previous} onClick={() => goToPage(pageNumber - 1)} disabled={pageNumber <= 1}>‹</button>

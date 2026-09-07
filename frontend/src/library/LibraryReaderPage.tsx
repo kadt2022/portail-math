@@ -1,6 +1,6 @@
 import { PdfReader, type PdfReaderLabels } from "@mbuyamba/pdf-reader";
 import { useTranslation } from "react-i18next";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { libraryCatalogue } from "./library-catalogue";
 import styles from "./LibraryReaderPage.module.css";
@@ -8,6 +8,7 @@ import styles from "./LibraryReaderPage.module.css";
 export function LibraryReaderPage() {
   const { bookId } = useParams();
   const { t } = useTranslation("library");
+  const navigate = useNavigate();
   const book = libraryCatalogue.find((item) => item.id === bookId);
   if (!book) return <Navigate to="/bibliotheque" replace />;
   const title = t(book.titleKey);
@@ -21,11 +22,14 @@ export function LibraryReaderPage() {
   };
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <Link to="/bibliotheque" className={styles.backLink}><span aria-hidden="true">←</span> {t("reader.back")}</Link>
-        <div><p>{t(book.levelKey)} · {t(book.subjectKey)}</p><h1>{title}</h1></div>
-      </header>
-      <PdfReader url={book.pdfPath} title={title} labels={labels} />
+      <PdfReader
+        url={book.pdfPath}
+        title={title}
+        subtitle={`${t(book.subjectKey)} · ${t(book.levelKey)}`}
+        backLabel={t("reader.back")}
+        onBack={() => navigate("/bibliotheque")}
+        labels={labels}
+      />
     </div>
   );
 }

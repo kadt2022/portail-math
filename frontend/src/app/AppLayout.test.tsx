@@ -52,4 +52,20 @@ describe("Sidebar mobile de l'en-tête", () => {
     renderLayout();
     expect(screen.getByRole("navigation", { name: /navigation principale/i })).toBeInTheDocument();
   });
+  it("réserve tout le viewport au lecteur sur une route de livre", () => {
+    render(
+      <MemoryRouter initialEntries={["/bibliotheque/math-primary-one"]}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="bibliotheque/:bookId" element={<p>Lecteur de test</p>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Lecteur de test")).toBeInTheDocument();
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: /navigation principale/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  });
 });

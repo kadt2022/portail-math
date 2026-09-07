@@ -1,7 +1,7 @@
-.page { display: grid; gap: 20px; min-width: 0; }
-.header { display: grid; gap: 14px; }
-.header p { margin: 0 0 4px; color: #68736e; font-size: 14px; font-weight: 750; }
-.header h1 { margin: 0; color: #103d35; font-size: clamp(25px, 3vw, 42px); line-height: 1.08; }
-.backLink { width: fit-content; color: #17493f; font-weight: 800; text-decoration: none; }
-.backLink:hover { text-decoration: underline; }
-@media (max-width: 620px) { .page { gap: 14px; } }
+.page {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-width: 0;
+  min-height: 0;
+}
