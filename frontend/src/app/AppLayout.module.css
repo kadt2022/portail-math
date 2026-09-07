@@ -137,9 +137,9 @@
 .footer {
   margin-top: 8px;
   padding: 18px clamp(16px, 3vw, 36px);
-  border-top: 1px solid #e4ddd2;
-  background: #fbf8f2;
-  color: #6b746f;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: linear-gradient(135deg, #353a38 0%, #292e2c 52%, #1d211f 100%);
+  color: rgb(255 255 255 / 74%);
 }
 
 .footerInner {
@@ -162,7 +162,7 @@
 }
 
 .footerBrand strong {
-  color: var(--pm-brand);
+  color: rgb(255 255 255 / 94%);
   font-size: 14px;
 }
 
@@ -184,19 +184,19 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--pm-brand);
+  color: rgb(255 255 255 / 82%);
   text-decoration: none;
 }
 
 .footerLink:hover,
 .footerLink:focus-visible {
-  color: #0f5b4c;
+  color: #fff;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .footerDot {
-  color: #b5aaa0;
+  color: rgb(255 255 255 / 34%);
 }
 
 @media (min-width: 900px) {
