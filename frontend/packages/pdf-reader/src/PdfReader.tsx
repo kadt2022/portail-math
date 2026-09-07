@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GlobalWorkerOptions, getDocument, type PDFDocumentProxy, type PDFPageProxy } from "pdfjs-dist";
+// Le suffixe ?url laisse Vite copier le worker parmi les assets et renvoyer son
+// URL finale hachée. Un simple new URL("pdfjs-dist/...", import.meta.url) n'est
+// pas réécrit par Vite pour un specifier de paquet : dans le build de prod, le
+// chemin resterait relatif au chunk émis (/app/assets/pdfjs-dist/...) et pdf.js
+// échouerait à démarrer son worker, laissant chaque livre en état d'erreur.
+import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 import styles from "./PdfReader.module.css";
 
-GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+GlobalWorkerOptions.workerSrc = workerSrc;
 
 const ZOOM_LEVELS = [0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
 const DEFAULT_ZOOM = 1;
@@ -204,7 +210,15 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     const validPage = clampPage(value, pageCount);
     setPageNumber(validPage);
     setPageInput(String(validPage));
-  }, [pageCount]);
+    // En mode continu, changer de page ne suffit pas : sans défilement, le
+    // document reste sur l'ancienne page et l'observateur d'intersection
+    // réécrit aussitôt le numéro demandé avec la page encore visible.
+    if (mode === "continuous") {
+      viewportRef.current
+        ?.querySelector<HTMLElement>(`[data-page="${validPage}"]`)
+        ?.scrollIntoView?.({ block: "start" });
+    }
+  }, [mode, pageCount]);
 
   useEffect(() => {
     let active = true;
@@ -317,7 +331,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     if (mode !== "continuous" || !viewportElement || !pdfDocument) return;
     const pages = Array.from(viewportElement.querySelectorAll<HTMLElement>("[data-page]"));
     const target = viewportElement.querySelector<HTMLElement>(`[data-page="${targetPageRef.current}"]`);
-    target?.scrollIntoView({ block: "center" });
+    target?.scrollIntoView?.({ block: "center" });
     const observer = new IntersectionObserver((entries) => {
       const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       const value = Number((visible?.target as HTMLElement | undefined)?.dataset.page);
@@ -407,7 +421,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
         <button type="button" title={isFullscreen ? labels.exitFullscreen : labels.fullscreen} aria-label={isFullscreen ? labels.exitFullscreen : labels.fullscreen} onClick={() => void toggleFullscreen()}>⛶ <span>{isFullscreen ? labels.exitFullscreen : labels.fullscreen}</span></button>
       </div>
       <div className={styles.body}>
-        {outlineOpen ? <aside className={styles.outline} aria-label={labels.contents}><button type="button" className={styles.closeOutline} onClick={() => setOutlineOpen(false)} aria-label={labels.closeContents}>×</button>{outlineLoading ? <p>{labels.contentsLoading}</p> : outline.length ? <OutlineList nodes={outline} currentPage={activeOutlinePage} onSelect={(page) => { goToPage(page); if (mode === "continuous") viewportElement?.querySelector<HTMLElement>(`[data-page="${page}"]`)?.scrollIntoView({ block: "start" }); }} /> : <p>{labels.contentsUnavailable}</p>}</aside> : null}
+        {outlineOpen ? <aside className={styles.outline} aria-label={labels.contents}><button type="button" className={styles.closeOutline} onClick={() => setOutlineOpen(false)} aria-label={labels.closeContents}>×</button>{outlineLoading ? <p>{labels.contentsLoading}</p> : outline.length ? <OutlineList nodes={outline} currentPage={activeOutlinePage} onSelect={goToPage} /> : <p>{labels.contentsUnavailable}</p>}</aside> : null}
         <div ref={setViewport} className={`${styles.viewport} ${mode === "continuous" ? styles.continuousViewport : ""}`}>
           {!pdfDocument && !error ? <p className={styles.status}>{labels.loading}</p> : null}
           {error ? <p className={styles.error} role="alert">{labels.error}</p> : null}

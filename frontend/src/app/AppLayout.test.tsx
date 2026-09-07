@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 
 import { AppLayout } from "./AppLayout";
 
@@ -67,5 +67,36 @@ describe("Sidebar mobile de l'en-tête", () => {
     expect(screen.queryByRole("banner")).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: /navigation principale/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  });
+
+  it("re-mesure l'en-tête en quittant le lecteur vers la bibliothèque", async () => {
+    const user = userEvent.setup();
+
+    function Lecteur() {
+      const navigate = useNavigate();
+      return (
+        <button type="button" onClick={() => navigate("/")}>
+          Quitter le lecteur
+        </button>
+      );
+    }
+
+    render(
+      <MemoryRouter initialEntries={["/bibliotheque/math-primary-one"]}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route index element={<p>Accueil de test</p>} />
+            <Route path="bibliotheque/:bookId" element={<Lecteur />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /quitter le lecteur/i }));
+
+    const header = screen.getByRole("banner");
+    expect(header.parentElement?.style.getPropertyValue("--pm-header-height")).toBe("0px");
   });
 });

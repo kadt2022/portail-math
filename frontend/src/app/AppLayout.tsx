@@ -21,6 +21,11 @@ export function AppLayout() {
 
   useSyncDocumentLanguage();
 
+  // isLibraryReader en dépendance : sur une route de lecteur, aucun en-tête
+  // n'est rendu et l'effet ressort sans rien mesurer. En revenant vers la
+  // bibliothèque, l'en-tête réapparaît et l'effet doit se rejouer, sinon
+  // --pm-header-height reste absent et le repli mobile (156px) décale la mise
+  // en page.
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
@@ -31,7 +36,7 @@ export function AppLayout() {
     const observer = new ResizeObserver(updateHeight);
     observer.observe(header);
     return () => observer.disconnect();
-  }, []);
+  }, [isLibraryReader]);
 
   // La sidebar mobile se referme avec Échap et rend le focus au bouton qui
   // l'a ouverte : sans ça, un utilisateur au clavier perdrait sa position.

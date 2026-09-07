@@ -1,9 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const renderTask = { promise: Promise.resolve(), cancel: vi.fn() };
 const pdfPage = { getViewport: ({ scale }: { scale: number }) => ({ width: 595 * scale, height: 842 * scale }), render: vi.fn(() => renderTask) };
 const pdfDocument = { numPages: 75, getPage: vi.fn(async () => pdfPage), getOutline: vi.fn(async () => []), getDestination: vi.fn(), getPageIndex: vi.fn() };
+
+// jsdom ne fournit ni IntersectionObserver (mode continu) ni scrollIntoView.
+class NoopIntersectionObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
 
 vi.mock("pdfjs-dist", () => ({
   GlobalWorkerOptions: {},
@@ -20,7 +27,15 @@ const labels: PdfReaderLabels = {
 };
 
 describe("PdfReader", () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    vi.stubGlobal("IntersectionObserver", NoopIntersectionObserver);
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it("propose tous les modes de zoom sans téléchargement", async () => {
     render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
@@ -33,6 +48,23 @@ describe("PdfReader", () => {
     expect(zoom).toHaveTextContent("Ajuster à la page");
     expect(zoom).toHaveTextContent("Ajuster à la largeur");
     expect(screen.queryByRole("link", { name: /télécharger/i })).not.toBeInTheDocument();
+  });
+
+  it("fait défiler jusqu'à la page demandée en mode continu", async () => {
+    render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Suivant" })).toBeEnabled());
+
+    fireEvent.click(screen.getByRole("button", { name: "Continu" }));
+    const scrollIntoView = Element.prototype.scrollIntoView as ReturnType<typeof vi.fn>;
+    scrollIntoView.mockClear();
+
+    fireEvent.click(screen.getByRole("button", { name: "Suivant" }));
+
+    await waitFor(() => {
+      const target = document.querySelector('[data-page="2"]');
+      expect(target).not.toBeNull();
+      expect(scrollIntoView.mock.instances).toContain(target);
+    });
   });
 
   it("valide la saisie de page et mémorise la position", async () => {
