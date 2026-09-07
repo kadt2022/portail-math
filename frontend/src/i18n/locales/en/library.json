@@ -22,7 +22,7 @@
     "pages_other": "{{count}} pages",
     "read": "Read the book",
     "download": "Download",
-    "readerNote": "The book opens in your browser's PDF reader."
+    "readerNote": "Open the book in the Mbuyamba reader."
   },
   "books": {
     "mathPrimaryOne": {
@@ -46,5 +46,17 @@
       "subject": "Mathematics",
       "format": "PDF"
     }
+  },
+  "reader": {
+    "back": "Back to the library",
+    "loading": "Loading the book…",
+    "error": "The book could not be loaded.",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page",
+    "of": "of",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "download": "Download the book"
   }
 }

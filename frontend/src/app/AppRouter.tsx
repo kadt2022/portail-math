@@ -36,6 +36,10 @@ import { ProgressionPage } from "./ProgressionPage";
 // chargement du module) : un chargement paresseux évite de l'inclure dans le
 // bundle principal et surtout d'exécuter ces effets de bord dès qu'une page
 // quelconque du portail est importée (tests compris).
+const LibraryReaderPage = lazy(() =>
+  import("../library/LibraryReaderPage").then((module) => ({ default: module.LibraryReaderPage })),
+);
+
 const TurboPulsePage = lazy(() =>
   import("../games/turbo-pulse/TurboPulsePage").then((module) => ({ default: module.TurboPulsePage })),
 );
@@ -60,6 +64,7 @@ export function AppRouter() {
           <Route path="exetat/matieres/:subjectId/quiz" element={<ExetatQuizPage />} />
           <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
           <Route path="bibliotheque" element={<LibraryPage />} />
+          <Route path="bibliotheque/:bookId" element={<Suspense fallback={null}><LibraryReaderPage /></Suspense>} />
           <Route path="jeux" element={<GamesCataloguePage />} />
           <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
           <Route
@@ -134,3 +139,4 @@ export function AppRouter() {
     </BrowserRouter>
   );
 }
+

@@ -31,7 +31,7 @@ describe("Routeur du portail React", () => {
     expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: /je découvre les maths autour de moi/i })).toHaveLength(3);
     expect(screen.getAllByRole("link", { name: /lire le livre/i })[0].getAttribute("href")).toMatch(
-      /\/books\/mbuyamba-1re-primaire-livre-complet\.pdf$/,
+      /\/app\/bibliotheque\/math-primary-one$/,
     );
   });
 
@@ -130,3 +130,4 @@ describe("Routeur du portail React", () => {
     expect(ecrites).toEqual([]);
   });
 });
+

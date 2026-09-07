@@ -12,6 +12,7 @@ export interface LibraryBook {
   pages: number;
   cover: string;
   pdfPath: string;
+  readerPath: string;
 }
 
 export const libraryCatalogue: LibraryBook[] = [
@@ -25,6 +26,7 @@ export const libraryCatalogue: LibraryBook[] = [
     pages: 75,
     cover: mathPrimaryOneCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-1re-primaire-livre-complet.pdf`,
+    readerPath: "/bibliotheque/math-primary-one",
   },
   {
     id: "math-primary-two",
@@ -36,6 +38,7 @@ export const libraryCatalogue: LibraryBook[] = [
     pages: 75,
     cover: mathPrimaryTwoCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-2e-primaire-livre-complet.pdf`,
+    readerPath: "/bibliotheque/math-primary-two",
   },
   {
     id: "math-primary-three",
@@ -47,5 +50,6 @@ export const libraryCatalogue: LibraryBook[] = [
     pages: 75,
     cover: mathPrimaryThreeCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-3e-primaire-livre-complet.pdf`,
+    readerPath: "/bibliotheque/math-primary-three",
   },
 ];
