@@ -137,9 +137,9 @@
 .footer {
   margin-top: 8px;
   padding: 18px clamp(16px, 3vw, 36px);
-  border-top: 1px solid #cfddd6;
-  background: #e8f0ec;
-  color: #536861;
+  border-top: 1px solid #e4ddd2;
+  background: #fbf8f2;
+  color: #6b746f;
 }
 
 .footerInner {
@@ -184,19 +184,19 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: #2f6558;
+  color: var(--pm-brand);
   text-decoration: none;
 }
 
 .footerLink:hover,
 .footerLink:focus-visible {
-  color: var(--pm-brand);
+  color: #0f5b4c;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .footerDot {
-  color: #93a59e;
+  color: #b5aaa0;
 }
 
 @media (min-width: 900px) {
