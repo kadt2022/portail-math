@@ -167,12 +167,26 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
       try {
         const items = await pdfDocument.getOutline();
         const mapItems = async (source: NonNullable<typeof items>): Promise<OutlineNode[]> => Promise.all(source.map(async (item) => {
-          const destination = typeof item.dest === "string" ? await pdfDocument.getDestination(item.dest) : item.dest;
+          let destination = typeof item.dest === "string" ? null : item.dest;
+          if (typeof item.dest === "string") {
+            try {
+              destination = await pdfDocument.getDestination(item.dest);
+            } catch {
+              destination = null;
+            }
+          }
+
           let target: number | null = null;
           if (destination?.[0]) {
-            try { target = await pdfDocument.getPageIndex(destination[0] as Parameters<PDFDocumentProxy["getPageIndex"]>[0]) + 1; } catch { target = null; }
+            try {
+              target = await pdfDocument.getPageIndex(destination[0] as Parameters<PDFDocumentProxy["getPageIndex"]>[0]) + 1;
+            } catch {
+              target = null;
+            }
           }
-          return { title: item.title, pageNumber: target, items: item.items ? await mapItems(item.items) : [] };
+
+          const childItems = item.items?.length ? await mapItems(item.items) : [];
+          return { title: item.title, pageNumber: target, items: childItems };
         }));
         const mappedOutline = items ? await mapItems(items) : [];
         if (active) setOutline(mappedOutline);
