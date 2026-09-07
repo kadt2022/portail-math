@@ -7,7 +7,7 @@ GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", i
 
 const ZOOM_LEVELS = [0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
 const DEFAULT_ZOOM = 1;
-const CHROME_LIKE_PAGE_WIDTH = 1000;
+const CHROME_LIKE_PAGE_WIDTH = 850;
 type ReaderMode = "page" | "continuous";
 type FitMode = "page" | "width" | "custom";
 type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNode[] };
