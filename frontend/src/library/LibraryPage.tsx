@@ -39,7 +39,6 @@ export function LibraryPage() {
 
               <div className={styles.bookDetails}>
                 <p className={styles.collection}>{t("book.collection")}</p>
-                <h3>{t(book.titleKey)}</h3>
                 <p className={styles.description}>{t(book.descriptionKey)}</p>
 
                 <dl className={styles.metadata}>
