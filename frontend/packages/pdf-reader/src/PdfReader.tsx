@@ -15,9 +15,9 @@ type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNod
 
 export interface PdfReaderLabels {
   loading: string; error: string; previous: string; next: string; page: string; of: string;
-  zoomOut: string; zoomIn: string; contents: string; closeContents: string; fullscreen: string;
-  exitFullscreen: string; pageMode: string; continuousMode: string; fitPage: string; fitWidth: string;
-  zoom: string;
+  zoomOut: string; zoomIn: string; contents: string; closeContents: string; contentsLoading: string;
+  contentsUnavailable: string; fullscreen: string; exitFullscreen: string; pageMode: string;
+  continuousMode: string; fitPage: string; fitWidth: string; zoom: string;
 }
 
 export interface PdfReaderProps {
@@ -101,6 +101,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
   const [scale, setScale] = useState(DEFAULT_ZOOM);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
+  const [outlineLoading, setOutlineLoading] = useState(true);
   const [outlineOpen, setOutlineOpen] = useState(shouldOpenOutlineByDefault);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState(false);
@@ -120,6 +121,11 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     setCustomZoom(DEFAULT_ZOOM);
     setScale(DEFAULT_ZOOM);
     setOutlineOpen(shouldOpenOutlineByDefault());
+    setOutline([]);
+    setOutlineLoading(true);
+    setDocument(null);
+    setSinglePage(null);
+    setError(false);
 
     let active = true;
     const task = getDocument(url);
@@ -154,17 +160,31 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
   useEffect(() => {
     if (!pdfDocument) return;
-    void pdfDocument.getOutline().then(async (items) => {
-      const mapItems = async (source: NonNullable<typeof items>): Promise<OutlineNode[]> => Promise.all(source.map(async (item) => {
-        const destination = typeof item.dest === "string" ? await pdfDocument.getDestination(item.dest) : item.dest;
-        let target: number | null = null;
-        if (destination?.[0]) {
-          try { target = await pdfDocument.getPageIndex(destination[0] as Parameters<PDFDocumentProxy["getPageIndex"]>[0]) + 1; } catch { target = null; }
-        }
-        return { title: item.title, pageNumber: target, items: item.items ? await mapItems(item.items) : [] };
-      }));
-      setOutline(items ? await mapItems(items) : []);
-    });
+    let active = true;
+    setOutlineLoading(true);
+
+    const loadOutline = async () => {
+      try {
+        const items = await pdfDocument.getOutline();
+        const mapItems = async (source: NonNullable<typeof items>): Promise<OutlineNode[]> => Promise.all(source.map(async (item) => {
+          const destination = typeof item.dest === "string" ? await pdfDocument.getDestination(item.dest) : item.dest;
+          let target: number | null = null;
+          if (destination?.[0]) {
+            try { target = await pdfDocument.getPageIndex(destination[0] as Parameters<PDFDocumentProxy["getPageIndex"]>[0]) + 1; } catch { target = null; }
+          }
+          return { title: item.title, pageNumber: target, items: item.items ? await mapItems(item.items) : [] };
+        }));
+        const mappedOutline = items ? await mapItems(items) : [];
+        if (active) setOutline(mappedOutline);
+      } catch {
+        if (active) setOutline([]);
+      } finally {
+        if (active) setOutlineLoading(false);
+      }
+    };
+
+    void loadOutline();
+    return () => { active = false; };
   }, [pdfDocument]);
 
   useEffect(() => {
@@ -281,7 +301,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
         <button type="button" title={isFullscreen ? labels.exitFullscreen : labels.fullscreen} aria-label={isFullscreen ? labels.exitFullscreen : labels.fullscreen} onClick={() => void toggleFullscreen()}>⛶ <span>{isFullscreen ? labels.exitFullscreen : labels.fullscreen}</span></button>
       </div>
       <div className={styles.body}>
-        {outlineOpen ? <aside className={styles.outline} aria-label={labels.contents}><button type="button" className={styles.closeOutline} onClick={() => setOutlineOpen(false)} aria-label={labels.closeContents}>×</button>{outline.length ? <OutlineList nodes={outline} currentPage={activeOutlinePage} onSelect={(page) => { goToPage(page); if (mode === "continuous") viewportElement?.querySelector<HTMLElement>(`[data-page="${page}"]`)?.scrollIntoView({ block: "start" }); }} /> : <p>{labels.loading}</p>}</aside> : null}
+        {outlineOpen ? <aside className={styles.outline} aria-label={labels.contents}><button type="button" className={styles.closeOutline} onClick={() => setOutlineOpen(false)} aria-label={labels.closeContents}>×</button>{outlineLoading ? <p>{labels.contentsLoading}</p> : outline.length ? <OutlineList nodes={outline} currentPage={activeOutlinePage} onSelect={(page) => { goToPage(page); if (mode === "continuous") viewportElement?.querySelector<HTMLElement>(`[data-page="${page}"]`)?.scrollIntoView({ block: "start" }); }} /> : <p>{labels.contentsUnavailable}</p>}</aside> : null}
         <div ref={setViewport} className={`${styles.viewport} ${mode === "continuous" ? styles.continuousViewport : ""}`}>
           {!pdfDocument && !error ? <p className={styles.status}>{labels.loading}</p> : null}
           {error ? <p className={styles.error} role="alert">{labels.error}</p> : null}
