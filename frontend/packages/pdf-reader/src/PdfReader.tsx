@@ -193,7 +193,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
   const [scale, setScale] = useState(DEFAULT_ZOOM);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
-  const [outlineLoading, setOutlineLoading] = useState(false);
+  const [outlineLoading, setOutlineLoading] = useState(shouldOpenOutlineByDefault);
   const [outlineOpen, setOutlineOpen] = useState(shouldOpenOutlineByDefault);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState(false);
@@ -207,18 +207,6 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   }, [pageCount]);
 
   useEffect(() => {
-    // Chaque livre démarre explicitement sur le zoom 100 %, même si le même
-    // composant est réutilisé après avoir consulté un autre PDF à un autre zoom.
-    setFitMode("custom");
-    setCustomZoom(DEFAULT_ZOOM);
-    setScale(DEFAULT_ZOOM);
-    setOutlineOpen(shouldOpenOutlineByDefault());
-    setOutline([]);
-    setOutlineLoading(false);
-    setDocument(null);
-    setSinglePage(null);
-    setError(false);
-
     let active = true;
     const task = getDocument(url);
     void task.promise.then((nextDocument) => {
@@ -236,7 +224,9 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   useEffect(() => {
     if (typeof window.matchMedia !== "function") return;
     const media = window.matchMedia(LARGE_SCREEN_QUERY);
-    const update = (event: MediaQueryListEvent) => setOutlineOpen(event.matches);
+    const update = (event: MediaQueryListEvent) => {
+      setOutlineOpen(event.matches);
+    };
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
@@ -253,8 +243,6 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   useEffect(() => {
     if (!pdfDocument || !outlineOpen || outline.length) return;
     let active = true;
-    setOutlineLoading(true);
-
     const loadOutline = async () => {
       try {
         const items = await pdfDocument.getOutline();
@@ -397,7 +385,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
             <div className={styles.bookTitle}><strong>{title}</strong>{subtitle ? <span>{subtitle}</span> : null}</div>
           </div>
         ) : null}
-        <button type="button" title={outlineOpen ? labels.closeContents : labels.contents} aria-label={outlineOpen ? labels.closeContents : labels.contents} aria-expanded={outlineOpen} onClick={() => setOutlineOpen((value) => !value)}>☰ <span>{labels.contents}</span></button>
+        <button type="button" title={outlineOpen ? labels.closeContents : labels.contents} aria-label={outlineOpen ? labels.closeContents : labels.contents} aria-expanded={outlineOpen} onClick={() => { if (!outlineOpen && !outline.length) setOutlineLoading(true); setOutlineOpen((value) => !value); }}>☰ <span>{labels.contents}</span></button>
         <div className={styles.pageControls}>
           <button type="button" title={labels.previous} aria-label={labels.previous} onClick={() => goToPage(pageNumber - 1)} disabled={pageNumber <= 1}>‹</button>
           <label>{labels.page} <input aria-label={labels.page} inputMode="numeric" value={pageInput} onChange={(event) => setPageInput(event.target.value.replace(/\D/g, ""))} onBlur={submitPage} onKeyDown={(event) => { if (event.key === "Enter") submitPage(); }} /> {labels.of} {pageCount || "…"}</label>
@@ -430,3 +418,4 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     </section>
   );
 }
+

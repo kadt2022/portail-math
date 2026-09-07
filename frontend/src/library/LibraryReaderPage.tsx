@@ -24,6 +24,7 @@ export function LibraryReaderPage() {
   return (
     <div className={styles.page}>
       <PdfReader
+        key={book.id}
         url={book.pdfPath}
         title={title}
         subtitle={`${t(book.subjectKey)} · ${t(book.levelKey)}`}
@@ -34,3 +35,4 @@ export function LibraryReaderPage() {
     </div>
   );
 }
+
