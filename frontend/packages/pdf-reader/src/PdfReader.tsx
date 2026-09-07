@@ -152,7 +152,13 @@ function CanvasPage({ page, scale, label }: { page: PDFPageProxy; scale: number;
     if (!context) return;
     const task = page.render({ canvas, canvasContext: context, viewport, transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0] });
     void task.promise.catch(() => undefined);
-    return () => task.cancel();
+    return () => {
+      task.cancel();
+      // Réduit immédiatement le backing store du canvas lorsqu'une page sort
+      // de la fenêtre virtuelle, au lieu d'attendre le GC du navigateur.
+      canvas.width = 0;
+      canvas.height = 0;
+    };
   }, [page, scale]);
   return <canvas ref={canvasRef} aria-label={label} />;
 }
@@ -163,11 +169,26 @@ function ContinuousPage({ pdfDocument, number, scale, label, root }: { pdfDocume
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !root) return;
+    let active = true;
+    let nearby = false;
     const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) void pdfDocument.getPage(number).then(setPage);
+      nearby = entries.some((entry) => entry.isIntersecting);
+      if (!nearby) {
+        // L'article conserve sa taille comme espace de défilement, mais son
+        // canvas est démonté dès qu'il sort de la fenêtre de préchargement.
+        setPage(null);
+        return;
+      }
+      void pdfDocument.getPage(number).then((nextPage) => {
+        if (active && nearby) setPage(nextPage);
+      }).catch(() => undefined);
     }, { root, rootMargin: "500px 0px" });
     observer.observe(host);
-    return () => observer.disconnect();
+    return () => {
+      active = false;
+      observer.disconnect();
+      setPage(null);
+    };
   }, [pdfDocument, number, root]);
   return (
     <article ref={hostRef} className={styles.continuousPage} data-page={number} style={{ width: `${595 * scale}px`, minHeight: `${842 * scale}px` }}>
@@ -205,12 +226,12 @@ function ContinuousModeIcon() {
 
 export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: PdfReaderProps) {
   const readerRef = useRef<HTMLElement>(null);
-  const targetPageRef = useRef(1);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
   const [pdfDocument, setDocument] = useState<PDFDocumentProxy | null>(null);
   const [singlePage, setSinglePage] = useState<PDFPageProxy | null>(null);
   const [pageNumber, setPageNumber] = useState(() => Number(localStorage.getItem(`mbuyamba-reader:${url}`)) || 1);
+  const targetPageRef = useRef(pageNumber);
   const [pageInput, setPageInput] = useState(String(pageNumber));
   const [mode, setMode] = useState<ReaderMode>("continuous");
   const [fitMode, setFitMode] = useState<FitMode>("custom");
@@ -226,6 +247,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const setViewport = useCallback((node: HTMLDivElement | null) => { viewportRef.current = node; setViewportElement(node); }, []);
   const goToPage = useCallback((value: number) => {
     const validPage = clampPage(value, pageCount);
+    targetPageRef.current = validPage;
     setPageNumber(validPage);
     setPageInput(String(validPage));
     // En mode continu, changer de page ne suffit pas : sans défilement, le
@@ -246,6 +268,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
       setDocument(nextDocument);
       setPageNumber((value) => {
         const validPage = clampPage(value, nextDocument.numPages);
+        targetPageRef.current = validPage;
         setPageInput(String(validPage));
         return validPage;
       });
