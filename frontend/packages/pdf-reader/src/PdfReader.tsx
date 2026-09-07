@@ -107,6 +107,12 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   }, [pageCount]);
 
   useEffect(() => {
+    // Chaque livre démarre explicitement sur le zoom 100 %, même si le même
+    // composant est réutilisé après avoir consulté un autre PDF à un autre zoom.
+    setFitMode("custom");
+    setCustomZoom(DEFAULT_ZOOM);
+    setScale(DEFAULT_ZOOM);
+
     let active = true;
     const task = getDocument(url);
     void task.promise.then((nextDocument) => {
