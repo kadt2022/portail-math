@@ -12,6 +12,7 @@ const LARGE_SCREEN_QUERY = "(min-width: 1200px)";
 type ReaderMode = "page" | "continuous";
 type FitMode = "page" | "width" | "custom";
 type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNode[] };
+type PageTextItem = { text: string; height: number };
 
 export interface PdfReaderLabels {
   loading: string; error: string; previous: string; next: string; page: string; of: string;
@@ -37,6 +38,97 @@ function shouldOpenOutlineByDefault() {
   return typeof window !== "undefined"
     && typeof window.matchMedia === "function"
     && window.matchMedia(LARGE_SCREEN_QUERY).matches;
+}
+
+function normalizeText(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function extractTextItems(items: Awaited<ReturnType<PDFPageProxy["getTextContent"]>>["items"]): PageTextItem[] {
+  return items.flatMap((item) => {
+    if (!("str" in item)) return [];
+    const text = normalizeText(item.str);
+    if (!text) return [];
+    return [{ text, height: typeof item.height === "number" ? item.height : 0 }];
+  });
+}
+
+function findLessonTitle(items: PageTextItem[]) {
+  const markerIndex = items.findIndex((item) => /LE[ÇC]ON\s*\d+/i.test(item.text));
+  if (markerIndex < 0) return "";
+
+  const ignored = /^(?:\d+|UNIT[ÉE]\s*\d+|OBJECTIF|JE D[ÉE]COUVRE|JE COMPRENDS|JE MANIPULE|JE M['’]ENTRA[IÎ]NE|FICHE PORTAIL)/i;
+  const candidates = items
+    .slice(markerIndex + 1, markerIndex + 12)
+    .filter((item) => item.text.length >= 3 && item.text.length <= 100 && !ignored.test(item.text));
+
+  if (!candidates.length) return "";
+  return [...candidates].sort((a, b) => b.height - a.height)[0].text;
+}
+
+async function buildFallbackOutline(pdfDocument: PDFDocumentProxy): Promise<OutlineNode[]> {
+  const roots: OutlineNode[] = [];
+  const unitNodes = new Map<number, OutlineNode>();
+  const introSeen = new Set<string>();
+
+  const addIntro = (title: string, pageNumber: number) => {
+    if (introSeen.has(title)) return;
+    introSeen.add(title);
+    roots.push({ title, pageNumber, items: [] });
+  };
+
+  const getUnit = (unitNumber: number, pageNumber: number) => {
+    let unit = unitNodes.get(unitNumber);
+    if (!unit) {
+      unit = { title: `Unité ${unitNumber}`, pageNumber, items: [] };
+      unitNodes.set(unitNumber, unit);
+      roots.push(unit);
+    }
+    return unit;
+  };
+
+  for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+    try {
+      const page = await pdfDocument.getPage(pageNumber);
+      const textContent = await page.getTextContent();
+      const textItems = extractTextItems(textContent.items);
+      const pageText = normalizeText(textItems.map((item) => item.text).join(" "));
+
+      if (pageNumber <= 8) {
+        if (pageNumber === 1) addIntro("Titre", pageNumber);
+        if (/\bBienvenue\b/i.test(pageText)) addIntro("Bienvenue", pageNumber);
+        if (/Ce que tu vas apprendre/i.test(pageText)) addIntro("Ce que tu vas apprendre", pageNumber);
+        if (/\bSommaire\b/i.test(pageText)) addIntro("Sommaire", pageNumber);
+      }
+
+      const lessonMatch = pageText.match(/LE[ÇC]ON\s*(\d+)\s*[•·\-–—:]?\s*UNIT[ÉE]\s*(\d+)/i);
+      if (lessonMatch) {
+        const lessonNumber = Number(lessonMatch[1]);
+        const unitNumber = Number(lessonMatch[2]);
+        const title = findLessonTitle(textItems);
+        const label = title ? `Leçon ${lessonNumber} - ${title}` : `Leçon ${lessonNumber}`;
+        const unit = getUnit(unitNumber, pageNumber);
+        if (!unit.items.some((item) => item.title === label)) {
+          unit.items.push({ title: label, pageNumber, items: [] });
+        }
+        continue;
+      }
+
+      const evaluationMatch = pageText.match(/[ÉE]VALUATION(?:\s*[-–—•:]?\s*UNIT[ÉE])?\s*(\d+)/i);
+      if (evaluationMatch) {
+        const unitNumber = Number(evaluationMatch[1]);
+        const unit = getUnit(unitNumber, pageNumber);
+        const label = `Évaluation - Unité ${unitNumber}`;
+        if (!unit.items.some((item) => item.title === label)) {
+          unit.items.push({ title: label, pageNumber, items: [] });
+        }
+      }
+    } catch {
+      // Une page illisible ne doit pas annuler le sommaire construit à partir des autres pages.
+    }
+  }
+
+  return roots;
 }
 
 function CanvasPage({ page, scale, label }: { page: PDFPageProxy; scale: number; label: string }) {
@@ -101,7 +193,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
   const [scale, setScale] = useState(DEFAULT_ZOOM);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
-  const [outlineLoading, setOutlineLoading] = useState(true);
+  const [outlineLoading, setOutlineLoading] = useState(false);
   const [outlineOpen, setOutlineOpen] = useState(shouldOpenOutlineByDefault);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState(false);
@@ -122,7 +214,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     setScale(DEFAULT_ZOOM);
     setOutlineOpen(shouldOpenOutlineByDefault());
     setOutline([]);
-    setOutlineLoading(true);
+    setOutlineLoading(false);
     setDocument(null);
     setSinglePage(null);
     setError(false);
@@ -159,7 +251,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   }, [pdfDocument, mode, pageNumber, url]);
 
   useEffect(() => {
-    if (!pdfDocument) return;
+    if (!pdfDocument || !outlineOpen || outline.length) return;
     let active = true;
     setOutlineLoading(true);
 
@@ -188,10 +280,22 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
           const childItems = item.items?.length ? await mapItems(item.items) : [];
           return { title: item.title, pageNumber: target, items: childItems };
         }));
-        const mappedOutline = items ? await mapItems(items) : [];
-        if (active) setOutline(mappedOutline);
+
+        const nativeOutline = items ? await mapItems(items) : [];
+        if (nativeOutline.length) {
+          if (active) setOutline(nativeOutline);
+          return;
+        }
+
+        const generatedOutline = await buildFallbackOutline(pdfDocument);
+        if (active) setOutline(generatedOutline);
       } catch {
-        if (active) setOutline([]);
+        try {
+          const generatedOutline = await buildFallbackOutline(pdfDocument);
+          if (active) setOutline(generatedOutline);
+        } catch {
+          if (active) setOutline([]);
+        }
       } finally {
         if (active) setOutlineLoading(false);
       }
@@ -199,7 +303,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
     void loadOutline();
     return () => { active = false; };
-  }, [pdfDocument]);
+  }, [outline.length, outlineOpen, pdfDocument]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
