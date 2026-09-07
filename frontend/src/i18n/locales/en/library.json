@@ -59,6 +59,8 @@
     "zoomIn": "Zoom in",
     "contents": "Contents",
     "closeContents": "Close contents",
+    "contentsLoading": "Loading contents…",
+    "contentsUnavailable": "Contents are not available for this book.",
     "fullscreen": "Full screen",
     "exitFullscreen": "Exit full screen",
     "pageMode": "Page",
