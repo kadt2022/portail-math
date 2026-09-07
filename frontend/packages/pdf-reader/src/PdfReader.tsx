@@ -8,6 +8,7 @@ GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", i
 const ZOOM_LEVELS = [0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
 const DEFAULT_ZOOM = 1;
 const CHROME_LIKE_PAGE_WIDTH = 850;
+const LARGE_SCREEN_QUERY = "(min-width: 1401px)";
 type ReaderMode = "page" | "continuous";
 type FitMode = "page" | "width" | "custom";
 type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNode[] };
@@ -30,6 +31,12 @@ export interface PdfReaderProps {
 
 function clampPage(value: number, pageCount: number) {
   return Math.min(Math.max(Math.trunc(value) || 1, 1), Math.max(pageCount, 1));
+}
+
+function shouldOpenOutlineByDefault() {
+  return typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia(LARGE_SCREEN_QUERY).matches;
 }
 
 function CanvasPage({ page, scale, label }: { page: PDFPageProxy; scale: number; label: string }) {
@@ -94,7 +101,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
   const [scale, setScale] = useState(DEFAULT_ZOOM);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
-  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(shouldOpenOutlineByDefault);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState(false);
 
@@ -112,6 +119,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     setFitMode("custom");
     setCustomZoom(DEFAULT_ZOOM);
     setScale(DEFAULT_ZOOM);
+    setOutlineOpen(shouldOpenOutlineByDefault());
 
     let active = true;
     const task = getDocument(url);
@@ -126,6 +134,14 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     }).catch(() => { if (active) setError(true); });
     return () => { active = false; void task.destroy(); };
   }, [url]);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia(LARGE_SCREEN_QUERY);
+    const update = (event: MediaQueryListEvent) => setOutlineOpen(event.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     if (!pdfDocument) return;
