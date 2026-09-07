@@ -88,7 +88,8 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [pageNumber, setPageNumber] = useState(() => Number(localStorage.getItem(`mbuyamba-reader:${url}`)) || 1);
   const [pageInput, setPageInput] = useState(String(pageNumber));
   const [mode, setMode] = useState<ReaderMode>("page");
-  const [fitMode, setFitMode] = useState<FitMode>("page");
+  const [fitMode, setFitMode] = useState<FitMode>("custom");
+  const [customZoom, setCustomZoom] = useState(1);
   const [scale, setScale] = useState(1);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
   const [outlineOpen, setOutlineOpen] = useState(false);
@@ -144,18 +145,23 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || !singlePage || fitMode === "custom") return;
+    if (!viewport || !singlePage) return;
     const fit = () => {
       const base = singlePage.getViewport({ scale: 1 });
-      const widthScale = Math.max(0.5, (viewport.clientWidth - 32) / base.width);
-      const heightScale = Math.max(0.5, (viewport.clientHeight - 32) / base.height);
-      setScale(Math.min(2, fitMode === "width" ? widthScale : Math.min(widthScale, heightScale)));
+      const widthScale = Math.max(0.5, (viewport.clientWidth - 28) / base.width);
+      const heightScale = Math.max(0.5, (viewport.clientHeight - 20) / base.height);
+      if (fitMode === "custom") {
+        const chromeLikeWidth = Math.min(900, Math.max(320, viewport.clientWidth - 28));
+        setScale((chromeLikeWidth / base.width) * customZoom);
+      } else {
+        setScale(fitMode === "width" ? widthScale : Math.min(widthScale, heightScale));
+      }
     };
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [fitMode, singlePage]);
+  }, [customZoom, fitMode, singlePage]);
 
   useEffect(() => {
     if (mode !== "continuous" || !viewportElement || !pdfDocument) return;
@@ -191,13 +197,14 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     return () => document.removeEventListener("fullscreenchange", update);
   }, []);
 
-  const selectZoom = (value: number) => { setFitMode("custom"); setScale(value); };
+  const selectZoom = (value: number) => { setFitMode("custom"); setCustomZoom(value); };
   const changeZoom = (direction: -1 | 1) => {
-    let index = ZOOM_LEVELS.findIndex((value) => value > scale + 0.001);
+    const currentZoom = fitMode === "custom" ? customZoom : 1;
+    let index = ZOOM_LEVELS.findIndex((value) => value > currentZoom + 0.001);
     if (direction < 0) {
       index = -1;
       for (let candidate = ZOOM_LEVELS.length - 1; candidate >= 0; candidate -= 1) {
-        if (ZOOM_LEVELS[candidate] < scale - 0.001) { index = candidate; break; }
+        if (ZOOM_LEVELS[candidate] < currentZoom - 0.001) { index = candidate; break; }
       }
     }
     selectZoom(ZOOM_LEVELS[index < 0 ? (direction > 0 ? ZOOM_LEVELS.length - 1 : 0) : index]);
@@ -238,13 +245,13 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
           <button type="button" aria-pressed={mode === "page"} onClick={() => changeMode("page")}>{labels.pageMode}</button>
           <button type="button" aria-pressed={mode === "continuous"} onClick={() => changeMode("continuous")}>{labels.continuousMode}</button>
         </div>
-        <select aria-label={labels.zoom} value={fitMode === "custom" ? String(scale) : fitMode} onChange={(event) => { const value = event.target.value; if (value === "page" || value === "width") setFitMode(value); else selectZoom(Number(value)); }}>
+        <select aria-label={labels.zoom} value={fitMode === "custom" ? String(customZoom) : fitMode} onChange={(event) => { const value = event.target.value; if (value === "page" || value === "width") setFitMode(value); else selectZoom(Number(value)); }}>
           <option value="page">{labels.fitPage}</option><option value="width">{labels.fitWidth}</option>
           {ZOOM_LEVELS.map((value) => <option key={value} value={value}>{Math.round(value * 100)} %</option>)}
         </select>
         <div className={styles.zoomControls}>
           <button type="button" title={labels.zoomOut} aria-label={labels.zoomOut} onClick={() => changeZoom(-1)}>−</button>
-          <strong>{Math.round(scale * 100)} %</strong>
+          <strong>{Math.round((fitMode === "custom" ? customZoom : scale) * 100)} %</strong>
           <button type="button" title={labels.zoomIn} aria-label={labels.zoomIn} onClick={() => changeZoom(1)}>+</button>
         </div>
         <button type="button" title={isFullscreen ? labels.exitFullscreen : labels.fullscreen} aria-label={isFullscreen ? labels.exitFullscreen : labels.fullscreen} onClick={() => void toggleFullscreen()}>⛶ <span>{isFullscreen ? labels.exitFullscreen : labels.fullscreen}</span></button>

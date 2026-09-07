@@ -26,6 +26,7 @@ describe("PdfReader", () => {
     render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Suivant" })).toBeEnabled());
     const zoom = screen.getByRole("combobox", { name: "Zoom" });
+    expect(zoom).toHaveValue("1");
     expect(zoom).toHaveTextContent("75 %");
     expect(zoom).toHaveTextContent("100 %");
     expect(zoom).toHaveTextContent("200 %");
@@ -45,4 +46,3 @@ describe("PdfReader", () => {
     expect(input).toHaveValue("75");
   });
 });
-
