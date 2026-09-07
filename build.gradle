@@ -84,6 +84,7 @@ tasks.register('frontendBuild', Exec) {
     workingDir frontendDir
     commandLine npmExecutable, 'run', 'build'
     inputs.dir(new File(frontendDir, 'src'))
+    inputs.dir(new File(frontendDir, 'packages'))
     inputs.file(new File(frontendDir, 'index.html'))
     inputs.file(new File(frontendDir, 'vite.config.ts'))
     inputs.file(new File(frontendDir, 'tsconfig.json'))

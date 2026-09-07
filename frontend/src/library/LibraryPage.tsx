@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 import { YambaGuide } from "../courses/components/YambaGuide";
 import { libraryCatalogue } from "./library-catalogue";
@@ -61,10 +62,10 @@ export function LibraryPage() {
                 </dl>
 
                 <div className={styles.actions}>
-                  <a className={styles.readButton} href={book.pdfPath} target="_blank" rel="noreferrer">
+                  <Link className={styles.readButton} to={book.readerPath}>
                     {t("book.read")}
-                    <span aria-hidden="true">↗</span>
-                  </a>
+                    <span aria-hidden="true">→</span>
+                  </Link>
                 </div>
                 <p className={styles.readerNote}>{t("book.readerNote")}</p>
               </div>

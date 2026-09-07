@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -10,6 +10,8 @@ import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
   const { t } = useTranslation("common");
+  const location = useLocation();
+  const isLibraryReader = /^\/bibliotheque\/[^/]+$/.test(location.pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navId = useId();
   const shellRef = useRef<HTMLDivElement>(null);
@@ -19,6 +21,11 @@ export function AppLayout() {
 
   useSyncDocumentLanguage();
 
+  // isLibraryReader en dépendance : sur une route de lecteur, aucun en-tête
+  // n'est rendu et l'effet ressort sans rien mesurer. En revenant vers la
+  // bibliothèque, l'en-tête réapparaît et l'effet doit se rejouer, sinon
+  // --pm-header-height reste absent et le repli mobile (156px) décale la mise
+  // en page.
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
@@ -29,7 +36,7 @@ export function AppLayout() {
     const observer = new ResizeObserver(updateHeight);
     observer.observe(header);
     return () => observer.disconnect();
-  }, []);
+  }, [isLibraryReader]);
 
   // La sidebar mobile se referme avec Échap et rend le focus au bouton qui
   // l'a ouverte : sans ça, un utilisateur au clavier perdrait sa position.
@@ -60,6 +67,15 @@ export function AppLayout() {
       document.body.style.overflow = previousOverflow;
     };
   }, [sidebarOpen]);
+
+  if (isLibraryReader) {
+    return (
+      <div ref={shellRef} className={`${styles.shell} ${styles.readerShell}`}>
+        <a className={styles.skipLink} href="#contenu">{t("skipToContent")}</a>
+        <main id="contenu" className={styles.readerMain}><Outlet /></main>
+      </div>
+    );
+  }
 
   return (
     <div ref={shellRef} className={styles.shell}>

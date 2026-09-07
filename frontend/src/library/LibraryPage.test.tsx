@@ -1,11 +1,12 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import { LibraryPage } from "./LibraryPage";
 
 describe("Bibliothèque", () => {
   it("présente les livres et propose la lecture du PDF", () => {
-    render(<LibraryPage />);
+    render(<MemoryRouter><LibraryPage /></MemoryRouter>);
 
     expect(screen.getByText("1re primaire")).toBeInTheDocument();
     expect(screen.getByText("2e primaire")).toBeInTheDocument();
@@ -16,8 +17,8 @@ describe("Bibliothèque", () => {
     expect(screen.getAllByRole("link", { name: /lire le livre/i })).toHaveLength(3);
     expect(screen.queryByRole("link", { name: /télécharger/i })).not.toBeInTheDocument();
     expect(readLink.getAttribute("href")).toMatch(
-      /\/books\/mbuyamba-1re-primaire-livre-complet\.pdf$/,
+      /\/bibliotheque\/math-primary-one$/,
     );
-    expect(readLink).toHaveAttribute("target", "_blank");
   });
 });
+

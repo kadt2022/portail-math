@@ -22,7 +22,7 @@
     "pages_other": "{{count}} pages",
     "read": "Lire le livre",
     "download": "Télécharger",
-    "readerNote": "La lecture s’ouvre dans le lecteur PDF de ton navigateur."
+    "readerNote": "Ouvre le livre dans le lecteur Mbuyamba."
   },
   "books": {
     "mathPrimaryOne": {
@@ -46,5 +46,27 @@
       "subject": "Mathématiques",
       "format": "PDF"
     }
+  },
+  "reader": {
+    "back": "Retour à la bibliothèque",
+    "loading": "Chargement du livre…",
+    "error": "Le livre n’a pas pu être chargé.",
+    "previous": "Page précédente",
+    "next": "Page suivante",
+    "page": "Page",
+    "of": "sur",
+    "zoomOut": "Réduire le zoom",
+    "zoomIn": "Agrandir le zoom",
+    "contents": "Sommaire",
+    "closeContents": "Fermer le sommaire",
+    "contentsLoading": "Chargement du sommaire…",
+    "contentsUnavailable": "Sommaire non disponible pour ce livre.",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran",
+    "pageMode": "Page",
+    "continuousMode": "Continu",
+    "fitPage": "Ajuster à la page",
+    "fitWidth": "Ajuster à la largeur",
+    "zoom": "Zoom"
   }
 }

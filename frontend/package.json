@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
     "node": ">=24 <25"
   },
@@ -14,6 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mbuyamba/pdf-reader": "file:packages/pdf-reader",
     "i18next": "^26.3.6",
     "phaser": "^3.90.0",
     "react": "^19.2.8",

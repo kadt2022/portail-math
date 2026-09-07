@@ -1,8 +1,14 @@
 import { render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppRouter } from "./AppRouter";
 import { PRIMARY_COURSES } from "./course-navigation";
+
+// Le lecteur PDF réel démarre pdfjs-dist et son worker : inutile pour vérifier
+// le routage. Le stub affiche seulement le titre reçu.
+vi.mock("@mbuyamba/pdf-reader", () => ({
+  PdfReader: ({ title }: { title: string }) => <h1>{title}</h1>,
+}));
 
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
@@ -31,8 +37,15 @@ describe("Routeur du portail React", () => {
     expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: /je découvre les maths autour de moi/i })).toHaveLength(3);
     expect(screen.getAllByRole("link", { name: /lire le livre/i })[0].getAttribute("href")).toMatch(
-      /\/books\/mbuyamba-1re-primaire-livre-complet\.pdf$/,
+      /\/app\/bibliotheque\/math-primary-one$/,
     );
+  });
+
+  it("ouvre le lecteur d'un livre sur /app/bibliotheque/:bookId", async () => {
+    renderAt("/app/bibliotheque/math-primary-one");
+    expect(
+      await screen.findByRole("heading", { level: 1, name: /je découvre les maths autour de moi/i }),
+    ).toBeInTheDocument();
   });
 
   it("affiche la page d'attente du nouveau jeu sans permettre de le lancer", () => {
@@ -130,3 +143,4 @@ describe("Routeur du portail React", () => {
     expect(ecrites).toEqual([]);
   });
 });
+
