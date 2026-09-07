@@ -30,7 +30,8 @@
   color: var(--pm-ink-soft);
   font: inherit;
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 600;
+  letter-spacing: 0.005em;
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
@@ -46,7 +47,7 @@
 
 .active {
   color: var(--pm-brand);
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .active::after {
