@@ -6,6 +6,8 @@ import styles from "./PdfReader.module.css";
 GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
 
 const ZOOM_LEVELS = [0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
+const DEFAULT_ZOOM = 1;
+const CHROME_LIKE_PAGE_WIDTH = 1000;
 type ReaderMode = "page" | "continuous";
 type FitMode = "page" | "width" | "custom";
 type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNode[] };
@@ -89,8 +91,8 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [pageInput, setPageInput] = useState(String(pageNumber));
   const [mode, setMode] = useState<ReaderMode>("page");
   const [fitMode, setFitMode] = useState<FitMode>("custom");
-  const [customZoom, setCustomZoom] = useState(1);
-  const [scale, setScale] = useState(1);
+  const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
+  const [scale, setScale] = useState(DEFAULT_ZOOM);
   const [outline, setOutline] = useState<OutlineNode[]>([]);
   const [outlineOpen, setOutlineOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -151,7 +153,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
       const widthScale = Math.max(0.5, (viewport.clientWidth - 28) / base.width);
       const heightScale = Math.max(0.5, (viewport.clientHeight - 20) / base.height);
       if (fitMode === "custom") {
-        const chromeLikeWidth = Math.min(900, Math.max(320, viewport.clientWidth - 28));
+        const chromeLikeWidth = Math.min(CHROME_LIKE_PAGE_WIDTH, Math.max(320, viewport.clientWidth - 28));
         setScale((chromeLikeWidth / base.width) * customZoom);
       } else {
         setScale(fitMode === "width" ? widthScale : Math.min(widthScale, heightScale));
@@ -199,7 +201,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
   const selectZoom = (value: number) => { setFitMode("custom"); setCustomZoom(value); };
   const changeZoom = (direction: -1 | 1) => {
-    const currentZoom = fitMode === "custom" ? customZoom : 1;
+    const currentZoom = fitMode === "custom" ? customZoom : DEFAULT_ZOOM;
     let index = ZOOM_LEVELS.findIndex((value) => value > currentZoom + 0.001);
     if (direction < 0) {
       index = -1;
