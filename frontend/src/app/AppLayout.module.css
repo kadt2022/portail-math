@@ -137,8 +137,9 @@
 .footer {
   margin-top: 8px;
   padding: 18px clamp(16px, 3vw, 36px);
-  background: #171a19;
-  color: rgb(255 255 255 / 76%);
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: linear-gradient(135deg, #353a38 0%, #292e2c 52%, #1d211f 100%);
+  color: rgb(255 255 255 / 74%);
 }
 
 .footerInner {
@@ -161,7 +162,7 @@
 }
 
 .footerBrand strong {
-  color: #fff;
+  color: rgb(255 255 255 / 94%);
   font-size: 14px;
 }
 
@@ -183,7 +184,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: rgb(255 255 255 / 84%);
+  color: rgb(255 255 255 / 82%);
   text-decoration: none;
 }
 
@@ -195,7 +196,7 @@
 }
 
 .footerDot {
-  color: rgb(255 255 255 / 38%);
+  color: rgb(255 255 255 / 34%);
 }
 
 @media (min-width: 900px) {

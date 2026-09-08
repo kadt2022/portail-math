@@ -67,6 +67,21 @@ describe("PdfReader", () => {
     });
   });
 
+  it("reprend la page mémorisée quand le mode continu est le mode initial", async () => {
+    localStorage.setItem("mbuyamba-reader:/livre.pdf", "37");
+    const scrollIntoView = Element.prototype.scrollIntoView as ReturnType<typeof vi.fn>;
+
+    render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
+
+    await waitFor(() => {
+      const target = document.querySelector('[data-page="37"]');
+      expect(target).not.toBeNull();
+      expect(scrollIntoView.mock.instances).toContain(target);
+    });
+    expect(screen.getByRole("textbox", { name: "Page" })).toHaveValue("37");
+    expect(localStorage.getItem("mbuyamba-reader:/livre.pdf")).toBe("37");
+  });
+
   it("valide la saisie de page et mémorise la position", async () => {
     render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
     const input = await screen.findByRole("textbox", { name: "Page" });

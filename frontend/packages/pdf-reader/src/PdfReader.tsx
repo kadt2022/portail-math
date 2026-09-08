@@ -152,7 +152,13 @@ function CanvasPage({ page, scale, label }: { page: PDFPageProxy; scale: number;
     if (!context) return;
     const task = page.render({ canvas, canvasContext: context, viewport, transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0] });
     void task.promise.catch(() => undefined);
-    return () => task.cancel();
+    return () => {
+      task.cancel();
+      // Réduit immédiatement le backing store du canvas lorsqu'une page sort
+      // de la fenêtre virtuelle, au lieu d'attendre le GC du navigateur.
+      canvas.width = 0;
+      canvas.height = 0;
+    };
   }, [page, scale]);
   return <canvas ref={canvasRef} aria-label={label} />;
 }
@@ -163,11 +169,26 @@ function ContinuousPage({ pdfDocument, number, scale, label, root }: { pdfDocume
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !root) return;
+    let active = true;
+    let nearby = false;
     const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) void pdfDocument.getPage(number).then(setPage);
+      nearby = entries.some((entry) => entry.isIntersecting);
+      if (!nearby) {
+        // L'article conserve sa taille comme espace de défilement, mais son
+        // canvas est démonté dès qu'il sort de la fenêtre de préchargement.
+        setPage(null);
+        return;
+      }
+      void pdfDocument.getPage(number).then((nextPage) => {
+        if (active && nearby) setPage(nextPage);
+      }).catch(() => undefined);
     }, { root, rootMargin: "500px 0px" });
     observer.observe(host);
-    return () => observer.disconnect();
+    return () => {
+      active = false;
+      observer.disconnect();
+      setPage(null);
+    };
   }, [pdfDocument, number, root]);
   return (
     <article ref={hostRef} className={styles.continuousPage} data-page={number} style={{ width: `${595 * scale}px`, minHeight: `${842 * scale}px` }}>
@@ -185,16 +206,34 @@ function OutlineList({ nodes, currentPage, onSelect }: { nodes: OutlineNode[]; c
   ))}</ul>;
 }
 
+function PageModeIcon() {
+  return (
+    <svg className={styles.modeIcon} viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="5" y="2.5" width="10" height="15" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function ContinuousModeIcon() {
+  return (
+    <svg className={styles.modeIcon} viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="5" y="1.5" width="10" height="4.5" rx="1" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="5" y="7.75" width="10" height="4.5" rx="1" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="5" y="14" width="10" height="4.5" rx="1" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: PdfReaderProps) {
   const readerRef = useRef<HTMLElement>(null);
-  const targetPageRef = useRef(1);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
   const [pdfDocument, setDocument] = useState<PDFDocumentProxy | null>(null);
   const [singlePage, setSinglePage] = useState<PDFPageProxy | null>(null);
   const [pageNumber, setPageNumber] = useState(() => Number(localStorage.getItem(`mbuyamba-reader:${url}`)) || 1);
+  const targetPageRef = useRef(pageNumber);
   const [pageInput, setPageInput] = useState(String(pageNumber));
-  const [mode, setMode] = useState<ReaderMode>("page");
+  const [mode, setMode] = useState<ReaderMode>("continuous");
   const [fitMode, setFitMode] = useState<FitMode>("custom");
   const [customZoom, setCustomZoom] = useState(DEFAULT_ZOOM);
   const [scale, setScale] = useState(DEFAULT_ZOOM);
@@ -208,6 +247,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const setViewport = useCallback((node: HTMLDivElement | null) => { viewportRef.current = node; setViewportElement(node); }, []);
   const goToPage = useCallback((value: number) => {
     const validPage = clampPage(value, pageCount);
+    targetPageRef.current = validPage;
     setPageNumber(validPage);
     setPageInput(String(validPage));
     // En mode continu, changer de page ne suffit pas : sans défilement, le
@@ -228,6 +268,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
       setDocument(nextDocument);
       setPageNumber((value) => {
         const validPage = clampPage(value, nextDocument.numPages);
+        targetPageRef.current = validPage;
         setPageInput(String(validPage));
         return validPage;
       });
@@ -249,10 +290,10 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     if (!pdfDocument) return;
     const validPage = clampPage(pageNumber, pdfDocument.numPages);
     let active = true;
-    if (mode === "page") void pdfDocument.getPage(validPage).then((nextPage) => { if (active) setSinglePage(nextPage); });
+    void pdfDocument.getPage(validPage).then((nextPage) => { if (active) setSinglePage(nextPage); });
     localStorage.setItem(`mbuyamba-reader:${url}`, String(validPage));
     return () => { active = false; };
-  }, [pdfDocument, mode, pageNumber, url]);
+  }, [pdfDocument, pageNumber, url]);
 
   useEffect(() => {
     if (!pdfDocument || !outlineOpen || outline.length) return;
@@ -406,8 +447,8 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
           <button type="button" title={labels.next} aria-label={labels.next} onClick={() => goToPage(pageNumber + 1)} disabled={!pageCount || pageNumber >= pageCount}>›</button>
         </div>
         <div className={styles.segmented} aria-label={`${labels.pageMode} / ${labels.continuousMode}`}>
-          <button type="button" aria-pressed={mode === "page"} onClick={() => changeMode("page")}>{labels.pageMode}</button>
-          <button type="button" aria-pressed={mode === "continuous"} onClick={() => changeMode("continuous")}>{labels.continuousMode}</button>
+          <button type="button" title={labels.pageMode} aria-label={labels.pageMode} aria-pressed={mode === "page"} onClick={() => changeMode("page")}><PageModeIcon /></button>
+          <button type="button" title={labels.continuousMode} aria-label={labels.continuousMode} aria-pressed={mode === "continuous"} onClick={() => changeMode("continuous")}><ContinuousModeIcon /></button>
         </div>
         <select aria-label={labels.zoom} value={fitMode === "custom" ? String(customZoom) : fitMode} onChange={(event) => { const value = event.target.value; if (value === "page" || value === "width") setFitMode(value); else selectZoom(Number(value)); }}>
           <option value="page">{labels.fitPage}</option><option value="width">{labels.fitWidth}</option>
@@ -432,4 +473,3 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
     </section>
   );
 }
-
