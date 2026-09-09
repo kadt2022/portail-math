@@ -23,7 +23,7 @@ export const libraryCatalogue: LibraryBook[] = [
     levelKey: "books.mathPrimaryOne.level",
     subjectKey: "books.mathPrimaryOne.subject",
     formatKey: "books.mathPrimaryOne.format",
-    pages: 75,
+    pages: 96,
     cover: mathPrimaryOneCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-1re-primaire-livre-complet.pdf`,
     readerPath: "/bibliotheque/math-primary-one",
