@@ -47,7 +47,7 @@ export const libraryCatalogue: LibraryBook[] = [
     levelKey: "books.mathPrimaryThree.level",
     subjectKey: "books.mathPrimaryThree.subject",
     formatKey: "books.mathPrimaryThree.format",
-    pages: 75,
+    pages: 96,
     cover: mathPrimaryThreeCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-3e-primaire-livre-complet.pdf`,
     readerPath: "/bibliotheque/math-primary-three",
