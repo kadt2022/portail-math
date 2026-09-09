@@ -65,7 +65,9 @@ describe("PdfReader", () => {
   it("ne télécharge que les octets des pages affichées", async () => {
     render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
 
-    await waitFor(() => expect(vi.mocked(getDocument)).toHaveBeenCalledWith({ url: "/livre.pdf", disableAutoFetch: true }));
+    // disableStream compte autant que disableAutoFetch : sans lui, pdf.js lit
+    // la reponse initiale en flux et telecharge le livre entier malgre tout.
+    await waitFor(() => expect(vi.mocked(getDocument)).toHaveBeenCalledWith({ url: "/livre.pdf", disableAutoFetch: true, disableStream: true }));
   });
 
   it("affiche la progression du téléchargement tant que le livre charge", async () => {

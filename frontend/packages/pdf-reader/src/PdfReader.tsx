@@ -264,10 +264,15 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   useEffect(() => {
     let active = true;
     // disableAutoFetch laisse pdf.js ne demander que les octets nécessaires aux
-    // pages affichées, par requêtes HTTP Range. Sans cette option, ouvrir un
+    // pages affichées, par requêtes HTTP Range. Sans ces options, ouvrir un
     // livre télécharge le PDF entier en arrière-plan, même pour n'en lire
     // qu'une seule page.
-    const task = getDocument({ url, disableAutoFetch: true });
+    //
+    // disableStream est indispensable : pdf.js ne documente disableAutoFetch
+    // que couplé à lui. Seul, il supprime le préchargement mais laisse la
+    // réponse initiale se lire en flux jusqu'au bout, donc le document entier
+    // arrive quand même.
+    const task = getDocument({ url, disableAutoFetch: true, disableStream: true });
     task.onProgress = ({ loaded, total }: { loaded: number; total: number }) => {
       if (active && total > 0) setProgress(Math.min(loaded / total, 1));
     };
