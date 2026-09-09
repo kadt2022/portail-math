@@ -11,7 +11,7 @@ describe("Bibliothèque", () => {
     expect(screen.getByText("1re primaire")).toBeInTheDocument();
     expect(screen.getByText("2e primaire")).toBeInTheDocument();
     expect(screen.getByText("3e primaire")).toBeInTheDocument();
-    expect(screen.getAllByText("75 pages")).toHaveLength(3);
+    expect(screen.getAllByText("96 pages")).toHaveLength(3);
 
     const [readLink] = screen.getAllByRole("link", { name: /lire le livre/i });
     expect(screen.getAllByRole("link", { name: /lire le livre/i })).toHaveLength(3);
