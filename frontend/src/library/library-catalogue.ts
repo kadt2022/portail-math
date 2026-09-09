@@ -35,7 +35,7 @@ export const libraryCatalogue: LibraryBook[] = [
     levelKey: "books.mathPrimaryTwo.level",
     subjectKey: "books.mathPrimaryTwo.subject",
     formatKey: "books.mathPrimaryTwo.format",
-    pages: 75,
+    pages: 96,
     cover: mathPrimaryTwoCover,
     pdfPath: `${import.meta.env.BASE_URL}books/mbuyamba-2e-primaire-livre-complet.pdf`,
     readerPath: "/bibliotheque/math-primary-two",
