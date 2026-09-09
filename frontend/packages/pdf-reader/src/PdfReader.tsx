@@ -241,6 +241,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [outlineLoading, setOutlineLoading] = useState(shouldOpenOutlineByDefault);
   const [outlineOpen, setOutlineOpen] = useState(shouldOpenOutlineByDefault);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState(false);
 
   const pageCount = pdfDocument?.numPages ?? 0;
@@ -262,7 +263,19 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
   useEffect(() => {
     let active = true;
-    const task = getDocument(url);
+    // disableAutoFetch laisse pdf.js ne demander que les octets nécessaires aux
+    // pages affichées, par requêtes HTTP Range. Sans ces options, ouvrir un
+    // livre télécharge le PDF entier en arrière-plan, même pour n'en lire
+    // qu'une seule page.
+    //
+    // disableStream est indispensable : pdf.js ne documente disableAutoFetch
+    // que couplé à lui. Seul, il supprime le préchargement mais laisse la
+    // réponse initiale se lire en flux jusqu'au bout, donc le document entier
+    // arrive quand même.
+    const task = getDocument({ url, disableAutoFetch: true, disableStream: true });
+    task.onProgress = ({ loaded, total }: { loaded: number; total: number }) => {
+      if (active && total > 0) setProgress(Math.min(loaded / total, 1));
+    };
     void task.promise.then((nextDocument) => {
       if (!active) return;
       setDocument(nextDocument);
@@ -273,7 +286,10 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
         return validPage;
       });
     }).catch(() => { if (active) setError(true); });
-    return () => { active = false; void task.destroy(); };
+    // La progression est remise à zéro au démontage plutôt qu'à l'ouverture :
+    // changer de livre repart ainsi d'un compteur vide, sans écrire dans l'état
+    // pendant le rendu de l'effet.
+    return () => { active = false; setProgress(null); void task.destroy(); };
   }, [url]);
 
   useEffect(() => {
@@ -296,7 +312,11 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   }, [pdfDocument, pageNumber, url]);
 
   useEffect(() => {
-    if (!pdfDocument || !outlineOpen || outline.length) return;
+    // Le sommaire attend que la première page soit prête. Faute de signets
+    // natifs, il est reconstruit en parcourant le texte de toutes les pages :
+    // lancer ce balayage avant l'affichage le mettrait en concurrence avec la
+    // page que l'enfant attend.
+    if (!pdfDocument || !singlePage || !outlineOpen || outline.length) return;
     let active = true;
     const loadOutline = async () => {
       try {
@@ -346,7 +366,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
 
     void loadOutline();
     return () => { active = false; };
-  }, [outline.length, outlineOpen, pdfDocument]);
+  }, [outline.length, outlineOpen, pdfDocument, singlePage]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -464,7 +484,11 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
       <div className={styles.body}>
         {outlineOpen ? <aside className={styles.outline} aria-label={labels.contents}><button type="button" className={styles.closeOutline} onClick={() => setOutlineOpen(false)} aria-label={labels.closeContents}>×</button>{outlineLoading ? <p>{labels.contentsLoading}</p> : outline.length ? <OutlineList nodes={outline} currentPage={activeOutlinePage} onSelect={goToPage} /> : <p>{labels.contentsUnavailable}</p>}</aside> : null}
         <div ref={setViewport} className={`${styles.viewport} ${mode === "continuous" ? styles.continuousViewport : ""}`}>
-          {!pdfDocument && !error ? <p className={styles.status}>{labels.loading}</p> : null}
+          {!pdfDocument && !error ? (
+            <p className={styles.status} role="status">
+              {progress === null ? labels.loading : `${labels.loading} ${Math.round(progress * 100)} %`}
+            </p>
+          ) : null}
           {error ? <p className={styles.error} role="alert">{labels.error}</p> : null}
           {mode === "page" && singlePage ? <CanvasPage page={singlePage} scale={scale} label={`${labels.page} ${pageNumber}`} /> : null}
           {mode === "continuous" && pdfDocument ? continuousPages.map((number) => <ContinuousPage key={number} pdfDocument={pdfDocument} number={number} scale={scale} label={labels.page} root={viewportElement} />) : null}

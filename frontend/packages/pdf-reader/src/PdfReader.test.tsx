@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const renderTask = { promise: Promise.resolve(), cancel: vi.fn() };
@@ -12,10 +12,27 @@ class NoopIntersectionObserver {
   disconnect() {}
 }
 
+type LoadingTask = { promise: Promise<unknown>; destroy: () => void; onProgress?: (data: { loaded: number; total: number }) => void };
+
+// Par défaut le document se résout aussitôt. Le test de progression le laisse
+// en attente pour observer l'état de chargement, qui disparaît sinon avant
+// d'avoir pu être lu.
+const documentLoading = { pending: false };
+let lastTask: LoadingTask | null = null;
+
 vi.mock("pdfjs-dist", () => ({
   GlobalWorkerOptions: {},
-  getDocument: vi.fn(() => ({ promise: Promise.resolve(pdfDocument), destroy: vi.fn() })),
+  getDocument: vi.fn(() => {
+    const task: LoadingTask = {
+      promise: documentLoading.pending ? new Promise(() => {}) : Promise.resolve(pdfDocument),
+      destroy: vi.fn(),
+    };
+    lastTask = task;
+    return task;
+  }),
 }));
+
+import { getDocument } from "pdfjs-dist";
 
 import { PdfReader, type PdfReaderLabels } from "./PdfReader";
 
@@ -34,7 +51,37 @@ describe("PdfReader", () => {
   });
 
   afterEach(() => {
+    // Le démontage doit précéder le retrait des doublures globales : les hooks
+    // afterEach s'exécutent en ordre inverse d'enregistrement, donc celui-ci
+    // passe avant le nettoyage automatique de Testing Library. Sans ce cleanup
+    // explicite, les effets encore en attente rejouent sans
+    // IntersectionObserver et font échouer le test au hasard.
+    cleanup();
     vi.unstubAllGlobals();
+    documentLoading.pending = false;
+    lastTask = null;
+  });
+
+  it("ne télécharge que les octets des pages affichées", async () => {
+    render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
+
+    // disableStream compte autant que disableAutoFetch : sans lui, pdf.js lit
+    // la reponse initiale en flux et telecharge le livre entier malgre tout.
+    await waitFor(() => expect(vi.mocked(getDocument)).toHaveBeenCalledWith({ url: "/livre.pdf", disableAutoFetch: true, disableStream: true }));
+  });
+
+  it("affiche la progression du téléchargement tant que le livre charge", async () => {
+    documentLoading.pending = true;
+    render(<PdfReader url="/livre.pdf" title="Livre" labels={labels} />);
+
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent("Chargement");
+
+    await act(async () => { lastTask?.onProgress?.({ loaded: 3_000_000, total: 12_000_000 }); });
+    expect(screen.getByRole("status")).toHaveTextContent("Chargement 25 %");
+
+    await act(async () => { lastTask?.onProgress?.({ loaded: 12_000_000, total: 12_000_000 }); });
+    expect(screen.getByRole("status")).toHaveTextContent("Chargement 100 %");
   });
 
   it("propose tous les modes de zoom sans téléchargement", async () => {
