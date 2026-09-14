@@ -22,7 +22,7 @@ Côté Takibo :
 
 À vérifier avant de commencer, et à porter par un récit dans Takibo-IAM si nécessaire. Aucun code de Takibo n'est modifié dans ce récit.
 
-1. **CORS.** Takibo autorise actuellement les requêtes CORS credentialed depuis toute origine via `allowedOriginPattern("*")`. `CorsConfig` (`takibo-iam-boot`) l'applique à `/**`, sous le commentaire « En dev, on ouvre large », sans restriction de profil. Cette configuration doit être restreinte avant une exposition de production, et inclure l'origine de Mbuyamba ;
+1. **CORS.** Takibo autorise actuellement les requêtes CORS credentialed depuis toute origine via `allowedOriginPattern("*")`. `CorsConfig` (`takibo-iam-boot`) l'applique à `/**`, sous le commentaire « En dev, on ouvre large », sans restriction de profil. Cette configuration doit être restreinte avant une exposition de production, et inclure l'origine de Mbuyamba. Porté par SEC-TMS-05 (Takibo-IAM, PR #66), qui désactive les credentials CORS. Mbuyamba n'en a pas besoin : le jeton passe par l'en-tête `Authorization`, jamais par un cookie ;
 2. **Comptes élèves.** Qui crée un compte élève dans Takibo (l'école, un enseignant, le Capitaine), et avec quels identifiants (D5) ;
 3. **Durée de vie** du jeton humain dans l'environnement cible, qui fixe la fréquence de reconnexion.
 

@@ -96,7 +96,7 @@ Aucune de ces décisions n'est prise par ce lot. La colonne de droite est rempli
 | D4 | Qui accorde un droit pendant le pilote ? | Le Capitaine, par une procédure SQL documentée et historisée | 05 | |
 | D5 | Comment un enfant sans e-mail se connecte-t-il, et qui crée son compte ? | Identifiant synthétique par école et code secret (proposé le 2026-08-25, non tranché). Comptes créés par l'école | 04 | |
 | D6 | Où garder le jeton ? | Web : mémoire et `sessionStorage`. Android : Keystore. Chemin court `POST /api/v1/auth/login` jusqu'à TAS-GRANTS-04 | 04 | |
-| D7 | Quelle coquille Android ? | Capacitor | 11 | |
+| D7 | Quelle coquille Android, et sous quelle origine ? | Capacitor, avec un nom d'hôte dédié pour la WebView : l'origine par défaut `https://localhost` n'est pas distinctive | 11 | |
 | D8 | Comment distribuer l'application ? | APK direct pour le pilote, Play Store ensuite | 11 | |
 | D9 | Combien d'appareils par élève ? | 2 appareils actifs | 10 | |
 
@@ -126,7 +126,7 @@ Sortir un contenu du dépôt protège ses versions futures. Les versions déjà 
 
 Ils ne se réalisent pas dans ce dépôt. Chacun fait l'objet d'un récit dans Takibo-IAM si la vérification le demande.
 
-- **CORS** : Takibo autorise actuellement les requêtes CORS credentialed depuis toute origine via `allowedOriginPattern("*")` (`CorsConfig` de `takibo-iam-boot`, appliqué à `/**`). Cette configuration doit être restreinte avant une exposition de production, et inclure les origines de Mbuyamba (web et Android). Requis par ACCES-04 et ACCES-11 ;
+- **CORS** : Takibo autorise actuellement les requêtes CORS credentialed depuis toute origine via `allowedOriginPattern("*")` (`CorsConfig` de `takibo-iam-boot`, appliqué à `/**`). Cette configuration doit être restreinte avant une exposition de production, et inclure les origines de Mbuyamba (web et Android). Porté par le récit SEC-TMS-05 de Takibo-IAM (PR #66, non fusionnée au 2026-09-13), qui désactive les credentials CORS. C'est compatible avec Mbuyamba, dont le jeton passe par l'en-tête `Authorization`. Requis par ACCES-04 et ACCES-11 ;
 - **destinataire du jeton** : pouvoir distinguer un jeton émis pour Mbuyamba d'un jeton émis pour une autre application. À vérifier en ACCES-03 ;
 - **comptes élèves** : identifiants sans e-mail (D5) ;
 - **flux cible** : `authorization_code` + PKCE (TAS-GRANTS-04, à rédiger).

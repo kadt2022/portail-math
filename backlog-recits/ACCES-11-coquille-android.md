@@ -39,8 +39,10 @@ afin de ne jamais perdre le contrôle de ce qui a été installé.
 - projet Android construit à partir de `frontend/dist`, avec la coquille retenue en D7 ;
 - **contenu de l'APK limité au code et aux contenus `LIBRE`**, garanti par une vérification automatisée ;
 - adresse absolue de l'API de Mbuyamba, puisque l'application n'est plus servie par le backend, configurable par environnement ;
-- **CORS du backend Mbuyamba** : autoriser l'origine de la WebView de l'application en plus de l'origine web, et rien d'autre ;
-- **CORS de Takibo** : l'origine de l'application doit être acceptée (prérequis Takibo, voir ACCES-04) ;
+- **origine de la WebView** : un nom d'hôte dédié à Mbuyamba, retenu en D7. L'origine par défaut d'une WebView Capacitor (`https://localhost`) n'est pas distinctive : toute autre application Capacitor la partage ;
+- **CORS du backend Mbuyamba** : autoriser cette origine en plus de l'origine web, et rien d'autre ;
+- **CORS de Takibo** : l'origine de l'application doit être acceptée (SEC-TMS-05, voir ACCES-04) ;
+- **CORS n'authentifie pas une application.** Il empêche une page web tierce de lire les réponses dans un navigateur, mais un client HTTP natif n'y est pas soumis. Ce qui protège réellement le contenu, c'est le jeton, la décision d'accès, le bail et la version minimale, pas l'origine ;
 - jeton Takibo et clé de cache du bail stockés dans le **Keystore Android** ;
 - **version minimale imposée par le serveur** :
   - `GET /api/v1/app/version-minimale` ;
@@ -79,7 +81,7 @@ Le jeton et la clé de cache sont dans le Keystore. Aucun secret n'est dans les 
 
 ### CA-07 — CORS strict
 
-Le backend de Mbuyamba accepte l'origine web et l'origine de l'application, et refuse une origine inconnue. Un test le démontre.
+Le backend de Mbuyamba accepte l'origine web et l'origine dédiée de l'application, et refuse une origine inconnue, y compris `https://localhost`. Un test le démontre. Ce critère ferme la lecture par des pages web tierces. Il ne prouve pas l'identité de l'application, et aucun autre critère ne doit s'appuyer sur l'origine pour autoriser un contenu.
 
 ### CA-08 — Validation sur appareil réel
 
