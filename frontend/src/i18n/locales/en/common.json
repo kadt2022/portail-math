@@ -15,6 +15,10 @@
     "progress": "Progress",
     "about": "About"
   },
+  "sidebar": {
+    "primaryProgress": "{{completed}} of {{total}} grades completed",
+    "comingSoon": "Soon"
+  },
   "courseNavigation": {
     "label": "Course navigation",
     "mobileSectionLabel": "Learning paths",

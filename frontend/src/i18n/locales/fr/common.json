@@ -15,6 +15,10 @@
     "progress": "Progression",
     "about": "À propos"
   },
+  "sidebar": {
+    "primaryProgress": "{{completed}} classes sur {{total}} terminées",
+    "comingSoon": "Bientôt"
+  },
   "courseNavigation": {
     "label": "Navigation des cours",
     "mobileSectionLabel": "Parcours scolaires",

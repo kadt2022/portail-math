@@ -14,9 +14,9 @@
   flex-direction: column;
   width: var(--pm-sidebar);
   overflow-y: auto;
-  padding: 22px 16px 24px;
+  padding: 22px 14px 24px;
   border-right: 1px solid var(--pm-line);
-  background: rgb(255 254 251 / 96%);
+  background: #f3f0e7;
   transform: translateX(0);
   transition: transform 200ms ease;
 }
@@ -32,84 +32,139 @@
 
 .nav {
   display: grid;
-  gap: 4px;
+  gap: 8px;
 }
 
 .link {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-columns: 34px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 10px;
-  border-radius: 12px;
-  color: var(--pm-ink-soft);
+  gap: 11px;
+  min-height: 52px;
+  padding: 9px 11px;
+  border: 1px solid #dfddd6;
+  border-radius: 14px;
+  background: #f8f8f6;
+  box-shadow: 0 1px 2px rgb(25 31 28 / 5%);
+  color: var(--pm-ink);
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 700;
+  line-height: 1.3;
   text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
 }
 
 .link:hover {
-  background: var(--pm-surface-warm);
+  border-color: #d2cec4;
+  background: #fff;
   color: var(--pm-ink);
+  transform: translateY(-1px);
 }
 
-.linkActive {
+.linkActive,
+.linkActive:hover {
+  border-color: var(--pm-brand);
   background: var(--pm-brand);
+  box-shadow: none;
+  color: #fff;
+  transform: none;
+}
+
+.iconWrap {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #c9612a;
+}
+
+.secondaryIcon {
+  color: #7d7c76;
+}
+
+.linkActive .iconWrap {
   color: #fff;
 }
 
-.linkActive .num {
-  background: rgb(255 255 255 / 18%);
-  color: #fff;
+.icon {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
-.num {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--pm-radius-signature);
-  background: #fff1e6;
-  color: #c95f1b;
+.linkLabel {
+  min-width: 0;
+}
+
+.linkText {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.primarySummary {
+  overflow: hidden;
+  color: var(--pm-ink-soft);
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 550;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkActive .primarySummary {
+  color: rgb(255 255 255 / 76%);
 }
 
 .courseGroup {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .courseMenuButton {
   width: 100%;
-  grid-template-columns: 30px minmax(0, 1fr) auto;
-  border: 0;
-  background: transparent;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  border: 1px solid #dfddd6;
+  background: #f8f8f6;
   font-family: inherit;
   font-size: 14px;
-  font-weight: 650;
-  line-height: 1.5;
-  color: var(--pm-ink-soft);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--pm-ink);
   text-align: left;
   cursor: pointer;
 }
 
-.courseMenuButton.linkActive {
-  background: transparent;
-  color: var(--pm-ink-soft);
+.courseMenuButton.linkActive,
+.courseMenuButton.linkActive:hover {
+  border-color: var(--pm-brand);
+  background: var(--pm-brand);
+  color: #fff;
 }
 
-.courseMenuButton.linkActive .num {
-  background: #fff1e6;
-  color: #c95f1b;
+.courseActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.comingSoonBadge {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eadfcd;
+  color: #8b581e;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .chevron {
   width: 7px;
   height: 7px;
-  margin-right: 3px;
+  margin-right: 2px;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   transform: translateY(-2px) rotate(45deg);
@@ -122,32 +177,32 @@
 
 .coursePanel {
   display: grid;
-  gap: 4px;
-  margin: 0 0 6px;
-  padding: 8px;
-  border-radius: var(--pm-radius-md);
-  background: var(--pm-bg);
-  box-shadow: var(--pm-shadow-sm);
+  gap: 3px;
+  margin: 0 0 2px 44px;
+  padding: 6px;
+  border: 1px solid #dfddd6;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 70%);
 }
 
 .levelLink {
   display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
+  grid-template-columns: 14px minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 10px 12px 10px 36px;
-  border-radius: 12px;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 9px;
+  border-radius: 10px;
   color: var(--pm-ink-soft);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 650;
-  line-height: 1.5;
+  line-height: 1.35;
   text-decoration: none;
 }
 
 .levelBullet {
   color: var(--pm-accent);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -195,15 +250,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 0 0 6px;
-  padding: 10px 12px 10px 36px;
-  border-radius: var(--pm-radius-md);
-  background: var(--pm-bg);
-  box-shadow: var(--pm-shadow-sm);
+  margin: 0 0 2px 44px;
+  padding: 9px 10px;
+  border: 1px solid #dfddd6;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 70%);
   color: var(--pm-ink-soft);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 650;
-  line-height: 1.5;
+  line-height: 1.35;
 }
 
 .secondaryNotice strong {
@@ -260,8 +315,8 @@
 @media (max-width: 767px) {
   .sidebar {
     width: min(260px, calc(100vw - 64px));
-    padding: 12px 12px 20px;
-    background: var(--pm-surface);
+    padding: 12px 10px 20px;
+    background: #f3f0e7;
   }
 
   .navLabel {
@@ -269,27 +324,35 @@
   }
 
   .nav {
-    gap: 2px;
+    gap: 6px;
   }
 
   .link {
-    min-height: 48px;
-    white-space: nowrap;
+    min-height: 50px;
+    padding-inline: 9px;
+  }
+
+  .courseMenuButton {
+    gap: 8px;
+  }
+
+  .comingSoonBadge {
+    padding-inline: 7px;
+    font-size: 9px;
   }
 
   .coursePanel {
-    margin-left: 0;
-    padding: 8px;
+    margin-left: 38px;
+    padding: 6px;
   }
 
   .levelLink {
-    min-height: 48px;
-    font-size: 14px;
+    min-height: 42px;
+    font-size: 13px;
   }
 
   .secondaryNotice {
-    margin-left: 0;
-    padding-left: 36px;
+    margin-left: 38px;
   }
 
   .sidebarOpen .backdrop {
@@ -302,13 +365,8 @@
     width: calc(100vw - 64px);
   }
 
-  .coursePanel {
-    margin-left: 0;
-    padding: 8px;
-  }
-
+  .coursePanel,
   .secondaryNotice {
-    margin-left: 0;
-    padding-left: 36px;
+    margin-left: 34px;
   }
 }
