@@ -1,0 +1,1335 @@
+{
+  "id": "MATH-4P",
+  "title": "course.title",
+  "level": "4e primaire",
+  "description": "course.lead",
+  "modules": [
+    {
+      "id": "MATH-4P-U01",
+      "title": "modules.m1.title",
+      "description": "module.referenceLead",
+      "lessons": [
+        {
+          "id": "MATH-4P-U01-L01",
+          "title": "lessons.l1.title",
+          "objective": "content.u01l01.objective",
+          "activities": [
+            {
+              "id": "MATH-4P-U01-L01-situation",
+              "type": "situation",
+              "title": "content.u01l01.objective",
+              "instructions": "content.u01l01.situation",
+              "data": {
+                "textKey": "content.u01l01.situation"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L01-discover",
+              "type": "discover",
+              "title": "content.u01l01.discover",
+              "instructions": "content.u01l01.discover",
+              "data": {
+                "textKey": "content.u01l01.discover",
+                "figureValue": 24638
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L01-manipulate",
+              "type": "manipulate",
+              "title": "content.u01l01.manipulate.title",
+              "instructions": "content.u01l01.manipulate.instruction",
+              "data": {
+                "hintKey": "content.u01l01.manipulate.hint",
+                "strongHintKey": "content.u01l01.manipulate.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l01-manipulate",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      24638
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L01-example",
+              "type": "example",
+              "title": "content.method",
+              "instructions": "content.method",
+              "data": {
+                "methodKey": "content.method",
+                "promptKeys": [
+                  "content.u01l01.example.easy",
+                  "content.u01l01.example.medium",
+                  "content.u01l01.example.reflection"
+                ]
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L01-practice",
+              "type": "practice",
+              "title": "content.u01l01.practice.title",
+              "instructions": "content.u01l01.practice.instruction",
+              "data": {
+                "hintKey": "content.u01l01.practice.hint",
+                "strongHintKey": "content.u01l01.practice.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l01-practice",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      40916
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L01-reflect",
+              "type": "reflect",
+              "title": "content.u01l01.reflect.title",
+              "instructions": "content.u01l01.reflect.instruction",
+              "data": {
+                "hintKey": "content.u01l01.reflect.hint",
+                "strongHintKey": "content.u01l01.reflect.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l01-reflect",
+                  "type": "numeric-question",
+                  "data": {
+                    "promptKey": "content.u01l01.reflect.prompt",
+                    "terms": [
+                      20000,
+                      7000,
+                      50,
+                      3
+                    ]
+                  },
+                  "serverData": {
+                    "answer": 27053
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L01-play",
+              "type": "play",
+              "title": "content.u01l01.play.title",
+              "instructions": "content.u01l01.play.instruction",
+              "data": {
+                "hintKey": "content.u01l01.play.hint",
+                "strongHintKey": "content.u01l01.play.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l01-play",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      78402
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L01-remember",
+              "type": "remember",
+              "title": "content.u01l01.remember",
+              "instructions": "content.u01l01.remember",
+              "data": {
+                "textKey": "content.u01l01.remember"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L01-check",
+              "type": "check",
+              "title": "content.u01l01.check.title",
+              "instructions": "content.u01l01.check.instruction",
+              "data": {
+                "hintKey": "content.u01l01.check.hint",
+                "strongHintKey": "content.u01l01.check.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l01-check",
+                  "type": "numeric-question",
+                  "data": {
+                    "promptKey": "content.u01l01.check.prompt",
+                    "choices": [
+                      3,
+                      300,
+                      3000
+                    ],
+                    "terms": [
+                      3000
+                    ]
+                  },
+                  "serverData": {
+                    "answer": 3000
+                  }
+                }
+              ]
+            }
+          ],
+          "content": {
+            "fr": {
+              "method": [
+                "Je représente les données.",
+                "J'estime le résultat.",
+                "Je calcule étape par étape.",
+                "Je vérifie par une autre méthode ou par estimation.",
+                "J'explique ma réponse par une phrase."
+              ],
+              "u01l01": {
+                "objective": "Je peux construire et expliquer un nombre jusqu'aux dizaines de mille.",
+                "situation": "Une coopérative compte 24 638 graines sélectionnées. Comment les compter facilement ?",
+                "discover": "Dans un nombre, chaque rang vaut dix fois le rang placé à sa droite. Dans 24 638, le 2 est à la position des dizaines de mille et vaut 20 000, le 4 est aux unités de mille et vaut 4 000, le 6 est aux centaines et vaut 600.",
+                "manipulate": {
+                  "title": "Forme le nombre 24 638",
+                  "instruction": "Construis 24 638 en réglant les compteurs de dizaines de mille, unités de mille, centaines, dizaines et unités.",
+                  "hint": "Commence par les dizaines de mille : combien de paquets de 10 000 faut-il ?",
+                  "strongHint": "24 638, c'est 2 DM, 4 UM, 6 C, 3 D et 8 U. Ajuste chaque compteur un par un."
+                },
+                "example": {
+                  "easy": "Facile. Décompose 53 207.",
+                  "medium": "Intermédiaire. Quel nombre forment 4 dizaines de mille, 0 unité de mille, 9 centaines, 1 dizaine et 6 unités ?",
+                  "reflection": "Réflexion. Dans 90 305, que vaut le chiffre 3 ?"
+                },
+                "practice": {
+                  "title": "Décompose 40 916",
+                  "instruction": "Construis 40 916 en réglant les cinq compteurs, comme dans l'exemple guidé.",
+                  "hint": "Regarde chaque chiffre de 40 916 : dizaines de mille, puis unités de mille, centaines, dizaines et unités.",
+                  "strongHint": "40 916, c'est 4 DM, 0 UM, 9 C, 1 D et 6 U."
+                },
+                "reflect": {
+                  "title": "Quel nombre cherche-t-on ?",
+                  "instruction": "Calcule le nombre à partir de sa décomposition, puis écris-le en chiffres.",
+                  "hint": "Additionne d'abord les dizaines de mille, puis les unités de mille, puis le reste.",
+                  "strongHint": "2 dizaines de mille font 20 000, 7 unités de mille font 7 000, 5 dizaines font 50 et 3 unités font 3 : 20 000 + 7 000 + 50 + 3.",
+                  "prompt": "Quel nombre forment 2 dizaines de mille, 7 unités de mille, 0 centaine, 5 dizaines et 3 unités ?"
+                },
+                "play": {
+                  "title": "Livre chaque chiffre à son rang",
+                  "instruction": "Livre les dizaines de mille, unités de mille, centaines, dizaines et unités de 78 402 au bon dépôt en construisant le nombre.",
+                  "hint": "Range d'abord les dizaines de mille, puis les unités de mille, puis le reste.",
+                  "strongHint": "78 402, c'est 7 DM, 8 UM, 4 C, 0 D et 2 U."
+                },
+                "remember": "Chaque rang vaut dix fois le rang placé à sa droite : dizaine de mille, unité de mille, centaine, dizaine, unité.",
+                "check": {
+                  "title": "Que vaut le chiffre souligné ?",
+                  "instruction": "Choisis la valeur exacte du chiffre des unités de mille dans 63 020.",
+                  "hint": "Ce chiffre est à la position des unités de mille : il ne vaut pas juste lui-même.",
+                  "strongHint": "Dans 63 020, le 3 est à la position des unités de mille, donc il vaut 3 000.",
+                  "prompt": "Dans 63 020, que vaut le chiffre 3 ?"
+                }
+              }
+            },
+            "en": {
+              "method": [
+                "I represent the data.",
+                "I estimate the result.",
+                "I calculate step by step.",
+                "I check with another method or by estimating.",
+                "I explain my answer in a sentence."
+              ],
+              "u01l01": {
+                "objective": "I can build and explain a number up to the ten thousands.",
+                "situation": "A cooperative counts 24,638 selected seeds. How can they be counted easily?",
+                "discover": "In a number, each place is worth ten times the place to its right. In 24,638, the 2 sits in the ten thousands place and is worth 20,000, the 4 sits in the thousands place and is worth 4,000, the 6 sits in the hundreds place and is worth 600.",
+                "manipulate": {
+                  "title": "Build the number 24,638",
+                  "instruction": "Build 24,638 by setting the ten thousands, thousands, hundreds, tens and units counters.",
+                  "hint": "Start with the ten thousands: how many groups of 10,000 are needed?",
+                  "strongHint": "24,638 is 2 TTh, 4 Th, 6 H, 3 T and 8 U. Adjust each counter one at a time."
+                },
+                "example": {
+                  "easy": "Easy. Break down 53,207.",
+                  "medium": "Intermediate. What number is made of 4 ten thousands, 0 thousands, 9 hundreds, 1 ten and 6 units?",
+                  "reflection": "Reflection. In 90,305, what is the value of the digit 3?"
+                },
+                "practice": {
+                  "title": "Break down 40,916",
+                  "instruction": "Build 40,916 by setting the five counters, just like in the guided example.",
+                  "hint": "Look at each digit of 40,916: ten thousands, then thousands, hundreds, tens and units.",
+                  "strongHint": "40,916 is 4 TTh, 0 Th, 9 H, 1 T and 6 U."
+                },
+                "reflect": {
+                  "title": "Which number is it?",
+                  "instruction": "Work out the number from its breakdown, then write it in digits.",
+                  "hint": "Add the ten thousands first, then the thousands, then the rest.",
+                  "strongHint": "2 ten thousands make 20,000, 7 thousands make 7,000, 5 tens make 50 and 3 units make 3: 20,000 + 7,000 + 50 + 3.",
+                  "prompt": "What number is made of 2 ten thousands, 7 thousands, 0 hundreds, 5 tens and 3 units?"
+                },
+                "play": {
+                  "title": "Deliver each digit to its place",
+                  "instruction": "Deliver the ten thousands, thousands, hundreds, tens and units of 78,402 to the right depot by building the number.",
+                  "hint": "Place the ten thousands first, then the thousands, then the rest.",
+                  "strongHint": "78,402 is 7 TTh, 8 Th, 4 H, 0 T and 2 U."
+                },
+                "remember": "Each place is worth ten times the place to its right: ten thousands, thousands, hundreds, tens, units.",
+                "check": {
+                  "title": "What is the highlighted digit worth?",
+                  "instruction": "Choose the exact value of the thousands digit in 63,020.",
+                  "hint": "This digit sits in the thousands place: it isn't just worth itself.",
+                  "strongHint": "In 63,020, the 3 is in the thousands place, so it is worth 3,000.",
+                  "prompt": "In 63,020, what is the value of the digit 3?"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "MATH-4P-U01-L02",
+          "title": "lessons.l2.title",
+          "objective": "content.u01l02.objective",
+          "activities": [
+            {
+              "id": "MATH-4P-U01-L02-situation",
+              "type": "situation",
+              "title": "content.u01l02.objective",
+              "instructions": "content.u01l02.situation",
+              "data": {
+                "textKey": "content.u01l02.situation"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L02-discover",
+              "type": "discover",
+              "title": "content.u01l02.discover",
+              "instructions": "content.u01l02.discover",
+              "data": {
+                "textKey": "content.u01l02.discover"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L02-manipulate",
+              "type": "manipulate",
+              "title": "content.u01l02.manipulate.title",
+              "instructions": "content.u01l02.manipulate.instruction",
+              "data": {
+                "hintKey": "content.u01l02.manipulate.hint",
+                "strongHintKey": "content.u01l02.manipulate.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l02-manipulate",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      40005,
+                      76000,
+                      99999
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L02-example",
+              "type": "example",
+              "title": "content.method",
+              "instructions": "content.method",
+              "data": {
+                "methodKey": "content.method",
+                "promptKeys": [
+                  "content.u01l02.example.easy",
+                  "content.u01l02.example.medium",
+                  "content.u01l02.example.reflection"
+                ]
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L02-practice",
+              "type": "practice",
+              "title": "content.u01l02.practice.title",
+              "instructions": "content.u01l02.practice.instruction",
+              "data": {
+                "hintKey": "content.u01l02.practice.hint",
+                "strongHintKey": "content.u01l02.practice.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l02-practice",
+                  "type": "number-words-match",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 45210,
+                        "direction": "words-to-digits",
+                        "distractors": [
+                          45120,
+                          45201,
+                          54210
+                        ]
+                      },
+                      {
+                        "value": 63020,
+                        "direction": "digits-to-words",
+                        "distractors": [
+                          63200,
+                          63002,
+                          36020
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L02-reflect",
+              "type": "reflect",
+              "title": "content.u01l02.reflect.title",
+              "instructions": "content.u01l02.reflect.instruction",
+              "data": {
+                "hintKey": "content.u01l02.reflect.hint",
+                "strongHintKey": "content.u01l02.reflect.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l02-reflect",
+                  "type": "numeric-question",
+                  "data": {
+                    "promptKey": "content.u01l02.reflect.prompt",
+                    "terms": [
+                      8000,
+                      700
+                    ]
+                  },
+                  "serverData": {
+                    "answer": 8700
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L02-play",
+              "type": "play",
+              "title": "content.u01l02.play.title",
+              "instructions": "content.u01l02.play.instruction",
+              "data": {
+                "hintKey": "content.u01l02.play.hint",
+                "strongHintKey": "content.u01l02.play.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l02-play",
+                  "type": "number-words-match",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 76000,
+                        "direction": "digits-to-words",
+                        "distractors": [
+                          70600,
+                          67000,
+                          76100
+                        ]
+                      },
+                      {
+                        "value": 99999,
+                        "direction": "words-to-digits",
+                        "distractors": [
+                          9999,
+                          90999,
+                          99990
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L02-remember",
+              "type": "remember",
+              "title": "content.u01l02.remember",
+              "instructions": "content.u01l02.remember",
+              "data": {
+                "textKey": "content.u01l02.remember"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L02-check",
+              "type": "check",
+              "title": "content.u01l02.check.title",
+              "instructions": "content.u01l02.check.instruction",
+              "data": {
+                "hintKey": "content.u01l02.check.hint",
+                "strongHintKey": "content.u01l02.check.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l02-check",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      40005
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            }
+          ],
+          "content": {
+            "fr": {
+              "method": [
+                "Je représente les données.",
+                "J'estime le résultat.",
+                "Je calcule étape par étape.",
+                "Je vérifie par une autre méthode ou par estimation.",
+                "J'explique ma réponse par une phrase."
+              ],
+              "u01l02": {
+                "objective": "Je peux passer des mots aux chiffres pour des nombres jusqu'à 100 000.",
+                "situation": "Une étiquette du grand marché indique « soixante-trois mille vingt » sacs de farine. Comment l'écrire en chiffres ?",
+                "discover": "On repère d'abord les milliers, puis les centaines, les dizaines et les unités. Un rang vide s'écrit toujours avec 0 : soixante-trois mille vingt s'écrit 63 020, car il n'y a pas de centaine.",
+                "manipulate": {
+                  "title": "Dicte et construis",
+                  "instruction": "Construis chaque nombre dicté avec les cinq compteurs : 40 005, puis 76 000, puis 99 999.",
+                  "hint": "Un rang vide s'écrit avec 0 : ne règle pas ce compteur s'il n'y a rien à ce rang.",
+                  "strongHint": "40 005 = 4 DM, 0 UM, 0 C, 0 D, 5 U. Vérifie chaque nombre rang par rang."
+                },
+                "example": {
+                  "easy": "Facile. Écris en chiffres : quarante-cinq mille deux cent dix.",
+                  "medium": "Intermédiaire. Écris 63 020 en toutes lettres.",
+                  "reflection": "Réflexion. Écris le nombre formé de 8 unités de mille et 7 centaines."
+                },
+                "practice": {
+                  "title": "Mots et chiffres",
+                  "instruction": "Associe chaque nombre à son écriture correcte en mots, ou chaque écriture à son nombre.",
+                  "hint": "Repère d'abord les milliers dans le mot ou dans le nombre.",
+                  "strongHint": "Quarante-cinq mille deux cent dix = 45 milliers puis 2 centaines et 1 dizaine, donc 45 210."
+                },
+                "reflect": {
+                  "title": "Retrouve le nombre",
+                  "instruction": "Calcule le nombre à partir de sa décomposition, puis écris-le en chiffres.",
+                  "hint": "8 unités de mille et 7 centaines : il n'y a pas de dizaine, donc 0 dizaine.",
+                  "strongHint": "8 unités de mille font 8 000, et 7 centaines font 700 : 8 000 + 700 = 8 700.",
+                  "prompt": "Écris le nombre formé de 8 unités de mille et 7 centaines."
+                },
+                "play": {
+                  "title": "Associe la carte-nombre",
+                  "instruction": "Associe chaque écriture en mots à sa carte-nombre, ou chaque carte-nombre à son écriture.",
+                  "hint": "Compte d'abord les milliers dans le mot avant de choisir.",
+                  "strongHint": "Relis le nombre rang par rang : milliers, puis centaines, dizaines et unités."
+                },
+                "remember": "On repère d'abord les milliers, puis les centaines, les dizaines et les unités ; un rang vide s'écrit toujours avec 0.",
+                "check": {
+                  "title": "Construis le nombre annoncé",
+                  "instruction": "Construis 40 005 avec les cinq compteurs.",
+                  "hint": "40 005 : combien de dizaines de mille, d'unités de mille, de centaines, de dizaines et d'unités ?",
+                  "strongHint": "40 005, c'est 4 DM, 0 UM, 0 C, 0 D et 5 U."
+                }
+              }
+            },
+            "en": {
+              "method": [
+                "I represent the data.",
+                "I estimate the result.",
+                "I calculate step by step.",
+                "I check with another method or by estimating.",
+                "I explain my answer in a sentence."
+              ],
+              "u01l02": {
+                "objective": "I can move from words to digits for numbers up to 100,000.",
+                "situation": "A sign at the big market reads \"sixty-three thousand and twenty\" bags of flour. How can this be written in digits?",
+                "discover": "We spot the thousands first, then the hundreds, tens and units. An empty place is always written with 0: sixty-three thousand and twenty is written 63,020, because there are no hundreds.",
+                "manipulate": {
+                  "title": "Listen and build",
+                  "instruction": "Build each number you are given, using the five counters: 40,005, then 76,000, then 99,999.",
+                  "hint": "An empty place is written with 0: don't set that counter if there is nothing at that place.",
+                  "strongHint": "40,005 = 4 TTh, 0 Th, 0 H, 0 T, 5 U. Check each number place by place."
+                },
+                "example": {
+                  "easy": "Easy. Write in digits: forty-five thousand two hundred and ten.",
+                  "medium": "Intermediate. Write 63,020 in words.",
+                  "reflection": "Reflection. Write the number made of 8 thousands and 7 hundreds."
+                },
+                "practice": {
+                  "title": "Words and digits",
+                  "instruction": "Match each number to its correct word form, or each word form to its number.",
+                  "hint": "Spot the thousands first, in the words or in the digits.",
+                  "strongHint": "Forty-five thousand two hundred and ten = 45 thousands, then 2 hundreds and 1 ten, so 45,210."
+                },
+                "reflect": {
+                  "title": "Find the number",
+                  "instruction": "Work out the number from its breakdown, then write it in digits.",
+                  "hint": "8 thousands and 7 hundreds: there is no ten, so 0 tens.",
+                  "strongHint": "8 thousands make 8,000, and 7 hundreds make 700: 8,000 + 700 = 8,700.",
+                  "prompt": "Write the number made of 8 thousands and 7 hundreds."
+                },
+                "play": {
+                  "title": "Match the number card",
+                  "instruction": "Match each word form to its number card, or each number card to its word form.",
+                  "hint": "Count the thousands in the word form before choosing.",
+                  "strongHint": "Read the number place by place: thousands, then hundreds, tens and units."
+                },
+                "remember": "We spot the thousands first, then the hundreds, tens and units; an empty place is always written with 0.",
+                "check": {
+                  "title": "Build the announced number",
+                  "instruction": "Build 40,005 with the five counters.",
+                  "hint": "40,005: how many ten thousands, thousands, hundreds, tens and units?",
+                  "strongHint": "40,005 is 4 TTh, 0 Th, 0 H, 0 T and 5 U."
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "MATH-4P-U01-L03",
+          "title": "lessons.l3.title",
+          "objective": "content.u01l03.objective",
+          "activities": [
+            {
+              "id": "MATH-4P-U01-L03-situation",
+              "type": "situation",
+              "title": "content.u01l03.objective",
+              "instructions": "content.u01l03.situation",
+              "data": {
+                "textKey": "content.u01l03.situation"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L03-discover",
+              "type": "discover",
+              "title": "content.u01l03.discover",
+              "instructions": "content.u01l03.discover",
+              "data": {
+                "textKey": "content.u01l03.discover"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L03-manipulate",
+              "type": "manipulate",
+              "title": "content.u01l03.manipulate.title",
+              "instructions": "content.u01l03.manipulate.instruction",
+              "data": {
+                "hintKey": "content.u01l03.manipulate.hint",
+                "strongHintKey": "content.u01l03.manipulate.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l03-manipulate",
+                  "type": "place-value-build",
+                  "data": {
+                    "targets": [
+                      47350,
+                      47530
+                    ],
+                    "maxDigit": 9
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L03-example",
+              "type": "example",
+              "title": "content.method",
+              "instructions": "content.method",
+              "data": {
+                "methodKey": "content.method",
+                "promptKeys": [
+                  "content.u01l03.example.easy",
+                  "content.u01l03.example.medium",
+                  "content.u01l03.example.reflection"
+                ]
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L03-practice",
+              "type": "practice",
+              "title": "content.u01l03.practice.title",
+              "instructions": "content.u01l03.practice.instruction",
+              "data": {
+                "hintKey": "content.u01l03.practice.hint",
+                "strongHintKey": "content.u01l03.practice.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l03-practice",
+                  "type": "compare-numbers",
+                  "data": {
+                    "items": [
+                      {
+                        "left": 52400,
+                        "right": 52040
+                      },
+                      {
+                        "left": 47350,
+                        "right": 47530
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L03-reflect",
+              "type": "reflect",
+              "title": "content.u01l03.reflect.title",
+              "instructions": "content.u01l03.reflect.instruction",
+              "data": {
+                "hintKey": "content.u01l03.reflect.hint",
+                "strongHintKey": "content.u01l03.reflect.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l03-reflect",
+                  "type": "number-order",
+                  "data": {
+                    "values": [
+                      81250,
+                      18520,
+                      80125,
+                      81025
+                    ],
+                    "direction": "ascending"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L03-play",
+              "type": "play",
+              "title": "content.u01l03.play.title",
+              "instructions": "content.u01l03.play.instruction",
+              "data": {
+                "hintKey": "content.u01l03.play.hint",
+                "strongHintKey": "content.u01l03.play.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l03-play",
+                  "type": "compare-numbers",
+                  "data": {
+                    "items": [
+                      {
+                        "left": 63450,
+                        "right": 63045
+                      },
+                      {
+                        "left": 29800,
+                        "right": 30200
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L03-remember",
+              "type": "remember",
+              "title": "content.u01l03.remember",
+              "instructions": "content.u01l03.remember",
+              "data": {
+                "textKey": "content.u01l03.remember"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L03-check",
+              "type": "check",
+              "title": "content.u01l03.check.title",
+              "instructions": "content.u01l03.check.instruction",
+              "data": {
+                "hintKey": "content.u01l03.check.hint",
+                "strongHintKey": "content.u01l03.check.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l03-check",
+                  "type": "number-in-range",
+                  "data": {
+                    "min": 9995,
+                    "max": 10005
+                  }
+                }
+              ]
+            }
+          ],
+          "content": {
+            "fr": {
+              "method": [
+                "Je représente les données.",
+                "J'estime le résultat.",
+                "Je calcule étape par étape.",
+                "Je vérifie par une autre méthode ou par estimation.",
+                "J'explique ma réponse par une phrase."
+              ],
+              "u01l03": {
+                "objective": "Je peux comparer et ordonner des nombres jusqu'à 100 000.",
+                "situation": "Deux coopératives affichent 47 350 et 47 530 sacs de maïs. Laquelle en a le plus ?",
+                "discover": "On compare d'abord les dizaines de mille, puis les unités de mille, puis les centaines, les dizaines et enfin les unités, rang par rang depuis la gauche.",
+                "manipulate": {
+                  "title": "Construis puis compare",
+                  "instruction": "Construis 47 350, puis 47 530, et observe le premier rang différent.",
+                  "hint": "Les dizaines de mille et les unités de mille sont identiques : regarde les centaines.",
+                  "strongHint": "47 350 a 3 centaines, 47 530 a 5 centaines : 47 530 est donc plus grand."
+                },
+                "example": {
+                  "easy": "Facile. Complète : 52 400 __ 52 040.",
+                  "medium": "Intermédiaire. Range 81 250, 18 520, 80 125, 81 025.",
+                  "reflection": "Réflexion. Trouve deux nombres compris entre 9 995 et 10 005."
+                },
+                "practice": {
+                  "title": "Compare les nombres",
+                  "instruction": "Choisis le symbole qui compare correctement chaque paire de nombres.",
+                  "hint": "Compare d'abord les dizaines de mille et les unités de mille de chaque nombre.",
+                  "strongHint": "Si les milliers sont égaux, compare les centaines, puis les dizaines, puis les unités."
+                },
+                "reflect": {
+                  "title": "Range les nombres",
+                  "instruction": "Place les quatre nombres du plus petit au plus grand.",
+                  "hint": "Commence par repérer le plus petit chiffre des dizaines de mille.",
+                  "strongHint": "18 520 a 1 dizaine de mille, les trois autres en ont 8 : compare ensuite leurs unités de mille et leurs centaines."
+                },
+                "play": {
+                  "title": "Construis la plus grande réserve",
+                  "instruction": "Choisis à chaque manche le plus grand des deux nombres proposés.",
+                  "hint": "Regarde d'abord les dizaines de mille et les unités de mille de chaque nombre.",
+                  "strongHint": "Compare rang par rang, en partant de la gauche, pour trouver le plus grand nombre."
+                },
+                "remember": "On compare les nombres rang par rang, en partant des dizaines de mille : dès qu'un rang diffère, il donne la réponse.",
+                "check": {
+                  "title": "Trouve un nombre caché",
+                  "instruction": "Écris un nombre entier compris strictement entre les deux bornes.",
+                  "hint": "Les nombres 9 995 et 10 005 ne comptent pas : cherche entre les deux.",
+                  "strongHint": "Entre 9 995 et 10 005, tu peux choisir par exemple 9 996, 10 000 ou 10 004."
+                }
+              }
+            },
+            "en": {
+              "method": [
+                "I represent the data.",
+                "I estimate the result.",
+                "I calculate step by step.",
+                "I check with another method or by estimating.",
+                "I explain my answer in a sentence."
+              ],
+              "u01l03": {
+                "objective": "I can compare and order numbers up to 100,000.",
+                "situation": "Two cooperatives show 47,350 and 47,530 bags of maize. Which one has more?",
+                "discover": "We compare the ten thousands first, then the thousands, then the hundreds, the tens and finally the units, place by place from the left.",
+                "manipulate": {
+                  "title": "Build, then compare",
+                  "instruction": "Build 47,350, then 47,530, and look at the first place where they differ.",
+                  "hint": "The ten thousands and thousands are the same: look at the hundreds.",
+                  "strongHint": "47,350 has 3 hundreds, 47,530 has 5 hundreds: so 47,530 is bigger."
+                },
+                "example": {
+                  "easy": "Easy. Complete: 52,400 __ 52,040.",
+                  "medium": "Intermediate. Order 81,250, 18,520, 80,125, 81,025.",
+                  "reflection": "Reflection. Find two numbers between 9,995 and 10,005."
+                },
+                "practice": {
+                  "title": "Compare the numbers",
+                  "instruction": "Choose the symbol that correctly compares each pair of numbers.",
+                  "hint": "Compare the ten thousands and thousands of each number first.",
+                  "strongHint": "If the thousands are equal, compare the hundreds, then the tens, then the units."
+                },
+                "reflect": {
+                  "title": "Order the numbers",
+                  "instruction": "Place the four numbers from smallest to largest.",
+                  "hint": "Start by spotting the smallest ten thousands digit.",
+                  "strongHint": "18,520 has 1 ten thousand, the other three have 8: compare their thousands and hundreds next."
+                },
+                "play": {
+                  "title": "Build the biggest reserve",
+                  "instruction": "In each round, choose the bigger of the two numbers shown.",
+                  "hint": "Look at the ten thousands and thousands of each number first.",
+                  "strongHint": "Compare place by place, starting from the left, to find the bigger number."
+                },
+                "remember": "We compare numbers place by place, starting from the ten thousands: as soon as a place differs, it gives the answer.",
+                "check": {
+                  "title": "Find a hidden number",
+                  "instruction": "Write a whole number that is strictly between the two limits.",
+                  "hint": "9,995 and 10,005 don't count: look for a number in between.",
+                  "strongHint": "Between 9,995 and 10,005, you can choose for example 9,996, 10,000 or 10,004."
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "MATH-4P-U01-L04",
+          "title": "lessons.l4.title",
+          "objective": "content.u01l04.objective",
+          "activities": [
+            {
+              "id": "MATH-4P-U01-L04-situation",
+              "type": "situation",
+              "title": "content.u01l04.objective",
+              "instructions": "content.u01l04.situation",
+              "data": {
+                "textKey": "content.u01l04.situation"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L04-discover",
+              "type": "discover",
+              "title": "content.u01l04.discover",
+              "instructions": "content.u01l04.discover",
+              "data": {
+                "textKey": "content.u01l04.discover"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L04-manipulate",
+              "type": "manipulate",
+              "title": "content.u01l04.manipulate.title",
+              "instructions": "content.u01l04.manipulate.instruction",
+              "data": {
+                "hintKey": "content.u01l04.manipulate.hint",
+                "strongHintKey": "content.u01l04.manipulate.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l04-manipulate",
+                  "type": "sequence-fill",
+                  "data": {
+                    "sequence": [
+                      15000,
+                      20000,
+                      25000,
+                      30000
+                    ],
+                    "blankIndex": 3
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L04-example",
+              "type": "example",
+              "title": "content.method",
+              "instructions": "content.method",
+              "data": {
+                "methodKey": "content.method",
+                "promptKeys": [
+                  "content.u01l04.example.easy",
+                  "content.u01l04.example.medium",
+                  "content.u01l04.example.reflection"
+                ]
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L04-practice",
+              "type": "practice",
+              "title": "content.u01l04.practice.title",
+              "instructions": "content.u01l04.practice.instruction",
+              "data": {
+                "hintKey": "content.u01l04.practice.hint",
+                "strongHintKey": "content.u01l04.practice.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l04-practice",
+                  "type": "sequence-fill",
+                  "data": {
+                    "sequence": [
+                      3000,
+                      3500,
+                      4000,
+                      4500
+                    ],
+                    "blankIndex": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L04-reflect",
+              "type": "reflect",
+              "title": "content.u01l04.reflect.title",
+              "instructions": "content.u01l04.reflect.instruction",
+              "data": {
+                "hintKey": "content.u01l04.reflect.hint",
+                "strongHintKey": "content.u01l04.reflect.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l04-reflect",
+                  "type": "round-to-target",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 24638,
+                        "roundTo": 1000,
+                        "distractor": 24000
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L04-play",
+              "type": "play",
+              "title": "content.u01l04.play.title",
+              "instructions": "content.u01l04.play.instruction",
+              "data": {
+                "hintKey": "content.u01l04.play.hint",
+                "strongHintKey": "content.u01l04.play.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l04-play",
+                  "type": "round-to-target",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 47350,
+                        "roundTo": 10000,
+                        "distractor": 40000
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-L04-remember",
+              "type": "remember",
+              "title": "content.u01l04.remember",
+              "instructions": "content.u01l04.remember",
+              "data": {
+                "textKey": "content.u01l04.remember"
+              },
+              "exercises": []
+            },
+            {
+              "id": "MATH-4P-U01-L04-check",
+              "type": "check",
+              "title": "content.u01l04.check.title",
+              "instructions": "content.u01l04.check.instruction",
+              "data": {
+                "hintKey": "content.u01l04.check.hint",
+                "strongHintKey": "content.u01l04.check.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01l04-check",
+                  "type": "round-to-target",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 63020,
+                        "roundTo": 100,
+                        "distractor": 63100
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "content": {
+            "fr": {
+              "method": [
+                "Je représente les données.",
+                "J'estime le résultat.",
+                "Je calcule étape par étape.",
+                "Je vérifie par une autre méthode ou par estimation.",
+                "J'explique ma réponse par une phrase."
+              ],
+              "u01l04": {
+                "objective": "Je peux estimer un résultat et arrondir un nombre au rang demandé.",
+                "situation": "Sur la route du marché, les bornes indiquent 15 000, 20 000, 25 000, puis une borne est effacée.",
+                "discover": "Une suite avance selon un pas régulier. Pour arrondir un nombre, on choisit le rang demandé (dizaine, centaine, millier ou dizaine de mille) et on regarde le chiffre juste après ce rang pour savoir s'il faut monter ou rester.",
+                "manipulate": {
+                  "title": "Continue la suite",
+                  "instruction": "Continue la suite de 5 000 en 5 000 avec des bornes de route.",
+                  "hint": "Regarde de combien la suite avance à chaque fois.",
+                  "strongHint": "La suite avance de 5 000 en 5 000 : 15 000, 20 000, 25 000, puis 30 000."
+                },
+                "example": {
+                  "easy": "Facile. Complète : 4 000, 6 000, __, 10 000.",
+                  "medium": "Intermédiaire. Arrondis 24 638 à la centaine la plus proche.",
+                  "reflection": "Réflexion. Arrondis 24 638 au millier le plus proche."
+                },
+                "practice": {
+                  "title": "Complète la suite",
+                  "instruction": "Trouve le nombre manquant dans la suite.",
+                  "hint": "Regarde l'écart entre les nombres déjà connus.",
+                  "strongHint": "La suite avance de 500 en 500 : après 3 500 vient 4 000."
+                },
+                "reflect": {
+                  "title": "Arrondis au millier",
+                  "instruction": "Choisis le millier le plus proche du nombre proposé.",
+                  "hint": "Regarde le chiffre des centaines : est-il plus proche de 0 ou de 10 ?",
+                  "strongHint": "24 638 est plus proche de 25 000 que de 24 000, car 638 est plus proche de 1 000 que de 0."
+                },
+                "play": {
+                  "title": "Atteins la borne la plus proche",
+                  "instruction": "Choisis la dizaine de mille la plus proche du nombre proposé sur la ligne graduée.",
+                  "hint": "Regarde le chiffre des unités de mille : est-il plus proche de 0 ou de 10 ?",
+                  "strongHint": "47 350 est plus proche de 50 000 que de 40 000."
+                },
+                "remember": "Pour arrondir un nombre, je regarde le rang demandé et le chiffre juste après : s'il est 5 ou plus, le rang monte d'une unité, sinon il reste identique.",
+                "check": {
+                  "title": "Arrondis à la centaine",
+                  "instruction": "Choisis la centaine la plus proche du nombre proposé.",
+                  "hint": "Regarde le chiffre des dizaines : est-il plus proche de 0 ou de 10 ?",
+                  "strongHint": "63 020 est plus proche de 63 000 que de 63 100."
+                }
+              }
+            },
+            "en": {
+              "method": [
+                "I represent the data.",
+                "I estimate the result.",
+                "I calculate step by step.",
+                "I check with another method or by estimating.",
+                "I explain my answer in a sentence."
+              ],
+              "u01l04": {
+                "objective": "I can estimate a result and round a number to the requested place.",
+                "situation": "Along the market road, the markers show 15,000, 20,000, 25,000, then one marker is missing.",
+                "discover": "A pattern moves forward following a regular step. To round a number, we choose the requested place (ten, hundred, thousand or ten thousand) and look at the digit right after it to know whether to round up or stay.",
+                "manipulate": {
+                  "title": "Continue the pattern",
+                  "instruction": "Continue the pattern counting up by 5,000 using road markers.",
+                  "hint": "Look at how much the pattern moves forward each time.",
+                  "strongHint": "The pattern moves forward by 5,000 each time: 15,000, 20,000, 25,000, then 30,000."
+                },
+                "example": {
+                  "easy": "Easy. Complete: 4,000, 6,000, __, 10,000.",
+                  "medium": "Intermediate. Round 24,638 to the nearest hundred.",
+                  "reflection": "Reflection. Round 24,638 to the nearest thousand."
+                },
+                "practice": {
+                  "title": "Complete the pattern",
+                  "instruction": "Find the missing number in the pattern.",
+                  "hint": "Look at the gap between the numbers you already know.",
+                  "strongHint": "The pattern moves forward by 500 each time: after 3,500 comes 4,000."
+                },
+                "reflect": {
+                  "title": "Round to the nearest thousand",
+                  "instruction": "Choose the thousand closest to the given number.",
+                  "hint": "Look at the hundreds digit: is it closer to 0 or to 10?",
+                  "strongHint": "24,638 is closer to 25,000 than to 24,000, because 638 is closer to 1,000 than to 0."
+                },
+                "play": {
+                  "title": "Reach the closest marker",
+                  "instruction": "Choose the ten thousand closest to the given number on the number line.",
+                  "hint": "Look at the thousands digit: is it closer to 0 or to 10?",
+                  "strongHint": "47,350 is closer to 50,000 than to 40,000."
+                },
+                "remember": "To round a number, I look at the requested place and the digit right after it: if it is 5 or more, the place goes up by one, otherwise it stays the same.",
+                "check": {
+                  "title": "Round to the nearest hundred",
+                  "instruction": "Choose the hundred closest to the given number.",
+                  "hint": "Look at the tens digit: is it closer to 0 or to 10?",
+                  "strongHint": "63,020 is closer to 63,000 than to 63,100."
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "MATH-4P-U01-EVAL",
+          "title": "modules.evaluation",
+          "objective": "content.u01eval.intro",
+          "activities": [
+            {
+              "id": "MATH-4P-U01-EVAL-question-1",
+              "type": "question",
+              "title": "content.u01eval.q1.title",
+              "instructions": "content.u01eval.q1.instruction",
+              "data": {
+                "hintKey": "content.u01eval.q1.hint",
+                "strongHintKey": "content.u01eval.q1.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01eval-q1",
+                  "type": "numeric-question",
+                  "data": {
+                    "promptKey": "content.u01eval.q1.prompt",
+                    "terms": [
+                      30000,
+                      5000,
+                      20,
+                      7
+                    ]
+                  },
+                  "serverData": {
+                    "answer": 35027
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-EVAL-question-2",
+              "type": "question",
+              "title": "content.u01eval.q2.title",
+              "instructions": "content.u01eval.q2.instruction",
+              "data": {
+                "hintKey": "content.u01eval.q2.hint",
+                "strongHintKey": "content.u01eval.q2.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01eval-q2",
+                  "type": "number-words-match",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 45210,
+                        "direction": "digits-to-words",
+                        "distractors": [
+                          45120,
+                          45201,
+                          54210
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-EVAL-question-3",
+              "type": "question",
+              "title": "content.u01eval.q3.title",
+              "instructions": "content.u01eval.q3.instruction",
+              "data": {
+                "hintKey": "content.u01eval.q3.hint",
+                "strongHintKey": "content.u01eval.q3.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01eval-q3",
+                  "type": "number-order",
+                  "data": {
+                    "values": [
+                      81250,
+                      18520,
+                      80125,
+                      81025
+                    ],
+                    "direction": "ascending"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "MATH-4P-U01-EVAL-question-4",
+              "type": "question",
+              "title": "content.u01eval.q4.title",
+              "instructions": "content.u01eval.q4.instruction",
+              "data": {
+                "hintKey": "content.u01eval.q4.hint",
+                "strongHintKey": "content.u01eval.q4.strongHint"
+              },
+              "exercises": [
+                {
+                  "id": "u01eval-q4",
+                  "type": "round-to-target",
+                  "data": {
+                    "items": [
+                      {
+                        "value": 24638,
+                        "roundTo": 1000,
+                        "distractor": 24000
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "content": {
+            "fr": {
+              "u01eval": {
+                "intro": "Travaille seul d'abord. Utilise un schéma si nécessaire et explique au moins une réponse.",
+                "q1": {
+                  "title": "Question 1",
+                  "instruction": "Calcule le nombre à partir de sa décomposition.",
+                  "hint": "Additionne les dizaines de mille, les unités de mille, puis le reste.",
+                  "strongHint": "3 dizaines de mille font 30 000, 5 unités de mille font 5 000, 2 dizaines font 20 et 7 unités font 7 : 30 000 + 5 000 + 20 + 7.",
+                  "prompt": "Quel nombre forment 3 dizaines de mille, 5 unités de mille, 0 centaine, 2 dizaines et 7 unités ?"
+                },
+                "q2": {
+                  "title": "Question 2",
+                  "instruction": "Choisis l'écriture en mots qui correspond exactement au nombre affiché.",
+                  "hint": "Repère d'abord les milliers : quarante-cinq mille.",
+                  "strongHint": "45 210 = quarante-cinq mille deux cent dix."
+                },
+                "q3": {
+                  "title": "Question 3",
+                  "instruction": "Place les quatre nombres du plus petit au plus grand.",
+                  "hint": "Compare d'abord les dizaines de mille et les unités de mille de chaque nombre.",
+                  "strongHint": "18 520 a 1 dizaine de mille, les trois autres en ont 8 : compare ensuite leurs unités de mille et leurs centaines."
+                },
+                "q4": {
+                  "title": "Question 4",
+                  "instruction": "Choisis le millier le plus proche du nombre proposé.",
+                  "hint": "Regarde le chiffre des centaines : est-il plus proche de 0 ou de 10 ?",
+                  "strongHint": "24 638 est plus proche de 25 000 que de 24 000."
+                }
+              }
+            },
+            "en": {
+              "u01eval": {
+                "intro": "Work on your own first. Use a drawing if you need to, and explain at least one answer.",
+                "q1": {
+                  "title": "Question 1",
+                  "instruction": "Work out the number from its breakdown.",
+                  "hint": "Add the ten thousands, the thousands, then the rest.",
+                  "strongHint": "3 ten thousands make 30,000, 5 thousands make 5,000, 2 tens make 20 and 7 units make 7: 30,000 + 5,000 + 20 + 7.",
+                  "prompt": "What number is made of 3 ten thousands, 5 thousands, 0 hundreds, 2 tens and 7 units?"
+                },
+                "q2": {
+                  "title": "Question 2",
+                  "instruction": "Choose the word form that matches the number shown exactly.",
+                  "hint": "Spot the thousands first: forty-five thousand.",
+                  "strongHint": "45,210 = forty-five thousand two hundred and ten."
+                },
+                "q3": {
+                  "title": "Question 3",
+                  "instruction": "Place the four numbers from smallest to largest.",
+                  "hint": "Compare the ten thousands and thousands of each number first.",
+                  "strongHint": "18,520 has 1 ten thousand, the other three have 8: compare their thousands and hundreds next."
+                },
+                "q4": {
+                  "title": "Question 4",
+                  "instruction": "Choose the thousand closest to the given number.",
+                  "hint": "Look at the hundreds digit: is it closer to 0 or to 10?",
+                  "strongHint": "24,638 is closer to 25,000 than to 24,000."
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

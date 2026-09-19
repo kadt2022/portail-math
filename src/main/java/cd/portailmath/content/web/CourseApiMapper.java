@@ -15,6 +15,8 @@ import cd.portailmath.content.web.response.PublicActivityResponse;
 import cd.portailmath.content.web.response.PublicExerciseResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class CourseApiMapper {
 
@@ -67,13 +69,18 @@ public class CourseApiMapper {
         );
     }
 
-    public LessonDetailResponse toDetail(Lesson lesson) {
+    public LessonDetailResponse toDetail(Lesson lesson, String language) {
         return new LessonDetailResponse(
                 lesson.id(),
                 lesson.title(),
                 lesson.objective(),
+                localizedContent(lesson, language),
                 lesson.activities().stream().map(this::toPublicActivity).toList()
         );
+    }
+
+    private Map<String, Object> localizedContent(Lesson lesson, String language) {
+        return lesson.content().getOrDefault(language, lesson.content().getOrDefault("fr", Map.of()));
     }
 
     private PublicActivityResponse toPublicActivity(Activity activity) {
@@ -82,6 +89,7 @@ public class CourseApiMapper {
                 activity.type(),
                 activity.title(),
                 activity.instructions(),
+                activity.data(),
                 activity.exercises().stream().map(this::toPublicExercise).toList()
         );
     }
