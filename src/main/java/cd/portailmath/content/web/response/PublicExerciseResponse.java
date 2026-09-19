@@ -1,11 +1,10 @@
 package cd.portailmath.content.web.response;
 
-import java.util.List;
+import java.util.Map;
 
 public record PublicExerciseResponse(
         String id,
         String type,
-        String prompt,
-        List<String> choices
+        Map<String, Object> data
 ) {
 }

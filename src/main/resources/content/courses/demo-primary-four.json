@@ -23,9 +23,13 @@
                 {
                   "id": "place-value-43-125",
                   "type": "single-choice",
-                  "prompt": "Quelle est la valeur du chiffre 3 dans 43 125 ?",
-                  "choices": ["3", "300", "3000"],
-                  "correctAnswer": "3000"
+                  "data": {
+                    "prompt": "Quelle est la valeur du chiffre 3 dans 43 125 ?",
+                    "choices": ["3", "300", "3000"]
+                  },
+                  "serverData": {
+                    "correctAnswer": "3000"
+                  }
                 }
               ]
             }

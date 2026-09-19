@@ -68,14 +68,11 @@ public class CourseCatalogValidator {
     }
 
     private void validateExercise(Exercise exercise, Set<String> exerciseIds) {
-        require(exercise != null && hasText(exercise.id()) && hasText(exercise.type())
-                        && hasText(exercise.prompt()) && hasText(exercise.correctAnswer()),
-                "Chaque exercice doit avoir un identifiant, un type, un énoncé et une réponse correcte.");
+        require(exercise != null && hasText(exercise.id()) && hasText(exercise.type()),
+                "Chaque exercice doit avoir un identifiant et un type.");
         require(exerciseIds.add(exercise.id()), "L’identifiant d’exercice " + exercise.id() + " est dupliqué.");
-        if (!exercise.choices().isEmpty()) {
-            require(exercise.choices().contains(exercise.correctAnswer()),
-                    "La réponse correcte de l’exercice " + exercise.id() + " doit correspondre à un choix.");
-        }
+        require(!exercise.data().isEmpty(),
+                "L’exercice " + exercise.id() + " doit fournir des données au composant frontend.");
     }
 
     private boolean hasText(String value) {

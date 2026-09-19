@@ -1,15 +1,15 @@
 package cd.portailmath.content.domain;
 
-import java.util.List;
+import java.util.Map;
 
 public record Exercise(
         String id,
         String type,
-        String prompt,
-        List<String> choices,
-        String correctAnswer
+        Map<String, Object> data,
+        Map<String, Object> serverData
 ) {
     public Exercise {
-        choices = choices == null ? List.of() : List.copyOf(choices);
+        data = data == null ? Map.of() : Map.copyOf(data);
+        serverData = serverData == null ? Map.of() : Map.copyOf(serverData);
     }
 }

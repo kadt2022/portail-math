@@ -90,8 +90,7 @@ public class CourseApiMapper {
         return new PublicExerciseResponse(
                 exercise.id(),
                 exercise.type(),
-                exercise.prompt(),
-                exercise.choices()
+                exercise.data()
         );
     }
 }

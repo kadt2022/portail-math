@@ -51,7 +51,12 @@ class CourseApiTests {
         mockMvc.perform(get("/api/v1/courses/demo-primary-four/lessons/place-value"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.activities[0].exercises[0].id").value("place-value-43-125"))
-                .andExpect(jsonPath("$.activities[0].exercises[0].correctAnswer").doesNotExist())
+                .andExpect(jsonPath("$.activities[0].exercises[0].type").value("single-choice"))
+                .andExpect(jsonPath("$.activities[0].exercises[0].data.prompt")
+                        .value("Quelle est la valeur du chiffre 3 dans 43 125 ?"))
+                .andExpect(jsonPath("$.activities[0].exercises[0].data.choices.length()").value(3))
+                .andExpect(jsonPath("$.activities[0].exercises[0].serverData").doesNotExist())
+                .andExpect(content().string(not(containsString("serverData"))))
                 .andExpect(content().string(not(containsString("correctAnswer"))));
     }
 

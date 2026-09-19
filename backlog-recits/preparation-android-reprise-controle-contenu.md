@@ -56,6 +56,12 @@ GET /api/v1/courses/{courseId}/lessons/{lessonId}
 
 Les réponses correctes ne doivent jamais être exposées dans les DTO publics.
 
+## Responsabilités techniques
+
+Le backend ne doit pas reproduire le moteur d’exercices TypeScript. Il est responsable du stockage, du catalogue et de la distribution contrôlée du contenu.
+
+Le frontend reste responsable de l’interprétation des types d’exercices et de l’expérience interactive. Le contrat backend d’un exercice doit donc rester générique : un identifiant, un type et des données publiques destinées au composant frontend. Les données réservées au serveur, notamment celles nécessaires à une future validation, ne doivent jamais être incluses dans le DTO public.
+
 ## Critère de fin
 
 Le backend peut charger et exposer un cours de démonstration sans dépendre du frontend.
