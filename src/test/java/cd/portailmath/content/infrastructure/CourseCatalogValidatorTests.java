@@ -41,7 +41,7 @@ class CourseCatalogValidatorTests {
         List<Activity> activities = IntStream.range(0, exerciseIds.length)
                 .mapToObj(index -> activity(courseId + "-activity-" + index, exerciseIds[index]))
                 .toList();
-        Lesson lesson = new Lesson("lesson-1", "Leçon", "Objectif", activities);
+        Lesson lesson = new Lesson("lesson-1", "Leçon", "Objectif", Map.of(), activities);
         CourseModule module = new CourseModule("module-1", "Module", "Description", List.of(lesson));
         return new Course(courseId, "Cours", "Primaire", "Description", List.of(module));
     }

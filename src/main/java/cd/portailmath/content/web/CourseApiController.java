@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -57,13 +58,14 @@ public class CourseApiController {
     public ResponseEntity<Object> findLesson(
             @PathVariable String courseId,
             @PathVariable String lessonId,
+            @RequestParam(defaultValue = "fr") String lang,
             HttpServletRequest request
     ) {
         if (catalogService.findCourseById(courseId).isEmpty()) {
             return notFound(COURSE_NOT_FOUND, COURSE_NOT_FOUND_MESSAGE, request);
         }
         return catalogService.findLessonById(courseId, lessonId)
-                .map(lesson -> ResponseEntity.<Object>ok(mapper.toDetail(lesson)))
+                .map(lesson -> ResponseEntity.<Object>ok(mapper.toDetail(lesson, lang)))
                 .orElseGet(() -> notFound("LESSON_NOT_FOUND", "La leçon demandée est introuvable.", request));
     }
 

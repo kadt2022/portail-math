@@ -50,6 +50,8 @@ class CourseApiTests {
     void returnsLessonWithoutEverLeakingCorrectAnswers() throws Exception {
         mockMvc.perform(get("/api/v1/courses/MATH-4P/lessons/MATH-4P-U01-L01"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.u01l01.situation")
+                        .value("Une coopérative compte 24 638 graines sélectionnées. Comment les compter facilement ?"))
                 .andExpect(jsonPath("$.activities[0].data.textKey").value("content.u01l01.situation"))
                 .andExpect(jsonPath("$.activities[2].exercises[0].id").value("u01l01-manipulate"))
                 .andExpect(jsonPath("$.activities[2].exercises[0].type").value("place-value-build"))
@@ -57,6 +59,15 @@ class CourseApiTests {
                 .andExpect(jsonPath("$.activities[5].exercises[0].serverData").doesNotExist())
                 .andExpect(content().string(not(containsString("serverData"))))
                 .andExpect(content().string(not(containsString("\"answer\""))));
+    }
+
+    @Test
+    void returnsPedagogicalContentInTheRequestedLanguage() throws Exception {
+        mockMvc.perform(get("/api/v1/courses/MATH-4P/lessons/MATH-4P-U01-L01").queryParam("lang", "en"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.u01l01.situation")
+                        .value("A cooperative counts 24,638 selected seeds. How can they be counted easily?"))
+                .andExpect(content().string(not(containsString("24 638 graines"))));
     }
 
     @Test

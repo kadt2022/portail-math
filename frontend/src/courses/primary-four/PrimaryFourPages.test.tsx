@@ -12,6 +12,7 @@ import primaryFourCatalog from "../../../../src/main/resources/content/courses/p
 
 interface CatalogLesson {
   id: string;
+  content: Record<string, Record<string, unknown>>;
   activities: unknown[];
 }
 
@@ -33,9 +34,14 @@ describe("Pages du parcours de 4e primaire", () => {
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
     vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
-      const lessonId = decodeURIComponent(String(input).split("/").pop() ?? "");
+      const url = new URL(String(input), window.location.origin);
+      const lessonId = decodeURIComponent(url.pathname.split("/").pop() ?? "");
+      const language = url.searchParams.get("lang") === "en" ? "en" : "fr";
       const lesson = catalog.modules.flatMap((module) => module.lessons).find((candidate) => candidate.id === lessonId);
-      return new Response(lesson ? JSON.stringify(publicLesson(lesson)) : "", {
+      const responseLesson = lesson
+        ? { ...publicLesson(lesson), content: lesson.content[language] }
+        : undefined;
+      return new Response(responseLesson ? JSON.stringify(responseLesson) : "", {
         status: lesson ? 200 : 404,
         headers: { "Content-Type": "application/json" },
       });
