@@ -115,7 +115,7 @@ Ne plus laisser le frontend décider si une réponse est correcte.
 Créer une API de validation :
 
 ```text
-POST /api/v1/exercises/{exerciseId}/answers
+POST /api/v1/courses/{courseId}/exercises/{exerciseId}/answers
 ```
 
 Le frontend envoie par exemple :
