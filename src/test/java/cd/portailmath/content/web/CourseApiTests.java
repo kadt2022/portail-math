@@ -25,48 +25,47 @@ class CourseApiTests {
         mockMvc.perform(get("/api/v1/courses"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").value("demo-primary-four"))
+                .andExpect(jsonPath("$[0].id").value("MATH-4P"))
                 .andExpect(jsonPath("$[0].moduleCount").value(1))
-                .andExpect(jsonPath("$[0].lessonCount").value(1));
+                .andExpect(jsonPath("$[0].lessonCount").value(5));
     }
 
     @Test
     void returnsCourseDetails() throws Exception {
-        mockMvc.perform(get("/api/v1/courses/demo-primary-four"))
+        mockMvc.perform(get("/api/v1/courses/MATH-4P"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.level").value("4e primaire"))
-                .andExpect(jsonPath("$.modules[0].id").value("numbers-foundation"));
+                .andExpect(jsonPath("$.modules[0].id").value("MATH-4P-U01"));
     }
 
     @Test
     void returnsModuleDetails() throws Exception {
-        mockMvc.perform(get("/api/v1/courses/demo-primary-four/modules/numbers-foundation"))
+        mockMvc.perform(get("/api/v1/courses/MATH-4P/modules/MATH-4P-U01"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("numbers-foundation"))
-                .andExpect(jsonPath("$.lessons[0].id").value("place-value"));
+                .andExpect(jsonPath("$.id").value("MATH-4P-U01"))
+                .andExpect(jsonPath("$.lessons[0].id").value("MATH-4P-U01-L01"));
     }
 
     @Test
     void returnsLessonWithoutEverLeakingCorrectAnswers() throws Exception {
-        mockMvc.perform(get("/api/v1/courses/demo-primary-four/lessons/place-value"))
+        mockMvc.perform(get("/api/v1/courses/MATH-4P/lessons/MATH-4P-U01-L01"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.activities[0].exercises[0].id").value("place-value-43-125"))
-                .andExpect(jsonPath("$.activities[0].exercises[0].type").value("single-choice"))
-                .andExpect(jsonPath("$.activities[0].exercises[0].data.prompt")
-                        .value("Quelle est la valeur du chiffre 3 dans 43 125 ?"))
-                .andExpect(jsonPath("$.activities[0].exercises[0].data.choices.length()").value(3))
-                .andExpect(jsonPath("$.activities[0].exercises[0].serverData").doesNotExist())
+                .andExpect(jsonPath("$.activities[0].data.textKey").value("content.u01l01.situation"))
+                .andExpect(jsonPath("$.activities[2].exercises[0].id").value("u01l01-manipulate"))
+                .andExpect(jsonPath("$.activities[2].exercises[0].type").value("place-value-build"))
+                .andExpect(jsonPath("$.activities[2].exercises[0].data.targets[0]").value(24638))
+                .andExpect(jsonPath("$.activities[5].exercises[0].serverData").doesNotExist())
                 .andExpect(content().string(not(containsString("serverData"))))
-                .andExpect(content().string(not(containsString("correctAnswer"))));
+                .andExpect(content().string(not(containsString("\"answer\""))));
     }
 
     @Test
     void unknownNestedResourcesReturnStructuredErrors() throws Exception {
-        mockMvc.perform(get("/api/v1/courses/demo-primary-four/modules/unknown"))
+        mockMvc.perform(get("/api/v1/courses/MATH-4P/modules/unknown"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("MODULE_NOT_FOUND"));
 
-        mockMvc.perform(get("/api/v1/courses/demo-primary-four/lessons/unknown"))
+        mockMvc.perform(get("/api/v1/courses/MATH-4P/lessons/unknown"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("LESSON_NOT_FOUND"));
     }

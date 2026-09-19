@@ -30,8 +30,9 @@ class CourseCatalogValidatorTests {
     @Test
     void rejectsDuplicateExerciseIdsInsideOneCourse() {
         Course course = course("MATH-4P", "u01l01-practice", "u01l01-practice");
+        List<Course> courses = List.of(course);
 
-        assertThatThrownBy(() -> validator.validate(List.of(course)))
+        assertThatThrownBy(() -> validator.validate(courses))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("L’identifiant d’exercice u01l01-practice est dupliqué.");
     }
@@ -52,6 +53,6 @@ class CourseCatalogValidatorTests {
                 Map.of("prompt", "Question"),
                 Map.of("answer", 42)
         );
-        return new Activity(activityId, "practice", "Activité", "Consigne", List.of(exercise));
+        return new Activity(activityId, "practice", "Activité", "Consigne", Map.of(), List.of(exercise));
     }
 }

@@ -19,6 +19,9 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Les tests de migration lisent le catalogue backend réel comme fixture,
+    // sans recopier le contenu pédagogique dans l'arbre frontend.
+    fs: { allow: [".."] },
     proxy: {
       // En développement, Vite sert React et relaie le reste à Spring Boot :
       // aucune configuration CORS n'est alors nécessaire.

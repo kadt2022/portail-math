@@ -82,6 +82,7 @@ public class CourseApiMapper {
                 activity.type(),
                 activity.title(),
                 activity.instructions(),
+                activity.data(),
                 activity.exercises().stream().map(this::toPublicExercise).toList()
         );
     }

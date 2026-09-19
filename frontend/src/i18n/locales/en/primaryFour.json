@@ -94,6 +94,7 @@
   },
   "lesson": {
     "label": "Lesson",
+    "loading": "Loading lesson content…",
     "objectiveLabel": "My goal",
     "duration": "About 30 minutes",
     "stepProgress": "Step {{current}} of {{total}} — {{label}}",
@@ -389,6 +390,7 @@
   },
   "errors": {
     "moduleNotFound": "This module does not exist.",
-    "lessonNotFound": "This lesson is not available."
+    "lessonNotFound": "This lesson is not available.",
+    "contentUnavailable": "This lesson's content is temporarily unavailable."
   }
 }

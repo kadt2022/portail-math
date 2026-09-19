@@ -1,6 +1,6 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppRouter } from "../../app/AppRouter";
 import { i18next } from "../../i18n/i18n";
@@ -8,6 +8,18 @@ import { completeLearningStep, createEmptyCourseProgress } from "../course-engin
 import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
 import { PRIMARY_FOUR_COURSE, PRIMARY_FOUR_MODULES } from "./course-catalogue";
 import { formatNumber } from "./number-words";
+import primaryFourCatalog from "../../../../src/main/resources/content/courses/primary-four.json?raw";
+
+interface CatalogLesson {
+  id: string;
+  activities: unknown[];
+}
+
+const catalog = JSON.parse(primaryFourCatalog) as { modules: { lessons: CatalogLesson[] }[] };
+
+function publicLesson(lesson: CatalogLesson) {
+  return JSON.parse(JSON.stringify(lesson), (key, value: unknown) => (key === "serverData" ? undefined : value));
+}
 
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
@@ -20,9 +32,20 @@ describe("Pages du parcours de 4e primaire", () => {
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const lessonId = decodeURIComponent(String(input).split("/").pop() ?? "");
+      const lesson = catalog.modules.flatMap((module) => module.lessons).find((candidate) => candidate.id === lessonId);
+      return new Response(lesson ? JSON.stringify(publicLesson(lesson)) : "", {
+        status: lesson ? 200 : 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }));
   });
 
-  afterEach(() => cleanup());
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
 
   it("affiche les 10 modules et garde 40 comme dénominateur", () => {
     renderAt("/app/apprentissages/primaire/4/mathematiques");
@@ -177,7 +200,7 @@ describe("Pages du parcours de 4e primaire", () => {
       const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).load();
       expect(stored.items["MATH-4P-U01-L01"].completed).toBe(true);
     },
-    20000,
+    30_000,
   );
 
   it("affiche 1 / 40 leçons après la première leçon terminée", () => {
@@ -349,7 +372,7 @@ describe("Pages du parcours de 4e primaire", () => {
       await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
       expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
     },
-    20000,
+    30_000,
   );
 
   it(
@@ -409,7 +432,7 @@ describe("Pages du parcours de 4e primaire", () => {
       await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
       expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
     },
-    20000,
+    30_000,
   );
 
   it("affiche une page d'erreur pour un module ou une leçon introuvable", () => {

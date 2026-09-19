@@ -1,4 +1,4 @@
-import type { Exercise } from "../exercises/exercise-types";
+import type { Exercise } from "./exercises/exercise-types";
 
 export interface ExerciseStepContent {
   titleKey: string;
@@ -12,9 +12,6 @@ export interface LessonContent {
   objectiveKey: string;
   situationKey: string;
   discoverKey: string;
-  // Valeur affichée par la figure tactile chiffre -> valeur du « Je
-  // découvre » (voir blocks/PlaceValueRevealBoard). Optionnel : seule la
-  // leçon 1 (valeur de position) en a besoin.
   discoverFigureValue?: number;
   manipulate: ExerciseStepContent;
   exampleMethodKey: string;

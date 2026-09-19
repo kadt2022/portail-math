@@ -16,6 +16,9 @@ import java.util.List;
 @RequestMapping("/api/v1/courses")
 public class CourseApiController {
 
+    private static final String COURSE_NOT_FOUND = "COURSE_NOT_FOUND";
+    private static final String COURSE_NOT_FOUND_MESSAGE = "Le cours demandé est introuvable.";
+
     private final CourseCatalogService catalogService;
     private final CourseApiMapper mapper;
 
@@ -30,45 +33,46 @@ public class CourseApiController {
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<?> findCourse(@PathVariable String courseId, HttpServletRequest request) {
+    public ResponseEntity<Object> findCourse(@PathVariable String courseId, HttpServletRequest request) {
         return catalogService.findCourseById(courseId)
-                .<ResponseEntity<?>>map(course -> ResponseEntity.ok(mapper.toDetail(course)))
-                .orElseGet(() -> notFound("COURSE_NOT_FOUND", "Le cours demandé est introuvable.", request));
+                .map(course -> ResponseEntity.<Object>ok(mapper.toDetail(course)))
+                .orElseGet(() -> notFound(COURSE_NOT_FOUND, COURSE_NOT_FOUND_MESSAGE, request));
     }
 
     @GetMapping("/{courseId}/modules/{moduleId}")
-    public ResponseEntity<?> findModule(
+    public ResponseEntity<Object> findModule(
             @PathVariable String courseId,
             @PathVariable String moduleId,
             HttpServletRequest request
     ) {
         if (catalogService.findCourseById(courseId).isEmpty()) {
-            return notFound("COURSE_NOT_FOUND", "Le cours demandé est introuvable.", request);
+            return notFound(COURSE_NOT_FOUND, COURSE_NOT_FOUND_MESSAGE, request);
         }
         return catalogService.findModuleById(courseId, moduleId)
-                .<ResponseEntity<?>>map(module -> ResponseEntity.ok(mapper.toDetail(module)))
+                .map(module -> ResponseEntity.<Object>ok(mapper.toDetail(module)))
                 .orElseGet(() -> notFound("MODULE_NOT_FOUND", "Le module demandé est introuvable.", request));
     }
 
     @GetMapping("/{courseId}/lessons/{lessonId}")
-    public ResponseEntity<?> findLesson(
+    public ResponseEntity<Object> findLesson(
             @PathVariable String courseId,
             @PathVariable String lessonId,
             HttpServletRequest request
     ) {
         if (catalogService.findCourseById(courseId).isEmpty()) {
-            return notFound("COURSE_NOT_FOUND", "Le cours demandé est introuvable.", request);
+            return notFound(COURSE_NOT_FOUND, COURSE_NOT_FOUND_MESSAGE, request);
         }
         return catalogService.findLessonById(courseId, lessonId)
-                .<ResponseEntity<?>>map(lesson -> ResponseEntity.ok(mapper.toDetail(lesson)))
+                .map(lesson -> ResponseEntity.<Object>ok(mapper.toDetail(lesson)))
                 .orElseGet(() -> notFound("LESSON_NOT_FOUND", "La leçon demandée est introuvable.", request));
     }
 
-    private ResponseEntity<ContentApiErrorResponse> notFound(
+    private ResponseEntity<Object> notFound(
             String code,
             String message,
             HttpServletRequest request
     ) {
-        return ResponseEntity.status(404).body(new ContentApiErrorResponse(code, message, request.getRequestURI()));
+        return ResponseEntity.status(404)
+                .body(new ContentApiErrorResponse(code, message, request.getRequestURI()));
     }
 }
