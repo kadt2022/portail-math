@@ -49,7 +49,7 @@ export interface NumericQuestionExercise {
 }
 
 export type ExerciseAnswer = number | string | readonly number[];
-export type ExerciseAnswerValidator = (round: number, answer: ExerciseAnswer) => Promise<boolean>;
+export type ExerciseAnswerValidator = (round: number, answer: ExerciseAnswer) => Promise<boolean | null>;
 
 export interface NumberInRangeExercise {
   kind: "number-in-range";
@@ -73,4 +73,6 @@ export interface SharedExerciseWidgetProps<TExercise> {
   namespace: string;
   formatNumber: (value: number) => string;
   validateAnswer?: ExerciseAnswerValidator;
+  validationPending?: boolean;
+  validationError?: boolean;
 }

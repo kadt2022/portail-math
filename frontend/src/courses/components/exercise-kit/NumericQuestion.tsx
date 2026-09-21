@@ -20,6 +20,8 @@ export function NumericQuestion({
   namespace,
   formatNumber,
   validateAnswer,
+  validationPending,
+  validationError,
 }: NumericQuestionProps) {
   const { t } = useTranslation(namespace);
   const [value, setValue] = useState(completed && exercise.answer !== undefined ? String(exercise.answer) : "");
@@ -36,6 +38,7 @@ export function NumericQuestion({
     const correct = validateAnswer
       ? await validateAnswer(0, given)
       : given === exercise.answer;
+    if (correct === null) return;
     if (correct) {
       onValidated();
       return;
@@ -51,6 +54,8 @@ export function NumericQuestion({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={styles.questionPrompt}>{t(exercise.promptKey, exercise.promptValues)}</p>
       {exercise.choices ? (

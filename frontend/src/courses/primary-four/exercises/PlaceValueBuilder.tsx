@@ -47,6 +47,8 @@ export function PlaceValueBuilder({
   completed,
   onValidated,
   validateAnswer,
+  validationPending,
+  validationError,
 }: PlaceValueBuilderProps) {
   const { t, i18n } = useTranslation("primaryFour");
   const lastTarget = exercise.targets[exercise.targets.length - 1];
@@ -69,10 +71,7 @@ export function PlaceValueBuilder({
     const correct = validateAnswer
       ? await validateAnswer(round, given)
       : PLACES.every((place) => digits[place.key] === expected[place.key]);
-    submit(
-      correct,
-      () => setDigits(decompose(0)),
-    );
+    if (correct !== null) submit(correct, () => setDigits(decompose(0)));
   };
 
   return (
@@ -84,6 +83,8 @@ export function PlaceValueBuilder({
       feedback={feedback}
       onValidate={validate}
       progressLabel={progressLabel}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={kitStyles.targetNumber} aria-live="polite">
         {t("exercise.placeValue.target", { number: formatNumber(target, i18n.language) })}

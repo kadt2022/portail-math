@@ -11,6 +11,8 @@ export interface ActivityShellProps {
   feedback: string;
   progressLabel?: string;
   onValidate: () => void;
+  validationPending?: boolean;
+  validationError?: boolean;
   children: ReactNode;
 }
 
@@ -26,6 +28,8 @@ export function ActivityShell({
   feedback,
   progressLabel,
   onValidate,
+  validationPending = false,
+  validationError = false,
   children,
 }: ActivityShellProps) {
   const { t } = useTranslation(namespace);
@@ -47,11 +51,11 @@ export function ActivityShell({
       <div className={styles.interactiveZone}>{children}</div>
       <div className={styles.validationRow}>
         <p className={completed ? styles.successMessage : styles.feedback} aria-live="polite">
-          {completed ? t("activity.success") : feedback}
+          {completed ? t("activity.success") : validationError ? t("activity.validationUnavailable") : feedback}
         </p>
         {!completed ? (
-          <button className={styles.validateButton} type="button" onClick={onValidate}>
-            {t("activity.validate")}
+          <button className={styles.validateButton} type="button" onClick={onValidate} disabled={validationPending}>
+            {validationPending ? t("activity.validating") : t("activity.validate")}
           </button>
         ) : null}
       </div>

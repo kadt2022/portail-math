@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NumberComparator } from "../../components/exercise-kit/NumberComparator";
@@ -26,9 +27,25 @@ export function InteractiveExercise(props: InteractiveExerciseProps) {
   const { i18n } = useTranslation("primaryFour");
   const format = (value: number) => formatNumber(value, i18n.language);
   const wordsOf = (i18n.resolvedLanguage ?? i18n.language).startsWith("en") ? numberToWordsEn : numberToWordsFr;
-  const validateAnswer = (round: number, answer: number | string | readonly number[]) =>
-    validatePrimaryFourExerciseAnswer(exercise.id, round, answer);
-  const validatedProps = { ...props, validateAnswer };
+  const requestPending = useRef(false);
+  const [validationPending, setValidationPending] = useState(false);
+  const [validationError, setValidationError] = useState(false);
+  const validateAnswer = async (round: number, answer: number | string | readonly number[]) => {
+    if (requestPending.current) return null;
+    requestPending.current = true;
+    setValidationPending(true);
+    setValidationError(false);
+    try {
+      return await validatePrimaryFourExerciseAnswer(exercise.id, round, answer);
+    } catch {
+      setValidationError(true);
+      return null;
+    } finally {
+      requestPending.current = false;
+      setValidationPending(false);
+    }
+  };
+  const validatedProps = { ...props, validateAnswer, validationPending, validationError };
 
   switch (exercise.kind) {
     case "place-value-build":

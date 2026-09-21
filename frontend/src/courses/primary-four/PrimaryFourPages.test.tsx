@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -8,6 +8,7 @@ import { completeLearningStep, createEmptyCourseProgress } from "../course-engin
 import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
 import { PRIMARY_FOUR_COURSE, PRIMARY_FOUR_MODULES } from "./course-catalogue";
 import { formatNumber } from "./number-words";
+import { InteractiveExercise } from "./exercises/InteractiveExercise";
 import primaryFourCatalog from "../../../../src/main/resources/content/courses/primary-four.json?raw";
 
 interface CatalogLesson {
@@ -315,6 +316,70 @@ describe("Pages du parcours de 4e primaire", () => {
 
     await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
     expect(screen.getByText(/2 DM, 4 UM, 6 C, 3 D et 8 U/i)).toBeInTheDocument();
+  });
+
+  it("bloque les doubles soumissions pendant la validation serveur", async () => {
+    let resolveValidation: ((response: Response) => void) | undefined;
+    const pendingValidation = new Promise<Response>((resolve) => {
+      resolveValidation = resolve;
+    });
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockReturnValue(pendingValidation);
+    const onValidated = vi.fn();
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "pending-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={onValidated}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    const validateButton = screen.getByRole("button", { name: /vérifier ma réponse/i });
+    fireEvent.click(validateButton);
+    fireEvent.click(validateButton);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: /vérification/i })).toBeDisabled();
+    resolveValidation?.(Response.json({ correct: true }));
+    await waitFor(() => expect(onValidated).toHaveBeenCalledTimes(1));
+  });
+
+  it("affiche une erreur réessayable lorsque la validation serveur échoue", async () => {
+    vi.mocked(fetch).mockRejectedValue(new TypeError("network unavailable"));
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "failed-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(await screen.findByText(/vérification est momentanément indisponible/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /vérifier ma réponse/i })).toBeEnabled();
   });
 
   it(

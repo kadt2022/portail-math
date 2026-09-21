@@ -27,6 +27,8 @@ export function NumberComparator({
   namespace,
   formatNumber,
   validateAnswer,
+  validationPending,
+  validationError,
 }: NumberComparatorProps) {
   const { t } = useTranslation(namespace);
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
@@ -48,7 +50,7 @@ export function NumberComparator({
     const correct = selected !== null && (validateAnswer
       ? await validateAnswer(round, selected)
       : selected === expected);
-    submit(correct, () => setSelected(null));
+    if (correct !== null) submit(correct, () => setSelected(null));
   };
 
   return (
@@ -60,6 +62,8 @@ export function NumberComparator({
       feedback={feedback}
       onValidate={validate}
       progressLabel={progressLabel}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <div className={styles.compareRow}>
         <span className={styles.compareNumber}>{formatNumber(item.left)}</span>

@@ -19,6 +19,8 @@ export function NumberInRange({
   namespace,
   formatNumber,
   validateAnswer,
+  validationPending,
+  validationError,
 }: NumberInRangeProps) {
   const { t } = useTranslation(namespace);
   const [value, setValue] = useState(completed ? String(exercise.min + 1) : "");
@@ -31,6 +33,7 @@ export function NumberInRange({
     const correct = validNumber && (validateAnswer
       ? await validateAnswer(0, given)
       : given > exercise.min && given < exercise.max);
+    if (correct === null) return;
     if (correct) {
       onValidated();
       return;
@@ -48,6 +51,8 @@ export function NumberInRange({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={styles.questionPrompt}>{prompt}</p>
       <input

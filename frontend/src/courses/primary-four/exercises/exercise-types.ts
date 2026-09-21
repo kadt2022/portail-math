@@ -62,4 +62,6 @@ export interface ExerciseWidgetProps<TExercise extends Exercise> {
   completed: boolean;
   onValidated: () => void;
   validateAnswer?: ExerciseAnswerValidator;
+  validationPending?: boolean;
+  validationError?: boolean;
 }

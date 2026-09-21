@@ -40,6 +40,8 @@ export function NumberWordsMatcher({
   formatNumber,
   wordsOf,
   validateAnswer,
+  validationPending,
+  validationError,
 }: NumberWordsMatcherProps) {
   const { t } = useTranslation(namespace);
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
@@ -63,7 +65,7 @@ export function NumberWordsMatcher({
     const correct = selected !== null && (validateAnswer
       ? await validateAnswer(round, selected)
       : selected === item.value);
-    submit(correct, () => setSelected(null));
+    if (correct !== null) submit(correct, () => setSelected(null));
   };
 
   return (
@@ -75,6 +77,8 @@ export function NumberWordsMatcher({
       feedback={feedback}
       onValidate={validate}
       progressLabel={progressLabel}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={styles.wordsPrompt} aria-live="polite">
         {item.direction === "digits-to-words" ? formatNumber(item.value) : wordsOf(item.value)}

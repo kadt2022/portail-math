@@ -19,6 +19,8 @@ export function SequenceFiller({
   namespace,
   formatNumber,
   validateAnswer,
+  validationPending,
+  validationError,
 }: SequenceFillerProps) {
   const { t } = useTranslation(namespace);
   const answer = exercise.sequence[exercise.blankIndex];
@@ -31,6 +33,7 @@ export function SequenceFiller({
     const correct = value.trim() !== "" && (validateAnswer
       ? await validateAnswer(0, given)
       : given === answer);
+    if (correct === null) return;
     if (correct) {
       onValidated();
       return;
@@ -46,6 +49,8 @@ export function SequenceFiller({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <div className={styles.sequenceRow} aria-label={t(instructionKey)}>
         {exercise.sequence.map((entry, index) =>
