@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ExerciseAnswerService {
@@ -30,12 +31,13 @@ public class ExerciseAnswerService {
 
         Map<String, Object> serverData = exercise.serverData();
         Object expected = answerAt(serverData, round);
-        List<?> acceptedAnswers = acceptedAnswers(serverData, round);
-        if (expected == null && acceptedAnswers == null) {
+        Optional<List<?>> acceptedAnswers = acceptedAnswers(serverData, round);
+        if (expected == null && acceptedAnswers.isEmpty()) {
             return ValidationResult.invalidRequest();
         }
-        if (acceptedAnswers != null) {
-            boolean accepted = acceptedAnswers.stream().anyMatch(candidate -> Objects.deepEquals(candidate, answer));
+        if (acceptedAnswers.isPresent()) {
+            boolean accepted = acceptedAnswers.orElseThrow().stream()
+                    .anyMatch(candidate -> Objects.deepEquals(candidate, answer));
             return ValidationResult.valid(accepted);
         }
         return ValidationResult.valid(Objects.deepEquals(expected, answer));
@@ -49,13 +51,13 @@ public class ExerciseAnswerService {
         return answerList.get(round);
     }
 
-    private List<?> acceptedAnswers(Map<String, Object> serverData, int round) {
+    private Optional<List<?>> acceptedAnswers(Map<String, Object> serverData, int round) {
         Object acceptedAnswers = serverData.get("acceptedAnswers");
         if (!(acceptedAnswers instanceof List<?> answersByRound) || round >= answersByRound.size()) {
-            return null;
+            return Optional.empty();
         }
         Object roundAnswers = answersByRound.get(round);
-        return roundAnswers instanceof List<?> answerList ? answerList : null;
+        return roundAnswers instanceof List<?> answerList ? Optional.of(answerList) : Optional.empty();
     }
 
     public record ValidationResult(Status status, boolean correct) {

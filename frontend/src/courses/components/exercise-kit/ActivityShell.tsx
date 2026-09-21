@@ -33,6 +33,8 @@ export function ActivityShell({
   children,
 }: ActivityShellProps) {
   const { t } = useTranslation(namespace);
+  const currentFeedback = validationError ? t("activity.validationUnavailable") : feedback;
+  const feedbackMessage = completed ? t("activity.success") : currentFeedback;
   return (
     <section className={styles.activityPanel} aria-labelledby="activity-title">
       <div className={styles.activityHeading}>
@@ -51,7 +53,7 @@ export function ActivityShell({
       <div className={styles.interactiveZone}>{children}</div>
       <div className={styles.validationRow}>
         <p className={completed ? styles.successMessage : styles.feedback} aria-live="polite">
-          {completed ? t("activity.success") : validationError ? t("activity.validationUnavailable") : feedback}
+          {feedbackMessage}
         </p>
         {!completed ? (
           <button className={styles.validateButton} type="button" onClick={onValidate} disabled={validationPending}>
