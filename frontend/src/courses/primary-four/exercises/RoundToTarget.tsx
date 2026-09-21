@@ -32,6 +32,9 @@ export function RoundToTarget({
   strongHintKey,
   completed,
   onValidated,
+  validateAnswer,
+  validationPending,
+  validationError,
 }: RoundToTargetProps) {
   const { t, i18n } = useTranslation("primaryFour");
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
@@ -55,8 +58,11 @@ export function RoundToTarget({
   const choices = answer < item.distractor ? [answer, item.distractor] : [item.distractor, answer];
   const position = upperBound === lowerBound ? 50 : ((item.value - lowerBound) / (upperBound - lowerBound)) * 100;
 
-  const validate = () => {
-    submit(selected === answer, () => setSelected(null));
+  const validate = async () => {
+    const correct = selected !== null && (validateAnswer
+      ? await validateAnswer(round, selected)
+      : selected === answer);
+    if (correct !== null) submit(correct, () => setSelected(null));
   };
 
   return (
@@ -68,6 +74,8 @@ export function RoundToTarget({
       feedback={feedback}
       onValidate={validate}
       progressLabel={progressLabel}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={kitStyles.wordsPrompt} aria-live="polite">
         {t("exercise.roundToTarget.question", {

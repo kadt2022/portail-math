@@ -23,6 +23,9 @@ export function NumberOrderer({
   onValidated,
   namespace,
   formatNumber,
+  validateAnswer,
+  validationPending,
+  validationError,
 }: NumberOrdererProps) {
   const { t } = useTranslation(namespace);
   const [placed, setPlaced] = useState<number[]>(completed ? expectedOrder(exercise) : []);
@@ -30,9 +33,14 @@ export function NumberOrderer({
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
   const remaining = exercise.values.filter((value) => !placed.includes(value));
 
-  const validate = () => {
+  const validate = async () => {
     const expected = expectedOrder(exercise);
-    if (placed.length === expected.length && placed.every((value, index) => value === expected[index])) {
+    const complete = placed.length === exercise.values.length;
+    const correct = complete && (validateAnswer
+      ? await validateAnswer(0, placed)
+      : placed.every((value, index) => value === expected[index]));
+    if (correct === null) return;
+    if (correct) {
       onValidated();
       return;
     }
@@ -47,6 +55,8 @@ export function NumberOrderer({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <div className={styles.numberCards} aria-label={t("exercise.order.available")}>
         {remaining.map((value) => (

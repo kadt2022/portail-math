@@ -3,6 +3,7 @@ package cd.portailmath.content.infrastructure;
 import cd.portailmath.content.application.CourseCatalogService;
 import cd.portailmath.content.domain.Course;
 import cd.portailmath.content.domain.CourseModule;
+import cd.portailmath.content.domain.Exercise;
 import cd.portailmath.content.domain.Lesson;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.Resource;
@@ -85,6 +86,17 @@ public class JsonCourseCatalogService implements CourseCatalogService {
                 .flatMap(course -> course.modules().stream())
                 .flatMap(module -> module.lessons().stream())
                 .filter(lesson -> lesson.id().equals(lessonId))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<Exercise> findExerciseById(String courseId, String exerciseId) {
+        return findCourseById(courseId).stream()
+                .flatMap(course -> course.modules().stream())
+                .flatMap(module -> module.lessons().stream())
+                .flatMap(lesson -> lesson.activities().stream())
+                .flatMap(activity -> activity.exercises().stream())
+                .filter(exercise -> exercise.id().equals(exerciseId))
                 .findFirst();
     }
 

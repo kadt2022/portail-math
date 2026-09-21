@@ -134,6 +134,8 @@
   },
   "activity": {
     "validate": "Vérifier ma réponse",
+    "validating": "Vérification…",
+    "validationUnavailable": "La vérification est momentanément indisponible. Réessaie.",
     "success": "Bravo, cette activité est réussie !",
     "progressRound": "{{current}} / {{total}}"
   },

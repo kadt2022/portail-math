@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -8,12 +8,27 @@ import { completeLearningStep, createEmptyCourseProgress } from "../course-engin
 import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
 import { PRIMARY_FOUR_COURSE, PRIMARY_FOUR_MODULES } from "./course-catalogue";
 import { formatNumber } from "./number-words";
+import { InteractiveExercise } from "./exercises/InteractiveExercise";
 import primaryFourCatalog from "../../../../src/main/resources/content/courses/primary-four.json?raw";
 
 interface CatalogLesson {
   id: string;
   content: Record<string, Record<string, unknown>>;
-  activities: unknown[];
+  activities: CatalogActivity[];
+}
+
+interface CatalogActivity {
+  exercises?: CatalogExercise[];
+}
+
+interface CatalogExercise {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  serverData?: {
+    answers?: unknown[];
+    acceptedAnswers?: unknown[][];
+  };
 }
 
 const catalog = JSON.parse(primaryFourCatalog) as { modules: { lessons: CatalogLesson[] }[] };
@@ -33,8 +48,23 @@ describe("Pages du parcours de 4e primaire", () => {
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
-    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input), window.location.origin);
+      if (init?.method === "POST") {
+        const exerciseId = decodeURIComponent(url.pathname.split("/").at(-2) ?? "");
+        const exercise = catalog.modules
+          .flatMap((module) => module.lessons)
+          .flatMap((lesson) => lesson.activities)
+          .flatMap((activity) => activity.exercises ?? [])
+          .find((candidate) => candidate.id === exerciseId);
+        const submission = JSON.parse(String(init.body)) as { round: number; answer: unknown };
+        const expected = exercise?.serverData?.answers?.[submission.round];
+        const accepted = exercise?.serverData?.acceptedAnswers?.[submission.round];
+        const correct = accepted
+          ? accepted.some((answer) => JSON.stringify(answer) === JSON.stringify(submission.answer))
+          : JSON.stringify(expected) === JSON.stringify(submission.answer);
+        return Response.json({ correct }, { status: exercise ? 200 : 404 });
+      }
       const lessonId = decodeURIComponent(url.pathname.split("/").pop() ?? "");
       const language = url.searchParams.get("lang") === "en" ? "en" : "fr";
       const lesson = catalog.modules.flatMap((module) => module.lessons).find((candidate) => candidate.id === lessonId);
@@ -290,6 +320,111 @@ describe("Pages du parcours de 4e primaire", () => {
     expect(screen.getByText(/2 DM, 4 UM, 6 C, 3 D et 8 U/i)).toBeInTheDocument();
   });
 
+  it("bloque les doubles soumissions pendant la validation serveur", async () => {
+    let resolveValidation: ((response: Response) => void) | undefined;
+    const pendingValidation = new Promise<Response>((resolve) => {
+      resolveValidation = resolve;
+    });
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockReturnValue(pendingValidation);
+    const onValidated = vi.fn();
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "pending-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={onValidated}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    const validateButton = screen.getByRole("button", { name: /vérifier ma réponse/i });
+    fireEvent.click(validateButton);
+    fireEvent.click(validateButton);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: /vérification/i })).toBeDisabled();
+    resolveValidation?.(Response.json({ correct: true }));
+    await waitFor(() => expect(onValidated).toHaveBeenCalledTimes(1));
+  });
+
+  it("affiche une erreur réessayable lorsque la validation serveur échoue", async () => {
+    vi.mocked(fetch).mockRejectedValue(new TypeError("network unavailable"));
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "failed-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(await screen.findByText(/vérification est momentanément indisponible/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /vérifier ma réponse/i })).toBeEnabled();
+  });
+
+  it("traite un résultat de validation mal formé comme une indisponibilité, pas comme une erreur de l'élève", async () => {
+    vi.mocked(fetch).mockResolvedValue(Response.json({}));
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "malformed-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(await screen.findByText(/vérification est momentanément indisponible/i)).toBeInTheDocument();
+  });
+
+  it("ne publie jamais la case à compléter d'une suite", () => {
+    const sequenceExercises = catalog.modules
+      .flatMap((module) => module.lessons)
+      .flatMap((lesson) => lesson.activities)
+      .flatMap((activity) => activity.exercises ?? [])
+      .filter((exercise) => exercise.type === "sequence-fill");
+
+    expect(sequenceExercises.length).toBeGreaterThan(0);
+    for (const exercise of sequenceExercises) {
+      const { sequence, blankIndex } = exercise.data as { sequence: (number | null)[]; blankIndex: number };
+      expect(sequence[blankIndex], exercise.id).toBeNull();
+      expect(exercise.serverData?.answers, exercise.id).toHaveLength(1);
+    }
+  });
+
   it(
     "termine la leçon 3 (comparer, ranger avec retrait d'une carte, encadrer)",
     async () => {
@@ -394,6 +529,9 @@ describe("Pages du parcours de 4e primaire", () => {
 
       // Je manipule : 15 000, 20 000, 25 000, __ -> 30 000
       expect(await screen.findByRole("heading", { name: /continue la suite/i })).toBeInTheDocument();
+      expect(screen.getByText("25 000")).toBeInTheDocument();
+      expect(screen.queryByText("30 000")).not.toBeInTheDocument();
+      expect(screen.getByRole("spinbutton")).toHaveValue(null);
       await user.type(screen.getByRole("spinbutton"), "30000");
       await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
       expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();

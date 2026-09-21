@@ -1,12 +1,17 @@
 package cd.portailmath.content.web;
 
 import cd.portailmath.content.application.CourseCatalogService;
+import cd.portailmath.content.application.ExerciseAnswerService;
+import cd.portailmath.content.web.request.SubmitExerciseAnswerRequest;
 import cd.portailmath.content.web.response.ContentApiErrorResponse;
 import cd.portailmath.content.web.response.CourseSummaryResponse;
+import cd.portailmath.content.web.response.ExerciseAnswerResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +27,16 @@ public class CourseApiController {
 
     private final CourseCatalogService catalogService;
     private final CourseApiMapper mapper;
+    private final ExerciseAnswerService answerService;
 
-    public CourseApiController(CourseCatalogService catalogService, CourseApiMapper mapper) {
+    public CourseApiController(
+            CourseCatalogService catalogService,
+            CourseApiMapper mapper,
+            ExerciseAnswerService answerService
+    ) {
         this.catalogService = catalogService;
         this.mapper = mapper;
+        this.answerService = answerService;
     }
 
     @GetMapping
@@ -67,6 +78,36 @@ public class CourseApiController {
         return catalogService.findLessonById(courseId, lessonId)
                 .map(lesson -> ResponseEntity.<Object>ok(mapper.toDetail(lesson, lang)))
                 .orElseGet(() -> notFound("LESSON_NOT_FOUND", "La leçon demandée est introuvable.", request));
+    }
+
+    @PostMapping("/{courseId}/exercises/{exerciseId}/answers")
+    public ResponseEntity<Object> submitExerciseAnswer(
+            @PathVariable String courseId,
+            @PathVariable String exerciseId,
+            @RequestBody SubmitExerciseAnswerRequest answer,
+            HttpServletRequest request
+    ) {
+        int round = answer.round() == null ? 0 : answer.round();
+        ExerciseAnswerService.ValidationResult result = answerService.validate(
+                courseId,
+                exerciseId,
+                round,
+                answer.answer()
+        );
+        return switch (result.status()) {
+            case VALID -> ResponseEntity.ok(new ExerciseAnswerResponse(result.correct()));
+            case COURSE_NOT_FOUND -> notFound(COURSE_NOT_FOUND, COURSE_NOT_FOUND_MESSAGE, request);
+            case EXERCISE_NOT_FOUND -> notFound(
+                    "EXERCISE_NOT_FOUND",
+                    "L'exercice demandé est introuvable.",
+                    request
+            );
+            case INVALID_REQUEST -> ResponseEntity.badRequest().body(new ContentApiErrorResponse(
+                    "INVALID_EXERCISE_ANSWER",
+                    "La réponse ou la manche demandée est invalide.",
+                    request.getRequestURI()
+            ));
+        };
     }
 
     private ResponseEntity<Object> notFound(

@@ -53,6 +53,11 @@
                       24638
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      24638
+                    ]
                   }
                 }
               ]
@@ -90,6 +95,11 @@
                       40916
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      40916
+                    ]
                   }
                 }
               ]
@@ -108,16 +118,12 @@
                   "id": "u01l01-reflect",
                   "type": "numeric-question",
                   "data": {
-                    "promptKey": "content.u01l01.reflect.prompt",
-                    "terms": [
-                      20000,
-                      7000,
-                      50,
-                      3
-                    ]
+                    "promptKey": "content.u01l01.reflect.prompt"
                   },
                   "serverData": {
-                    "answer": 27053
+                    "answers": [
+                      27053
+                    ]
                   }
                 }
               ]
@@ -140,6 +146,11 @@
                       78402
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      78402
+                    ]
                   }
                 }
               ]
@@ -173,13 +184,12 @@
                       3,
                       300,
                       3000
-                    ],
-                    "terms": [
-                      3000
                     ]
                   },
                   "serverData": {
-                    "answer": 3000
+                    "answers": [
+                      3000
+                    ]
                   }
                 }
               ]
@@ -337,6 +347,13 @@
                       99999
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      40005,
+                      76000,
+                      99999
+                    ]
                   }
                 }
               ]
@@ -390,6 +407,12 @@
                         ]
                       }
                     ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      45210,
+                      63020
+                    ]
                   }
                 }
               ]
@@ -408,14 +431,12 @@
                   "id": "u01l02-reflect",
                   "type": "numeric-question",
                   "data": {
-                    "promptKey": "content.u01l02.reflect.prompt",
-                    "terms": [
-                      8000,
-                      700
-                    ]
+                    "promptKey": "content.u01l02.reflect.prompt"
                   },
                   "serverData": {
-                    "answer": 8700
+                    "answers": [
+                      8700
+                    ]
                   }
                 }
               ]
@@ -454,6 +475,12 @@
                         ]
                       }
                     ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      76000,
+                      99999
+                    ]
                   }
                 }
               ]
@@ -486,6 +513,11 @@
                       40005
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      40005
+                    ]
                   }
                 }
               ]
@@ -640,6 +672,12 @@
                       47530
                     ],
                     "maxDigit": 9
+                  },
+                  "serverData": {
+                    "answers": [
+                      47350,
+                      47530
+                    ]
                   }
                 }
               ]
@@ -683,6 +721,12 @@
                         "right": 47530
                       }
                     ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      ">",
+                      "<"
+                    ]
                   }
                 }
               ]
@@ -708,6 +752,16 @@
                       81025
                     ],
                     "direction": "ascending"
+                  },
+                  "serverData": {
+                    "answers": [
+                      [
+                        18520,
+                        80125,
+                        81025,
+                        81250
+                      ]
+                    ]
                   }
                 }
               ]
@@ -735,6 +789,12 @@
                         "left": 29800,
                         "right": 30200
                       }
+                    ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      ">",
+                      "<"
                     ]
                   }
                 }
@@ -766,6 +826,21 @@
                   "data": {
                     "min": 9995,
                     "max": 10005
+                  },
+                  "serverData": {
+                    "acceptedAnswers": [
+                      [
+                        9996,
+                        9997,
+                        9998,
+                        9999,
+                        10000,
+                        10001,
+                        10002,
+                        10003,
+                        10004
+                      ]
+                    ]
                   }
                 }
               ]
@@ -917,9 +992,14 @@
                       15000,
                       20000,
                       25000,
-                      30000
+                      null
                     ],
                     "blankIndex": 3
+                  },
+                  "serverData": {
+                    "answers": [
+                      30000
+                    ]
                   }
                 }
               ]
@@ -956,10 +1036,15 @@
                     "sequence": [
                       3000,
                       3500,
-                      4000,
+                      null,
                       4500
                     ],
                     "blankIndex": 2
+                  },
+                  "serverData": {
+                    "answers": [
+                      4000
+                    ]
                   }
                 }
               ]
@@ -985,6 +1070,11 @@
                         "distractor": 24000
                       }
                     ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      25000
+                    ]
                   }
                 }
               ]
@@ -1009,6 +1099,11 @@
                         "roundTo": 10000,
                         "distractor": 40000
                       }
+                    ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      50000
                     ]
                   }
                 }
@@ -1044,6 +1139,11 @@
                         "roundTo": 100,
                         "distractor": 63100
                       }
+                    ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      63000
                     ]
                   }
                 }
@@ -1172,16 +1272,12 @@
                   "id": "u01eval-q1",
                   "type": "numeric-question",
                   "data": {
-                    "promptKey": "content.u01eval.q1.prompt",
-                    "terms": [
-                      30000,
-                      5000,
-                      20,
-                      7
-                    ]
+                    "promptKey": "content.u01eval.q1.prompt"
                   },
                   "serverData": {
-                    "answer": 35027
+                    "answers": [
+                      35027
+                    ]
                   }
                 }
               ]
@@ -1211,6 +1307,11 @@
                         ]
                       }
                     ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      45210
+                    ]
                   }
                 }
               ]
@@ -1236,6 +1337,16 @@
                       81025
                     ],
                     "direction": "ascending"
+                  },
+                  "serverData": {
+                    "answers": [
+                      [
+                        18520,
+                        80125,
+                        81025,
+                        81250
+                      ]
+                    ]
                   }
                 }
               ]
@@ -1260,6 +1371,11 @@
                         "roundTo": 1000,
                         "distractor": 24000
                       }
+                    ]
+                  },
+                  "serverData": {
+                    "answers": [
+                      25000
                     ]
                   }
                 }

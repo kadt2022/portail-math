@@ -134,6 +134,8 @@
   },
   "activity": {
     "validate": "Check my answer",
+    "validating": "Checking…",
+    "validationUnavailable": "Answer checking is temporarily unavailable. Please try again.",
     "success": "Well done, this activity is complete!",
     "progressRound": "{{current}} / {{total}}"
   },
