@@ -24,7 +24,7 @@ export function SequenceFiller({
 }: SequenceFillerProps) {
   const { t } = useTranslation(namespace);
   const answer = exercise.sequence[exercise.blankIndex];
-  const [value, setValue] = useState(completed ? String(answer) : "");
+  const [value, setValue] = useState(completed && typeof answer === "number" ? String(answer) : "");
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
@@ -69,7 +69,7 @@ export function SequenceFiller({
             />
           ) : (
             <span key={index} className={styles.sequenceChip}>
-              {formatNumber(entry)}
+              {entry === null ? null : formatNumber(entry)}
             </span>
           ),
         )}

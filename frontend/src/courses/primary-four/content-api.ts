@@ -81,7 +81,10 @@ export async function validatePrimaryFourExerciseAnswer(
   if (!response.ok) {
     throw new Error(`La validation de ${exerciseId} est indisponible (${response.status}).`);
   }
-  const result = (await response.json()) as { correct: boolean };
+  const result = (await response.json()) as { correct?: unknown };
+  if (typeof result.correct !== "boolean") {
+    throw new TypeError(`Résultat de validation invalide pour ${exerciseId}.`);
+  }
   return result.correct;
 }
 

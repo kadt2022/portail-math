@@ -23,6 +23,8 @@ interface CatalogActivity {
 
 interface CatalogExercise {
   id: string;
+  type: string;
+  data: Record<string, unknown>;
   serverData?: {
     answers?: unknown[];
     acceptedAnswers?: unknown[][];
@@ -382,6 +384,47 @@ describe("Pages du parcours de 4e primaire", () => {
     expect(screen.getByRole("button", { name: /vérifier ma réponse/i })).toBeEnabled();
   });
 
+  it("traite un résultat de validation mal formé comme une indisponibilité, pas comme une erreur de l'élève", async () => {
+    vi.mocked(fetch).mockResolvedValue(Response.json({}));
+
+    render(
+      <InteractiveExercise
+        exercise={{
+          id: "malformed-answer",
+          kind: "numeric-question",
+          promptKey: "content.u01l01.check.prompt",
+          choices: [3, 300, 3000],
+        }}
+        titleKey="content.u01l01.check.title"
+        instructionKey="content.u01l01.check.instructions"
+        hintKey="content.u01l01.check.hint"
+        strongHintKey="content.u01l01.check.strongHint"
+        completed={false}
+        onValidated={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "3 000" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(await screen.findByText(/vérification est momentanément indisponible/i)).toBeInTheDocument();
+  });
+
+  it("ne publie jamais la case à compléter d'une suite", () => {
+    const sequenceExercises = catalog.modules
+      .flatMap((module) => module.lessons)
+      .flatMap((lesson) => lesson.activities)
+      .flatMap((activity) => activity.exercises ?? [])
+      .filter((exercise) => exercise.type === "sequence-fill");
+
+    expect(sequenceExercises.length).toBeGreaterThan(0);
+    for (const exercise of sequenceExercises) {
+      const { sequence, blankIndex } = exercise.data as { sequence: (number | null)[]; blankIndex: number };
+      expect(sequence[blankIndex], exercise.id).toBeNull();
+      expect(exercise.serverData?.answers, exercise.id).toHaveLength(1);
+    }
+  });
+
   it(
     "termine la leçon 3 (comparer, ranger avec retrait d'une carte, encadrer)",
     async () => {
@@ -486,6 +529,9 @@ describe("Pages du parcours de 4e primaire", () => {
 
       // Je manipule : 15 000, 20 000, 25 000, __ -> 30 000
       expect(await screen.findByRole("heading", { name: /continue la suite/i })).toBeInTheDocument();
+      expect(screen.getByText("25 000")).toBeInTheDocument();
+      expect(screen.queryByText("30 000")).not.toBeInTheDocument();
+      expect(screen.getByRole("spinbutton")).toHaveValue(null);
       await user.type(screen.getByRole("spinbutton"), "30000");
       await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
       expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();

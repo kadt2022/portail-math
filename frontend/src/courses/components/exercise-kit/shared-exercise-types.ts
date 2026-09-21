@@ -28,7 +28,8 @@ export interface CompareNumbersExercise {
 export interface SequenceFillExercise {
   kind: "sequence-fill";
   id: string;
-  sequence: readonly number[];
+  // La case à compléter vaut `null` quand le serveur garde la réponse.
+  sequence: readonly (number | null)[];
   blankIndex: number;
 }
 
