@@ -189,6 +189,12 @@
   font-size: 11px;
 }
 
+.status {
+  margin: 0 0 14px;
+  color: var(--pm-ink-soft);
+  font-size: 13px;
+}
+
 @media (max-width: 1180px) {
   .bookGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

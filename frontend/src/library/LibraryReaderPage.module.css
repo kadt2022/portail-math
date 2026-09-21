@@ -5,3 +5,10 @@
   min-width: 0;
   min-height: 0;
 }
+
+.status {
+  margin: 0;
+  padding: 24px;
+  color: var(--pm-ink-soft);
+  font-size: 13px;
+}

@@ -8,7 +8,9 @@
     "eyebrow": "À découvrir",
     "title": "Notre sélection",
     "count_one": "{{count}} livre",
-    "count_other": "{{count}} livres"
+    "count_other": "{{count}} livres",
+    "loading": "Chargement de la bibliothèque…",
+    "error": "La bibliothèque est momentanément indisponible. Réessaie dans un instant."
   },
   "book": {
     "collection": "Collection Mbuyamba Education",
