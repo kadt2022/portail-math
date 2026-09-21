@@ -36,7 +36,9 @@ class ResourceApiTests {
                 .andExpect(jsonPath("$.gameQuestionBanks.length()").value(1))
                 .andExpect(jsonPath("$.gameQuestionBanks[0].id").value("fraction-river"))
                 .andExpect(jsonPath("$.gameQuestionBanks[0].dataUrl")
-                        .value("/api/v1/resources/game-question-banks/fraction-river"));
+                        .value("/api/v1/resources/game-question-banks/fraction-river"))
+                .andExpect(jsonPath("$.gameQuestionBanks[0].scriptUrl")
+                        .value("/api/v1/resources/game-question-banks/fraction-river/script"));
     }
 
     @Test
@@ -106,6 +108,28 @@ class ResourceApiTests {
     @Test
     void reportsUnknownQuestionBank() throws Exception {
         mockMvc.perform(get("/api/v1/resources/game-question-banks/multiplication-train"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("QUESTION_BANK_NOT_FOUND"));
+    }
+
+    @Test
+    void servesTheSameBankAsAScriptForTheGameShell() throws Exception {
+        String script = mockMvc.perform(get("/api/v1/resources/game-question-banks/fraction-river/script"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "text/javascript;charset=UTF-8"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(script)
+                .contains("root.MbuyambaQuestionBanks[\"fraction-river\"]")
+                .contains("\"S01\"")
+                .doesNotContain("</");
+    }
+
+    @Test
+    void reportsUnknownQuestionBankScript() throws Exception {
+        mockMvc.perform(get("/api/v1/resources/game-question-banks/multiplication-train/script"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("QUESTION_BANK_NOT_FOUND"));
     }

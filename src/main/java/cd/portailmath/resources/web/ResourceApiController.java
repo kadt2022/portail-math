@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Distribution contrôlée des ressources pédagogiques : le catalogue dit ce qui
  * existe, les deux autres routes livrent le contenu. Rien ici ne reproduit un
@@ -27,6 +29,8 @@ public class ResourceApiController {
 
     private static final String BOOK_NOT_FOUND = "BOOK_NOT_FOUND";
     private static final String BOOK_NOT_FOUND_MESSAGE = "Le livre demandé est introuvable.";
+    private static final String QUESTION_BANK_NOT_FOUND = "QUESTION_BANK_NOT_FOUND";
+    private static final String QUESTION_BANK_NOT_FOUND_MESSAGE = "La banque de questions demandée est introuvable.";
 
     private final ResourceCatalogService catalogService;
     private final ResourceApiMapper mapper;
@@ -77,9 +81,22 @@ public class ResourceApiController {
     public ResponseEntity<Object> findQuestionBank(@PathVariable String bankId, HttpServletRequest request) {
         return catalogService.findQuestionBankById(bankId)
                 .map(bank -> ResponseEntity.<Object>ok(bank.data()))
+                .orElseGet(() -> notFound(QUESTION_BANK_NOT_FOUND, QUESTION_BANK_NOT_FOUND_MESSAGE, request));
+    }
+
+    /**
+     * La même banque, servie comme script : c'est la forme qu'attend une
+     * coquille de jeu qui enchaîne ses balises et démarre aussitôt.
+     */
+    @GetMapping("/game-question-banks/{bankId}/script")
+    public ResponseEntity<Object> findQuestionBankScript(@PathVariable String bankId, HttpServletRequest request) {
+        return catalogService.findQuestionBankById(bankId)
+                .map(bank -> ResponseEntity.ok()
+                        .contentType(new MediaType("text", "javascript", StandardCharsets.UTF_8))
+                        .body((Object) mapper.toScript(bank)))
                 .orElseGet(() -> notFound(
-                        "QUESTION_BANK_NOT_FOUND",
-                        "La banque de questions demandée est introuvable.",
+                        QUESTION_BANK_NOT_FOUND,
+                        QUESTION_BANK_NOT_FOUND_MESSAGE,
                         request
                 ));
     }

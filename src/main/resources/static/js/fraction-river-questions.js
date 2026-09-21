@@ -8,17 +8,23 @@
         ? require("./fraction-river-i18n.js")
         : root.FractionRiverI18n;
 
-    const STEP_COUNT = 5;
+    // Les données du niveau 1 ne vivent plus dans ce fichier : elles sont
+    // stockées et distribuées par le backend (content/games/fraction-river.json).
+    // La coquille du jeu charge la banque par une balise `script` avant celle-ci,
+    // ce qui garde le démarrage synchrone ; sous Node, les tests lisent le
+    // contenu backend directement.
+    const bank = typeof require === "function" && typeof module !== "undefined"
+        ? require("../../content/games/fraction-river.json").data
+        : (root.MbuyambaQuestionBanks || {})["fraction-river"];
+
+    if (!bank) {
+        throw new Error("La banque de questions de la Rivière des fractions n'a pas été chargée.");
+    }
+
+    const STEP_COUNT = bank.stepCount;
 
     // Niveau 1 — Le Gué des parts : uniquement la reconnaissance (§7.4).
-    const ALLOWED_FRACTIONS = [
-        {numerator: 1, denominator: 2},
-        {numerator: 1, denominator: 3},
-        {numerator: 1, denominator: 4},
-        {numerator: 2, denominator: 3},
-        {numerator: 2, denominator: 4},
-        {numerator: 3, denominator: 4}
-    ];
+    const ALLOWED_FRACTIONS = bank.allowedFractions;
 
     // Les cinq étapes du niveau 1, dans l'ordre où l'enfant les rencontre.
     //
@@ -33,17 +39,11 @@
     // Il est remplacé par une seconde reconnaissance de fraction, à une autre
     // fraction et sur un autre type de dessin : cinq étapes, toutes jouables
     // avec trois grandes réponses.
-    const STEP_TYPES = [
-        "IDENTIFY",
-        "MATCH_VISUAL",
-        "IDENTIFY",
-        "NUMERATOR",
-        "DENOMINATOR"
-    ];
+    const STEP_TYPES = bank.stepTypes;
 
     // Type retiré du parcours. Conservé nommé pour que les tests puissent
     // prouver son absence plutôt que de vérifier une liste de longueur cinq.
-    const RETIRED_STEP_TYPES = ["SELECT_PARTS"];
+    const RETIRED_STEP_TYPES = bank.retiredStepTypes;
 
     // Vue French de dictionary.fr["hint.*"] : conservée pour la forme d'API
     // existante (clé = code de distracteur). Le contenu réel vit dans
@@ -56,18 +56,7 @@
         DENOMINATOR_CONFUSION: fractionRiverI18n.fr["hint.DENOMINATOR_CONFUSION"]
     };
 
-    const SCENARIOS = [
-        {id: "S01", type: "IDENTIFY", visualKind: "DISC", fractions: ["1/2", "1/4", "3/4", "2/4"]},
-        {id: "S02", type: "IDENTIFY", visualKind: "BAR", fractions: ["1/3", "2/3", "1/4", "3/4"]},
-        {id: "S03", type: "MATCH_VISUAL", visualKind: "DISC", fractions: ["1/2", "1/4", "3/4"]},
-        {id: "S04", type: "MATCH_VISUAL", visualKind: "BAR", fractions: ["1/3", "2/3", "2/4"]},
-        {id: "S05", type: "SELECT_PARTS", visualKind: "BAR", fractions: ["1/2", "2/4", "3/4", "1/4"]},
-        {id: "S06", type: "SELECT_PARTS", visualKind: "BASKET", fractions: ["1/3", "2/3", "1/2"]},
-        {id: "S07", type: "NUMERATOR", visualKind: "DISC", fractions: ["2/3", "3/4", "1/2"]},
-        {id: "S08", type: "NUMERATOR", visualKind: "BAR", fractions: ["1/4", "2/4", "1/3"]},
-        {id: "S09", type: "DENOMINATOR", visualKind: "BASKET", fractions: ["2/4", "1/3", "3/4"]},
-        {id: "S10", type: "DENOMINATOR", visualKind: "BAR", fractions: ["1/2", "2/3", "1/4"]}
-    ];
+    const SCENARIOS = bank.scenarios;
 
     function fractionKey(fraction) {
         return `${fraction.numerator}/${fraction.denominator}`;
@@ -389,7 +378,7 @@
 
     // Climax — la passerelle des représentations (§7.6) : une séquence distincte
     // qui suit les cinq étapes, elle ne les remplace pas.
-    const BRIDGE_FRACTIONS = ["1/2", "1/4", "3/4"];
+    const BRIDGE_FRACTIONS = bank.bridgeFractions;
 
     function createBridgePairs(random = Math.random) {
         const pairs = BRIDGE_FRACTIONS.map((key) => {

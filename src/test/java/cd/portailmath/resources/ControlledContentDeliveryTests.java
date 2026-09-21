@@ -59,4 +59,28 @@ class ControlledContentDeliveryTests {
                     .toList();
         }
     }
+
+    @Test
+    void theFractionRiverModuleNoLongerCarriesItsOwnQuestions() throws IOException {
+        String module = Files.readString(
+                Path.of("src/main/resources/static/js/fraction-river-questions.js"),
+                StandardCharsets.UTF_8
+        );
+        assertThat(module)
+                .as("les scénarios doivent venir du contenu backend")
+                .doesNotContain("visualKind: \"DISC\"")
+                .doesNotContain("{id: \"S01\"");
+    }
+
+    @Test
+    void theGameShellLoadsTheBankBeforeTheModuleThatReadsIt() throws IOException {
+        String shell = Files.readString(
+                Path.of("src/main/resources/static/games/fraction-river.html"),
+                StandardCharsets.UTF_8
+        );
+        int bank = shell.indexOf("/api/v1/resources/game-question-banks/fraction-river/script");
+        int module = shell.indexOf("/js/fraction-river-questions.js");
+        assertThat(bank).isPositive();
+        assertThat(bank).isLessThan(module);
+    }
 }
