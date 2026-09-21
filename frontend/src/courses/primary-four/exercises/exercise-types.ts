@@ -7,6 +7,7 @@ import type {
   NumberWordsMatchExercise,
   NumericQuestionExercise,
   SequenceFillExercise,
+  ExerciseAnswerValidator,
 } from "../../components/exercise-kit/shared-exercise-types";
 
 export type {
@@ -60,4 +61,5 @@ export interface ExerciseWidgetProps<TExercise extends Exercise> {
   strongHintKey: string;
   completed: boolean;
   onValidated: () => void;
+  validateAnswer?: ExerciseAnswerValidator;
 }

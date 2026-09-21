@@ -44,9 +44,12 @@ export interface NumericQuestionExercise {
   id: string;
   promptKey: string;
   promptValues?: Record<string, number | string>;
-  answer: number;
+  answer?: number;
   choices?: readonly number[];
 }
+
+export type ExerciseAnswer = number | string | readonly number[];
+export type ExerciseAnswerValidator = (round: number, answer: ExerciseAnswer) => Promise<boolean>;
 
 export interface NumberInRangeExercise {
   kind: "number-in-range";
@@ -69,4 +72,5 @@ export interface SharedExerciseWidgetProps<TExercise> {
   onValidated: () => void;
   namespace: string;
   formatNumber: (value: number) => string;
+  validateAnswer?: ExerciseAnswerValidator;
 }

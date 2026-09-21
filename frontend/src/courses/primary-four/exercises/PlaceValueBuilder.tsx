@@ -46,6 +46,7 @@ export function PlaceValueBuilder({
   strongHintKey,
   completed,
   onValidated,
+  validateAnswer,
 }: PlaceValueBuilderProps) {
   const { t, i18n } = useTranslation("primaryFour");
   const lastTarget = exercise.targets[exercise.targets.length - 1];
@@ -63,9 +64,13 @@ export function PlaceValueBuilder({
   const target = exercise.targets[round];
   const expected = decompose(target);
 
-  const validate = () => {
+  const validate = async () => {
+    const given = PLACES.reduce((value, place) => value + digits[place.key] * place.divisor, 0);
+    const correct = validateAnswer
+      ? await validateAnswer(round, given)
+      : PLACES.every((place) => digits[place.key] === expected[place.key]);
     submit(
-      PLACES.every((place) => digits[place.key] === expected[place.key]),
+      correct,
       () => setDigits(decompose(0)),
     );
   };

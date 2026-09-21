@@ -18,15 +18,20 @@ export function NumberInRange({
   onValidated,
   namespace,
   formatNumber,
+  validateAnswer,
 }: NumberInRangeProps) {
   const { t } = useTranslation(namespace);
   const [value, setValue] = useState(completed ? String(exercise.min + 1) : "");
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
-  const validate = () => {
+  const validate = async () => {
     const given = Number(value);
-    if (value.trim() !== "" && Number.isInteger(given) && given > exercise.min && given < exercise.max) {
+    const validNumber = value.trim() !== "" && Number.isInteger(given);
+    const correct = validNumber && (validateAnswer
+      ? await validateAnswer(0, given)
+      : given > exercise.min && given < exercise.max);
+    if (correct) {
       onValidated();
       return;
     }

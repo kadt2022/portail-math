@@ -32,6 +32,7 @@ export function RoundToTarget({
   strongHintKey,
   completed,
   onValidated,
+  validateAnswer,
 }: RoundToTargetProps) {
   const { t, i18n } = useTranslation("primaryFour");
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
@@ -55,8 +56,11 @@ export function RoundToTarget({
   const choices = answer < item.distractor ? [answer, item.distractor] : [item.distractor, answer];
   const position = upperBound === lowerBound ? 50 : ((item.value - lowerBound) / (upperBound - lowerBound)) * 100;
 
-  const validate = () => {
-    submit(selected === answer, () => setSelected(null));
+  const validate = async () => {
+    const correct = selected !== null && (validateAnswer
+      ? await validateAnswer(round, selected)
+      : selected === answer);
+    submit(correct, () => setSelected(null));
   };
 
   return (

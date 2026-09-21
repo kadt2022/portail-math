@@ -13,7 +13,19 @@ import primaryFourCatalog from "../../../../src/main/resources/content/courses/p
 interface CatalogLesson {
   id: string;
   content: Record<string, Record<string, unknown>>;
-  activities: unknown[];
+  activities: CatalogActivity[];
+}
+
+interface CatalogActivity {
+  exercises?: CatalogExercise[];
+}
+
+interface CatalogExercise {
+  id: string;
+  serverData?: {
+    answers?: unknown[];
+    acceptedAnswers?: unknown[][];
+  };
 }
 
 const catalog = JSON.parse(primaryFourCatalog) as { modules: { lessons: CatalogLesson[] }[] };
@@ -33,8 +45,23 @@ describe("Pages du parcours de 4e primaire", () => {
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
-    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input), window.location.origin);
+      if (init?.method === "POST") {
+        const exerciseId = decodeURIComponent(url.pathname.split("/").at(-2) ?? "");
+        const exercise = catalog.modules
+          .flatMap((module) => module.lessons)
+          .flatMap((lesson) => lesson.activities)
+          .flatMap((activity) => activity.exercises ?? [])
+          .find((candidate) => candidate.id === exerciseId);
+        const submission = JSON.parse(String(init.body)) as { round: number; answer: unknown };
+        const expected = exercise?.serverData?.answers?.[submission.round];
+        const accepted = exercise?.serverData?.acceptedAnswers?.[submission.round];
+        const correct = accepted
+          ? accepted.some((answer) => JSON.stringify(answer) === JSON.stringify(submission.answer))
+          : JSON.stringify(expected) === JSON.stringify(submission.answer);
+        return Response.json({ correct }, { status: exercise ? 200 : 404 });
+      }
       const lessonId = decodeURIComponent(url.pathname.split("/").pop() ?? "");
       const language = url.searchParams.get("lang") === "en" ? "en" : "fr";
       const lesson = catalog.modules.flatMap((module) => module.lessons).find((candidate) => candidate.id === lessonId);

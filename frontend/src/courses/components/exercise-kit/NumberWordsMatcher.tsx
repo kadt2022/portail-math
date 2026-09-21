@@ -39,6 +39,7 @@ export function NumberWordsMatcher({
   namespace,
   formatNumber,
   wordsOf,
+  validateAnswer,
 }: NumberWordsMatcherProps) {
   const { t } = useTranslation(namespace);
   const { round, feedback, progressLabel, submit } = useRoundedExercise({
@@ -58,8 +59,11 @@ export function NumberWordsMatcher({
     [item, round],
   );
 
-  const validate = () => {
-    submit(selected === item.value, () => setSelected(null));
+  const validate = async () => {
+    const correct = selected !== null && (validateAnswer
+      ? await validateAnswer(round, selected)
+      : selected === item.value);
+    submit(correct, () => setSelected(null));
   };
 
   return (

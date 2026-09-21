@@ -62,16 +62,27 @@ function stringData(activity: CourseActivityDto, key: string) {
 }
 
 function toExercise(dto: CourseExerciseDto): Exercise {
-  const data = { ...dto.data };
-  if (dto.type === "numeric-question") {
-    const terms = data.terms;
-    if (!Array.isArray(terms) || !terms.every((term) => typeof term === "number")) {
-      throw new TypeError(`Décomposition numérique absente de ${dto.id}.`);
-    }
-    data.answer = terms.reduce((sum, term) => sum + term, 0);
-    delete data.terms;
+  return { id: dto.id, kind: dto.type, ...dto.data } as unknown as Exercise;
+}
+
+export async function validatePrimaryFourExerciseAnswer(
+  exerciseId: string,
+  round: number,
+  answer: number | string | readonly number[],
+) {
+  const response = await fetch(
+    `/api/v1/courses/MATH-4P/exercises/${encodeURIComponent(exerciseId)}/answers`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ round, answer }),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`La validation de ${exerciseId} est indisponible (${response.status}).`);
   }
-  return { id: dto.id, kind: dto.type, ...data } as unknown as Exercise;
+  const result = (await response.json()) as { correct: boolean };
+  return result.correct;
 }
 
 function toExerciseStep(activity: CourseActivityDto): ExerciseStepContent {

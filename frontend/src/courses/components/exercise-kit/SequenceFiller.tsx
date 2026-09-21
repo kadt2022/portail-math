@@ -18,6 +18,7 @@ export function SequenceFiller({
   onValidated,
   namespace,
   formatNumber,
+  validateAnswer,
 }: SequenceFillerProps) {
   const { t } = useTranslation(namespace);
   const answer = exercise.sequence[exercise.blankIndex];
@@ -25,8 +26,12 @@ export function SequenceFiller({
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
-  const validate = () => {
-    if (Number(value) === answer && value.trim() !== "") {
+  const validate = async () => {
+    const given = Number(value);
+    const correct = value.trim() !== "" && (validateAnswer
+      ? await validateAnswer(0, given)
+      : given === answer);
+    if (correct) {
       onValidated();
       return;
     }
