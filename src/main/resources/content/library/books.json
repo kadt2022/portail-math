@@ -1,0 +1,32 @@
+[
+  {
+    "id": "math-primary-one",
+    "titleKey": "books.mathPrimaryOne.title",
+    "descriptionKey": "books.mathPrimaryOne.description",
+    "levelKey": "books.mathPrimaryOne.level",
+    "subjectKey": "books.mathPrimaryOne.subject",
+    "formatKey": "books.mathPrimaryOne.format",
+    "pages": 96,
+    "file": "mbuyamba-1re-primaire-livre-complet.pdf"
+  },
+  {
+    "id": "math-primary-two",
+    "titleKey": "books.mathPrimaryTwo.title",
+    "descriptionKey": "books.mathPrimaryTwo.description",
+    "levelKey": "books.mathPrimaryTwo.level",
+    "subjectKey": "books.mathPrimaryTwo.subject",
+    "formatKey": "books.mathPrimaryTwo.format",
+    "pages": 96,
+    "file": "mbuyamba-2e-primaire-livre-complet.pdf"
+  },
+  {
+    "id": "math-primary-three",
+    "titleKey": "books.mathPrimaryThree.title",
+    "descriptionKey": "books.mathPrimaryThree.description",
+    "levelKey": "books.mathPrimaryThree.level",
+    "subjectKey": "books.mathPrimaryThree.subject",
+    "formatKey": "books.mathPrimaryThree.format",
+    "pages": 96,
+    "file": "mbuyamba-3e-primaire-livre-complet.pdf"
+  }
+]

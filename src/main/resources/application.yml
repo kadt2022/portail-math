@@ -30,6 +30,9 @@ info:
 portail-math:
   courses:
     content-location: classpath:/content/courses/
+  resources:
+    library-location: classpath:/content/library/
+    games-location: classpath:/content/games/
   exetat:
     content-location: classpath:/content/exetat/
     expected-questions-per-subject: 5
