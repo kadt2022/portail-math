@@ -1,7 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppRouter } from "./AppRouter";
+import { mockLibraryCatalogue } from "../library/library-catalogue.fixture";
 import { PRIMARY_COURSES } from "./course-navigation";
 
 // Le lecteur PDF réel démarre pdfjs-dist et son worker : inutile pour vérifier
@@ -21,6 +22,13 @@ describe("Routeur du portail React", () => {
     window.history.pushState({}, "", "/app");
   });
 
+  // La bibliothèque lit son catalogue depuis le backend : seules ses deux
+  // routes ont besoin de la réponse simulée, les autres pages du routeur ne
+  // doivent pas hériter d'un `fetch` détourné.
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("affiche le tableau de bord sur /app", () => {
     renderAt("/app");
     expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
@@ -32,10 +40,11 @@ describe("Routeur du portail React", () => {
     expect(screen.getByText(/le train des multiplications/i)).toBeInTheDocument();
   });
 
-  it("affiche la bibliothèque et son premier livre", () => {
+  it("affiche la bibliothèque et son premier livre", async () => {
+    mockLibraryCatalogue();
     renderAt("/app/bibliotheque");
     expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
-    const bookLinks = screen.getAllByRole("link", { name: /lire le livre/i });
+    const bookLinks = await screen.findAllByRole("link", { name: /lire le livre/i });
     expect(bookLinks).toHaveLength(3);
     expect(bookLinks[0].getAttribute("href")).toMatch(
       /\/app\/bibliotheque\/math-primary-one$/,
@@ -43,6 +52,7 @@ describe("Routeur du portail React", () => {
   });
 
   it("ouvre le lecteur d'un livre sur /app/bibliotheque/:bookId", async () => {
+    mockLibraryCatalogue();
     renderAt("/app/bibliotheque/math-primary-one");
     expect(
       await screen.findByRole("heading", { level: 1, name: /je découvre les maths autour de moi/i }),

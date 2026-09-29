@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NumberComparator } from "../../components/exercise-kit/NumberComparator";
@@ -7,6 +8,7 @@ import { NumberWordsMatcher } from "../../components/exercise-kit/NumberWordsMat
 import { NumericQuestion } from "../../components/exercise-kit/NumericQuestion";
 import { SequenceFiller } from "../../components/exercise-kit/SequenceFiller";
 import { formatNumber, numberToWordsEn, numberToWordsFr } from "../number-words";
+import { validatePrimaryFourExerciseAnswer } from "../content-api";
 import type { Exercise, ExerciseWidgetProps } from "./exercise-types";
 import { PlaceValueBuilder } from "./PlaceValueBuilder";
 import { RoundToTarget } from "./RoundToTarget";
@@ -25,24 +27,43 @@ export function InteractiveExercise(props: InteractiveExerciseProps) {
   const { i18n } = useTranslation("primaryFour");
   const format = (value: number) => formatNumber(value, i18n.language);
   const wordsOf = (i18n.resolvedLanguage ?? i18n.language).startsWith("en") ? numberToWordsEn : numberToWordsFr;
+  const requestPending = useRef(false);
+  const [validationPending, setValidationPending] = useState(false);
+  const [validationError, setValidationError] = useState(false);
+  const validateAnswer = async (round: number, answer: number | string | readonly number[]) => {
+    if (requestPending.current) return null;
+    requestPending.current = true;
+    setValidationPending(true);
+    setValidationError(false);
+    try {
+      return await validatePrimaryFourExerciseAnswer(exercise.id, round, answer);
+    } catch {
+      setValidationError(true);
+      return null;
+    } finally {
+      requestPending.current = false;
+      setValidationPending(false);
+    }
+  };
+  const validatedProps = { ...props, validateAnswer, validationPending, validationError };
 
   switch (exercise.kind) {
     case "place-value-build":
-      return <PlaceValueBuilder {...props} exercise={exercise} />;
+      return <PlaceValueBuilder {...validatedProps} exercise={exercise} />;
     case "round-to-target":
-      return <RoundToTarget {...props} exercise={exercise} />;
+      return <RoundToTarget {...validatedProps} exercise={exercise} />;
     case "number-words-match":
-      return <NumberWordsMatcher {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} wordsOf={wordsOf} />;
+      return <NumberWordsMatcher {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} wordsOf={wordsOf} />;
     case "compare-numbers":
-      return <NumberComparator {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
+      return <NumberComparator {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
     case "sequence-fill":
-      return <SequenceFiller {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
+      return <SequenceFiller {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
     case "number-order":
-      return <NumberOrderer {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
+      return <NumberOrderer {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
     case "numeric-question":
-      return <NumericQuestion {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
+      return <NumericQuestion {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
     case "number-in-range":
-      return <NumberInRange {...props} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
+      return <NumberInRange {...validatedProps} exercise={exercise} namespace="primaryFour" formatNumber={format} />;
     default:
       return null;
   }

@@ -41,6 +41,15 @@
   min-height: 48px;
 }
 
+.remoteStatus {
+  max-width: 720px;
+  margin: 48px auto;
+  padding: 24px;
+  color: var(--pm-ink-soft);
+  font-weight: 800;
+  text-align: center;
+}
+
 /* Valeur de position (compteurs numériques à 5 rangs) */
 
 .stickControls5 {

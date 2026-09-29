@@ -2,11 +2,12 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { YambaGuide } from "../courses/components/YambaGuide";
-import { libraryCatalogue } from "./library-catalogue";
+import { useLibraryCatalogue } from "./library-catalogue";
 import styles from "./LibraryPage.module.css";
 
 export function LibraryPage() {
   const { t } = useTranslation("library");
+  const { books, loading, error } = useLibraryCatalogue();
 
   return (
     <div className={styles.page}>
@@ -26,16 +27,25 @@ export function LibraryPage() {
           </div>
         </div>
 
+        {loading && <p className={styles.status}>{t("selection.loading")}</p>}
+        {error && (
+          <p className={styles.status} role="alert">
+            {t("selection.error")}
+          </p>
+        )}
+
         <div className={styles.bookGrid}>
-          {libraryCatalogue.map((book) => (
+          {books.map((book) => (
             <article className={styles.book} key={book.id}>
-              <div className={styles.coverWrap}>
-                <img
-                  className={styles.cover}
-                  src={book.cover}
-                  alt={t("book.coverAlt", { title: t(book.titleKey) })}
-                />
-              </div>
+              {book.cover && (
+                <div className={styles.coverWrap}>
+                  <img
+                    className={styles.cover}
+                    src={book.cover}
+                    alt={t("book.coverAlt", { title: t(book.titleKey) })}
+                  />
+                </div>
+              )}
 
               <div className={styles.bookDetails}>
                 <p className={styles.collection}>{t("book.collection")}</p>

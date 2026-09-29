@@ -2,15 +2,17 @@ import { PdfReader, type PdfReaderLabels } from "@mbuyamba/pdf-reader";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import { libraryCatalogue } from "./library-catalogue";
+import { useLibraryCatalogue } from "./library-catalogue";
 import styles from "./LibraryReaderPage.module.css";
 
 export function LibraryReaderPage() {
   const { bookId } = useParams();
   const { t } = useTranslation("library");
   const navigate = useNavigate();
-  const book = libraryCatalogue.find((item) => item.id === bookId);
-  if (!book) return <Navigate to="/bibliotheque" replace />;
+  const { books, loading, error } = useLibraryCatalogue();
+  const book = books.find((item) => item.id === bookId);
+  if (loading) return <p className={styles.status}>{t("reader.loading")}</p>;
+  if (error || !book) return <Navigate to="/bibliotheque" replace />;
   const title = t(book.titleKey);
   const labels: PdfReaderLabels = {
     loading: t("reader.loading"), error: t("reader.error"), previous: t("reader.previous"),
@@ -25,7 +27,7 @@ export function LibraryReaderPage() {
     <div className={styles.page}>
       <PdfReader
         key={book.id}
-        url={book.pdfPath}
+        url={book.pdfUrl}
         title={title}
         subtitle={`${t(book.subjectKey)} · ${t(book.levelKey)}`}
         backLabel={t("reader.back")}

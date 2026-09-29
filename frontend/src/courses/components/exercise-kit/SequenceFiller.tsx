@@ -18,15 +18,23 @@ export function SequenceFiller({
   onValidated,
   namespace,
   formatNumber,
+  validateAnswer,
+  validationPending,
+  validationError,
 }: SequenceFillerProps) {
   const { t } = useTranslation(namespace);
   const answer = exercise.sequence[exercise.blankIndex];
-  const [value, setValue] = useState(completed ? String(answer) : "");
+  const [value, setValue] = useState(completed && typeof answer === "number" ? String(answer) : "");
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
-  const validate = () => {
-    if (Number(value) === answer && value.trim() !== "") {
+  const validate = async () => {
+    const given = Number(value);
+    const correct = value.trim() !== "" && (validateAnswer
+      ? await validateAnswer(0, given)
+      : given === answer);
+    if (correct === null) return;
+    if (correct) {
       onValidated();
       return;
     }
@@ -41,6 +49,8 @@ export function SequenceFiller({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <div className={styles.sequenceRow} aria-label={t(instructionKey)}>
         {exercise.sequence.map((entry, index) =>
@@ -59,7 +69,7 @@ export function SequenceFiller({
             />
           ) : (
             <span key={index} className={styles.sequenceChip}>
-              {formatNumber(entry)}
+              {entry === null ? null : formatNumber(entry)}
             </span>
           ),
         )}

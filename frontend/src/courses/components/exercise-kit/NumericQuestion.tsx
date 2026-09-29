@@ -19,16 +19,27 @@ export function NumericQuestion({
   onValidated,
   namespace,
   formatNumber,
+  validateAnswer,
+  validationPending,
+  validationError,
 }: NumericQuestionProps) {
   const { t } = useTranslation(namespace);
-  const [value, setValue] = useState(completed ? String(exercise.answer) : "");
-  const [selected, setSelected] = useState<number | null>(completed ? exercise.answer : null);
+  const [value, setValue] = useState(completed && exercise.answer !== undefined ? String(exercise.answer) : "");
+  const [selected, setSelected] = useState<number | null>(completed ? (exercise.answer ?? null) : null);
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
-  const validate = () => {
+  const validate = async () => {
     const given = exercise.choices ? selected : Number(value);
-    if (given === exercise.answer && (exercise.choices || value.trim() !== "")) {
+    if (given === null || (!exercise.choices && value.trim() === "")) {
+      registerWrong();
+      return;
+    }
+    const correct = validateAnswer
+      ? await validateAnswer(0, given)
+      : given === exercise.answer;
+    if (correct === null) return;
+    if (correct) {
       onValidated();
       return;
     }
@@ -43,6 +54,8 @@ export function NumericQuestion({
       completed={completed}
       feedback={feedback}
       onValidate={validate}
+      validationPending={validationPending}
+      validationError={validationError}
     >
       <p className={styles.questionPrompt}>{t(exercise.promptKey, exercise.promptValues)}</p>
       {exercise.choices ? (

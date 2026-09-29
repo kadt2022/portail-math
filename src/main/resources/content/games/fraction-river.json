@@ -1,0 +1,153 @@
+{
+  "id": "fraction-river",
+  "gameId": "fraction-river",
+  "data": {
+    "stepCount": 5,
+    "stepTypes": [
+      "IDENTIFY",
+      "MATCH_VISUAL",
+      "IDENTIFY",
+      "NUMERATOR",
+      "DENOMINATOR"
+    ],
+    "retiredStepTypes": [
+      "SELECT_PARTS"
+    ],
+    "allowedFractions": [
+      {
+        "numerator": 1,
+        "denominator": 2
+      },
+      {
+        "numerator": 1,
+        "denominator": 3
+      },
+      {
+        "numerator": 1,
+        "denominator": 4
+      },
+      {
+        "numerator": 2,
+        "denominator": 3
+      },
+      {
+        "numerator": 2,
+        "denominator": 4
+      },
+      {
+        "numerator": 3,
+        "denominator": 4
+      }
+    ],
+    "bridgeFractions": [
+      "1/2",
+      "1/4",
+      "3/4"
+    ],
+    "scenarios": [
+      {
+        "id": "S01",
+        "type": "IDENTIFY",
+        "visualKind": "DISC",
+        "fractions": [
+          "1/2",
+          "1/4",
+          "3/4",
+          "2/4"
+        ]
+      },
+      {
+        "id": "S02",
+        "type": "IDENTIFY",
+        "visualKind": "BAR",
+        "fractions": [
+          "1/3",
+          "2/3",
+          "1/4",
+          "3/4"
+        ]
+      },
+      {
+        "id": "S03",
+        "type": "MATCH_VISUAL",
+        "visualKind": "DISC",
+        "fractions": [
+          "1/2",
+          "1/4",
+          "3/4"
+        ]
+      },
+      {
+        "id": "S04",
+        "type": "MATCH_VISUAL",
+        "visualKind": "BAR",
+        "fractions": [
+          "1/3",
+          "2/3",
+          "2/4"
+        ]
+      },
+      {
+        "id": "S05",
+        "type": "SELECT_PARTS",
+        "visualKind": "BAR",
+        "fractions": [
+          "1/2",
+          "2/4",
+          "3/4",
+          "1/4"
+        ]
+      },
+      {
+        "id": "S06",
+        "type": "SELECT_PARTS",
+        "visualKind": "BASKET",
+        "fractions": [
+          "1/3",
+          "2/3",
+          "1/2"
+        ]
+      },
+      {
+        "id": "S07",
+        "type": "NUMERATOR",
+        "visualKind": "DISC",
+        "fractions": [
+          "2/3",
+          "3/4",
+          "1/2"
+        ]
+      },
+      {
+        "id": "S08",
+        "type": "NUMERATOR",
+        "visualKind": "BAR",
+        "fractions": [
+          "1/4",
+          "2/4",
+          "1/3"
+        ]
+      },
+      {
+        "id": "S09",
+        "type": "DENOMINATOR",
+        "visualKind": "BASKET",
+        "fractions": [
+          "2/4",
+          "1/3",
+          "3/4"
+        ]
+      },
+      {
+        "id": "S10",
+        "type": "DENOMINATOR",
+        "visualKind": "BAR",
+        "fractions": [
+          "1/2",
+          "2/3",
+          "1/4"
+        ]
+      }
+    ]
+  }
+}

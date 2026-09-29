@@ -8,7 +8,9 @@
     "eyebrow": "Featured",
     "title": "Our selection",
     "count_one": "{{count}} book",
-    "count_other": "{{count}} books"
+    "count_other": "{{count}} books",
+    "loading": "Loading the library…",
+    "error": "The library is temporarily unavailable. Please try again shortly."
   },
   "book": {
     "collection": "Mbuyamba Education Collection",

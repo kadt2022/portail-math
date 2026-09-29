@@ -1,3 +1,6 @@
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+
 import { GenericLessonPage } from "../components/GenericLessonPage";
 import { ExplanationBlock } from "../components/exercise-kit/ExplanationBlock";
 import { GuidedExample } from "../components/exercise-kit/GuidedExample";
@@ -14,14 +17,35 @@ import {
   PRIMARY_FOUR_COURSE,
   PRIMARY_FOUR_MODULES,
 } from "./course-catalogue";
-import { PRIMARY_FOUR_EVALUATION_CONTENT, PRIMARY_FOUR_LESSON_CONTENT } from "./content";
-import type { EvaluationContent, LessonContent } from "./content/lesson-content";
+import { usePrimaryFourContent } from "./content-api";
 import { InteractiveExercise } from "./exercises/InteractiveExercise";
+import type { EvaluationContent, LessonContent } from "./lesson-content";
 import styles from "./PrimaryFourLesson.module.css";
 
 const NAMESPACE = "primaryFour";
 
 export function PrimaryFourLessonPage() {
+  const { moduleId, lessonId } = useParams();
+  const { t } = useTranslation(NAMESPACE);
+  const module = getPrimaryFourModule(moduleId);
+  const item = module ? getPrimaryFourItem(module, lessonId) : undefined;
+  const { content, loading, error } = usePrimaryFourContent(item?.id);
+
+  if (!item || !lessonId) {
+    return <h1 className={styles.remoteStatus}>{t("errors.lessonNotFound")}</h1>;
+  }
+
+  if (loading) {
+    return <p className={styles.remoteStatus}>{t("lesson.loading")}</p>;
+  }
+
+  if (error || !content) {
+    return <p className={styles.remoteStatus}>{t("errors.contentUnavailable")}</p>;
+  }
+
+  const lessonContentById = content.lesson ? { [lessonId]: content.lesson } : {};
+  const evaluationContentById = content.evaluation ? { [lessonId]: content.evaluation } : {};
+
   return (
     <GenericLessonPage<LessonContent, EvaluationContent>
       namespace={NAMESPACE}
@@ -32,8 +56,8 @@ export function PrimaryFourLessonPage() {
       getItemById={getPrimaryFourItem}
       modulePath={modulePath}
       lessonPath={lessonPath}
-      lessonContentById={PRIMARY_FOUR_LESSON_CONTENT}
-      evaluationContentById={PRIMARY_FOUR_EVALUATION_CONTENT}
+      lessonContentById={lessonContentById}
+      evaluationContentById={evaluationContentById}
       getObjectiveKey={(lessonContent, evaluationContent) => lessonContent?.objectiveKey ?? evaluationContent?.introKey}
       pageStyles={{
         duration: styles.duration,

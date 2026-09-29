@@ -28,7 +28,8 @@ export interface CompareNumbersExercise {
 export interface SequenceFillExercise {
   kind: "sequence-fill";
   id: string;
-  sequence: readonly number[];
+  // La case à compléter vaut `null` quand le serveur garde la réponse.
+  sequence: readonly (number | null)[];
   blankIndex: number;
 }
 
@@ -44,9 +45,12 @@ export interface NumericQuestionExercise {
   id: string;
   promptKey: string;
   promptValues?: Record<string, number | string>;
-  answer: number;
+  answer?: number;
   choices?: readonly number[];
 }
+
+export type ExerciseAnswer = number | string | readonly number[];
+export type ExerciseAnswerValidator = (round: number, answer: ExerciseAnswer) => Promise<boolean | null>;
 
 export interface NumberInRangeExercise {
   kind: "number-in-range";
@@ -69,4 +73,7 @@ export interface SharedExerciseWidgetProps<TExercise> {
   onValidated: () => void;
   namespace: string;
   formatNumber: (value: number) => string;
+  validateAnswer?: ExerciseAnswerValidator;
+  validationPending?: boolean;
+  validationError?: boolean;
 }
