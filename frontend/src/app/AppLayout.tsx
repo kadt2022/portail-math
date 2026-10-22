@@ -13,6 +13,7 @@ export function AppLayout() {
   const location = useLocation();
   const isLibraryReader = /^\/bibliotheque\/[^/]+$/.test(location.pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navId = useId();
   const shellRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -78,12 +79,24 @@ export function AppLayout() {
   }
 
   return (
-    <div ref={shellRef} className={styles.shell}>
+    <div ref={shellRef} className={`${styles.shell}${sidebarCollapsed ? ` ${styles.sidebarCollapsed}` : ""}`}>
       <a className={styles.skipLink} href="#contenu">
         {t("skipToContent")}
       </a>
 
       <header ref={headerRef} className={styles.header}>
+        <button
+          type="button"
+          className={`${styles.menuButton} ${styles.desktopMenuButton}`}
+          aria-expanded={!sidebarCollapsed}
+          aria-controls={navId}
+          aria-label={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
+          title={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
+          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+        >
+          <span />
+        </button>
+
         <Link to="/" className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true" />
           <span className={styles.brandText}>
@@ -103,14 +116,24 @@ export function AppLayout() {
           aria-expanded={sidebarOpen}
           aria-controls={navId}
           aria-label={sidebarOpen ? t("closeMenu") : t("openMenu")}
-          onClick={() => setSidebarOpen((open) => !open)}
+          onClick={() => {
+            setSidebarCollapsed(false);
+            setSidebarOpen((open) => !open);
+          }}
         >
           <span />
         </button>
       </header>
 
-      <Sidebar open={sidebarOpen} onNavigate={() => setSidebarOpen(false)} navId={navId} />
+      <Sidebar
+        open={sidebarOpen}
+        collapsed={sidebarCollapsed}
+        onExpand={() => setSidebarCollapsed(false)}
+        onNavigate={() => setSidebarOpen(false)}
+        navId={navId}
+      />
 
+      <div className={`${styles.scroller}${sidebarOpen ? ` ${styles.scrollerLocked}` : ""}`}>
       <div className={styles.body}>
         <main id="contenu" className={styles.main}>
           <Outlet />
@@ -133,6 +156,7 @@ export function AppLayout() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

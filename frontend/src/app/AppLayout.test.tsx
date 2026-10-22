@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
@@ -98,5 +98,60 @@ describe("Sidebar mobile de l'en-tête", () => {
 
     const header = screen.getByRole("banner");
     expect(header.parentElement?.style.getPropertyValue("--pm-header-height")).toBe("0px");
+  });
+});
+
+describe("Menu compact sur ordinateur", () => {
+  // JSDOM ne résout pas les media queries : le titre permet de cibler le
+  // bouton desktop. Sa visibilité et la largeur du rail sont vérifiées au navigateur.
+  it("réduit puis déploie le menu en gardant les rubriques accessibles", async () => {
+    const user = userEvent.setup();
+    renderLayout();
+    const nav = screen.getByRole("navigation", { name: /navigation principale/i });
+    const reduce = screen.getByTitle("Réduire le menu");
+    expect(reduce).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(reduce);
+
+    const expand = screen.getByTitle("Déployer le menu");
+    expect(expand).toHaveAttribute("aria-expanded", "false");
+    expect(expand).toHaveAttribute("aria-controls", nav.parentElement?.id);
+    for (const name of ["Tableau de bord", "Préparer l'EXETAT", "Bibliothèque", "Jeux", "Ma progression", "À propos"]) {
+      expect(within(nav).getByRole("link", { name })).toHaveAttribute("title", name);
+    }
+    expect(document.body.style.overflow).not.toBe("hidden");
+
+    await user.click(expand);
+
+    expect(screen.getByTitle("Réduire le menu")).toHaveAttribute("aria-expanded", "true");
+    expect(within(nav).getByRole("link", { name: "À propos" })).not.toHaveAttribute("title");
+  });
+
+  it("ouvre le choix de classe depuis l'icône du menu compact", async () => {
+    const user = userEvent.setup();
+    renderLayout();
+    const nav = screen.getByRole("navigation", { name: /navigation principale/i });
+    await user.click(screen.getByTitle("Réduire le menu"));
+
+    const primary = within(nav).getByRole("button", { name: "Niveaux du primaire" });
+    expect(primary).toHaveAttribute("aria-expanded", "false");
+    expect(within(nav).queryByRole("link", { name: "1re primaire" })).not.toBeInTheDocument();
+    await user.click(primary);
+
+    expect(screen.getByTitle("Réduire le menu")).toHaveAttribute("aria-expanded", "true");
+    expect(primary).toHaveAttribute("aria-expanded", "true");
+    expect(within(nav).getByRole("link", { name: "1re primaire" })).toHaveAttribute("href", "/apprentissages/primaire/1/mathematiques");
+  });
+
+  it("ouvre le menu complet sur mobile même après une réduction sur ordinateur", async () => {
+    const user = userEvent.setup();
+    renderLayout();
+    await user.click(screen.getByTitle("Réduire le menu"));
+    await user.click(screen.getByRole("button", { name: "Ouvrir le menu" }));
+
+    expect(screen.getByTitle("Réduire le menu")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Fermer le menu" })).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("button", { name: "Ouvrir le menu" })).toHaveFocus();
   });
 });

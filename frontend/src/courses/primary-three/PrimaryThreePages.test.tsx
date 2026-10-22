@@ -471,7 +471,7 @@ describe("Pages du parcours de 3e primaire", () => {
     const user = userEvent.setup();
     renderAt("/app");
     await user.click(screen.getByRole("button", { name: /cours primaires/i }));
-    expect(screen.getByRole("link", { name: /3e primaire/i })).toHaveAttribute(
+    expect(within(screen.getByRole("group", { name: /niveaux du primaire/i })).getByRole("link", { name: /3e primaire/i })).toHaveAttribute(
       "href",
       "/app/apprentissages/primaire/3/mathematiques",
     );

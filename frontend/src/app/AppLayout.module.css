@@ -1,8 +1,23 @@
 .shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Le défilement vit ici, sous l'en-tête : la barre d'ascenseur commence en
+   dessous et l'en-tête occupe toute la largeur jusqu'au bord droit. */
+.scroller {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.scrollerLocked {
+  overflow-y: hidden;
 }
 
 .skipLink {
@@ -24,17 +39,30 @@
 }
 
 .header {
-  position: fixed;
-  inset: 0 0 auto 0;
+  --pm-header-link: #eef5ff;
+  --pm-header-link-active: #fff;
+  --pm-header-muted: #c8d9ed;
+  --pm-header-hover: rgb(255 255 255 / 12%);
+  --pm-header-control-bg: rgb(255 255 255 / 8%);
+  --pm-header-control-border: rgb(255 255 255 / 24%);
+  --pm-header-language-active-bg: #f3f8ff;
+  --pm-header-language-active-ink: #23496c;
+  position: relative;
+  flex: 0 0 auto;
   z-index: 50;
   display: flex;
   align-items: center;
   gap: 16px;
   height: var(--pm-topbar);
   padding: 0 clamp(14px, 3vw, 24px);
-  border-bottom: 1px solid var(--pm-line);
-  background: rgb(251 247 240 / 94%);
-  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  background: linear-gradient(110deg, #182c50 0%, #24476d 54%, #246b75 100%);
+  color: #fff;
+  box-shadow: 0 4px 18px rgb(18 40 62 / 12%);
+}
+
+.header :is(a, button):focus-visible {
+  outline-color: #ffd395;
 }
 
 .brand {
@@ -68,11 +96,11 @@
 
 .brandName {
   font-size: 17px;
-  color: var(--pm-brand);
+  color: #fff;
 }
 
 .brandTagline {
-  color: var(--pm-ink-soft);
+  color: var(--pm-header-muted);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.02em;
@@ -85,9 +113,9 @@
   justify-content: center;
   width: 42px;
   height: 42px;
-  border: 1px solid var(--pm-line);
+  border: 1px solid var(--pm-header-control-border);
   border-radius: var(--pm-radius-sm);
-  background: var(--pm-surface);
+  background: var(--pm-header-control-bg);
   cursor: pointer;
 }
 
@@ -98,7 +126,7 @@
   display: block;
   width: 18px;
   height: 2px;
-  background: var(--pm-brand);
+  background: #fff;
   transition: transform 150ms ease, opacity 150ms ease;
 }
 
@@ -110,28 +138,27 @@
   transform: translateY(3px);
 }
 
-.menuButton[aria-expanded="true"] span {
+.menuButton:not(.desktopMenuButton)[aria-expanded="true"] span {
   background: transparent;
 }
 
-.menuButton[aria-expanded="true"] span::before {
+.menuButton:not(.desktopMenuButton)[aria-expanded="true"] span::before {
   transform: translateY(0) rotate(45deg);
 }
 
-.menuButton[aria-expanded="true"] span::after {
+.menuButton:not(.desktopMenuButton)[aria-expanded="true"] span::after {
   transform: translateY(-2px) rotate(-45deg);
 }
 
 .body {
   flex: 1 0 auto;
-  padding-top: var(--pm-header-height, var(--pm-topbar));
 }
 
 .main {
   width: 100%;
   max-width: calc(var(--pm-max-width) + var(--pm-sidebar));
   margin: 0 auto;
-  padding: 0 clamp(16px, 3vw, 36px) 64px;
+  padding: 0 16px 36px;
 }
 
 .footer {
@@ -201,7 +228,6 @@
 
 @media (min-width: 900px) {
   .body {
-    padding-top: var(--pm-header-height, var(--pm-topbar));
     padding-left: var(--pm-sidebar);
   }
 
@@ -238,9 +264,6 @@
     grid-row: 2;
   }
 
-  .body {
-    padding-top: var(--pm-header-height, 156px);
-  }
 }
 
 @media (max-width: 767px) {
@@ -365,4 +388,27 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+}
+
+@media (min-width: 1100px) { .brandMark { width: 37px; height: 37px; border-width: 8px; } .brandName { font-size: 18px; } .brandTagline { font-size: 12px; color: var(--pm-header-muted); } }
+
+.desktopMenuButton { display: none; }
+
+@media (min-width: 900px) {
+  .sidebarCollapsed { --pm-sidebar: 76px; }
+  .desktopMenuButton { display: inline-flex; width: 36px; height: 36px; border-radius: 9px; }
+  .desktopMenuButton span, .desktopMenuButton span::before, .desktopMenuButton span::after { width: 16px; }
+  .body { transition: padding-left 180ms ease; }
+  .footer { transition: margin-left 180ms ease; }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  .header { gap: 10px; padding-right: 16px; padding-left: 16px; }
+  .brandMark { width: 30px; height: 30px; border-width: 6px; }
+  .brandName { font-size: 15px; }
+  .brandTagline { font-size: 10px; }
+}
+
+@media (min-width: 900px) {
+  .main { padding-right: 24px; padding-left: 24px; }
 }

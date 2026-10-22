@@ -8,9 +8,9 @@
   margin-left: auto;
   gap: 2px;
   padding: 3px;
-  border: 1px solid var(--pm-line);
+  border: 1px solid var(--pm-header-control-border, var(--pm-line));
   border-radius: 999px;
-  background: var(--pm-surface);
+  background: var(--pm-header-control-bg, var(--pm-surface));
 }
 
 .option {
@@ -20,7 +20,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--pm-ink-soft);
+  color: var(--pm-header-link, var(--pm-ink-soft));
   font: inherit;
   font-size: 12px;
   font-weight: 800;
@@ -29,16 +29,16 @@
 }
 
 .option:hover {
-  color: var(--pm-brand);
+  color: var(--pm-header-link-active, var(--pm-brand));
 }
 
 .optionActive {
-  background: var(--pm-brand);
-  color: #fff;
+  background: var(--pm-header-language-active-bg, var(--pm-brand));
+  color: var(--pm-header-language-active-ink, #fff);
 }
 
 .optionActive:hover {
-  color: #fff;
+  color: var(--pm-header-language-active-ink, #fff);
 }
 
 @media (max-width: 767px) {

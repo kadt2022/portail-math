@@ -27,7 +27,7 @@
   border: 0;
   border-radius: 11px;
   background: transparent;
-  color: var(--pm-ink-soft);
+  color: var(--pm-header-link, var(--pm-ink-soft));
   font: inherit;
   font-size: 14px;
   font-weight: 750;
@@ -41,12 +41,12 @@
 
 .trigger:hover,
 .directLink:hover {
-  background: var(--pm-surface-warm);
-  color: var(--pm-brand);
+  background: var(--pm-header-hover, var(--pm-surface-warm));
+  color: var(--pm-header-link-active, var(--pm-brand));
 }
 
 .active {
-  color: var(--pm-brand);
+  color: var(--pm-header-link-active, var(--pm-brand));
   font-weight: 850;
 }
 
@@ -246,4 +246,8 @@
 
 @media (max-width: 480px) {
   .track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  .trigger, .directLink { gap: 6px; padding-right: 7px; padding-left: 7px; font-size: 12px; }
 }

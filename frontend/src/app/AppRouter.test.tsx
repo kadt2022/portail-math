@@ -31,7 +31,26 @@ describe("Routeur du portail React", () => {
 
   it("affiche le tableau de bord sur /app", () => {
     renderAt("/app");
-    expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /choisir un parcours/i })).toBeInTheDocument();
+  });
+
+  it("présente le mode d'emploi complet sur la page principale", () => {
+    renderAt("/app");
+    const howTo = screen.getByRole("region", { name: "Comment utiliser Mbuyamba ?" });
+    expect(within(howTo).getAllByRole("article")).toHaveLength(4);
+    for (const title of ["Choisis ton parcours", "Découvre et comprends", "Exerce-toi et joue", "Progresse à ton rythme"]) {
+      expect(within(howTo).getByRole("heading", { level: 3, name: title })).toBeInTheDocument();
+    }
+    expect(within(howTo).getByText("À ton rythme")).toBeInTheDocument();
+  });
+
+  it("conserve l'histoire, la vision et le menu À propos après le déplacement du mode d'emploi", () => {
+    renderAt("/app/a-propos");
+    expect(screen.getByRole("heading", { level: 1, name: "Une autre façon d'apprendre" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Construire l'école de demain, aujourd'hui" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Comment utiliser Mbuyamba ?" })).not.toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: /navigation principale/i });
+    expect(within(nav).getByRole("link", { name: "À propos" })).toHaveAttribute("href", "/app/a-propos");
   });
 
   it("affiche le catalogue sur /app/jeux", () => {
@@ -118,7 +137,7 @@ describe("Routeur du portail React", () => {
       "href",
       "/app/bibliotheque",
     );
-    expect(within(nav).getByRole("link", { name: /^progression$/i })).toHaveAttribute(
+    expect(within(nav).getByRole("link", { name: /^ma progression$/i })).toHaveAttribute(
       "href",
       "/app/progression",
     );

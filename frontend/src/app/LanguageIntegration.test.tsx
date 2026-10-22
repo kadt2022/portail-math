@@ -19,11 +19,11 @@ describe("Changement de langue dans l'application", () => {
     const user = userEvent.setup();
     renderAt("/app");
 
-    expect(screen.getByRole("heading", { level: 1, name: /bonjour, explorateur/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /choisir un parcours/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /^english$/i }));
 
-    await screen.findByRole("heading", { level: 1, name: /welcome, explorer/i });
+    await screen.findByRole("heading", { level: 1, name: /choose a learning path/i });
     expect(window.location.pathname).toBe("/app");
   });
 
