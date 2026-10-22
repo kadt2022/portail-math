@@ -2,40 +2,55 @@ import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
+
 import { PRIMARY_COURSES } from "./course-navigation";
 import { navigationLinks } from "./navigation";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
   open: boolean;
+  collapsed: boolean;
+  onExpand: () => void;
   onNavigate: () => void;
   navId: string;
 }
 
-export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
+export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: SidebarProps) {
   const { t } = useTranslation("common");
   const location = useLocation();
   const primaryActive = location.pathname.startsWith("/apprentissages/primaire/");
-  const [primaryOpen, setPrimaryOpen] = useState(primaryActive);
+  // Sur l'accueil, le groupe primaire est déplié d'office seulement sur grand écran :
+  // sur téléphone, ouvrir le menu ne doit pas aussi dérouler ce groupe.
+  const [primaryOpen, setPrimaryOpen] = useState(
+    primaryActive || (location.pathname === "/" && (window.matchMedia?.("(min-width: 900px)").matches ?? true)),
+  );
   const [secondaryOpen, setSecondaryOpen] = useState(false);
 
   const [dashboardLink, ...remainingLinks] = navigationLinks;
+  const learningLinks = remainingLinks.filter((link) => link.to === "/exetat");
+  const resourceLinks = remainingLinks.filter((link) => ["/bibliotheque", "/jeux"].includes(link.to));
+  const referenceLinks = remainingLinks.filter((link) => !["/exetat", "/bibliotheque", "/jeux"].includes(link.to));
 
-  function renderPortalLink(link: (typeof navigationLinks)[number], number: number) {
+  const linkIcons: Record<string, PortalIconName> = { "/": "home", "/exetat": "file", "/bibliotheque": "library", "/jeux": "game", "/progression": "progress", "/a-propos": "info" };
+
+  function renderPortalLink(link: (typeof navigationLinks)[number]) {
     return (
       <NavLink
         key={link.to}
         to={link.to}
         end={link.to === "/"}
+        aria-label={t(link.labelKey)}
+        title={collapsed ? t(link.labelKey) : undefined}
         className={({ isActive }) =>
           isActive ? `${styles.link} ${styles.linkActive}` : styles.link
         }
         onClick={onNavigate}
       >
         <span className={styles.num} aria-hidden="true">
-          {String(number).padStart(2, "0")}
+          <PortalIcon name={linkIcons[link.to]} />
         </span>
-        <span>{t(link.labelKey)}</span>
+        <span className={styles.linkText}>{t(link.labelKey)}</span>
       </NavLink>
     );
   }
@@ -49,73 +64,101 @@ export function Sidebar({ open, onNavigate, navId }: SidebarProps) {
         onClick={onNavigate}
       />
 
-      <aside id={navId} className={styles.sidebar}>
+      <aside id={navId} className={`${styles.sidebar}${collapsed ? ` ${styles.collapsed}` : ""}`}>
         <nav className={styles.nav} aria-label={t("mainNavigation")}>
-          {renderPortalLink(dashboardLink, 1)}
+          {renderPortalLink(dashboardLink)}
 
-          <div className={styles.courseGroup}>
-            <button
-              type="button"
-              className={`${styles.link} ${styles.courseMenuButton}${primaryActive ? ` ${styles.linkActive}` : ""}`}
-              aria-label={t("courseNavigation.primaryLevels")}
-              aria-expanded={primaryOpen}
-              onClick={() => setPrimaryOpen((value) => !value)}
-            >
-              <span className={styles.num} aria-hidden="true">02</span>
-              <span>{t("courseNavigation.primary")}</span>
-              <span className={styles.chevron} aria-hidden="true" />
-            </button>
+          <div className={styles.navSection} role="group" aria-label={t("navGroups.learning")}>
+            <p className={styles.navSectionTitle} aria-hidden="true">{t("navGroups.learning")}</p>
+            <div className={styles.courseGroup}>
+              <button
+                type="button"
+                className={`${styles.link} ${styles.courseMenuButton}${primaryActive ? ` ${styles.linkActive}` : ""}`}
+                aria-label={t("courseNavigation.primaryLevels")}
+                aria-expanded={primaryOpen && !collapsed}
+                title={collapsed ? t("courseNavigation.primary") : undefined}
+                onClick={() => {
+                  if (collapsed) {
+                    onExpand();
+                    setPrimaryOpen(true);
+                  } else {
+                    setPrimaryOpen((value) => !value);
+                  }
+                }}
+              >
+                <span className={styles.num} aria-hidden="true"><PortalIcon name="book" /></span>
+                <span className={styles.linkText}>{t("courseNavigation.primary")}</span>
+                <span className={styles.chevron} aria-hidden="true" />
+              </button>
 
-            {primaryOpen ? (
-              <div className={styles.coursePanel}>
-                {PRIMARY_COURSES.map((course) => {
-                  const selected = location.pathname === course.route;
-                  return (
-                    <Link
-                      key={course.id}
-                      to={course.route}
-                      className={selected ? `${styles.levelLink} ${styles.levelLinkActive}` : styles.levelLink}
-                      aria-current={selected ? "page" : undefined}
-                      onClick={onNavigate}
-                    >
-                      <span className={styles.levelBullet} aria-hidden="true">
-                        ○
-                      </span>
-                      <span className={styles.levelText}>
-                        <span>{t(course.labelKey)}</span>
-                        {course.availability === "coming-soon" ? (
-                          <small>{t("courseNavigation.comingSoon")}</small>
-                        ) : null}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : null}
+              {primaryOpen && !collapsed ? (
+                <div className={styles.coursePanel}>
+                  {PRIMARY_COURSES.map((course) => {
+                    const selected = location.pathname === course.route;
+                    return (
+                      <Link
+                        key={course.id}
+                        to={course.route}
+                        className={selected ? `${styles.levelLink} ${styles.levelLinkActive}` : styles.levelLink}
+                        aria-current={selected ? "page" : undefined}
+                        onClick={onNavigate}
+                      >
+                        <span className={styles.levelBullet} aria-hidden="true">
+                          •
+                        </span>
+                        <span className={styles.levelText}>
+                          <span>{t(course.labelKey)}</span>
+                          {course.availability === "coming-soon" ? (
+                            <small>{t("courseNavigation.comingSoon")}</small>
+                          ) : null}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            <div className={styles.courseGroup}>
+              <button
+                type="button"
+                className={`${styles.link} ${styles.courseMenuButton}`}
+                aria-label={t("courseNavigation.secondaryInformation")}
+                aria-expanded={secondaryOpen && !collapsed}
+                title={collapsed ? t("courseNavigation.secondary") : undefined}
+                onClick={() => {
+                  if (collapsed) {
+                    onExpand();
+                    setSecondaryOpen(true);
+                  } else {
+                    setSecondaryOpen((value) => !value);
+                  }
+                }}
+              >
+                <span className={styles.num} aria-hidden="true"><PortalIcon name="cap" /></span>
+                <span className={styles.linkText}>{t("courseNavigation.secondary")}</span>
+                <span className={styles.chevron} aria-hidden="true" />
+              </button>
+
+              {secondaryOpen && !collapsed ? (
+                <div className={styles.secondaryNotice}>
+                  <span>{t("courseNavigation.secondaryInformation")}</span>
+                  <strong>{t("courseNavigation.comingSoon")}</strong>
+                </div>
+              ) : null}
+            </div>
+            {learningLinks.map((link) => renderPortalLink(link))}
           </div>
 
-          <div className={styles.courseGroup}>
-            <button
-              type="button"
-              className={`${styles.link} ${styles.courseMenuButton}`}
-              aria-label={t("courseNavigation.secondaryInformation")}
-              aria-expanded={secondaryOpen}
-              onClick={() => setSecondaryOpen((value) => !value)}
-            >
-              <span className={styles.num} aria-hidden="true">03</span>
-              <span>{t("courseNavigation.secondary")}</span>
-              <span className={styles.chevron} aria-hidden="true" />
-            </button>
-
-            {secondaryOpen ? (
-              <div className={styles.secondaryNotice}>
-                <span>{t("courseNavigation.secondaryInformation")}</span>
-                <strong>{t("courseNavigation.comingSoon")}</strong>
-              </div>
-            ) : null}
+          <div className={styles.navSection} role="group" aria-label={t("navGroups.resources")}>
+            <p className={styles.navSectionTitle} aria-hidden="true">{t("navGroups.resources")}</p>
+            {resourceLinks.map((link) => renderPortalLink(link))}
           </div>
 
-          {remainingLinks.map((link, index) => renderPortalLink(link, index + 4))}
+          <div className={styles.navSection} role="group" aria-label={t("navGroups.reference")}>
+            <p className={styles.navSectionTitle} aria-hidden="true">{t("navGroups.reference")}</p>
+            {referenceLinks.map((link) => renderPortalLink(link))}
+          </div>
         </nav>
       </aside>
     </div>

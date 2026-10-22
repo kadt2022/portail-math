@@ -5,6 +5,8 @@
   "skipToContent": "Aller au contenu",
   "openMenu": "Ouvrir le menu",
   "closeMenu": "Fermer le menu",
+  "collapseMenu": "Réduire le menu",
+  "expandMenu": "Déployer le menu",
   "mainNavigation": "Navigation principale",
   "navSectionLabel": "Portail",
   "nav": {
@@ -12,8 +14,13 @@
     "exetat": "Préparer l'EXETAT",
     "library": "Bibliothèque",
     "games": "Jeux",
-    "progress": "Progression",
+    "progress": "Ma progression",
     "about": "À propos"
+  },
+  "navGroups": {
+    "learning": "Parcours",
+    "resources": "Ressources",
+    "reference": "Repères"
   },
   "courseNavigation": {
     "label": "Navigation des cours",

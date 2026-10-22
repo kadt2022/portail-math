@@ -56,5 +56,63 @@
   },
   "upcomingGames": {
     "heading": "Coming soon"
+  },
+  "home": {
+    "title": "Choose a learning path",
+    "start": "Start",
+    "description": "Select your level to start or continue your learning journey.",
+    "primary": {
+      "title": "Primary learning path",
+      "description": "Strong foundations to grow in mathematics.",
+      "level1": "1st primary",
+      "level2": "2nd primary",
+      "level3": "3rd primary",
+      "level4": "4th primary",
+      "level5": "5th primary",
+      "level6": "6th primary"
+    },
+    "secondary": {
+      "title": "Secondary learning path",
+      "description": "Advanced concepts to prepare for your future.",
+      "level1": "1st secondary",
+      "level2": "2nd secondary",
+      "level3": "3rd secondary",
+      "level4": "4th secondary",
+      "level5": "5th secondary",
+      "level6": "6th secondary"
+    },
+    "welcome": {
+      "eyebrow": "Welcome to Mbuyamba",
+      "title": "Learn while having fun",
+      "description": "Courses, games and challenges to develop your mathematics skills from primary to secondary school.",
+      "cta": "Discover Mbuyamba"
+    },
+    "features": {
+      "library": {
+        "title": "Learn and explore the library",
+        "description": "Learning paths by grade, digital books, worksheets and resources to build your understanding step by step."
+      },
+      "play": {
+        "title": "Learn through play",
+        "description": "Mathematics becomes adventures, challenges and problems to solve."
+      },
+      "progress": {
+        "title": "Understand your progress",
+        "description": "See what you have achieved, what you can learn next and the challenges ahead."
+      }
+    },
+    "games": {
+      "eyebrow": "Educational games",
+      "title": "Mathematical adventures",
+      "highlight": "are waiting for you!",
+      "description": "Multiplication Train, Fraction River, Magic Grid and much more.",
+      "cta": "See the games"
+    },
+    "exetat": {
+      "eyebrow": "EXETAT preparation",
+      "title": "Revise and test your knowledge",
+      "description": "Questions, corrections and a way to track your results.",
+      "cta": "Get started"
+    }
   }
 }

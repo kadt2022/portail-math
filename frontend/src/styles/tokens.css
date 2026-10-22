@@ -3,15 +3,16 @@
 :root {
   /* Couleurs chaudes, lumineuses et calmes. */
   --pm-bg: #fbf7f0;
+  scrollbar-color: rgb(36 107 117 / 32%) rgb(36 107 117 / 4%);
   --pm-surface: #ffffff;
   --pm-surface-warm: #fef3e6;
   --pm-ink: #1f2a24;
   --pm-ink-soft: #5b6660;
-  --pm-line: #ead9c4;
+  --pm-line: #ece9e4;
 
   --pm-brand: #17493f;
   --pm-brand-dark: #0f332b;
-  --pm-accent: #e2762b;
+  --pm-accent: #ff6415;
   --pm-accent-dark: #b85c1c;
   --pm-accent-soft: #fce3cd;
 
@@ -33,8 +34,8 @@
   --pm-radius-signature: 18px 6px 18px 6px;
 
   --pm-max-width: 1560px;
-  --pm-sidebar: 264px;
-  --pm-topbar: 68px;
+  --pm-sidebar: 278px;
+  --pm-topbar: 70px;
   --pm-course-nav-height: 56px;
 }
 

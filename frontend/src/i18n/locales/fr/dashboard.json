@@ -56,5 +56,63 @@
   },
   "upcomingGames": {
     "heading": "À découvrir bientôt"
+  },
+  "home": {
+    "title": "Choisir un parcours",
+    "start": "Commencer",
+    "description": "Sélectionne ton niveau pour commencer ou reprendre ton apprentissage.",
+    "primary": {
+      "title": "Parcours primaire",
+      "description": "Des bases solides pour bien grandir en mathématiques.",
+      "level1": "1re primaire",
+      "level2": "2e primaire",
+      "level3": "3e primaire",
+      "level4": "4e primaire",
+      "level5": "5e primaire",
+      "level6": "6e primaire"
+    },
+    "secondary": {
+      "title": "Parcours secondaire",
+      "description": "Des notions avancées pour préparer ton avenir.",
+      "level1": "1re secondaire",
+      "level2": "2e secondaire",
+      "level3": "3e secondaire",
+      "level4": "4e secondaire",
+      "level5": "5e secondaire",
+      "level6": "6e secondaire"
+    },
+    "welcome": {
+      "eyebrow": "Bienvenue sur Mbuyamba",
+      "title": "Apprendre en s’amusant",
+      "description": "Des cours, des jeux et des défis pour progresser en mathématiques du primaire au secondaire.",
+      "cta": "Découvrir Mbuyamba"
+    },
+    "features": {
+      "library": {
+        "title": "Apprendre et explorer la bibliothèque",
+        "description": "Des parcours organisés par classe, des livres numériques, des fiches et des ressources pour avancer progressivement et consolider les notions essentielles."
+      },
+      "play": {
+        "title": "Apprendre aussi en jouant",
+        "description": "Les mathématiques deviennent des aventures, des défis et des situations à résoudre."
+      },
+      "progress": {
+        "title": "Comprendre ses progrès",
+        "description": "Visualise ce que tu as déjà accompli, ce qu’il te reste à apprendre et les défis à relever."
+      }
+    },
+    "games": {
+      "eyebrow": "Jeux éducatifs",
+      "title": "Des aventures",
+      "highlight": "mathématiques t’attendent !",
+      "description": "Train des multiplications, Rivière des fractions, Grille magique et bien plus encore.",
+      "cta": "Voir les jeux"
+    },
+    "exetat": {
+      "eyebrow": "Préparation EXETAT",
+      "title": "Révise et teste tes connaissances",
+      "description": "Des questions, des corrections et un suivi de tes résultats.",
+      "cta": "Commencer"
+    }
   }
 }

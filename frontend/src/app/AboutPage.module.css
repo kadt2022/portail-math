@@ -106,85 +106,6 @@
   font-size: 13px;
 }
 
-.howTo {
-  padding: clamp(28px, 5vw, 56px);
-  border: 1px solid var(--pm-line);
-  border-radius: 34px 10px 34px 10px;
-  background:
-    radial-gradient(circle at 95% 5%, rgb(226 118 43 / 13%), transparent 30%),
-    var(--pm-surface);
-  box-shadow: var(--pm-shadow-md);
-}
-
-.sectionHeading {
-  max-width: 760px;
-}
-
-.sectionHeading h2 {
-  margin: 8px 0 12px;
-  font-size: clamp(30px, 4vw, 48px);
-}
-
-.sectionHeading > p:last-child {
-  margin-bottom: 0;
-  color: var(--pm-ink-soft);
-  font-size: 18px;
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 34px;
-}
-
-.step {
-  min-width: 0;
-  padding: 22px;
-  border-top: 1px solid var(--pm-line);
-}
-
-.stepNumber {
-  display: inline-grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border-radius: var(--pm-radius-signature);
-  color: #fff;
-  background: var(--pm-brand);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.step h3 {
-  margin: 18px 0 8px;
-  font-size: 20px;
-}
-
-.step p {
-  margin: 0;
-  color: var(--pm-ink-soft);
-}
-
-.paceNote {
-  display: flex;
-  gap: 18px;
-  margin-top: 30px;
-  padding: 18px 20px;
-  align-items: baseline;
-  border-radius: var(--pm-radius-md);
-  background: var(--pm-surface-warm);
-}
-
-.paceNote strong {
-  flex: 0 0 auto;
-  color: var(--pm-accent-dark);
-}
-
-.paceNote p {
-  margin: 0;
-}
-
 .vision {
   align-items: start;
   background: transparent;
@@ -238,7 +159,7 @@
 
 .promise {
   position: sticky;
-  top: calc(var(--pm-topbar) + 28px);
+  top: 28px;
   padding: clamp(28px, 4vw, 44px);
   border-radius: 34px 10px 34px 10px;
   color: #fff;
@@ -300,10 +221,6 @@
     max-height: 520px;
   }
 
-  .steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .promise {
     position: static;
   }
@@ -341,27 +258,6 @@
   .heroVisual img {
     aspect-ratio: 4 / 3;
     border-radius: 24px 8px 24px 8px;
-  }
-
-  .howTo {
-    padding: 24px 18px;
-    border-radius: 24px 8px 24px 8px;
-  }
-
-  .steps {
-    grid-template-columns: 1fr;
-  }
-
-  .step {
-    padding: 20px 4px;
-  }
-
-  .paceNote {
-    display: block;
-  }
-
-  .paceNote p {
-    margin-top: 6px;
   }
 
   .promise {
