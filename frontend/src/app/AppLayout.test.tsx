@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { Link, MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 
 import { AppLayout } from "./AppLayout";
 
@@ -153,5 +153,32 @@ describe("Menu compact sur ordinateur", () => {
     expect(screen.getByRole("button", { name: "Fermer le menu" })).toHaveAttribute("aria-expanded", "true");
     await user.keyboard("{Escape}");
     expect(screen.getByRole("button", { name: "Ouvrir le menu" })).toHaveFocus();
+  });
+});
+
+describe("Navigation vers un cours primaire", () => {
+  it("reste fermé sur l'accueil puis se déplie à chaque nouvelle classe active", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route index element={<Link to="/apprentissages/primaire/1/mathematiques">Ouvrir une classe</Link>} />
+            <Route path="apprentissages/primaire/:level/mathematiques" element={<Link to="/apprentissages/primaire/2/mathematiques">Autre classe</Link>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+    const nav = screen.getByRole("navigation", { name: /navigation principale/i });
+    const primary = within(nav).getByRole("button", { name: "Niveaux du primaire" });
+    expect(primary).toHaveAttribute("aria-expanded", "false");
+    await user.click(screen.getByRole("link", { name: "Ouvrir une classe" }));
+    expect(primary).toHaveAttribute("aria-expanded", "true");
+    expect(within(nav).getByRole("link", { name: "1re primaire" })).toHaveAttribute("aria-current", "page");
+    await user.click(primary);
+    expect(primary).toHaveAttribute("aria-expanded", "false");
+    await user.click(screen.getByRole("link", { name: "Autre classe" }));
+    expect(primary).toHaveAttribute("aria-expanded", "true");
+    expect(within(nav).getByRole("link", { name: "2e primaire" })).toHaveAttribute("aria-current", "page");
   });
 });

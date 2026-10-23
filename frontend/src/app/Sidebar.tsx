@@ -20,12 +20,17 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
   const { t } = useTranslation("common");
   const location = useLocation();
   const primaryActive = location.pathname.startsWith("/apprentissages/primaire/");
-  // Sur l'accueil, le groupe primaire est déplié d'office seulement sur grand écran :
-  // sur téléphone, ouvrir le menu ne doit pas aussi dérouler ce groupe.
-  const [primaryOpen, setPrimaryOpen] = useState(
-    primaryActive || (location.pathname === "/" && (window.matchMedia?.("(min-width: 900px)").matches ?? true)),
-  );
+  const [primaryOpen, setPrimaryOpen] = useState(primaryActive);
   const [secondaryOpen, setSecondaryOpen] = useState(false);
+  const [previousPath, setPreviousPath] = useState(location.pathname);
+
+  // Le layout reste monté pendant la navigation : ouvrir aussi le groupe
+  // lorsqu’une nouvelle route primaire devient active, pas seulement au montage.
+  if (previousPath !== location.pathname) {
+    setPreviousPath(location.pathname);
+    if (primaryActive) setPrimaryOpen(true);
+  }
+
 
   const [dashboardLink, ...remainingLinks] = navigationLinks;
   const learningLinks = remainingLinks.filter((link) => link.to === "/exetat");
