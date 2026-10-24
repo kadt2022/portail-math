@@ -106,6 +106,7 @@ function ResponseControls({ q, response, onChange }: { q: Question; response: Re
       {stepper(t("activity.units"), numberAt(1), (n) => setNumber(1, n), q.exchange ? 20 : 9)}
       <div className={styles.tokens}>{Array.from({ length: numberAt(0) }, (_, i) => <span key={i} aria-label={t("activity.bundle")}>▥</span>)}</div><Tokens count={numberAt(1)} token="│" />
       {q.exchange ? <button type="button" disabled={numberAt(1) < 10} onClick={() => onChange({ numbers: [numberAt(0) + 1, numberAt(1) - 10, 1] })}>{t("activity.exchange")}</button> : null}
+      {q.exchange ? <button type="button" onClick={() => onChange(initialResponse(q))}>{t("activity.reset")}</button> : null}
       <p>{numberAt(0)} × 10 + {numberAt(1)} = {numberAt(0) * 10 + numberAt(1)}</p>
     </>;
     case "house": return <>
@@ -151,7 +152,10 @@ export function PrimaryOneActivity({ questions, completed, onValidated, onRestar
   }, [questions,completed,onValidated]);
   return <div>
     <p aria-live="polite">{t("activity.questionProgress", { current: index + 1, total: questions.length })}</p>
-    <PrimaryOneQuestion key={question.id} question={question} onRestart={() => {setPassed(false);onRestart();}} onValidated={() => { setPassed(true); if (index === questions.length - 1) onValidated(); }} />
+    <PrimaryOneQuestion key={question.id} question={question} onRestart={() => {setPassed(false);onRestart();}} onValidated={() => {
+      setPassed(true);
+      if (questions.every((candidate) => getResult(candidate)?.correct)) onValidated();
+    }} />
     {passed && index < questions.length - 1 ? <button type="button" className={styles.next} onClick={() => { setIndex(index + 1); setPassed(Boolean(getResult(questions[index + 1])?.correct)); }}>{t("activity.nextQuestion")}</button> : null}
   </div>;
 }
