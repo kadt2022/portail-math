@@ -31,7 +31,7 @@ describe("Progression du parcours de 1re primaire", () => {
 
     expect(getCourseProgress(progress)).toEqual({
       completedLessons: 0,
-      totalLessons: 4,
+      totalLessons: 40,
       percentage: 0,
       completed: false,
     });

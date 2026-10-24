@@ -12,13 +12,18 @@ import {
   modulePath,
   PRIMARY_ONE_BASE_PATH,
   PRIMARY_ONE_MODULES,
+  questionsForStep,
 } from "./course-catalogue";
 import styles from "./PrimaryOneCourse.module.css";
 import { useCourseProgress } from "./useCourseProgress";
+import { PrimaryOneActivity } from "./PrimaryOneActivity";
+import { AssessmentResult } from "./AssessmentResult";
+import { EVALUATIONS } from "./lesson-content";
 
 export function PrimaryOneLessonPage() {
   const { moduleId, lessonId } = useParams();
-  const { t } = useTranslation("primaryOne");
+  const { t, i18n } = useTranslation("primaryOne");
+  const frenchContent = (i18n.resolvedLanguage ?? i18n.language).startsWith("fr");
   const { progress, startItem, completeStep } = useCourseProgress();
   const module = getPrimaryOneModule(moduleId);
   const item = module ? getLearningItem(module, lessonId) : undefined;
@@ -33,10 +38,10 @@ export function PrimaryOneLessonPage() {
   const view = item ? viewByItem[item.id] ?? defaultView : undefined;
 
   useEffect(() => {
-    if (item && !progress.items[item.id]) {
+    if (frenchContent && item && !progress.items[item.id]) {
       startItem(item);
     }
-  }, [item, progress.items, startItem]);
+  }, [item, frenchContent, progress.items, startItem]);
 
   if (!module || !item || !view) {
     return (
@@ -49,6 +54,11 @@ export function PrimaryOneLessonPage() {
       </div>
     );
   }
+
+  if (!frenchContent) return <section className={styles.missingPage}>
+    <p>{t("lesson.languageNotice")}</p>
+    <button type="button" className={styles.primaryAction} onClick={() => { void i18n.changeLanguage("fr"); }}>{t("lesson.switchFrench")}</button>
+  </section>;
 
   const setView = (next: string | "done") => {
     setViewByItem((current) => ({ ...current, [item.id]: next }));
@@ -76,11 +86,12 @@ export function PrimaryOneLessonPage() {
           <span className={styles.completionMark} aria-hidden="true">✓</span>
           <p className={styles.eyebrow}>{t("lessonComplete.eyebrow")}</p>
           <h1>
-            {item.kind === "evaluation"
+            {item.id === "MATH-1P-FINAL" ? t("lessonComplete.finalTitle") : item.kind === "evaluation"
               ? t("lessonComplete.evaluationTitle")
               : t("lessonComplete.title")}
           </h1>
           <p>{t("lessonComplete.message")}</p>
+          {item.kind === "evaluation" ? <AssessmentResult questions={EVALUATIONS[item.id]} /> : null}
           <YambaGuide
             compact
             name={t("yamba.name")}
@@ -106,11 +117,13 @@ export function PrimaryOneLessonPage() {
   const step = item.steps[safeStepIndex];
   const nextStep = item.steps[safeStepIndex + 1];
   const wasAlreadyCompleted = Boolean(storedItem?.completed);
+  const questions = questionsForStep(item, step);
+  const stepCompleted = Boolean(storedItem?.completedStepIds.includes(step.id));
+  const canContinue = questions.length === 0 || stepCompleted;
 
   const continueLesson = () => {
-    if (!wasAlreadyCompleted) {
-      completeStep(item, step.id);
-    }
+    if (!canContinue) return;
+    if (!stepCompleted) completeStep(item, step.id, true);
     setView(nextStep?.id ?? "done");
   };
 
@@ -157,27 +170,24 @@ export function PrimaryOneLessonPage() {
         </div>
       </header>
 
-      <section className={styles.activityCard} aria-labelledby="activity-step-title">
-        <div className={styles.activityVisual} aria-hidden="true">
-          <span>●</span><span>▲</span><span>■</span>
-        </div>
+      {questions.length > 0 ? <>
+        {step.kind === "remember" ? <p>{t(`content.${item.id}.remember`)}</p> : null}
+        <PrimaryOneActivity key={`${item.id}:${step.id}`} questions={questions} completed={stepCompleted} onRestart={() => { setView(step.id); completeStep(item,step.id,false); }} onValidated={() => { setView(step.id); completeStep(item, step.id, true); }} />
+      </> : <section className={styles.activityCard} aria-labelledby="activity-step-title">
         <div className={styles.activityCopy}>
-          <p className={styles.eyebrow}>{t("lesson.currentStep")}</p>
+          <p className={styles.eyebrow}>{t(`content.${item.id}.objective`)}</p>
           <h2 id="activity-step-title">{t(step.labelKey)}</h2>
-          <div className={styles.pendingNotice}>
-            <strong>{t("contentPending.title")}</strong>
-            <p>{t("contentPending.activityMessage")}</p>
-          </div>
-          <p className={styles.prototypeNote}>{t("contentPending.prototypeNote")}</p>
+          <p>{t(`content.${item.id}.${step.kind}`)}</p>
         </div>
-      </section>
+      </section>}
+      {!canContinue ? <p aria-live="polite">{t("lesson.validationRequired")}</p> : null}
 
       <div className={styles.lessonActions}>
         <Link className={styles.secondaryAction} to={modulePath(module.id)}>
           <CourseActionIcon className={styles.actionIcon} name="back" />
           {t("lesson.back")}
         </Link>
-        <button className={styles.primaryAction} type="button" onClick={continueLesson}>
+        <button className={styles.primaryAction} type="button" disabled={!canContinue} onClick={continueLesson}>
           <CourseActionIcon className={styles.actionIcon} name="continue" />
           {nextStep
             ? t("lesson.continue")

@@ -8,37 +8,39 @@ import {
 } from "./course-progress";
 import { createLocalCourseProgressStorage } from "./progress-storage";
 
-export function useCourseProgress(courseId: string) {
+const identityProgress = (progress: CourseProgress) => progress;
+
+export function useCourseProgress(courseId: string, prepareProgress = identityProgress) {
   const storage = useMemo(
     () => createLocalCourseProgressStorage(window.localStorage, courseId),
     [courseId],
   );
-  const [progress, setProgress] = useState<CourseProgress>(() => storage.load());
+  const [progress, setProgress] = useState<CourseProgress>(() => prepareProgress(storage.load()));
 
   const startItem = useCallback(
     (item: CourseItemLike) => {
       setProgress((current) => {
-        const next = startLearningItem(current, item);
+        const next = startLearningItem(prepareProgress(current), item);
         if (next !== current) {
           storage.save(next);
         }
         return next;
       });
     },
-    [storage],
+    [storage, prepareProgress],
   );
 
   const completeStep = useCallback(
     (item: CourseItemLike, stepId: string, validated: boolean) => {
       setProgress((current) => {
-        const next = completeLearningStep(current, item, stepId, validated);
+        const next = completeLearningStep(prepareProgress(current), item, stepId, validated);
         if (next !== current) {
           storage.save(next);
         }
         return next;
       });
     },
-    [storage],
+    [storage, prepareProgress],
   );
 
   return { progress, startItem, completeStep };

@@ -16,7 +16,7 @@
     "completed": "Completed"
   },
   "progress": {
-    "overall": "My overall progress",
+    "overall": "Overall progress — lessons and assessments",
     "lessons": "{{completed}} lessons completed out of {{total}}",
     "moduleLessons": "{{completed}} lessons completed out of {{total}}",
     "contentPending": "Lessons to be completed",
@@ -43,16 +43,36 @@
     "title": "My learning path",
     "orderHint": "The order is recommended, but every module remains available.",
     "number": "Module {{number}}",
-    "m1": { "title": "I observe and sort" },
-    "m2": { "title": "I count to 5" },
-    "m3": { "title": "I count to 10" },
-    "m4": { "title": "I compare numbers" },
-    "m5": { "title": "I discover addition" },
-    "m6": { "title": "I discover subtraction" },
-    "m7": { "title": "Numbers up to 20" },
-    "m8": { "title": "I measure around me" },
-    "m9": { "title": "Shapes and paths" },
-    "m10": { "title": "Time and challenges" }
+    "m1": {
+      "title": "I observe and sort"
+    },
+    "m2": {
+      "title": "I count to 5"
+    },
+    "m3": {
+      "title": "I count to 10"
+    },
+    "m4": {
+      "title": "I compare numbers"
+    },
+    "m5": {
+      "title": "I discover addition"
+    },
+    "m6": {
+      "title": "I discover subtraction"
+    },
+    "m7": {
+      "title": "Numbers up to 20"
+    },
+    "m8": {
+      "title": "I measure around me"
+    },
+    "m9": {
+      "title": "Shapes and paths"
+    },
+    "m10": {
+      "title": "Time and challenges"
+    }
   },
   "module": {
     "referenceLead": "Explore the lessons in the suggested order, then complete the module assessment.",
@@ -63,14 +83,32 @@
   },
   "lessons": {
     "number": "Lesson {{number}}",
-    "l1": { "title": "Same or different?" },
-    "l2": { "title": "I sort by colour or shape" },
-    "l3": { "title": "From smallest to largest" },
-    "l4": { "title": "I continue a pattern" }
+    "l1": {
+      "title": "Same or different?"
+    },
+    "l2": {
+      "title": "I sort by colour or shape"
+    },
+    "l3": {
+      "title": "From smallest to largest"
+    },
+    "l4": {
+      "title": "I continue a pattern"
+    }
   },
   "evaluation": {
     "label": "Module assessment",
-    "title": "Module assessment"
+    "title": "Module assessment",
+    "finalTitle": "Final assessment",
+    "results": "My results",
+    "score": "{{count}} corrected answers out of {{total}}",
+    "firstTry": "{{count}} correct on the first attempt out of {{total}}",
+    "review": "Topics to review",
+    "mastered": "All answers were correct on the first attempt.",
+    "finalLead": "After the ten modules, check your learning with eight challenges.",
+    "startFinal": "Open the final assessment",
+    "firstTry_one": "{{count}} correct on the first attempt out of {{total}}",
+    "firstTry_other": "{{count}} correct on the first attempt out of {{total}}"
   },
   "steps": {
     "discover": "I discover",
@@ -92,7 +130,11 @@
     "back": "Back to module",
     "continue": "Continue",
     "finish": "Finish the lesson",
-    "finishEvaluation": "Finish the assessment"
+    "finishEvaluation": "Finish the assessment",
+    "objectiveLabel": "Mon objectif",
+    "validationRequired": "Réussis les exercices pour continuer.",
+    "languageNotice": "This course uses the French RDC textbook. Switch to French to start or resume your activities.",
+    "switchFrench": "Switch to French"
   },
   "contentPending": {
     "title": "Teaching content to be completed",
@@ -108,10 +150,1609 @@
     "backToModule": "Back to module",
     "nextLesson": "Next lesson",
     "nextModule": "Next module",
-    "reviewCourse": "Review my lessons"
+    "reviewCourse": "Review my lessons",
+    "finalTitle": "Well done, the final assessment is complete!"
   },
   "errors": {
     "moduleNotFound": "This module does not exist.",
     "lessonNotFound": "This lesson does not exist."
+  },
+  "content": {
+    "MATH-1P-U01-L01": {
+      "title": "Même ou différent ?",
+      "objective": "Je peux observer la couleur, la forme et la taille.",
+      "discover": "Amina pose deux feuilles sur la table. Elles sont vertes et longues. Sont-elles pareilles ?",
+      "understand": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "remember": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété."
+    },
+    "MATH-1P-U01-L02": {
+      "title": "Je trie par couleur ou par forme",
+      "objective": "Je peux mettre ensemble selon une règle.",
+      "discover": "La classe mélange des graines claires, des graines foncées et des bouchons. Il faut ranger.",
+      "understand": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "remember": "Trier, c’est mettre ensemble les objets qui respectent une même règle."
+    },
+    "MATH-1P-U01-L03": {
+      "title": "Du plus petit au plus grand",
+      "objective": "Je peux comparer puis classer des grandeurs.",
+      "discover": "Trois calebasses ont des tailles différentes. On veut les aligner.",
+      "understand": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "remember": "Classer, c’est placer dans un ordre."
+    },
+    "MATH-1P-U01-L04": {
+      "title": "Je continue une suite",
+      "objective": "Je peux repérer une règle qui se répète.",
+      "discover": "Mado décore une natte : jaune, vert, jaune, vert…",
+      "understand": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "remember": "Une suite suit une règle."
+    },
+    "MATH-1P-U02-L01": {
+      "title": "Un, deux et trois",
+      "objective": "Je peux compter une fois chaque objet.",
+      "discover": "Trois enfants apportent chacun une craie.",
+      "understand": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "remember": "Pour compter, touche chaque objet une seule fois."
+    },
+    "MATH-1P-U02-L02": {
+      "title": "Quatre et cinq",
+      "objective": "Je peux reconnaître et former 4 et 5.",
+      "discover": "Il y a quatre gobelets et cinq enfants. Tous peuvent-ils recevoir un gobelet ?",
+      "understand": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "remember": "Quatre vient après trois."
+    },
+    "MATH-1P-U02-L03": {
+      "title": "Zéro : aucun",
+      "objective": "Je peux comprendre la quantité zéro.",
+      "discover": "Après la distribution, le panier est vide.",
+      "understand": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "remember": "Zéro signifie qu’il n’y a aucun objet."
+    },
+    "MATH-1P-U02-L04": {
+      "title": "Je montre, je lis et j’écris de 0 à 5",
+      "objective": "Je peux relier chiffre, mot et quantité.",
+      "discover": "L’enseignante prépare des cartes 0, 1, 2, 3, 4 et 5.",
+      "understand": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "remember": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre."
+    },
+    "MATH-1P-U03-L01": {
+      "title": "Six et sept",
+      "objective": "Je peux former 6 et 7 à partir de 5.",
+      "discover": "Une table a cinq cahiers. On en apporte encore un, puis encore un.",
+      "understand": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "remember": "Six, c’est 5 et encore 1."
+    },
+    "MATH-1P-U03-L02": {
+      "title": "Huit, neuf et dix",
+      "objective": "Je peux former et écrire 8, 9, 10.",
+      "discover": "Dix élèves forment une ronde.",
+      "understand": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "remember": "Huit vient après 7, neuf après 8 et dix après 9."
+    },
+    "MATH-1P-U03-L03": {
+      "title": "En avant et en arrière",
+      "objective": "Je peux réciter et utiliser l’ordre.",
+      "discover": "Une grenouille avance sur des pierres de 0 à 10 puis revient.",
+      "understand": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "remember": "Compter en avant, c’est aller vers le nombre suivant."
+    },
+    "MATH-1P-U03-L04": {
+      "title": "Je construis un nombre",
+      "objective": "Je peux composer et décomposer jusqu’à 10.",
+      "discover": "Deux enfants réunissent leurs graines dans un même bol.",
+      "understand": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "remember": "On peut construire un nombre avec deux groupes différents."
+    },
+    "MATH-1P-U04-L01": {
+      "title": "Autant, plus ou moins ?",
+      "objective": "Je peux comparer par correspondance.",
+      "discover": "Deux équipes reçoivent des ballons. On veut savoir si le partage est égal.",
+      "understand": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "remember": "Mets un objet de chaque groupe en paire."
+    },
+    "MATH-1P-U04-L02": {
+      "title": "Même quantité : =",
+      "objective": "Je peux utiliser le signe égal.",
+      "discover": "Deux assiettes contiennent chacune quatre bananes.",
+      "understand": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "remember": "Le signe = se lit « est égal à »."
+    },
+    "MATH-1P-U04-L03": {
+      "title": "Plus grand ou plus petit : > et <",
+      "objective": "Je peux lire et placer les signes de comparaison.",
+      "discover": "Une poule choisit le panier qui contient le plus de grains.",
+      "understand": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "remember": "Le côté ouvert du signe regarde le plus grand nombre."
+    },
+    "MATH-1P-U04-L04": {
+      "title": "Je range les nombres",
+      "objective": "Je peux ordonner plusieurs nombres.",
+      "discover": "Des maisons portent les numéros 2, 7, 4 et 1.",
+      "understand": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "remember": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent."
+    },
+    "MATH-1P-U05-L01": {
+      "title": "Je réunis deux groupes",
+      "objective": "Je peux trouver le total de deux collections.",
+      "discover": "Lina apporte 2 mangues et Kanku en apporte 3.",
+      "understand": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "remember": "Réunir deux groupes permet de trouver combien il y en a en tout."
+    },
+    "MATH-1P-U05-L02": {
+      "title": "J’ajoute ce qui arrive",
+      "objective": "Je peux modéliser une augmentation.",
+      "discover": "Trois oiseaux sont au sol. Deux autres arrivent.",
+      "understand": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "remember": "Quand des objets arrivent, la quantité augmente."
+    },
+    "MATH-1P-U05-L03": {
+      "title": "J’écris une addition",
+      "objective": "Je peux utiliser + et =.",
+      "discover": "On veut noter le nombre total de fruits sans tout redessiner.",
+      "understand": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "remember": "Le signe + signifie « plus » ou « on ajoute »."
+    },
+    "MATH-1P-U05-L04": {
+      "title": "Je décompose un nombre",
+      "objective": "Je peux écrire plusieurs additions de même total.",
+      "discover": "Un panier de 8 fruits est partagé en deux petits paniers.",
+      "understand": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "remember": "Décomposer un nombre, c’est le former avec des parties."
+    },
+    "MATH-1P-U05-L05": {
+      "title": "Je cherche ce qui manque",
+      "objective": "Je peux trouver un complément.",
+      "discover": "Une table doit avoir 10 gobelets. Il y en a déjà 6.",
+      "understand": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "remember": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé."
+    },
+    "MATH-1P-U06-L01": {
+      "title": "J’enlève et je trouve le reste",
+      "objective": "Je peux retirer d’une collection.",
+      "discover": "Il y a 5 bananes. On en donne 2.",
+      "understand": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "remember": "Soustraire peut vouloir dire enlever."
+    },
+    "MATH-1P-U06-L02": {
+      "title": "Je barre sur un dessin",
+      "objective": "Je peux représenter un retrait.",
+      "discover": "Sept poissons sont dessinés. Deux s’éloignent.",
+      "understand": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "remember": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer."
+    },
+    "MATH-1P-U06-L03": {
+      "title": "J’écris une soustraction",
+      "objective": "Je peux utiliser − et =.",
+      "discover": "On veut noter rapidement le retrait des craies.",
+      "understand": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "remember": "Le signe − signifie « moins » ou « on enlève »."
+    },
+    "MATH-1P-U06-L04": {
+      "title": "Combien de plus ? de moins ?",
+      "objective": "Je peux trouver un écart.",
+      "discover": "Mimi a 7 graines et Sefu en a 4.",
+      "understand": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "remember": "Pour trouver l’écart, mets les objets en paires."
+    },
+    "MATH-1P-U06-L05": {
+      "title": "Addition ou soustraction ?",
+      "objective": "Je peux choisir l’opération adaptée.",
+      "discover": "Un problème raconte soit une arrivée, soit un départ.",
+      "understand": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "remember": "On additionne quand on réunit ou quand quelque chose arrive."
+    },
+    "MATH-1P-U07-L01": {
+      "title": "Onze à quinze",
+      "objective": "Je peux lire et former 11 à 15.",
+      "discover": "Un fagot contient 10 bâtonnets. On ajoute des bâtonnets seuls.",
+      "understand": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "remember": "Onze, c’est 10 et 1."
+    },
+    "MATH-1P-U07-L02": {
+      "title": "Seize à vingt",
+      "objective": "Je peux lire et former 16 à 20.",
+      "discover": "La classe compte vingt graines pour un jeu.",
+      "understand": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "remember": "Seize est 10 et 6."
+    },
+    "MATH-1P-U07-L03": {
+      "title": "Une dizaine et des unités",
+      "objective": "Je peux distinguer dizaine et unités.",
+      "discover": "On attache dix bâtonnets ensemble et on laisse les autres séparés.",
+      "understand": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "remember": "Un groupe de dix s’appelle une dizaine."
+    },
+    "MATH-1P-U07-L04": {
+      "title": "Je calcule et je partage",
+      "objective": "Je peux calculer et reconnaître double ou moitié.",
+      "discover": "Deux enfants reçoivent le même nombre de graines.",
+      "understand": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "remember": "Le double, c’est deux fois la même quantité."
+    },
+    "MATH-1P-U08-L01": {
+      "title": "Plus long ou plus court ?",
+      "objective": "Je peux comparer des longueurs.",
+      "discover": "Deux chemins relient la maison à l’école.",
+      "understand": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "remember": "Aligne les objets au même point de départ."
+    },
+    "MATH-1P-U08-L02": {
+      "title": "Je mesure avec une unité",
+      "objective": "Je peux répéter la même unité sans trou.",
+      "discover": "Kanku mesure un banc avec un même bâtonnet.",
+      "understand": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "remember": "Pour mesurer, on répète la même unité, sans trou ni chevauchement."
+    },
+    "MATH-1P-U08-L03": {
+      "title": "Plus lourd ou plus léger ?",
+      "objective": "Je peux comparer des masses.",
+      "discover": "Un petit sac de sable et une feuille sont posés dans les mains.",
+      "understand": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "remember": "L’objet qui pèse davantage est plus lourd."
+    },
+    "MATH-1P-U08-L04": {
+      "title": "Quel récipient contient le plus ?",
+      "objective": "Je peux comparer des capacités.",
+      "discover": "Deux récipients propres doivent transporter de l’eau.",
+      "understand": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "remember": "La capacité est la quantité qu’un récipient peut contenir."
+    },
+    "MATH-1P-U09-L01": {
+      "title": "Lignes droites et courbes",
+      "objective": "Je peux distinguer des types de lignes.",
+      "discover": "On observe une route droite, une rivière courbe et une clôture fermée.",
+      "understand": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "remember": "Une ligne droite ne tourne pas."
+    },
+    "MATH-1P-U09-L02": {
+      "title": "Carré, rectangle, triangle, cercle",
+      "objective": "Je peux reconnaître quatre formes.",
+      "discover": "Les formes apparaissent sur une fenêtre, un panneau et une assiette.",
+      "understand": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "remember": "Le triangle a 3 côtés."
+    },
+    "MATH-1P-U09-L03": {
+      "title": "Gauche, droite, haut, bas",
+      "objective": "Je peux décrire une position.",
+      "discover": "Un ballon est à gauche d’un arbre; un oiseau est en haut.",
+      "understand": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "remember": "Les mots de position dépendent du repère."
+    },
+    "MATH-1P-U09-L04": {
+      "title": "Je suis un chemin",
+      "objective": "Je peux suivre et décrire un déplacement.",
+      "discover": "Ayo doit aller de l’école au jardin sans quitter le chemin.",
+      "understand": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "remember": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite."
+    },
+    "MATH-1P-U10-L01": {
+      "title": "Ma journée et ma semaine",
+      "objective": "Je peux ordonner des moments et nommer les jours.",
+      "discover": "Avant l’école, Leya se prépare; après l’école, elle joue puis se repose.",
+      "understand": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "remember": "Une journée a des moments : matin, midi, après-midi, soir, nuit."
+    },
+    "MATH-1P-U10-L02": {
+      "title": "Je résous un défi",
+      "objective": "Je peux choisir une démarche et vérifier.",
+      "discover": "Au jardin, 8 tomates sont mûres. On en cueille 3, puis on apporte 2 paniers.",
+      "understand": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "remember": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase."
+    }
+  },
+  "questions": {
+    "MATH-1P-U01-L01-practice-1": {
+      "prompt": "Entoure l’intrus : rond, rond, carré, rond.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Le carré."
+    },
+    "MATH-1P-U01-L01-practice-2": {
+      "prompt": "Une petite mangue verte et une grande mangue verte : donne un point commun et une différence.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Même couleur; tailles différentes."
+    },
+    "MATH-1P-U01-L01-practice-3": {
+      "prompt": "Choisis deux objets pareils par la forme mais différents par la taille.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Deux formes identiques de tailles différentes."
+    },
+    "MATH-1P-U01-L01-manipulate": {
+      "prompt": "Choisis les deux bouchons de même couleur.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille."
+    },
+    "MATH-1P-U01-L01-play": {
+      "prompt": "Associe les deux cartes qui ont la même forme.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille."
+    },
+    "MATH-1P-U01-L01-check": {
+      "prompt": "Choisis deux objets pareils par la forme mais différents par la taille.",
+      "hint": "Deux objets sont pareils pour un critère lorsqu’ils ont la même propriété. Ils peuvent être pareils par la couleur et différents par la taille.",
+      "explanation": "Deux formes identiques de tailles différentes."
+    },
+    "MATH-1P-U01-L02-practice-1": {
+      "prompt": "Trie : cercle rouge, carré bleu, cercle bleu. Mets les cercles ensemble.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Les deux cercles ensemble; le carré à part."
+    },
+    "MATH-1P-U01-L02-practice-2": {
+      "prompt": "Avec les mêmes objets, trie maintenant par couleur : sélectionne les deux bleus.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Par couleur : les deux bleus ensemble."
+    },
+    "MATH-1P-U01-L02-practice-3": {
+      "prompt": "Un objet peut-il changer de groupe si la règle change ? Explique.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Oui. Un cercle bleu est avec les cercles selon la forme, puis avec les bleus selon la couleur."
+    },
+    "MATH-1P-U01-L02-manipulate": {
+      "prompt": "Sélectionne les bouchons rouges. Les autres restent à part.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle."
+    },
+    "MATH-1P-U01-L02-play": {
+      "prompt": "Panier bleu : sélectionne le bouchon bleu.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle."
+    },
+    "MATH-1P-U01-L02-check": {
+      "prompt": "Un objet peut-il changer de groupe si la règle change ? Explique.",
+      "hint": "Trier, c’est mettre ensemble les objets qui respectent une même règle. On annonce toujours la règle.",
+      "explanation": "Oui. Un cercle bleu est avec les cercles selon la forme, puis avec les bleus selon la couleur."
+    },
+    "MATH-1P-U01-L03-practice-1": {
+      "prompt": "Range grand, petit, moyen du plus petit au plus grand.",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "Petit, moyen, grand."
+    },
+    "MATH-1P-U01-L03-practice-2": {
+      "prompt": "Bâtons de 2, 5 et 3 cases : range-les.",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "2, 3, 5 cases."
+    },
+    "MATH-1P-U01-L03-practice-3": {
+      "prompt": "Deux objets ont la même taille. Lequel vient d’abord ?",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "L’un ou l’autre; ils sont de même taille."
+    },
+    "MATH-1P-U01-L03-manipulate": {
+      "prompt": "Touche les crayons du plus petit au plus grand.",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois."
+    },
+    "MATH-1P-U01-L03-play": {
+      "prompt": "Place les paniers du plus petit au plus grand.",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois."
+    },
+    "MATH-1P-U01-L03-check": {
+      "prompt": "Deux objets ont la même taille. Lequel vient d’abord ?",
+      "hint": "Classer, c’est placer dans un ordre. Pour aller du plus petit au plus grand, on compare deux objets à la fois.",
+      "explanation": "L’un ou l’autre; ils sont de même taille."
+    },
+    "MATH-1P-U01-L04-practice-1": {
+      "prompt": "Continue : cercle, carré, cercle, carré, …, …",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Cercle, carré."
+    },
+    "MATH-1P-U01-L04-practice-2": {
+      "prompt": "Continue : petit, petit, grand, petit, petit, grand, …",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Petit."
+    },
+    "MATH-1P-U01-L04-practice-3": {
+      "prompt": "Invente une frise avec deux couleurs différentes qui se répètent : A, B, A, B, A, B.",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Toute suite régulière expliquée est acceptée."
+    },
+    "MATH-1P-U01-L04-manipulate": {
+      "prompt": "Après graine, bouchon, graine, bouchon, choisis les deux objets suivants.",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer."
+    },
+    "MATH-1P-U01-L04-play": {
+      "prompt": "Répare la frise : ●, ■, ●, ■, __, __.",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer."
+    },
+    "MATH-1P-U01-L04-check": {
+      "prompt": "Invente une frise avec deux couleurs différentes qui se répètent : A, B, A, B, A, B.",
+      "hint": "Une suite suit une règle. On observe les premiers éléments, on nomme la règle, puis on continue sans la changer.",
+      "explanation": "Toute suite régulière expliquée est acceptée."
+    },
+    "MATH-1P-U02-L01-practice-1": {
+      "prompt": "Combien : ● ● ?",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "2."
+    },
+    "MATH-1P-U02-L01-practice-2": {
+      "prompt": "Dessine trois poissons à l’écran en ajoutant les poissons un à un.",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "Trois poissons dessinés."
+    },
+    "MATH-1P-U02-L01-practice-3": {
+      "prompt": "Montre trois de deux façons différentes avec deux groupes de graines.",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "Par exemple 3 doigts d’une main; 2 doigts et 1 doigt."
+    },
+    "MATH-1P-U02-L01-manipulate": {
+      "prompt": "Pose 3 graines en ligne et compte : 1, 2, 3.",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a."
+    },
+    "MATH-1P-U02-L01-play": {
+      "prompt": "Charge trois mangues dans la pirogue.",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a."
+    },
+    "MATH-1P-U02-L01-check": {
+      "prompt": "Montre trois de deux façons différentes avec deux groupes de graines.",
+      "hint": "Pour compter, touche chaque objet une seule fois. Le dernier mot-nombre dit combien il y en a.",
+      "explanation": "Par exemple 3 doigts d’une main; 2 doigts et 1 doigt."
+    },
+    "MATH-1P-U02-L02-practice-1": {
+      "prompt": "Complète : 1, 2, 3, __, 5.",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "4."
+    },
+    "MATH-1P-U02-L02-practice-2": {
+      "prompt": "Il y a 5 mangues. Cache-en 1. Combien vois-tu ?",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "4."
+    },
+    "MATH-1P-U02-L02-practice-3": {
+      "prompt": "Fais 5 avec deux petits groupes.",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "Exemples : 1 et 4; 2 et 3."
+    },
+    "MATH-1P-U02-L02-manipulate": {
+      "prompt": "Forme une ligne de 4 graines, puis ajoute-en une : tu obtiens 5.",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés."
+    },
+    "MATH-1P-U02-L02-play": {
+      "prompt": "Prépare un panier de quatre mangues.",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés."
+    },
+    "MATH-1P-U02-L02-check": {
+      "prompt": "Fais 5 avec deux petits groupes.",
+      "hint": "Quatre vient après trois. Cinq vient après quatre. Pour vérifier une quantité, on peut déplacer les objets déjà comptés.",
+      "explanation": "Exemples : 1 et 4; 2 et 3."
+    },
+    "MATH-1P-U02-L03-practice-1": {
+      "prompt": "Écris le nombre d’oiseaux dans un arbre vide.",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "0."
+    },
+    "MATH-1P-U02-L03-practice-2": {
+      "prompt": "Complète : 0, 1, 2, __, 4.",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "3."
+    },
+    "MATH-1P-U02-L03-practice-3": {
+      "prompt": "Musa a 2 craies et donne les 2. Combien lui en reste-t-il ?",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "0 craie."
+    },
+    "MATH-1P-U02-L03-manipulate": {
+      "prompt": "Vide une petite boîte, montre qu’elle contient 0 graine.",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1."
+    },
+    "MATH-1P-U02-L03-play": {
+      "prompt": "Ce panier porte 0 : vide-le entièrement.",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1."
+    },
+    "MATH-1P-U02-L03-check": {
+      "prompt": "Musa a 2 craies et donne les 2. Combien lui en reste-t-il ?",
+      "hint": "Zéro signifie qu’il n’y a aucun objet. Son chiffre est 0. Zéro est avant 1.",
+      "explanation": "0 craie."
+    },
+    "MATH-1P-U02-L04-practice-1": {
+      "prompt": "Relie « quatre » au bon chiffre.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "4."
+    },
+    "MATH-1P-U02-L04-practice-2": {
+      "prompt": "Écris les nombres de 0 à 5 dans l’ordre.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "0, 1, 2, 3, 4, 5."
+    },
+    "MATH-1P-U02-L04-practice-3": {
+      "prompt": "Complète les deux trous dans l’ordre : 0, 1, __, 3, __, 5.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "2 et 4."
+    },
+    "MATH-1P-U02-L04-manipulate": {
+      "prompt": "Carte 4 : ajoute quatre graines.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre."
+    },
+    "MATH-1P-U02-L04-play": {
+      "prompt": "Retourne la carte 5 : forme la bonne quantité.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre."
+    },
+    "MATH-1P-U02-L04-check": {
+      "prompt": "Complète les deux trous dans l’ordre : 0, 1, __, 3, __, 5.",
+      "hint": "Un même nombre peut être montré par des objets, des doigts, un dessin, un mot ou un chiffre.",
+      "explanation": "2 et 4."
+    },
+    "MATH-1P-U03-L01-practice-1": {
+      "prompt": "5 et encore 1 font combien ?",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "6."
+    },
+    "MATH-1P-U03-L01-practice-2": {
+      "prompt": "Dessine 7 points en deux groupes : 5 et __.",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "2."
+    },
+    "MATH-1P-U03-L01-practice-3": {
+      "prompt": "Trouve deux groupes qui font 6.",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "Exemples : 1 et 5; 2 et 4; 3 et 3."
+    },
+    "MATH-1P-U03-L01-manipulate": {
+      "prompt": "Pose 5 graines, puis 1 : compte 6. Ajoute encore 1 : compte 7.",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2."
+    },
+    "MATH-1P-U03-L01-play": {
+      "prompt": "Complète le pont de cinq planches pour en avoir six.",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2."
+    },
+    "MATH-1P-U03-L01-check": {
+      "prompt": "Trouve deux groupes qui font 6.",
+      "hint": "Six, c’est 5 et encore 1. Sept, c’est 5 et encore 2.",
+      "explanation": "Exemples : 1 et 5; 2 et 4; 3 et 3."
+    },
+    "MATH-1P-U03-L02-practice-1": {
+      "prompt": "Complète : 7, 8, __, 10.",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "9."
+    },
+    "MATH-1P-U03-L02-practice-2": {
+      "prompt": "5 graines et 3 graines font combien ?",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "8."
+    },
+    "MATH-1P-U03-L02-practice-3": {
+      "prompt": "Construis deux groupes égaux qui font dix.",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "5 et 5."
+    },
+    "MATH-1P-U03-L02-manipulate": {
+      "prompt": "Fais deux rangées de 5 graines : cela fait 10.",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0."
+    },
+    "MATH-1P-U03-L02-play": {
+      "prompt": "Remplis les dix cases du cadre.",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0."
+    },
+    "MATH-1P-U03-L02-check": {
+      "prompt": "Construis deux groupes égaux qui font dix.",
+      "hint": "Huit vient après 7, neuf après 8 et dix après 9. Dix s’écrit avec deux chiffres : 1 et 0.",
+      "explanation": "5 et 5."
+    },
+    "MATH-1P-U03-L03-practice-1": {
+      "prompt": "Après 6 vient __.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "7."
+    },
+    "MATH-1P-U03-L03-practice-2": {
+      "prompt": "Avant 9 vient __.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "8."
+    },
+    "MATH-1P-U03-L03-practice-3": {
+      "prompt": "Complète dans l’ordre : 10, 9, __, __, 6.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "8, 7."
+    },
+    "MATH-1P-U03-L03-manipulate": {
+      "prompt": "Touche les nombres de 2 à 8 dans l’ordre. Ensuite, redis-les en arrière.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent."
+    },
+    "MATH-1P-U03-L03-play": {
+      "prompt": "Le pion part de la case 2. Avance de deux cases vers la droite.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent."
+    },
+    "MATH-1P-U03-L03-check": {
+      "prompt": "Complète dans l’ordre : 10, 9, __, __, 6.",
+      "hint": "Compter en avant, c’est aller vers le nombre suivant. En arrière, c’est aller vers le nombre précédent.",
+      "explanation": "8, 7."
+    },
+    "MATH-1P-U03-L04-practice-1": {
+      "prompt": "Complète : 6 = 5 + __.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "1."
+    },
+    "MATH-1P-U03-L04-practice-2": {
+      "prompt": "Donne deux façons de faire 9.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "Par exemple 5 + 4 et 6 + 3."
+    },
+    "MATH-1P-U03-L04-practice-3": {
+      "prompt": "Construis dix avec deux groupes égaux.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "Oui : 5 et 5."
+    },
+    "MATH-1P-U03-L04-manipulate": {
+      "prompt": "Partage 8 graines en deux groupes de plusieurs façons.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3."
+    },
+    "MATH-1P-U03-L04-play": {
+      "prompt": "Ouvre deux portes dont les points font sept.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3."
+    },
+    "MATH-1P-U03-L04-check": {
+      "prompt": "Construis dix avec deux groupes égaux.",
+      "hint": "On peut construire un nombre avec deux groupes différents. Par exemple 7 = 5 + 2 et 7 = 4 + 3.",
+      "explanation": "Oui : 5 et 5."
+    },
+    "MATH-1P-U04-L01-practice-1": {
+      "prompt": "2 mangues et 2 oranges : autant, plus ou moins ?",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Autant."
+    },
+    "MATH-1P-U04-L01-practice-2": {
+      "prompt": "5 craies et 3 élèves : y a-t-il plus de craies ou d’élèves ?",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Plus de craies."
+    },
+    "MATH-1P-U04-L01-practice-3": {
+      "prompt": "Ajoute ce qu’il faut à 3 pour avoir autant que 5.",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Ajouter 2."
+    },
+    "MATH-1P-U04-L01-manipulate": {
+      "prompt": "Compare quatre bouchons et trois graines. Fais des paires avec ton doigt, puis choisis.",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus."
+    },
+    "MATH-1P-U04-L01-play": {
+      "prompt": "Ajoute des graines au panier de deux pour avoir autant que le panier de quatre.",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus."
+    },
+    "MATH-1P-U04-L01-check": {
+      "prompt": "Ajoute ce qu’il faut à 3 pour avoir autant que 5.",
+      "hint": "Mets un objet de chaque groupe en paire. S’il ne reste rien, il y en a autant. Sinon, le groupe où il reste des objets en a plus.",
+      "explanation": "Ajouter 2."
+    },
+    "MATH-1P-U04-L02-practice-1": {
+      "prompt": "Complète : 5 __ 5.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "=."
+    },
+    "MATH-1P-U04-L02-practice-2": {
+      "prompt": "2 + 1 __ 3.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "=."
+    },
+    "MATH-1P-U04-L02-practice-3": {
+      "prompt": "Construis une égalité avec quatre : 4 = un groupe + un autre groupe.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "Exemples : 4 = 4; 3 + 1 = 4."
+    },
+    "MATH-1P-U04-L02-manipulate": {
+      "prompt": "Construis deux groupes de trois graines.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité."
+    },
+    "MATH-1P-U04-L02-play": {
+      "prompt": "Ferme la balance qui montre une égalité.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité."
+    },
+    "MATH-1P-U04-L02-check": {
+      "prompt": "Construis une égalité avec quatre : 4 = un groupe + un autre groupe.",
+      "hint": "Le signe = se lit « est égal à ». Il dit que les deux côtés ont la même quantité.",
+      "explanation": "Exemples : 4 = 4; 3 + 1 = 4."
+    },
+    "MATH-1P-U04-L03-practice-1": {
+      "prompt": "Complète : 4 __ 2.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": ">."
+    },
+    "MATH-1P-U04-L03-practice-2": {
+      "prompt": "Complète : 3 __ 7.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": "<."
+    },
+    "MATH-1P-U04-L03-practice-3": {
+      "prompt": "Trouve un nombre : 5 < __ < 8.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": "6 ou 7."
+    },
+    "MATH-1P-U04-L03-manipulate": {
+      "prompt": "Compare six graines et trois graines, puis place le signe.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5."
+    },
+    "MATH-1P-U04-L03-play": {
+      "prompt": "Oriente la bouche ouverte vers six graines plutôt que trois.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5."
+    },
+    "MATH-1P-U04-L03-check": {
+      "prompt": "Trouve un nombre : 5 < __ < 8.",
+      "hint": "Le côté ouvert du signe regarde le plus grand nombre. La pointe regarde le plus petit : 5 > 2 et 2 < 5.",
+      "explanation": "6 ou 7."
+    },
+    "MATH-1P-U04-L04-practice-1": {
+      "prompt": "Range 3, 1, 2.",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "1, 2, 3."
+    },
+    "MATH-1P-U04-L04-practice-2": {
+      "prompt": "Range 8, 5, 10, 6.",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "5, 6, 8, 10."
+    },
+    "MATH-1P-U04-L04-practice-3": {
+      "prompt": "Quel nombre peut aller entre 4 et 6 ?",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "5."
+    },
+    "MATH-1P-U04-L04-manipulate": {
+      "prompt": "Range les cartes 5, 2, 4 : 2, 4, 5.",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent."
+    },
+    "MATH-1P-U04-L04-play": {
+      "prompt": "Replace les pierres numérotées du plus petit au plus grand.",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent."
+    },
+    "MATH-1P-U04-L04-check": {
+      "prompt": "Quel nombre peut aller entre 4 et 6 ?",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "5."
+    },
+    "MATH-1P-U05-L01-practice-1": {
+      "prompt": "1 ballon et 2 ballons font combien ?",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "3 ballons."
+    },
+    "MATH-1P-U05-L01-practice-2": {
+      "prompt": "4 cahiers et 3 cahiers font combien ?",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "7 cahiers."
+    },
+    "MATH-1P-U05-L01-practice-3": {
+      "prompt": "Deux groupes font 6. Donne une possibilité.",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "Par exemple 2 et 4."
+    },
+    "MATH-1P-U05-L01-manipulate": {
+      "prompt": "Réunis 2 graines et 3 graines : il y en a 5.",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis."
+    },
+    "MATH-1P-U05-L01-play": {
+      "prompt": "Réunis les fruits des deux paniers : cinq en tout.",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis."
+    },
+    "MATH-1P-U05-L01-check": {
+      "prompt": "Deux groupes font 6. Donne une possibilité.",
+      "hint": "Réunir deux groupes permet de trouver combien il y en a en tout. On compte tous les objets après les avoir réunis.",
+      "explanation": "Par exemple 2 et 4."
+    },
+    "MATH-1P-U05-L02-practice-1": {
+      "prompt": "2 chèvres, puis 1 arrive : combien ?",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "3 chèvres."
+    },
+    "MATH-1P-U05-L02-practice-2": {
+      "prompt": "5 enfants, puis 3 arrivent : combien ?",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "8 enfants."
+    },
+    "MATH-1P-U05-L02-practice-3": {
+      "prompt": "Il y en a 7 après l’arrivée de 2. Combien y en avait-il avant ?",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "5."
+    },
+    "MATH-1P-U05-L02-manipulate": {
+      "prompt": "Pose 3 graines. Ajoute 2 graines : compte 4, 5.",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets."
+    },
+    "MATH-1P-U05-L02-play": {
+      "prompt": "Cinq passagers sont à bord. Fais-en arriver trois pour avoir huit passagers.",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets."
+    },
+    "MATH-1P-U05-L02-check": {
+      "prompt": "Il y en a 7 après l’arrivée de 2. Combien y en avait-il avant ?",
+      "hint": "Quand des objets arrivent, la quantité augmente. On part de la quantité présente puis on compte les nouveaux objets.",
+      "explanation": "5."
+    },
+    "MATH-1P-U05-L03-practice-1": {
+      "prompt": "3 + 1 = __.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "4."
+    },
+    "MATH-1P-U05-L03-practice-2": {
+      "prompt": "5 + 4 = __.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "9."
+    },
+    "MATH-1P-U05-L03-practice-3": {
+      "prompt": "Complète : __ + 2 = 7.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "5."
+    },
+    "MATH-1P-U05-L03-manipulate": {
+      "prompt": "Montre 4 + 2 avec des graines et calcule 6.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5."
+    },
+    "MATH-1P-U05-L03-play": {
+      "prompt": "Assemble le wagon 5 et le wagon manquant pour obtenir 7.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5."
+    },
+    "MATH-1P-U05-L03-check": {
+      "prompt": "Complète : __ + 2 = 7.",
+      "hint": "Le signe + signifie « plus » ou « on ajoute ». On écrit les deux quantités, puis = et le total : 2 + 3 = 5.",
+      "explanation": "5."
+    },
+    "MATH-1P-U05-L04-practice-1": {
+      "prompt": "5 = 2 + __.",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "3."
+    },
+    "MATH-1P-U05-L04-practice-2": {
+      "prompt": "Donne trois façons de faire 7.",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "Par exemple 0+7, 1+6, 2+5."
+    },
+    "MATH-1P-U05-L04-practice-3": {
+      "prompt": "3 + 5 et 5 + 3 donnent-ils le même total ?",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "Oui, 8."
+    },
+    "MATH-1P-U05-L04-manipulate": {
+      "prompt": "8 peut être 5 + 3 ou 4 + 4.",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total."
+    },
+    "MATH-1P-U05-L04-play": {
+      "prompt": "Remplis deux paniers pour obtenir huit fruits.",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total."
+    },
+    "MATH-1P-U05-L04-check": {
+      "prompt": "3 + 5 et 5 + 3 donnent-ils le même total ?",
+      "hint": "Décomposer un nombre, c’est le former avec des parties. L’ordre des deux groupes ne change pas le total.",
+      "explanation": "Oui, 8."
+    },
+    "MATH-1P-U05-L05-practice-1": {
+      "prompt": "2 + __ = 5.",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "3."
+    },
+    "MATH-1P-U05-L05-practice-2": {
+      "prompt": "7 + __ = 10.",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "3."
+    },
+    "MATH-1P-U05-L05-practice-3": {
+      "prompt": "Un panier contient 4 fruits. Combien ajouter pour en avoir 9 ?",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "5 fruits."
+    },
+    "MATH-1P-U05-L05-manipulate": {
+      "prompt": "Pour aller de 6 à 10 : 7, 8, 9, 10. Il manque 4.",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant."
+    },
+    "MATH-1P-U05-L05-play": {
+      "prompt": "Sept planches sont posées. Ajoute juste assez pour en avoir dix.",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant."
+    },
+    "MATH-1P-U05-L05-check": {
+      "prompt": "Un panier contient 4 fruits. Combien ajouter pour en avoir 9 ?",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "5 fruits."
+    },
+    "MATH-1P-U06-L01-practice-1": {
+      "prompt": "4 mangues, on en donne 1 : reste ?",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "3 mangues."
+    },
+    "MATH-1P-U06-L01-practice-2": {
+      "prompt": "9 craies, on en utilise 3 : reste ?",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "6 craies."
+    },
+    "MATH-1P-U06-L01-practice-3": {
+      "prompt": "Il reste 5 après avoir enlevé 2. Combien y en avait-il ?",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "7."
+    },
+    "MATH-1P-U06-L01-manipulate": {
+      "prompt": "Pose 5 graines, enlève 2 : il reste 3.",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste."
+    },
+    "MATH-1P-U06-L01-play": {
+      "prompt": "Sers une commande de trois fruits sur neuf. Compte le reste.",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste."
+    },
+    "MATH-1P-U06-L01-check": {
+      "prompt": "Il reste 5 après avoir enlevé 2. Combien y en avait-il ?",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "7."
+    },
+    "MATH-1P-U06-L02-practice-1": {
+      "prompt": "Dessine 5 traits, barres-en 1. Combien restent ?",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "4."
+    },
+    "MATH-1P-U06-L02-practice-2": {
+      "prompt": "Sur 8 points, barres-en 3. Combien restent ?",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "5."
+    },
+    "MATH-1P-U06-L02-practice-3": {
+      "prompt": "Il reste 2 points sur 6. Combien ont été barrés ?",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "4."
+    },
+    "MATH-1P-U06-L02-manipulate": {
+      "prompt": "Dessine 6 ronds, barres-en 2 : il en reste 4.",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés."
+    },
+    "MATH-1P-U06-L02-play": {
+      "prompt": "Touche les deux poissons qui quittent la scène de sept poissons.",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés."
+    },
+    "MATH-1P-U06-L02-check": {
+      "prompt": "Il reste 2 points sur 6. Combien ont été barrés ?",
+      "hint": "Pour montrer un retrait sur un dessin, on barre les objets enlevés sans les effacer. On compte les objets non barrés.",
+      "explanation": "4."
+    },
+    "MATH-1P-U06-L03-practice-1": {
+      "prompt": "5 − 2 = __.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "3."
+    },
+    "MATH-1P-U06-L03-practice-2": {
+      "prompt": "10 − 4 = __.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "6."
+    },
+    "MATH-1P-U06-L03-practice-3": {
+      "prompt": "Complète : 9 − __ = 5.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "4."
+    },
+    "MATH-1P-U06-L03-manipulate": {
+      "prompt": "Montre 8 − 2 avec des graines : il reste 6.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4."
+    },
+    "MATH-1P-U06-L03-play": {
+      "prompt": "Retire quatre objets sur neuf.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4."
+    },
+    "MATH-1P-U06-L03-check": {
+      "prompt": "Complète : 9 − __ = 5.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "4."
+    },
+    "MATH-1P-U06-L04-practice-1": {
+      "prompt": "5 et 3 : combien de plus ?",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "2."
+    },
+    "MATH-1P-U06-L04-practice-2": {
+      "prompt": "9 et 6 : quel écart ?",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "3."
+    },
+    "MATH-1P-U06-L04-practice-3": {
+      "prompt": "Une équipe a 2 points de plus qu’une équipe qui en a 5. Combien a-t-elle ?",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "7 points."
+    },
+    "MATH-1P-U06-L04-manipulate": {
+      "prompt": "Mets mentalement les sept graines en paire avec les quatre autres. Écris le nombre sans partenaire.",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus."
+    },
+    "MATH-1P-U06-L04-play": {
+      "prompt": "Aligne sept joueurs avec quatre joueurs. Combien sont sans partenaire ?",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus."
+    },
+    "MATH-1P-U06-L04-check": {
+      "prompt": "Une équipe a 2 points de plus qu’une équipe qui en a 5. Combien a-t-elle ?",
+      "hint": "Pour trouver l’écart, mets les objets en paires. Les objets sans partenaire montrent combien il y en a de plus.",
+      "explanation": "7 points."
+    },
+    "MATH-1P-U06-L05-practice-1": {
+      "prompt": "6 fruits, on en mange 2 : quelle opération ?",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "Soustraction : 6 − 2 = 4."
+    },
+    "MATH-1P-U06-L05-practice-2": {
+      "prompt": "4 rouges et 3 verts : combien en tout ?",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "Addition : 4 + 3 = 7."
+    },
+    "MATH-1P-U06-L05-practice-3": {
+      "prompt": "Construis ton histoire pour 8 − 3 : choisis les objets, puis retire-en trois. Vérifie qu’il en reste cinq.",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "Toute histoire cohérente avec 5 comme reste."
+    },
+    "MATH-1P-U06-L05-manipulate": {
+      "prompt": "3 enfants sont là, 2 arrivent : 3 + 2 = 5.",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste."
+    },
+    "MATH-1P-U06-L05-play": {
+      "prompt": "Six mangues : deux sont mangées. Déplace les objets qui quittent la scène.",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste."
+    },
+    "MATH-1P-U06-L05-check": {
+      "prompt": "Construis ton histoire pour 8 − 3 : choisis les objets, puis retire-en trois. Vérifie qu’il en reste cinq.",
+      "hint": "On additionne quand on réunit ou quand quelque chose arrive. On soustrait quand on enlève, donne, perd ou cherche ce qui reste.",
+      "explanation": "Toute histoire cohérente avec 5 comme reste."
+    },
+    "MATH-1P-U07-L01-practice-1": {
+      "prompt": "10 + 2 = __.",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "12."
+    },
+    "MATH-1P-U07-L01-practice-2": {
+      "prompt": "Dans 15, il y a 10 et encore __.",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "5."
+    },
+    "MATH-1P-U07-L01-practice-3": {
+      "prompt": "Quel nombre est entre 12 et 14 ?",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "13."
+    },
+    "MATH-1P-U07-L01-manipulate": {
+      "prompt": "Fais un groupe de 10, puis ajoute 4 : tu formes 14.",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5."
+    },
+    "MATH-1P-U07-L01-play": {
+      "prompt": "Construis quinze avec un fagot de dix et des bâtons seuls.",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5."
+    },
+    "MATH-1P-U07-L01-check": {
+      "prompt": "Quel nombre est entre 12 et 14 ?",
+      "hint": "Onze, c’est 10 et 1. Douze, c’est 10 et 2, jusqu’à quinze, 10 et 5.",
+      "explanation": "13."
+    },
+    "MATH-1P-U07-L02-practice-1": {
+      "prompt": "10 + 7 = __.",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "17."
+    },
+    "MATH-1P-U07-L02-practice-2": {
+      "prompt": "Complète les deux trous dans l’ordre : 16, 17, __, 19, __.",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "18, 20."
+    },
+    "MATH-1P-U07-L02-practice-3": {
+      "prompt": "Combien de groupes de 10 dans 20 ?",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "2 groupes."
+    },
+    "MATH-1P-U07-L02-manipulate": {
+      "prompt": "Forme 18 avec un groupe de 10 et 8 unités.",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10."
+    },
+    "MATH-1P-U07-L02-play": {
+      "prompt": "Remplis les deux cadres de dix cases.",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10."
+    },
+    "MATH-1P-U07-L02-check": {
+      "prompt": "Combien de groupes de 10 dans 20 ?",
+      "hint": "Seize est 10 et 6. Dix-sept est 10 et 7. Vingt, c’est deux groupes de 10.",
+      "explanation": "2 groupes."
+    },
+    "MATH-1P-U07-L03-practice-1": {
+      "prompt": "14 = 1 dizaine et __ unités.",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "4."
+    },
+    "MATH-1P-U07-L03-practice-2": {
+      "prompt": "1 dizaine et 9 unités font __.",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "19."
+    },
+    "MATH-1P-U07-L03-practice-3": {
+      "prompt": "2 dizaines et 0 unité font combien ?",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "20."
+    },
+    "MATH-1P-U07-L03-manipulate": {
+      "prompt": "Représente 16 : une dizaine et six unités.",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités."
+    },
+    "MATH-1P-U07-L03-play": {
+      "prompt": "Ajoute dix unités, puis échange-les contre un fagot de dix.",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités."
+    },
+    "MATH-1P-U07-L03-check": {
+      "prompt": "2 dizaines et 0 unité font combien ?",
+      "hint": "Un groupe de dix s’appelle une dizaine. Les objets seuls sont des unités. Dans 13 : 1 dizaine et 3 unités.",
+      "explanation": "20."
+    },
+    "MATH-1P-U07-L04-practice-1": {
+      "prompt": "Double de 3 ?",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "6."
+    },
+    "MATH-1P-U07-L04-practice-2": {
+      "prompt": "Partage douze graines dans deux bols égaux : montre la moitié de douze.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "6."
+    },
+    "MATH-1P-U07-L04-practice-3": {
+      "prompt": "Partage quatorze graines dans deux bols égaux.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "7 graines."
+    },
+    "MATH-1P-U07-L04-manipulate": {
+      "prompt": "Partage 10 graines en deux parts égales : 5 et 5.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4."
+    },
+    "MATH-1P-U07-L04-play": {
+      "prompt": "Distribue dix graines dans deux bols, en parts égales.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4."
+    },
+    "MATH-1P-U07-L04-check": {
+      "prompt": "Partage quatorze graines dans deux bols égaux.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "7 graines."
+    },
+    "MATH-1P-U08-L01-practice-1": {
+      "prompt": "Une corde de 5 cases et une de 3 : laquelle est plus longue ?",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "Celle de 5 cases."
+    },
+    "MATH-1P-U08-L01-practice-2": {
+      "prompt": "Range 2, 6 et 4 cases du plus court au plus long.",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "2, 4, 6."
+    },
+    "MATH-1P-U08-L01-practice-3": {
+      "prompt": "Pourquoi faut-il aligner les départs ?",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "Pour comparer correctement les extrémités."
+    },
+    "MATH-1P-U08-L01-manipulate": {
+      "prompt": "Déplace les deux rubans jusqu’au même repère de départ.",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long."
+    },
+    "MATH-1P-U08-L01-play": {
+      "prompt": "Aligne les deux rubans au repère zéro.",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long."
+    },
+    "MATH-1P-U08-L01-check": {
+      "prompt": "Pourquoi faut-il aligner les départs ?",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "Pour comparer correctement les extrémités."
+    },
+    "MATH-1P-U08-L02-practice-1": {
+      "prompt": "Une ligne couvre 4 bâtonnets : mesure ?",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "4 bâtonnets."
+    },
+    "MATH-1P-U08-L02-practice-2": {
+      "prompt": "Peut-on changer de bâtonnet pendant la mesure ?",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "Non, l’unité doit rester la même."
+    },
+    "MATH-1P-U08-L02-practice-3": {
+      "prompt": "Deux enfants utilisent des unités différentes. Leurs nombres seront-ils forcément égaux ?",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "Non; une unité plus petite est répétée davantage."
+    },
+    "MATH-1P-U08-L02-manipulate": {
+      "prompt": "Couvre les quatre cases du cahier avec des unités identiques, bord à bord.",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure."
+    },
+    "MATH-1P-U08-L02-play": {
+      "prompt": "Pose cinq unités identiques, bord à bord, sur le chemin.",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure."
+    },
+    "MATH-1P-U08-L02-check": {
+      "prompt": "Deux enfants utilisent des unités différentes. Leurs nombres seront-ils forcément égaux ?",
+      "hint": "Pour mesurer, on répète la même unité, sans trou ni chevauchement. Le nombre d’unités donne la mesure.",
+      "explanation": "Non; une unité plus petite est répétée davantage."
+    },
+    "MATH-1P-U08-L03-practice-1": {
+      "prompt": "En général, lequel est plus lourd : une pierre ou une feuille ?",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "La pierre."
+    },
+    "MATH-1P-U08-L03-practice-2": {
+      "prompt": "Un gros sac vide peut-il être plus léger qu’un petit sac plein ?",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "Oui."
+    },
+    "MATH-1P-U08-L03-practice-3": {
+      "prompt": "Pourquoi la taille ne suffit-elle pas ?",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "Des matières différentes n’ont pas la même masse."
+    },
+    "MATH-1P-U08-L03-manipulate": {
+      "prompt": "Place la pierre et la feuille sur la balance. Observe, puis indique l’objet le plus lourd.",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille."
+    },
+    "MATH-1P-U08-L03-play": {
+      "prompt": "Pose la pierre et la feuille sur la balance et observe le plateau le plus bas.",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille."
+    },
+    "MATH-1P-U08-L03-check": {
+      "prompt": "Pourquoi la taille ne suffit-elle pas ?",
+      "hint": "L’objet qui pèse davantage est plus lourd. Une balance aide à comparer sans se fier seulement à la taille.",
+      "explanation": "Des matières différentes n’ont pas la même masse."
+    },
+    "MATH-1P-U08-L04-practice-1": {
+      "prompt": "Un seau contient-il en général plus qu’une tasse ?",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "Oui."
+    },
+    "MATH-1P-U08-L04-practice-2": {
+      "prompt": "Un bol prend 4 tasses et l’autre 6. Lequel contient le plus ?",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "Celui de 6 tasses."
+    },
+    "MATH-1P-U08-L04-practice-3": {
+      "prompt": "Pourquoi utiliser la même tasse ?",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "Pour garder la même unité de comparaison."
+    },
+    "MATH-1P-U08-L04-manipulate": {
+      "prompt": "Remplis le premier bol avec quatre tasses et le second avec six tasses de la même mesure.",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse."
+    },
+    "MATH-1P-U08-L04-play": {
+      "prompt": "Remplis les bols de quatre et six tasses avec la même petite mesure.",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse."
+    },
+    "MATH-1P-U08-L04-check": {
+      "prompt": "Pourquoi utiliser la même tasse ?",
+      "hint": "La capacité est la quantité qu’un récipient peut contenir. Pour comparer, on peut remplir avec la même petite tasse.",
+      "explanation": "Pour garder la même unité de comparaison."
+    },
+    "MATH-1P-U09-L01-practice-1": {
+      "prompt": "Le bord d’une règle est-il droit ou courbe ?",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Droit."
+    },
+    "MATH-1P-U09-L01-practice-2": {
+      "prompt": "Un cercle est-il une ligne ouverte ou fermée ?",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Fermée."
+    },
+    "MATH-1P-U09-L01-practice-3": {
+      "prompt": "Construis une courbe ouverte avec au moins trois points. Garde deux bouts distincts.",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Toute courbe avec deux extrémités distinctes."
+    },
+    "MATH-1P-U09-L01-manipulate": {
+      "prompt": "Touche au moins trois points pour construire une courbe ouverte. Les deux bouts doivent être distincts.",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts."
+    },
+    "MATH-1P-U09-L01-play": {
+      "prompt": "Choisis le chemin qui est une courbe ouverte.",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts."
+    },
+    "MATH-1P-U09-L01-check": {
+      "prompt": "Construis une courbe ouverte avec au moins trois points. Garde deux bouts distincts.",
+      "hint": "Une ligne droite ne tourne pas. Une ligne courbe tourne. Une ligne fermée revient à son départ; une ligne ouverte a deux bouts.",
+      "explanation": "Toute courbe avec deux extrémités distinctes."
+    },
+    "MATH-1P-U09-L02-practice-1": {
+      "prompt": "Quelle forme a 3 côtés ?",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Le triangle."
+    },
+    "MATH-1P-U09-L02-practice-2": {
+      "prompt": "Carré ou cercle : lequel a des côtés droits ?",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Le carré."
+    },
+    "MATH-1P-U09-L02-practice-3": {
+      "prompt": "Un carré a-t-il aussi 4 côtés comme un rectangle ?",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Oui; mais ses 4 côtés sont égaux."
+    },
+    "MATH-1P-U09-L02-manipulate": {
+      "prompt": "Touche le triangle parmi les quatre formes.",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit."
+    },
+    "MATH-1P-U09-L02-play": {
+      "prompt": "Assemble une maison : toit triangulaire, mur carré, porte rectangulaire et fenêtre ronde.",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit."
+    },
+    "MATH-1P-U09-L02-check": {
+      "prompt": "Un carré a-t-il aussi 4 côtés comme un rectangle ?",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Oui; mais ses 4 côtés sont égaux."
+    },
+    "MATH-1P-U09-L03-practice-1": {
+      "prompt": "Le ciel est-il en haut ou en bas sur un paysage ?",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "En haut."
+    },
+    "MATH-1P-U09-L03-practice-2": {
+      "prompt": "Place le bouchon à droite du crayon, selon le repère de l’écran.",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "Bouchon placé du côté droit."
+    },
+    "MATH-1P-U09-L03-practice-3": {
+      "prompt": "Si deux personnes se font face, leur droite pointe-t-elle du même côté ?",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "Non."
+    },
+    "MATH-1P-U09-L03-manipulate": {
+      "prompt": "Place le bouchon à gauche du crayon, selon le repère de l’écran.",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi."
+    },
+    "MATH-1P-U09-L03-play": {
+      "prompt": "Guide le personnage : deux cases à droite et une case vers le haut.",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi."
+    },
+    "MATH-1P-U09-L03-check": {
+      "prompt": "Si deux personnes se font face, leur droite pointe-t-elle du même côté ?",
+      "hint": "Les mots de position dépendent du repère. Ta gauche et ta droite ne changent pas quand tu regardes devant toi.",
+      "explanation": "Non."
+    },
+    "MATH-1P-U09-L04-practice-1": {
+      "prompt": "Suis : droite, droite, haut. Combien de déplacements ?",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "3."
+    },
+    "MATH-1P-U09-L04-practice-2": {
+      "prompt": "Départ case 1; avance de 3 cases. Où arrives-tu ?",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "Case 4."
+    },
+    "MATH-1P-U09-L04-practice-3": {
+      "prompt": "Deux chemins différents peuvent-ils mener au même endroit ?",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "Oui."
+    },
+    "MATH-1P-U09-L04-manipulate": {
+      "prompt": "Avance de deux cases vers la droite, puis monte d’une case.",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite."
+    },
+    "MATH-1P-U09-L04-play": {
+      "prompt": "Rejoins le jardin en haut à droite sans traverser les cases fermées.",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite."
+    },
+    "MATH-1P-U09-L04-check": {
+      "prompt": "Deux chemins différents peuvent-ils mener au même endroit ?",
+      "hint": "Pour décrire un déplacement, donne les actions dans l’ordre : avance, tourne à gauche, tourne à droite.",
+      "explanation": "Oui."
+    },
+    "MATH-1P-U10-L01-practice-1": {
+      "prompt": "Quel jour vient après mardi ?",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Mercredi."
+    },
+    "MATH-1P-U10-L01-practice-2": {
+      "prompt": "Range : soir, matin, après-midi.",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Matin, après-midi, soir."
+    },
+    "MATH-1P-U10-L01-practice-3": {
+      "prompt": "Si aujourd’hui est vendredi, quel jour sera demain ?",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Samedi."
+    },
+    "MATH-1P-U10-L01-manipulate": {
+      "prompt": "Touche les moments dans l’ordre : matin, après-midi, soir.",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche."
+    },
+    "MATH-1P-U10-L01-play": {
+      "prompt": "Replace le matin, le soir et la nuit dans l’ordre de la journée.",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche."
+    },
+    "MATH-1P-U10-L01-check": {
+      "prompt": "Si aujourd’hui est vendredi, quel jour sera demain ?",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Samedi."
+    },
+    "MATH-1P-U10-L02-practice-1": {
+      "prompt": "4 oiseaux et 2 arrivent. Combien ?",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "4 + 2 = 6 oiseaux."
+    },
+    "MATH-1P-U10-L02-practice-2": {
+      "prompt": "Partage douze graines également entre deux enfants.",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "6 graines chacun."
+    },
+    "MATH-1P-U10-L02-practice-3": {
+      "prompt": "Mina a 7 fruits, soit 2 de plus que Kito. Combien Kito en a-t-il ?",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "5 fruits."
+    },
+    "MATH-1P-U10-L02-manipulate": {
+      "prompt": "8 tomates, 3 cueillies : 8 − 3 = 5. Il reste 5 tomates.",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase."
+    },
+    "MATH-1P-U10-L02-play": {
+      "prompt": "Mission au jardin : cueille trois tomates sur huit et compte ce qui reste.",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase."
+    },
+    "MATH-1P-U10-L02-check": {
+      "prompt": "Mina a 7 fruits, soit 2 de plus que Kito. Combien Kito en a-t-il ?",
+      "hint": "Pour résoudre : écoute, cherche ce que l’on demande, représente avec des objets ou un dessin, calcule, puis réponds avec une phrase.",
+      "explanation": "5 fruits."
+    },
+    "MATH-1P-U04-L04-final-1": {
+      "prompt": "Range 9, 4, 7 et 2 du plus petit au plus grand.",
+      "hint": "Pour ranger du plus petit au plus grand, cherche d’abord le plus petit, puis recommence avec ceux qui restent.",
+      "explanation": "2, 4, 7, 9."
+    },
+    "MATH-1P-U05-L05-final-2": {
+      "prompt": "Complète : 6 + __ = 10.",
+      "hint": "Le complément est ce qu’il faut ajouter pour atteindre le total demandé. On peut compter en avant.",
+      "explanation": "Il faut ajouter quatre à six pour obtenir dix."
+    },
+    "MATH-1P-U06-L03-final-3": {
+      "prompt": "Calcule : 15 − 3.",
+      "hint": "Le signe − signifie « moins » ou « on enlève ». Exemple : 7 − 3 = 4.",
+      "explanation": "Quinze moins trois font douze."
+    },
+    "MATH-1P-U07-L04-final-4": {
+      "prompt": "Partage dix graines également entre deux enfants.",
+      "hint": "Le double, c’est deux fois la même quantité. La moitié est une des deux parts égales. Le double de 4 est 8; la moitié de 8 est 4.",
+      "explanation": "Cinq graines chacun."
+    },
+    "MATH-1P-U10-L01-final-5": {
+      "prompt": "Quel jour vient après dimanche ?",
+      "hint": "Une journée a des moments : matin, midi, après-midi, soir, nuit. La semaine suit l’ordre lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+      "explanation": "Après dimanche, c’est lundi."
+    },
+    "MATH-1P-U08-L01-final-6": {
+      "prompt": "Une corde mesure sept bâtonnets et une autre cinq. Laquelle est plus longue ?",
+      "hint": "Aligne les objets au même point de départ. Celui qui va le plus loin est le plus long.",
+      "explanation": "La corde de sept bâtonnets est plus longue."
+    },
+    "MATH-1P-U09-L02-final-7": {
+      "prompt": "Quelle forme a trois côtés ?",
+      "hint": "Le triangle a 3 côtés. Le carré a 4 côtés égaux. Le rectangle a 4 côtés avec deux longs et deux courts. Le cercle n’a pas de côté droit.",
+      "explanation": "Le triangle a trois côtés."
+    },
+    "MATH-1P-U06-L01-final-8": {
+      "prompt": "Awa a huit mangues et en donne deux. Retire-les puis compte ce qui reste.",
+      "hint": "Soustraire peut vouloir dire enlever. On part du tout, on retire la quantité annoncée, puis on compte ce qui reste.",
+      "explanation": "Huit moins deux font six mangues."
+    }
+  },
+  "activity": {
+    "question": "À toi de jouer",
+    "validate": "Vérifier ma réponse",
+    "success": "Bravo, tu as vérifié ta réponse !",
+    "validating": "Vérification…",
+    "validationUnavailable": "La vérification est indisponible. Réessaie.",
+    "objects": "{{count}} objets",
+    "empty": "Vide : 0",
+    "increase": "Ajouter — {{label}}",
+    "decrease": "Retirer — {{label}}",
+    "cards": "Cartes à ranger",
+    "order": "Mon rangement",
+    "reset": "Recommencer la manipulation",
+    "group": "Groupe {{number}}",
+    "answer": "Ma réponse",
+    "quantity": "Quantité",
+    "added": "{{count}} objets ajoutés",
+    "storyChoose": "Choisis les objets de ton histoire",
+    "removeObjects": "Objets à retirer",
+    "object": "Objet {{number}}",
+    "remaining": "Il reste {{count}} objets.",
+    "story": "Il y a {{total}} {{objects}}. J’en retire {{removed}}. Il en reste {{remaining}}.",
+    "way": "Façon {{number}}",
+    "bowl": "Bol {{number}}",
+    "pathPosition": "Pion en colonne {{column}}, ligne {{row}}. Jardin en colonne {{targetColumn}}, ligne {{targetRow}}. Obstacles (colonne, ligne) : {{walls}}.",
+    "left": "Aller à gauche",
+    "right": "Aller à droite",
+    "up": "Monter",
+    "down": "Descendre",
+    "screenReference": "Le repère est celui de l’écran : gauche ← ; droite →.",
+    "position": "Position du bouchon",
+    "gauche": "À gauche",
+    "droite": "À droite",
+    "haut": "En haut",
+    "bas": "En bas",
+    "placed": "Le bouchon est placé : {{position}}.",
+    "slot": "Case {{number}}",
+    "point": "Point {{number}}",
+    "unitInstruction": "Touche chaque case pour y poser une unité de même longueur. Les unités se touchent sans se chevaucher.",
+    "unit": "Poser ou retirer l’unité {{number}}",
+    "unitsPlaced": "{{count}} unités posées",
+    "referenceZero": "Repère de départ zéro",
+    "ribbon": "Décalage du ruban {{number}}",
+    "stone": "La pierre",
+    "leaf": "La feuille",
+    "stoneLower": "La pierre fait descendre son plateau : elle est plus lourde que la feuille.",
+    "scaleEmpty": "Place les objets sur les plateaux.",
+    "heaviest": "Quel objet est le plus lourd ?",
+    "container": "Bol {{number}} : capacité de {{count}} tasses",
+    "cups": "Tasses du bol {{number}}",
+    "tens": "Dizaines",
+    "units": "Unités",
+    "bundle": "Un fagot de dix bâtonnets",
+    "exchange": "Échanger dix unités contre une dizaine",
+    "roof": "Le toit",
+    "wall": "Le mur",
+    "door": "La porte",
+    "window": "La fenêtre",
+    "circle": "Cercle ○",
+    "square": "Carré □",
+    "triangle": "Triangle △",
+    "rectangle": "Rectangle ▭",
+    "questionProgress": "Question {{current}} sur {{total}}",
+    "nextQuestion": "Question suivante",
+    "leftObject": "Objet {{number}} à gauche",
+    "rightObject": "Objet {{number}} à droite",
+    "makePair": "Associer la paire {{number}}",
+    "noPartner": "Sans partenaire",
+    "compare": "Compare les groupes",
+    "difference": "Combien restent sans partenaire ?",
+    "retryQuestion": "Refaire cette question",
+    "noObstacles": "aucun",
+    "traceGrid": "Les points sont rangés en trois lignes : 1, 2, 3 en haut ; 4, 5, 6 au milieu ; 7, 8, 9 en bas."
   }
 }

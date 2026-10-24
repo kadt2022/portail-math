@@ -6,12 +6,15 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import {
   getLearningItems,
   PRIMARY_ONE_MODULES,
+  questionsForStep,
 } from "./course-catalogue";
 import {
   completeLearningStep,
   createEmptyCourseProgress,
   type CourseProgress,
 } from "./course-progress";
+import { recordResponse } from "./learning-results";
+import { solutionResponse } from "./exercise-model";
 import { PrimaryOneModulePage } from "./PrimaryOneModulePage";
 import { createLocalCourseProgressStorage } from "./progress-storage";
 
@@ -34,7 +37,10 @@ function renderModule(moduleId: string) {
 
 function completeItem(progress: CourseProgress, item: ReturnType<typeof getLearningItems>[number]) {
   return item.steps.reduce(
-    (current, step) => completeLearningStep(current, item, step.id),
+    (current, step) => {
+      questionsForStep(item,step).forEach((q) => recordResponse(q,solutionResponse(q)));
+      return completeLearningStep(current,item,step.id);
+    },
     progress,
   );
 }
@@ -73,7 +79,7 @@ describe("Page d'un module de 1re primaire", () => {
 
     const firstCard = screen.getAllByRole("article")[0];
     expect(within(firstCard).getByText("En cours")).toBeInTheDocument();
-    expect(within(firstCard).getByText("1 étapes sur 3")).toBeInTheDocument();
+    expect(within(firstCard).getByText("1 étapes sur 6")).toBeInTheDocument();
     expect(within(firstCard).getByRole("link", { name: /reprendre/i })).toBeInTheDocument();
   });
 
@@ -94,16 +100,14 @@ describe("Page d'un module de 1re primaire", () => {
     );
   });
 
-  it("signale clairement un module dont les activités restent à intégrer", () => {
+  it("présente les leçons et l’évaluation du deuxième module", () => {
     renderModule(PRIMARY_ONE_MODULES[1].id);
 
     expect(
       screen.getByRole("heading", { level: 1, name: /je compte jusqu'à 5/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /contenu pédagogique à compléter/i }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(5);
+    expect(screen.getByRole("heading",{name:"Un, deux et trois"})).toBeInTheDocument();
   });
 
   it("affiche un retour sûr lorsqu'un identifiant de module est inconnu", () => {

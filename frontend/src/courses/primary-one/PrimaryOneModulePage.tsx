@@ -18,6 +18,8 @@ import {
 } from "./course-progress";
 import styles from "./PrimaryOneCourse.module.css";
 import { useCourseProgress } from "./useCourseProgress";
+import { AssessmentResult } from "./AssessmentResult";
+import { EVALUATIONS } from "./lesson-content";
 
 interface LearningCardProps {
   item: LearningItem;
@@ -153,6 +155,7 @@ export function PrimaryOneModulePage() {
         </section>
       )}
 
+      {progress.items[module.evaluation.id] ? <AssessmentResult questions={EVALUATIONS[module.evaluation.id]} /> : null}
       <div className={styles.moduleFooterActions}>
         <Link className={styles.secondaryAction} to={PRIMARY_ONE_BASE_PATH}>
           <CourseActionIcon className={styles.actionIcon} name="return-to-modules" />
