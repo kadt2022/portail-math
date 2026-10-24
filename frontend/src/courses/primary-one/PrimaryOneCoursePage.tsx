@@ -7,6 +7,7 @@ import {
   lessonPath,
   modulePath,
   PRIMARY_ONE_MODULES,
+  PRIMARY_ONE_FINAL,
 } from "./course-catalogue";
 import {
   getCoursePrimaryAction,
@@ -82,6 +83,10 @@ export function PrimaryOneCoursePage() {
         </div>
       </section>
 
+      <section className={styles.moduleHero} aria-label={t("evaluation.finalTitle")}>
+        <div><h2>{t("evaluation.finalTitle")}</h2><p>{t("evaluation.finalLead")}</p></div>
+        <Link className={styles.primaryAction} to={lessonPath(PRIMARY_ONE_FINAL.moduleId,PRIMARY_ONE_FINAL.id)}>{t("evaluation.startFinal")}</Link>
+      </section>
       <section className={styles.modulesSection} aria-labelledby="modules-title">
         <div className={styles.sectionHeading}>
           <div>

@@ -16,6 +16,8 @@ import type { LearningState } from "../course-engine/course-model";
 import {
   PRIMARY_ONE_COURSE_ID,
   PRIMARY_ONE_MODULES,
+  PRIMARY_ONE_FINAL,
+  getAllLearningItems,
   type LearningItem,
   type PrimaryOneModule,
 } from "./course-catalogue";
@@ -52,7 +54,11 @@ export function getModuleProgress(
 }
 
 export function getCourseProgress(progress: CourseProgress): CourseProgressSummary {
-  return getGenericCourseProgress(progress, PRIMARY_ONE_DEFINITION);
+  const summary = getGenericCourseProgress(progress, PRIMARY_ONE_DEFINITION);
+  const items = getAllLearningItems();
+  const completedItems = items.filter((i) => getLearningState(progress,i) === "completed").length;
+  return { ...summary, percentage: Math.round(completedItems / items.length * 1000) / 10,
+    completed: summary.completed && getLearningState(progress,PRIMARY_ONE_FINAL) === "completed" };
 }
 
 export function startLearningItem(
@@ -73,5 +79,13 @@ export function completeLearningStep(
 }
 
 export function getCoursePrimaryAction(progress: CourseProgress): CoursePrimaryAction {
-  return getGenericCoursePrimaryAction(progress, PRIMARY_ONE_DEFINITION);
+  const all = getAllLearningItems();
+  const active = all.filter((i) => getLearningState(progress,i) === "in-progress").sort((a,b) => progress.items[b.id].lastActivityAt.localeCompare(progress.items[a.id].lastActivityAt))[0];
+  if (active) return { type: "resume", moduleId: active.moduleId, itemId: active.id };
+  const next = all.find((i) => getLearningState(progress,i) !== "completed");
+  if (!next) return { type: "review", moduleId: all[0].moduleId, itemId: all[0].id };
+  const generic = getGenericCoursePrimaryAction(progress, PRIMARY_ONE_DEFINITION);
+  if (generic.type === "start") return generic;
+  if (generic.type === "next-module" && generic.moduleId === next.moduleId) return generic;
+  return { type: "next-lesson", moduleId: next.moduleId, itemId: next.id };
 }
