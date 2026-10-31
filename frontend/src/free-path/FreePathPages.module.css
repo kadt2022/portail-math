@@ -3,7 +3,8 @@
 .page p { line-height:1.6; }
 
 .hero { min-height:clamp(240px,25vw,340px); position:relative; isolation:isolate; display:flex; align-items:center; gap:20px; overflow:hidden; padding:clamp(20px,3.5vw,36px); margin-bottom:56px; border-radius:20px; background:linear-gradient(100deg,#e6f5ef 0%,#e5edf1 45%,#f6f8f9 100%); box-shadow:0 5px 20px rgb(52 40 20 / 6%); }
-.hero::after { content:""; position:absolute; z-index:-1; inset:0; background:url("../assets/dashboard/free-path-etudiants.webp") right center / auto 100% no-repeat; opacity:.42; -webkit-mask-image:linear-gradient(to right,transparent 30%,#000 62%); mask-image:linear-gradient(to right,transparent 30%,#000 62%); pointer-events:none; }
+/* La zone de la photo suit son ratio (2:1) : le fondu part du bord de la photo, sans séparateur visible. */
+.hero::after { content:""; position:absolute; z-index:-1; inset:0 0 0 auto; aspect-ratio:2 / 1; background:url("../assets/dashboard/free-path-etudiants.webp") center / cover no-repeat; opacity:.42; -webkit-mask-image:linear-gradient(to right,transparent 0,rgb(0 0 0 / 40%) 25%,#000 60%); mask-image:linear-gradient(to right,transparent 0,rgb(0 0 0 / 40%) 25%,#000 60%); pointer-events:none; }
 .hero > div { max-width:62%; }
 .hero h1 { margin:0 0 8px; color:#082a38; font-size:clamp(24px,3.4vw,38px); line-height:1.2; letter-spacing:-.03em; overflow-wrap:anywhere; }
 .hero p { max-width:66ch; margin:0; color:#4d5b63; }
@@ -45,7 +46,7 @@
 @media (max-width:699px) { .grid { grid-template-columns:1fr; } }
 @media (max-width:699px) {
   .hero { min-height:0; }
-  .hero::after { background-size:100% auto; background-position:top; -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent); mask-image:linear-gradient(to bottom,#000 55%,transparent); }
+  .hero::after { inset:0 0 auto 0; aspect-ratio:auto; height:auto; min-height:60%; background-size:100% auto; background-position:top; -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent); mask-image:linear-gradient(to bottom,#000 55%,transparent); }
   .hero > div { max-width:none; }
 }
 @media (prefers-reduced-motion:reduce) { .card { transition:none; } .card:hover { transform:none; } }
