@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
 import styles from "./FreePathPages.module.css";
 
-// Tests de raisonnement propres à Mbuyamba (aucun diplôme, aucune certification) et EXETAT,
+// Tests de raisonnement propres à Mbuyamba et EXETAT,
 // qui conserve sa route existante. Sans route, un test s'affiche en « Contenu à venir » et n'est pas cliquable.
 // Ajouter un test = une entrée ici + ses textes dans freePath.json.
 const preparations: { id: string; route?: string; icon: PortalIconName; comingSoon: boolean; tone: string }[] = [
@@ -54,7 +54,6 @@ export function FreePathPage() {
         <PortalIcon name="brain" />
         <div>
           <strong>{t("other.text")}</strong>
-          <p>{t("notice")}</p>
         </div>
       </aside>
     </div>

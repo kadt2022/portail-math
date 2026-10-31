@@ -22,11 +22,11 @@ describe("Parcours libre", () => {
   expect(within(cards[3]).getByText(language === "fr" ? "Disponible" : "Available")).toBeInTheDocument();
   expect(screen.queryByText(/GRE|SAT|ACT|TOEFL|IELTS/)).not.toBeInTheDocument();
  });
- it("précise que les tests ne délivrent ni diplôme ni certification, sans appel API ni progression enregistrée", () => {
+ it("n'appelle aucune API et n'enregistre aucune progression", () => {
   const fetch = vi.fn(); vi.stubGlobal("fetch", fetch);
   const storage = vi.spyOn(Storage.prototype, "setItem");
   render(<MemoryRouter><FreePathPage /></MemoryRouter>);
-  expect(screen.getByText(/ne délivrent ni diplôme ni certification/)).toBeInTheDocument();
+  expect(screen.getByText("D’autres tests arriveront bientôt.")).toBeInTheDocument();
   expect(fetch).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled(); storage.mockRestore();
  });
  it("présente le Parcours libre comme section propre, hors des cartes primaire et secondaire", () => {
