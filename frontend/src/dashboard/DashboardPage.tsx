@@ -82,11 +82,11 @@ export function DashboardPage() {
           </div>
           <Link to="/parcours-libre" className={styles.freePath}>
             <PortalIcon name="cap" />
-            <div>
+            <div className={styles.freePathCopy}>
               <h2>{t("home.freePath.title")}</h2>
               <p>{t("home.freePath.description")}</p>
-              <strong>{t("home.freePath.action")} →</strong>
             </div>
+            <strong className={styles.freePathAction}>{t("home.freePath.action")} →</strong>
           </Link>
         </section>
 

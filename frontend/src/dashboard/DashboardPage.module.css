@@ -1,5 +1,5 @@
 .page { padding: 12px 0 0; color: #082a38; }
-.topGrid { display: grid; grid-template-columns: 1.16fr 1fr; gap: 14px; align-items: stretch; }
+.topGrid { display: grid; grid-template-columns: 1.16fr 1fr; gap: 14px; align-items: start; }
 .pathways, .welcome, .banner { border-radius: 20px; overflow: hidden; box-shadow: 0 5px 20px rgb(52 40 20 / 6%); }
 .pathways { display: flex; flex-direction: column; padding: 18px; background: #fff; }
 .sectionHeading { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
@@ -115,7 +115,7 @@ a.level:focus-visible { outline: 3px solid #246b75; outline-offset: 2px; }
   .welcomeTitleRow h2 { font-size: 24px; }
   .orangeButton { min-height: 38px; font-size: 12px; }
 }
-@media (max-width: 1399px) {
+@media (max-width: 1099px) {
   .topGrid { grid-template-columns: 1fr; }
   .sectionHeading h1 { font-size: 30px; }
   .welcome { display: grid; grid-template-columns: 1fr 1fr; }
@@ -123,6 +123,8 @@ a.level:focus-visible { outline: 3px solid #246b75; outline-offset: 2px; }
   .welcomeContent { display: flex; flex-direction: column; justify-content: center; padding: 24px 24px 24px 8px; }
   .welcomeTitleRow { align-items: flex-start; flex-direction: column; }
   .welcomeTitleRow h2 { font-size: 26px; }
+}
+@media (max-width: 1399px) {
   .featureGrid { grid-template-columns: 1fr 1fr; }
   .library { grid-column: 1 / -1; }
   .feature h2 { font-size: 16px; }
@@ -201,9 +203,13 @@ a.level:focus-visible { outline: 3px solid #246b75; outline-offset: 2px; }
 
 .sectionHeading .iconBadge { background: linear-gradient(135deg, #315475, #246b75); }
 
-.freePath { display:flex; gap:14px; margin-top:14px; padding:18px; border-radius:19px; background:#e6f5ef; color:#246b75; text-decoration:none; }
+.freePath { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 16px; border-radius: 19px; background: #e6f5ef; color: #246b75; text-decoration: none; }
 .freePath > svg { width:36px; height:36px; flex:0 0 auto; }
 .freePath h2 { margin:0 0 8px; font-size:20px; }
-.freePath p { color:#5f6f77; line-height:1.6; }
+.freePath p { margin: 0; color: #5f6f77; font-size: 13px; line-height: 1.5; }
 .freePath:hover { background:#d6eee5; }
 .freePath:focus-visible { outline:3px solid #246b75; outline-offset:3px; }
+
+.freePathCopy { flex: 1; min-width: 0; }
+.freePathAction { flex: 0 0 auto; padding: 10px 12px; border-radius: 10px; background: #246b75; color: white; font-size: 12px; }
+@media (max-width: 599px) { .freePath { flex-wrap: wrap; } .freePathAction { margin-left: 48px; } }
