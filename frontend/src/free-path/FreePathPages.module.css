@@ -45,8 +45,10 @@
 @media (max-width:899px) { .soonGrid { grid-template-columns:1fr; } }
 @media (max-width:699px) { .grid { grid-template-columns:1fr; } }
 @media (max-width:699px) {
-  .hero { min-height:0; }
-  .hero::after { inset:0 0 auto 0; aspect-ratio:auto; height:auto; min-height:60%; background-size:100% auto; background-position:top; -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent); mask-image:linear-gradient(to bottom,#000 55%,transparent); }
+  /* Téléphone : la photo devient un bandeau net au-dessus du texte, plus de texte posé sur l'image. */
+  .hero { min-height:0; align-items:stretch; flex-direction:column; gap:14px; padding:0 20px 24px; margin-bottom:28px; }
+  .hero::after { display:none; }
+  .hero::before { content:""; display:block; align-self:stretch; margin:0 -20px; aspect-ratio:2 / 1; background:url("../assets/dashboard/free-path-etudiants.webp") center / cover no-repeat; -webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent); mask-image:linear-gradient(to bottom,#000 72%,transparent); }
   .hero > div { max-width:none; }
 }
 @media (prefers-reduced-motion:reduce) { .card { transition:none; } .card:hover { transform:none; } }
