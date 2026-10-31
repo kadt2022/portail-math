@@ -11,7 +11,8 @@
   --sidebar-muted: #63758b;
   --sidebar-accent: #476b94;
   --sidebar-hover: #f1f5fa;
-  --sidebar-panel: #f7f9fc;
+  /* Fond des sous-menus : un niveau plus clair que le fond du menu. */
+  --sidebar-panel: #ffffff;
   --sidebar-active: #e8f0fa;
   --sidebar-active-ink: #244f7e;
   position: fixed;
@@ -76,7 +77,7 @@
 
 .navSection .coursePanel {
   margin-left: 0;
-  background: transparent;
+  background: var(--sidebar-panel);
 }
 
 .link {

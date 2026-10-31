@@ -1,0 +1,50 @@
+{
+  "section": {
+    "title": "Parcours libre",
+    "description": "Teste tes connaissances, développe ton raisonnement et prépare tes examens.",
+    "action": "Explorer le parcours libre"
+  },
+  "title": "Parcours libre",
+  "description": "Mesure tes acquis avec les tests Mbuyamba, ou prépare un examen officiel.",
+  "other": {
+    "text": "D’autres tests arriveront bientôt."
+  },
+  "discover": "Découvrir la préparation",
+  "comingSoon": "Contenu à venir",
+  "available": "Disponible",
+  "trm": {
+    "title": "TRM — Test de Raisonnement Mathématique",
+    "description": "Vérifie ta logique : suites, proportions et problèmes à étapes."
+  },
+  "qmt": {
+    "title": "QMT — Test Quantitatif Mbuyamba",
+    "description": "Mesure ton aisance avec les nombres, les pourcentages et les données."
+  },
+  "mbd": {
+    "title": "MBD — Mesure des Bases et de la Déduction",
+    "description": "Teste tes bases et ta capacité à raisonner sur des problèmes nouveaux."
+  },
+  "exetat": {
+    "title": "EXETAT — Examen d’État",
+    "description": "Préparation aux épreuves de mathématiques de l’Examen d’État de la RDC."
+  },
+  "choose": {
+    "open": "Ouvrir",
+    "tests": {
+      "title": "Tests de raisonnement",
+      "description": "Les tests Mbuyamba mesurent ce que tu as retenu sous différents angles : logique, calcul et bases."
+    },
+    "exams": {
+      "title": "Préparations aux examens",
+      "description": "Prépare un examen officiel, comme l’Examen d’État de la RDC."
+    }
+  },
+  "testsPage": {
+    "title": "Tests de raisonnement",
+    "description": "Après tes apprentissages, mesure ce que tu as retenu sous différents angles."
+  },
+  "examsPage": {
+    "title": "Préparations aux examens",
+    "description": "Prépare les examens officiels à ton rythme."
+  }
+}

@@ -15,7 +15,8 @@
     "library": "Library",
     "games": "Games",
     "progress": "My progress",
-    "about": "About"
+    "about": "About",
+    "freePath": "Free learning path"
   },
   "navGroups": {
     "learning": "Learning",
@@ -116,5 +117,11 @@
     "promiseQuote": "One environment to learn in class, continue at home, and follow the student's progress.",
     "welcome": "Welcome to Mbuyamba.",
     "closing": "Learn. Explore. Try. Try again. Progress."
+  },
+  "freePathMenu": {
+    "label": "Free learning path",
+    "sections": "Free learning path sections",
+    "tests": "Reasoning tests",
+    "exams": "Exam preparation"
   }
 }

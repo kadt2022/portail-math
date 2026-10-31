@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type PortalIconName = "home" | "book" | "school" | "cap" | "file" | "library" | "game" | "progress" | "lock" | "info";
+export type PortalIconName = "home" | "book" | "school" | "cap" | "file" | "library" | "game" | "progress" | "lock" | "info" | "compass" | "brain" | "calculator" | "bulb";
 
 export function PortalIcon({ name, className }: { name: PortalIconName; className?: string }) {
   const paths: Record<PortalIconName, ReactNode> = {
@@ -14,6 +14,10 @@ export function PortalIcon({ name, className }: { name: PortalIconName; classNam
     progress: <><path d="M4 20v-5h3v5M11 20v-9h3v9M18 20V6h3v14M3 10l6-5 5 2 6-5M17 2h3v3" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3" /></>,
     info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.1" /></>,
+    compass: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" /></>,
+    brain: <><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a3 3 0 0 0-3-1ZM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1M9 9h1m4 0h1M9 14h1m4 0h1" /></>,
+    calculator: <><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01" /></>,
+    bulb: <><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3Z" /></>,
   };
   return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{paths[name]}</svg>;
 }

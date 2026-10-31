@@ -1,0 +1,50 @@
+{
+  "section": {
+    "title": "Free learning path",
+    "description": "Test your knowledge, develop your reasoning and prepare for your exams.",
+    "action": "Explore the free learning path"
+  },
+  "title": "Free learning path",
+  "description": "Measure what you know with the Mbuyamba tests, or prepare for an official exam.",
+  "other": {
+    "text": "More tests are coming soon."
+  },
+  "discover": "Explore preparation",
+  "comingSoon": "Content coming soon",
+  "available": "Available",
+  "trm": {
+    "title": "TRM — Mathematical Reasoning Test",
+    "description": "Check your logic: sequences, proportions and multi-step problems."
+  },
+  "qmt": {
+    "title": "QMT — Mbuyamba Quantitative Test",
+    "description": "Measure how comfortable you are with numbers, percentages and data."
+  },
+  "mbd": {
+    "title": "MBD — Foundations and Deduction Measure",
+    "description": "Test your foundations and your ability to reason on new problems."
+  },
+  "exetat": {
+    "title": "EXETAT — State Examination",
+    "description": "Preparation for the mathematics papers of the DRC State Examination."
+  },
+  "choose": {
+    "open": "Open",
+    "tests": {
+      "title": "Reasoning tests",
+      "description": "The Mbuyamba tests measure what you have retained from different angles: logic, calculation and foundations."
+    },
+    "exams": {
+      "title": "Exam preparation",
+      "description": "Prepare for an official exam, such as the DRC State Examination."
+    }
+  },
+  "testsPage": {
+    "title": "Reasoning tests",
+    "description": "After your lessons, measure what you have retained from different angles."
+  },
+  "examsPage": {
+    "title": "Exam preparation",
+    "description": "Prepare for official exams at your own pace."
+  }
+}

@@ -1,6 +1,8 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import freePathEn from "./locales/en/freePath.json";
+import freePathFr from "./locales/fr/freePath.json";
 import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import exetatEn from "./locales/en/exetat.json";
@@ -34,6 +36,7 @@ void i18next
     fallbackLng: FALLBACK_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,
     ns: [
+      "freePath",
       "common",
       "dashboard",
       "exetat",
@@ -51,6 +54,7 @@ void i18next
     },
     resources: {
       fr: {
+        freePath: freePathFr,
         common: commonFr,
         dashboard: dashboardFr,
         exetat: exetatFr,
@@ -63,6 +67,7 @@ void i18next
         primaryFour: primaryFourFr,
       },
       en: {
+        freePath: freePathEn,
         common: commonEn,
         dashboard: dashboardEn,
         exetat: exetatEn,

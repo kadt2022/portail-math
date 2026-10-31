@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
@@ -22,6 +22,11 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
   const primaryActive = location.pathname.startsWith("/apprentissages/primaire/");
   const [primaryOpen, setPrimaryOpen] = useState(primaryActive);
   const [secondaryOpen, setSecondaryOpen] = useState(false);
+  const navigate = useNavigate();
+  const examsSelected = location.pathname.startsWith("/exetat") || location.pathname.startsWith("/parcours-libre/examens");
+  const testsSelected = location.pathname.startsWith("/parcours-libre/tests");
+  const freePathActive = location.pathname.startsWith("/parcours-libre") || examsSelected;
+  const [freePathOpen, setFreePathOpen] = useState(freePathActive);
   const [previousPath, setPreviousPath] = useState(location.pathname);
 
   // Le layout reste monté pendant la navigation : ouvrir aussi le groupe
@@ -29,13 +34,13 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
   if (previousPath !== location.pathname) {
     setPreviousPath(location.pathname);
     if (primaryActive) setPrimaryOpen(true);
+    if (freePathActive) setFreePathOpen(true);
   }
 
 
   const [dashboardLink, ...remainingLinks] = navigationLinks;
-  const learningLinks = remainingLinks.filter((link) => link.to === "/exetat");
-  const resourceLinks = remainingLinks.filter((link) => ["/bibliotheque", "/jeux"].includes(link.to));
-  const referenceLinks = remainingLinks.filter((link) => !["/exetat", "/bibliotheque", "/jeux"].includes(link.to));
+    const resourceLinks = remainingLinks.filter((link) => ["/bibliotheque", "/jeux"].includes(link.to));
+  const referenceLinks = remainingLinks.filter((link) => !["/parcours-libre", "/exetat", "/bibliotheque", "/jeux"].includes(link.to));
 
   const linkIcons: Record<string, PortalIconName> = { "/": "home", "/exetat": "file", "/bibliotheque": "library", "/jeux": "game", "/progression": "progress", "/a-propos": "info" };
 
@@ -152,7 +157,50 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
                 </div>
               ) : null}
             </div>
-            {learningLinks.map((link) => renderPortalLink(link))}
+
+            <div className={styles.courseGroup}>
+              <button
+                type="button"
+                className={`${styles.link} ${styles.courseMenuButton}${freePathActive ? ` ${styles.linkActive}` : ""}`}
+                aria-label={t("freePathMenu.sections")}
+                aria-expanded={freePathOpen && !collapsed}
+                title={collapsed ? t("freePathMenu.label") : undefined}
+                // Un clic amène à la page de choix ; un second clic depuis cette page replie le groupe.
+                onClick={() => {
+                  if (collapsed) onExpand();
+                  if (collapsed || !freePathOpen || location.pathname !== "/parcours-libre") {
+                    setFreePathOpen(true);
+                    navigate("/parcours-libre");
+                  } else {
+                    setFreePathOpen(false);
+                  }
+                }}
+              >
+                <span className={styles.num} aria-hidden="true"><PortalIcon name="compass" /></span>
+                <span className={styles.linkText}>{t("freePathMenu.label")}</span>
+                <span className={styles.chevron} aria-hidden="true" />
+              </button>
+
+              {freePathOpen && !collapsed ? (
+                <div className={styles.coursePanel}>
+                  {[
+                    { id: "tests", to: "/parcours-libre/tests", selected: testsSelected, label: t("freePathMenu.tests") },
+                    { id: "exams", to: "/parcours-libre/examens", selected: examsSelected, label: t("freePathMenu.exams") },
+                  ].map(({ id, to, selected, label }) => (
+                    <Link
+                      key={id}
+                      to={to}
+                      className={selected ? `${styles.levelLink} ${styles.levelLinkActive}` : styles.levelLink}
+                      aria-current={selected ? "page" : undefined}
+                      onClick={onNavigate}
+                    >
+                      <span className={styles.levelBullet} aria-hidden="true">•</span>
+                      <span className={styles.levelText}><span>{label}</span></span>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <div className={styles.navSection} role="group" aria-label={t("navGroups.resources")}>

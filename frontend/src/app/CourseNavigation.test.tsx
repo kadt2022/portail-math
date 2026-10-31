@@ -29,7 +29,7 @@ describe("Navigation horizontale des cours", () => {
     });
   });
 
-  it("affiche les quatre entrées dans l'ordre demandé", () => {
+  it("affiche les cinq entrées dans l'ordre demandé", () => {
     renderNavigation();
     const navigation = screen.getByRole("navigation", { name: /navigation des cours/i });
     const entries = [...navigation.querySelectorAll("button, a")];
@@ -38,6 +38,7 @@ describe("Navigation horizontale des cours", () => {
       "Cours primaires",
       "Cours secondaires",
       "Préparation EXETAT",
+      "Parcours libre",
       "Ma progression",
     ]);
   });
