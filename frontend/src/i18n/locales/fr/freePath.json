@@ -30,19 +30,11 @@
   },
   "sat": {
     "title": "SAT — Scholastic Assessment Test",
-    "description": "Préparation aux épreuves du SAT pour les études universitaires."
+    "description": "Préparation aux épreuves de mathématiques du SAT."
   },
   "act": {
     "title": "ACT — American College Testing",
-    "description": "Préparation aux épreuves de l’ACT pour les études universitaires."
-  },
-  "toefl": {
-    "title": "TOEFL — Test of English as a Foreign Language",
-    "description": "Préparation au test d’anglais langue étrangère."
-  },
-  "ielts": {
-    "title": "IELTS — International English Language Testing System",
-    "description": "Préparation au test international d’anglais."
+    "description": "Préparation aux épreuves de mathématiques de l’ACT."
   },
   "exetat": {
     "sigil": "EXETAT",

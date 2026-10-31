@@ -1,19 +1,18 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
+import { PortalIcon } from "../components/PortalIcon";
 import styles from "./FreePathPages.module.css";
 
+// Seules les préparations de mathématiques figurent ici. Couleur = pays de l'examen (États-Unis : bleus, RDC : rouge du drapeau).
 // EXETAT conserve sa route existante. GRE attend son premier contenu.
 // Ajouter une préparation = une entrée ici + ses textes dans freePath.json.
 // Sans route, la préparation s'affiche en « Contenu à venir » et n'est pas cliquable.
-const preparations: { id: string; route?: string; icon: PortalIconName; comingSoon: boolean; tone: string }[] = [
-  { id: "gre", route: "/parcours-libre/gre", icon: "progress", comingSoon: true, tone: styles.toneGre },
-  { id: "sat", icon: "school", comingSoon: true, tone: styles.toneSoon },
-  { id: "act", icon: "book", comingSoon: true, tone: styles.toneSoon },
-  { id: "toefl", icon: "file", comingSoon: true, tone: styles.toneSoon },
-  { id: "ielts", icon: "library", comingSoon: true, tone: styles.toneSoon },
-  { id: "exetat", route: "/exetat", icon: "file", comingSoon: false, tone: styles.toneExetat },
+const preparations: { id: string; route?: string; comingSoon: boolean; tone: string }[] = [
+  { id: "gre", route: "/parcours-libre/gre", comingSoon: true, tone: styles.toneGre },
+  { id: "sat", comingSoon: true, tone: styles.toneSat },
+  { id: "act", comingSoon: true, tone: styles.toneAct },
+  { id: "exetat", route: "/exetat", comingSoon: false, tone: styles.toneExetat },
 ];
 
 const greSections = ["resources", "exercises", "assessments"] as const;
@@ -34,9 +33,9 @@ export function FreePathPage() {
 
       <h2 className={styles.sectionTitle}>{t("preparationsTitle")}</h2>
       <div className={styles.grid}>
-        {preparations.map(({ id, route, icon, comingSoon, tone }) => (
+        {preparations.map(({ id, route, comingSoon, tone }) => (
           <article key={id} className={route ? `${styles.card} ${tone}` : `${styles.card} ${tone} ${styles.cardSoon}`}>
-            <span className={styles.cardIcon} aria-hidden="true"><PortalIcon name={icon} /></span>
+            <span className={styles.cardIcon} aria-hidden="true"><PortalIcon name="cap" /></span>
             <div className={styles.cardBody}>
               <h3>{t(`${id}.title`)}</h3>
               <p>{t(`${id}.description`)}</p>
@@ -75,7 +74,7 @@ export function GrePage() {
     <div className={styles.page}>
       <Link to="/parcours-libre" className={styles.back}>{t("gre.back")}</Link>
       <header className={`${styles.hero} ${styles.toneGre}`}>
-        <span className={styles.heroIcon}><PortalIcon name="progress" /></span>
+        <span className={styles.heroIcon}><PortalIcon name="cap" /></span>
         <div>
           <h1>{t("gre.title")}</h1>
           <p>{t("gre.description")}</p>
