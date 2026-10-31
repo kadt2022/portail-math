@@ -25,6 +25,17 @@ describe("Parcours libre", () => {
   expect(screen.getByRole("link", { name: "Retour au Parcours libre" })).toHaveAttribute("href", "/parcours-libre");
   expect(fetch).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled(); storage.mockRestore();
  });
+ it.each(["fr", "en"])("annonce les repères du parcours et les trois rubriques GRE à venir en %s", async language => {
+  await i18next.changeLanguage(language);
+  const { unmount } = render(<MemoryRouter><FreePathPage /></MemoryRouter>);
+  expect(screen.getAllByRole("listitem")).toHaveLength(3);
+  expect(screen.getByText(language === "fr" ? "Sans compte supplémentaire" : "No extra account needed")).toBeInTheDocument();
+  unmount();
+  render(<MemoryRouter><GrePage /></MemoryRouter>);
+  const items = screen.getAllByRole("listitem");
+  expect(items).toHaveLength(3);
+  items.forEach(item => expect(within(item).getByText(language === "fr" ? "Bientôt" : "Soon")).toBeInTheDocument());
+ });
  it("relie tableau de bord, menu, GRE et retour avec changement FR/EN", async () => {
   const user = userEvent.setup(); window.history.pushState({}, "", "/app"); render(<AppRouter />);
   const nav = screen.getByRole("navigation", { name: "Navigation principale" });

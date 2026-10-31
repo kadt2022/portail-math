@@ -203,13 +203,18 @@ a.level:focus-visible { outline: 3px solid #246b75; outline-offset: 2px; }
 
 .sectionHeading .iconBadge { background: linear-gradient(135deg, #315475, #246b75); }
 
-.freePath { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 16px; border-radius: 19px; background: #e6f5ef; color: #246b75; text-decoration: none; }
-.freePath > svg { width:36px; height:36px; flex:0 0 auto; }
-.freePath h2 { margin:0 0 8px; font-size:20px; }
-.freePath p { margin: 0; color: #5f6f77; font-size: 13px; line-height: 1.5; }
-.freePath:hover { background:#d6eee5; }
-.freePath:focus-visible { outline:3px solid #246b75; outline-offset:3px; }
+.freePath { position: relative; display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 18px; overflow: hidden; border-radius: 19px; background: linear-gradient(115deg, #1d2a6b, #3a3fa8 60%, #17766a); color: #fff; text-decoration: none; box-shadow: 0 8px 20px rgb(29 42 107 / 22%); transition: transform 150ms ease, box-shadow 150ms ease; }
+.freePath::after { position: absolute; top: -50px; right: -30px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgb(255 191 25 / 35%), transparent 70%); content: ""; pointer-events: none; }
+.freePathBadge { display: grid; place-items: center; flex: 0 0 auto; width: 52px; height: 52px; border-radius: 14px; background: rgb(255 255 255 / 16%); color: #ffbf19; }
+.freePathBadge svg { width: 30px; height: 30px; }
+.freePath h2 { margin: 0 0 6px; font-size: 20px; }
+.freePath p { margin: 0 0 8px; color: #dfe6ff; font-size: 13px; line-height: 1.5; }
+.freePathTags { display: flex; gap: 6px; }
+.freePathTags b { padding: 2px 10px; border-radius: 999px; background: rgb(255 255 255 / 16%); font-size: 11px; letter-spacing: .06em; }
+.freePath:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgb(29 42 107 / 30%); }
+.freePath:focus-visible { outline: 3px solid #ffbf19; outline-offset: 3px; }
 
 .freePathCopy { flex: 1; min-width: 0; }
-.freePathAction { flex: 0 0 auto; padding: 10px 12px; border-radius: 10px; background: #246b75; color: white; font-size: 12px; }
-@media (max-width: 599px) { .freePath { flex-wrap: wrap; } .freePathAction { margin-left: 48px; } }
+.freePathAction { position: relative; z-index: 1; flex: 0 0 auto; padding: 10px 14px; border-radius: 10px; background: #fff; color: #1d2a6b; font-size: 12px; }
+@media (max-width: 599px) { .freePath { flex-wrap: wrap; } .freePathAction { margin-left: 66px; } }
+@media (prefers-reduced-motion: reduce) { .freePath { transition: none; } .freePath:hover { transform: none; } }
