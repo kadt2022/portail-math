@@ -33,11 +33,11 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
 
 
   const [dashboardLink, ...remainingLinks] = navigationLinks;
-  const learningLinks = remainingLinks.filter((link) => link.to === "/exetat");
+  const learningLinks = remainingLinks.filter((link) => ["/parcours-libre", "/exetat"].includes(link.to));
   const resourceLinks = remainingLinks.filter((link) => ["/bibliotheque", "/jeux"].includes(link.to));
-  const referenceLinks = remainingLinks.filter((link) => !["/exetat", "/bibliotheque", "/jeux"].includes(link.to));
+  const referenceLinks = remainingLinks.filter((link) => !["/parcours-libre", "/exetat", "/bibliotheque", "/jeux"].includes(link.to));
 
-  const linkIcons: Record<string, PortalIconName> = { "/": "home", "/exetat": "file", "/bibliotheque": "library", "/jeux": "game", "/progression": "progress", "/a-propos": "info" };
+  const linkIcons: Record<string, PortalIconName> = { "/": "home", "/parcours-libre": "cap", "/exetat": "file", "/bibliotheque": "library", "/jeux": "game", "/progression": "progress", "/a-propos": "info" };
 
   function renderPortalLink(link: (typeof navigationLinks)[number]) {
     return (

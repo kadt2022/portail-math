@@ -1,0 +1,39 @@
+{
+  "section": {
+    "eyebrow": "For exam candidates",
+    "title": "Free learning path",
+    "description": "Prepare for your exams at your own pace: resources, exercises and assessments, GRE and EXETAT.",
+    "action": "Explore the free learning path",
+    "tilesLabel": "Preparations"
+  },
+  "eyebrow": "Free learning path",
+  "title": "Free learning path — Exam preparation",
+  "description": "Prepare for your exams at your own pace. Choose a preparation to gradually discover the available resources, exercises and assessments.",
+  "highlights": {
+    "pace": "At your own pace",
+    "content": "Resources, exercises, assessments",
+    "noAccount": "No extra account needed"
+  },
+  "back": "Back to dashboard",
+  "discover": "Explore preparation",
+  "comingSoon": "Content coming soon",
+  "available": "Available",
+  "soon": "Soon",
+  "gre": {
+    "sigil": "GRE",
+    "title": "GRE — Graduate Record Examination",
+    "description": "Preparation for GRE quantitative reasoning.",
+    "empty": "Resources, exercises and assessments will be added gradually.",
+    "back": "Back to free learning path",
+    "sections": {
+      "resources": "Resources",
+      "exercises": "Exercises",
+      "assessments": "Assessments"
+    }
+  },
+  "exetat": {
+    "sigil": "EXETAT",
+    "title": "EXETAT — State Examination",
+    "description": "Preparation for the mathematics papers of the DRC State Examination."
+  }
+}

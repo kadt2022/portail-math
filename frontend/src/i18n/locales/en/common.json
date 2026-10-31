@@ -15,7 +15,8 @@
     "library": "Library",
     "games": "Games",
     "progress": "My progress",
-    "about": "About"
+    "about": "About",
+    "freePath": "Free learning path"
   },
   "navGroups": {
     "learning": "Learning",

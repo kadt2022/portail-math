@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { PRIMARY_COURSES } from "../app/course-navigation";
 import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
+import { FreePathSection } from "../free-path/FreePathSection";
 import childrenArt from "../../../src/main/resources/static/images/enfants-revision.webp";
 import yambaHead from "../assets/yamba-head.jpg";
 import libraryArt from "../assets/dashboard/library.webp";
@@ -94,6 +95,8 @@ export function DashboardPage() {
           </div>
         </section>
       </div>
+
+      <FreePathSection />
 
       <div className={styles.featureGrid}>
         {features.map(({ id, to, icon, art }) => (
