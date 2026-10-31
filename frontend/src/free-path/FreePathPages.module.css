@@ -1,4 +1,4 @@
-.page { padding:20px 0 64px; }
+.page { padding:20px clamp(0px,4vw,64px) 64px; }
 .back { display:inline-block; margin-bottom:16px; color:#0f5f54; font-size:14px; font-weight:700; }
 .page p { line-height:1.6; }
 
