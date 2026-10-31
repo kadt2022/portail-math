@@ -37,15 +37,26 @@ describe("Parcours libre", () => {
   expect(screen.getByRole("region", { name: "Choisir un parcours" })).toContainElement(section);
   expect(screen.getByRole("region", { name: "Parcours secondaire" })).not.toContainElement(section);
  });
- it("relie tableau de bord et menu à la page, avec changement FR/EN", async () => {
+ it("organise le menu Parcours libre en deux sous-menus et relie le tableau de bord à la page", async () => {
   const user = userEvent.setup(); window.history.pushState({}, "", "/app"); render(<AppRouter />);
   const nav = screen.getByRole("navigation", { name: "Navigation principale" });
-  expect(within(nav).getByRole("link", { name: "Parcours libre" })).toHaveAttribute("href", "/app/parcours-libre");
-  expect(within(nav).getByRole("link", { name: "Préparer l'EXETAT" })).toHaveAttribute("href", "/app/exetat");
+  expect(within(nav).queryByRole("link", { name: "Préparer l'EXETAT" })).not.toBeInTheDocument();
+  const group = within(nav).getByRole("button", { name: "Sections du Parcours libre" });
+  expect(group).toHaveAttribute("aria-expanded", "false");
+  await user.click(group);
+  expect(group).toHaveAttribute("aria-expanded", "true");
+  expect(within(nav).getByRole("link", { name: "Tests de raisonnement" })).toHaveAttribute("href", "/app/parcours-libre#tests-de-raisonnement");
+  expect(within(nav).getByRole("link", { name: "Préparations aux examens" })).toHaveAttribute("href", "/app/parcours-libre#preparations-examens");
   await user.click(screen.getByRole("link", { name: /Explorer le parcours libre/i }));
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Parcours libre — Tests de raisonnement");
   await user.click(screen.getByRole("button", { name: /^English$/ }));
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Free learning path — Reasoning tests");
+ });
+ it("marque le sous-menu actif selon la section ou la page EXETAT", async () => {
+  window.history.pushState({}, "", "/app/parcours-libre#preparations-examens"); render(<AppRouter />);
+  const nav = screen.getByRole("navigation", { name: "Navigation principale" });
+  expect(within(nav).getByRole("link", { name: "Préparations aux examens" })).toHaveAttribute("aria-current", "page");
+  expect(within(nav).getByRole("link", { name: "Tests de raisonnement" })).not.toHaveAttribute("aria-current");
  });
  it("ouvre le catalogue EXETAT existant et son API", async () => {
   const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { headers: { "Content-Type": "application/json" } })); vi.stubGlobal("fetch", fetch);

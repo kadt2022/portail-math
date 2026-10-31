@@ -117,5 +117,11 @@
     "promiseQuote": "Un seul environnement pour apprendre en classe, continuer à la maison et suivre les progrès de l’élève.",
     "welcome": "Bienvenue sur Mbuyamba.",
     "closing": "Apprends. Explore. Essaie. Recommence. Progresse."
+  },
+  "freePathMenu": {
+    "label": "Parcours libre",
+    "sections": "Sections du Parcours libre",
+    "tests": "Tests de raisonnement",
+    "exams": "Préparations aux examens"
   }
 }

@@ -27,5 +27,9 @@
   "exetat": {
     "title": "EXETAT — State Examination",
     "description": "Preparation for the mathematics papers of the DRC State Examination."
+  },
+  "groups": {
+    "tests": "Reasoning tests",
+    "exams": "Exam preparation"
   }
 }

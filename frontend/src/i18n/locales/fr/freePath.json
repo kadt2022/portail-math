@@ -27,5 +27,9 @@
   "exetat": {
     "title": "EXETAT — Examen d’État",
     "description": "Préparation aux épreuves de mathématiques de l’Examen d’État de la RDC."
+  },
+  "groups": {
+    "tests": "Tests de raisonnement",
+    "exams": "Préparations aux examens"
   }
 }

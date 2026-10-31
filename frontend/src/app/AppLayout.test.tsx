@@ -116,7 +116,7 @@ describe("Menu compact sur ordinateur", () => {
     const expand = screen.getByTitle("Déployer le menu");
     expect(expand).toHaveAttribute("aria-expanded", "false");
     expect(expand).toHaveAttribute("aria-controls", nav.parentElement?.id);
-    for (const name of ["Tableau de bord", "Préparer l'EXETAT", "Bibliothèque", "Jeux", "Ma progression", "À propos"]) {
+    for (const name of ["Tableau de bord", "Bibliothèque", "Jeux", "Ma progression", "À propos"]) {
       expect(within(nav).getByRole("link", { name })).toHaveAttribute("title", name);
     }
     expect(document.body.style.overflow).not.toBe("hidden");
