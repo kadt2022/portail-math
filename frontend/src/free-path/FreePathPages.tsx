@@ -29,13 +29,12 @@ export function FreePathPage() {
         </div>
       </header>
 
-      <h2 className={styles.sectionTitle}>{t("preparationsTitle")}</h2>
       <div className={styles.grid}>
         {preparations.map(({ id, route, comingSoon, tone }) => (
           <article key={id} className={route ? `${styles.card} ${tone}` : `${styles.card} ${tone} ${styles.cardSoon}`}>
             <span className={styles.cardIcon} aria-hidden="true"><PortalIcon name="cap" /></span>
             <div className={styles.cardBody}>
-              <h3>{t(`${id}.title`)}</h3>
+              <h2>{t(`${id}.title`)}</h2>
               <p>{t(`${id}.description`)}</p>
               <span className={comingSoon ? styles.status : `${styles.status} ${styles.statusOn}`}>
                 {comingSoon ? t("comingSoon") : t("available")}
