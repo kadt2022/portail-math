@@ -608,7 +608,53 @@ jobs:
           fi
 
           oc login "${OPENSHIFT_SERVER}" --token="${OPENSHIFT_TOKEN}"
-          oc project "${OPENSHIFT_NAMESPACE}"
+          # Sélection locale du namespace : `oc project` exige le droit de consulter le projet,
+          # que le ServiceAccount de déploiement n'a pas (et n'a pas besoin d'avoir).
+          oc config set-context --current --namespace="${OPENSHIFT_NAMESPACE}"
+
+      - name: Vérifier l'identité, le namespace et les permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Identité : $(oc whoami)"
+
+          current_namespace="$(oc config view --minify -o jsonpath='{..namespace}')"
+          echo "Namespace : ${current_namespace}"
+          if [[ "${current_namespace}" != "${OPENSHIFT_NAMESPACE}" ]]; then
+            echo "::error::Le namespace actif (${current_namespace}) diffère de OPENSHIFT_NAMESPACE (${OPENSHIFT_NAMESPACE})."
+            exit 1
+          fi
+
+          # Inventaire informatif des droits utilisés par les étapes suivantes : il ne modifie rien
+          # et n'échoue pas, les étapes concernées signalent tout refus réel.
+          checks=(
+            "get deployment/portail-math"
+            "patch deployment/portail-math"
+            "update deployment/portail-math"
+            "create deployments.apps"
+            "get imagestreams.image.openshift.io"
+            "create imagestreams.image.openshift.io"
+            "patch imagestreams.image.openshift.io"
+            "get buildconfigs.build.openshift.io"
+            "create buildconfigs.build.openshift.io"
+            "patch buildconfigs.build.openshift.io"
+            "create buildconfigs.build.openshift.io --subresource=instantiatebinary"
+            "list builds.build.openshift.io"
+            "get builds.build.openshift.io --subresource=log"
+            "get services"
+            "create services"
+            "patch services"
+            "get routes.route.openshift.io"
+            "create routes.route.openshift.io"
+            "patch routes.route.openshift.io"
+            "create routes.route.openshift.io --subresource=custom-host"
+            "list pods"
+          )
+          for check in "${checks[@]}"; do
+            read -r -a words <<< "${check}"
+            answer="$(oc auth can-i "${words[@]}" -n "${OPENSHIFT_NAMESPACE}" 2>/dev/null || true)"
+            printf '%-75s %s\n' "${check}" "${answer:-?}"
+          done
 
       - name: Produire les manifestes propres à l'environnement
         shell: bash
