@@ -1,41 +1,31 @@
 {
   "section": {
     "title": "Parcours libre",
-    "description": "Prépare tes examens à ton rythme : GRE, SAT, ACT, EXETAT et tant d’autres.",
+    "description": "Teste tes acquis sous différents angles : TRM, QMT, MBD et l’EXETAT.",
     "action": "Explorer le parcours libre"
   },
-  "title": "Parcours libre — Préparations aux examens",
-  "description": "Prépare tes examens à ton rythme. Choisis une préparation pour découvrir progressivement les ressources, les exercices et les évaluations disponibles.",
+  "title": "Parcours libre — Tests de raisonnement",
+  "description": "Après tes apprentissages, mesure ce que tu as retenu sous différents angles. Choisis un test et vois où tu en es.",
   "other": {
-    "title": "Autres préparations",
-    "text": "D’autres préparations seront ajoutées progressivement."
+    "text": "D’autres tests arriveront bientôt."
   },
+  "notice": "Ces tests mesurent tes connaissances pour t’aider à progresser. Ils ne délivrent ni diplôme ni certification.",
   "discover": "Découvrir la préparation",
   "comingSoon": "Contenu à venir",
   "available": "Disponible",
-  "soon": "Bientôt",
-  "gre": {
-    "sigil": "GRE",
-    "title": "GRE — Graduate Record Examination",
-    "description": "Préparation au raisonnement quantitatif du GRE.",
-    "empty": "Les ressources, les exercices et les évaluations seront ajoutés progressivement.",
-    "back": "Retour au Parcours libre",
-    "sections": {
-      "resources": "Ressources",
-      "exercises": "Exercices",
-      "assessments": "Évaluations"
-    }
+  "trm": {
+    "title": "TRM — Test de Raisonnement Mathématique",
+    "description": "Vérifie ta logique : suites, proportions et problèmes à étapes."
   },
-  "sat": {
-    "title": "SAT — Scholastic Assessment Test",
-    "description": "Préparation aux épreuves de mathématiques du SAT."
+  "qmt": {
+    "title": "QMT — Test Quantitatif Mbuyamba",
+    "description": "Mesure ton aisance avec les nombres, les pourcentages et les données."
   },
-  "act": {
-    "title": "ACT — American College Testing",
-    "description": "Préparation aux épreuves de mathématiques de l’ACT."
+  "mbd": {
+    "title": "MBD — Mesure des Bases et de la Déduction",
+    "description": "Teste tes bases et ta capacité à raisonner sur des problèmes nouveaux."
   },
   "exetat": {
-    "sigil": "EXETAT",
     "title": "EXETAT — Examen d’État",
     "description": "Préparation aux épreuves de mathématiques de l’Examen d’État de la RDC."
   }

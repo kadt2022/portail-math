@@ -1,41 +1,31 @@
 {
   "section": {
     "title": "Free learning path",
-    "description": "Prepare for your exams at your own pace: GRE, SAT, ACT, EXETAT and many more.",
+    "description": "Test what you know from different angles: TRM, QMT, MBD and the EXETAT.",
     "action": "Explore the free learning path"
   },
-  "title": "Free learning path — Exam preparation",
-  "description": "Prepare for your exams at your own pace. Choose a preparation to gradually discover the available resources, exercises and assessments.",
+  "title": "Free learning path — Reasoning tests",
+  "description": "After your lessons, measure what you have retained from different angles. Choose a test and see where you stand.",
   "other": {
-    "title": "More preparations",
-    "text": "More preparations will be added gradually."
+    "text": "More tests are coming soon."
   },
+  "notice": "These tests measure your knowledge to help you progress. They award no diploma or certification.",
   "discover": "Explore preparation",
   "comingSoon": "Content coming soon",
   "available": "Available",
-  "soon": "Soon",
-  "gre": {
-    "sigil": "GRE",
-    "title": "GRE — Graduate Record Examination",
-    "description": "Preparation for GRE quantitative reasoning.",
-    "empty": "Resources, exercises and assessments will be added gradually.",
-    "back": "Back to free learning path",
-    "sections": {
-      "resources": "Resources",
-      "exercises": "Exercises",
-      "assessments": "Assessments"
-    }
+  "trm": {
+    "title": "TRM — Mathematical Reasoning Test",
+    "description": "Check your logic: sequences, proportions and multi-step problems."
   },
-  "sat": {
-    "title": "SAT — Scholastic Assessment Test",
-    "description": "Preparation for the SAT mathematics sections."
+  "qmt": {
+    "title": "QMT — Mbuyamba Quantitative Test",
+    "description": "Measure how comfortable you are with numbers, percentages and data."
   },
-  "act": {
-    "title": "ACT — American College Testing",
-    "description": "Preparation for the ACT mathematics section."
+  "mbd": {
+    "title": "MBD — Foundations and Deduction Measure",
+    "description": "Test your foundations and your ability to reason on new problems."
   },
   "exetat": {
-    "sigil": "EXETAT",
     "title": "EXETAT — State Examination",
     "description": "Preparation for the mathematics papers of the DRC State Examination."
   }

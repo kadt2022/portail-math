@@ -2,43 +2,32 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { FreePathPage, GrePage } from "./FreePathPages";
+import { FreePathPage } from "./FreePathPages";
 import { AppRouter } from "../app/AppRouter";
 import { i18next } from "../i18n/i18n";
 
 afterEach(async () => { vi.unstubAllGlobals(); await i18next.changeLanguage("fr"); });
 describe("Parcours libre", () => {
- it.each(["fr", "en"])("affiche quatre préparations de mathématiques dont seules GRE et EXETAT sont ouvertes en %s", async language => {
+ it.each(["fr", "en"])("affiche TRM, QMT, MBD à venir et l'EXETAT disponible en %s", async language => {
   await i18next.changeLanguage(language);
   render(<MemoryRouter><FreePathPage /></MemoryRouter>);
   const cards = screen.getAllByRole("article");
-  const linked = cards.filter(card => within(card).queryByRole("link"));
-  expect(linked).toHaveLength(2);
-  expect(cards.filter(card => !within(card).queryByRole("link"))).toHaveLength(2);
   expect(cards).toHaveLength(4);
-  expect(screen.queryByText(/TOEFL|IELTS/)).not.toBeInTheDocument();
-  expect(within(linked[0]).getByRole("link")).toHaveAttribute("href", "/parcours-libre/gre");
-  expect(within(linked[1]).getByRole("link")).toHaveAttribute("href", "/exetat");
-  cards.slice(0, 3).forEach(card => expect(within(card).getByText(language === "fr" ? "Contenu à venir" : "Content coming soon")).toBeInTheDocument());
+  ["TRM", "QMT", "MBD"].forEach((sigil, index) => {
+   expect(within(cards[index]).getByRole("heading")).toHaveTextContent(sigil);
+   expect(within(cards[index]).queryByRole("link")).not.toBeInTheDocument();
+   expect(within(cards[index]).getByText(language === "fr" ? "Contenu à venir" : "Content coming soon")).toBeInTheDocument();
+  });
+  expect(within(cards[3]).getByRole("link")).toHaveAttribute("href", "/exetat");
   expect(within(cards[3]).getByText(language === "fr" ? "Disponible" : "Available")).toBeInTheDocument();
+  expect(screen.queryByText(/GRE|SAT|ACT|TOEFL|IELTS/)).not.toBeInTheDocument();
  });
- it("GRE reste vide sans appel API ni progression enregistrée", () => {
+ it("précise que les tests ne délivrent ni diplôme ni certification, sans appel API ni progression enregistrée", () => {
   const fetch = vi.fn(); vi.stubGlobal("fetch", fetch);
   const storage = vi.spyOn(Storage.prototype, "setItem");
-  render(<MemoryRouter><GrePage /></MemoryRouter>);
-  expect(screen.getByRole("heading", { name: "Contenu à venir" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Retour au Parcours libre" })).toHaveAttribute("href", "/parcours-libre");
+  render(<MemoryRouter><FreePathPage /></MemoryRouter>);
+  expect(screen.getByText(/ne délivrent ni diplôme ni certification/)).toBeInTheDocument();
   expect(fetch).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled(); storage.mockRestore();
- });
- it.each(["fr", "en"])("annonce les autres préparations et les trois rubriques GRE à venir en %s", async language => {
-  await i18next.changeLanguage(language);
-  const { unmount } = render(<MemoryRouter><FreePathPage /></MemoryRouter>);
-  expect(screen.getByText(language === "fr" ? "Autres préparations" : "More preparations")).toBeInTheDocument();
-  unmount();
-  render(<MemoryRouter><GrePage /></MemoryRouter>);
-  const items = screen.getAllByRole("listitem");
-  expect(items).toHaveLength(3);
-  items.forEach(item => expect(within(item).getByText(language === "fr" ? "Bientôt" : "Soon")).toBeInTheDocument());
  });
  it("présente le Parcours libre comme section propre, hors des cartes primaire et secondaire", () => {
   window.history.pushState({}, "", "/app"); render(<AppRouter />);
@@ -48,19 +37,15 @@ describe("Parcours libre", () => {
   expect(screen.getByRole("region", { name: "Choisir un parcours" })).toContainElement(section);
   expect(screen.getByRole("region", { name: "Parcours secondaire" })).not.toContainElement(section);
  });
- it("relie tableau de bord, menu, GRE et retour avec changement FR/EN", async () => {
+ it("relie tableau de bord et menu à la page, avec changement FR/EN", async () => {
   const user = userEvent.setup(); window.history.pushState({}, "", "/app"); render(<AppRouter />);
   const nav = screen.getByRole("navigation", { name: "Navigation principale" });
   expect(within(nav).getByRole("link", { name: "Parcours libre" })).toHaveAttribute("href", "/app/parcours-libre");
   expect(within(nav).getByRole("link", { name: "Préparer l'EXETAT" })).toHaveAttribute("href", "/app/exetat");
   await user.click(screen.getByRole("link", { name: /Explorer le parcours libre/i }));
-  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Parcours libre — Préparations aux examens");
-  await user.click(screen.getByRole("link", { name: /Découvrir la préparation : GRE/ }));
-  expect(window.location.pathname).toBe("/app/parcours-libre/gre");
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Parcours libre — Tests de raisonnement");
   await user.click(screen.getByRole("button", { name: /^English$/ }));
-  expect(screen.getByRole("heading", { name: "Content coming soon" })).toBeInTheDocument();
-  await user.click(screen.getByRole("link", { name: "Back to free learning path" }));
-  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Free learning path — Exam preparation");
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Free learning path — Reasoning tests");
  });
  it("ouvre le catalogue EXETAT existant et son API", async () => {
   const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { headers: { "Content-Type": "application/json" } })); vi.stubGlobal("fetch", fetch);
@@ -70,9 +55,9 @@ describe("Parcours libre", () => {
   expect(await screen.findByRole("heading", { name: "Choisis une matière" })).toBeInTheDocument();
   expect(fetch.mock.calls[0][0]).toBe("/api/v1/exetat/matieres");
  });
- it.each(["/app/parcours-libre", "/app/parcours-libre/gre"])("accepte la route directe %s", path => {
-  window.history.pushState({}, "", path); render(<AppRouter />);
+ it("accepte la route directe", () => {
+  window.history.pushState({}, "", "/app/parcours-libre"); render(<AppRouter />);
   expect(screen.queryByRole("heading", { name: /Cette page n'existe pas/ })).not.toBeInTheDocument();
-  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(path.endsWith("gre") ? "GRE" : "Parcours libre");
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Parcours libre");
  });
 });

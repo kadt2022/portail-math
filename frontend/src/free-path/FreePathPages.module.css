@@ -12,8 +12,10 @@
 .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
 .card { position:relative; display:flex; align-items:center; gap:12px; min-width:0; padding:18px; border:1px solid #ece9e4; border-radius:18px; background:#fff; box-shadow:0 5px 20px rgb(52 40 20 / 6%); transition:transform 160ms ease, box-shadow 160ms ease; }
 .card:hover { transform:translateY(-2px); box-shadow:0 10px 26px rgb(52 40 20 / 12%); }
-/* Teintes discrètes inspirées du pays de l'examen : une base dominante et une touche des autres couleurs du drapeau. */
-.toneUs { --ink:#1d2f6e; --tone:radial-gradient(circle at 100% 100%,rgb(200 50 70 / 55%),transparent 58%),linear-gradient(145deg,#3a5bc7,#1d2f6e); }
+/* Un angle, une teinte Mbuyamba ; l'EXETAT garde des teintes discrètes de la RDC. */
+.toneTrm { --ink:#0f5f54; --tone:linear-gradient(145deg,#2aa58f,#0f5f54); }
+.toneQmt { --ink:#1b5aa8; --tone:linear-gradient(145deg,#3b8de0,#1b5aa8); }
+.toneMbd { --ink:#5a3fb0; --tone:linear-gradient(145deg,#8b6fe0,#5a3fb0); }
 .toneRdc { --ink:#0b5cad; --tone:radial-gradient(circle at 100% 100%,rgb(247 214 24 / 60%),transparent 55%),radial-gradient(circle at 0 100%,rgb(206 16 33 / 35%),transparent 50%),linear-gradient(145deg,#2f9bff,#0a5bb5); }
 .cardSoon:hover { transform:none; box-shadow:0 5px 20px rgb(52 40 20 / 6%); }
 .cardSoon { background:#fbfaff; }
@@ -32,17 +34,9 @@
 .other svg { width:32px; height:32px; flex:0 0 auto; }
 .other p { margin:2px 0 0; color:#5d4f8f; font-size:13.5px; }
 
-.empty { padding:clamp(20px,3.5vw,32px); border:1px dashed #b9b6d9; border-radius:20px; background:#f6f5ff; }
-.empty h2 { margin:0 0 8px; color:#2f3390; }
-.empty > p { margin:0 0 20px; color:#5f6f77; }
-.soonGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:0; padding:0; list-style:none; }
-.soonGrid li { display:flex; flex-direction:column; align-items:flex-start; gap:8px; padding:16px; border-radius:16px; background:#fff; border:1px solid #e1def7; }
-.soonGrid svg { width:28px; height:28px; color:#3a3fa8; }
-.soonGrid span { padding:3px 10px; border-radius:999px; background:#fef3e6; color:#b85c1c; font-size:12px; font-weight:750; }
 
 .page a:focus-visible { outline:3px solid #123c8f; outline-offset:4px; }
 .card:focus-within { box-shadow:0 0 0 3px #123c8f; }
-@media (max-width:899px) { .soonGrid { grid-template-columns:1fr; } }
 @media (max-width:699px) { .grid { grid-template-columns:1fr; } }
 @media (max-width:699px) {
   /* Téléphone : la photo devient un bandeau net au-dessus du texte, plus de texte posé sur l'image. */

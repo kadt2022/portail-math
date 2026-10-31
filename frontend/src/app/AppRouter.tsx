@@ -14,7 +14,7 @@ import { PrimaryThreeModulePage } from "../courses/primary-three/PrimaryThreeMod
 import { PrimaryTwoCoursePage } from "../courses/primary-two/PrimaryTwoCoursePage";
 import { PrimaryTwoLessonPage } from "../courses/primary-two/PrimaryTwoLessonPage";
 import { PrimaryTwoModulePage } from "../courses/primary-two/PrimaryTwoModulePage";
-import { FreePathPage, GrePage } from "../free-path/FreePathPages";
+import { FreePathPage } from "../free-path/FreePathPages";
 import { DashboardPage } from "../dashboard/DashboardPage";
 import {
   ExetatCataloguePage,
@@ -57,7 +57,6 @@ export function AppRouter() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="parcours-libre" element={<FreePathPage />} />
-          <Route path="parcours-libre/gre" element={<GrePage />} />
           <Route path="exetat" element={<ExetatCataloguePage />} />
           <Route path="exetat/matieres/:subjectId" element={<ExetatSubjectPage />} />
           <Route

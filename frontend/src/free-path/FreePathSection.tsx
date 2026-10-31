@@ -10,7 +10,7 @@ export function FreePathSection() {
 
   return (
     <section className={styles.card} aria-labelledby="free-path-title">
-      <span className={styles.badge}><PortalIcon name="cap" /></span>
+      <span className={styles.badge}><PortalIcon name="brain" /></span>
       <div className={styles.copy}>
         <h2 id="free-path-title">{t("section.title")}</h2>
         <p>{t("section.description")}</p>
