@@ -22,9 +22,7 @@ export function FreePathPage() {
 
   return (
     <div className={styles.page}>
-      <Link to="/" className={styles.back}>{t("back")}</Link>
       <header className={styles.hero}>
-        <span className={styles.heroIcon}><PortalIcon name="compass" /></span>
         <div>
           <h1>{t("title")}</h1>
           <p>{t("description")}</p>
@@ -74,7 +72,6 @@ export function GrePage() {
     <div className={styles.page}>
       <Link to="/parcours-libre" className={styles.back}>{t("gre.back")}</Link>
       <header className={`${styles.hero} ${styles.toneUs}`}>
-        <span className={styles.heroIcon}><PortalIcon name="cap" /></span>
         <div>
           <h1>{t("gre.title")}</h1>
           <p>{t("gre.description")}</p>
