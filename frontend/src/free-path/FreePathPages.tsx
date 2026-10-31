@@ -4,15 +4,15 @@ import { useTranslation } from "react-i18next";
 import { PortalIcon } from "../components/PortalIcon";
 import styles from "./FreePathPages.module.css";
 
-// Seules les préparations de mathématiques figurent ici. Couleur = pays de l'examen (États-Unis : bleus, RDC : rouge du drapeau).
+// Seules les préparations de mathématiques figurent ici. Couleurs du logo = drapeau du pays de l'examen (États-Unis, RDC).
 // EXETAT conserve sa route existante. GRE attend son premier contenu.
 // Ajouter une préparation = une entrée ici + ses textes dans freePath.json.
 // Sans route, la préparation s'affiche en « Contenu à venir » et n'est pas cliquable.
 const preparations: { id: string; route?: string; comingSoon: boolean; tone: string }[] = [
-  { id: "gre", route: "/parcours-libre/gre", comingSoon: true, tone: styles.toneGre },
-  { id: "sat", comingSoon: true, tone: styles.toneSat },
-  { id: "act", comingSoon: true, tone: styles.toneAct },
-  { id: "exetat", route: "/exetat", comingSoon: false, tone: styles.toneExetat },
+  { id: "gre", route: "/parcours-libre/gre", comingSoon: true, tone: styles.toneUs },
+  { id: "sat", comingSoon: true, tone: styles.toneUs },
+  { id: "act", comingSoon: true, tone: styles.toneUs },
+  { id: "exetat", route: "/exetat", comingSoon: false, tone: styles.toneRdc },
 ];
 
 const greSections = ["resources", "exercises", "assessments"] as const;
@@ -73,7 +73,7 @@ export function GrePage() {
   return (
     <div className={styles.page}>
       <Link to="/parcours-libre" className={styles.back}>{t("gre.back")}</Link>
-      <header className={`${styles.hero} ${styles.toneGre}`}>
+      <header className={`${styles.hero} ${styles.toneUs}`}>
         <span className={styles.heroIcon}><PortalIcon name="cap" /></span>
         <div>
           <h1>{t("gre.title")}</h1>
