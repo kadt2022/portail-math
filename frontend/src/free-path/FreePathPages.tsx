@@ -71,6 +71,13 @@ export function FreePathPage() {
         <div className={styles.grid}>
           {tests.map((test) => <PreparationCard key={test.id} {...test} />)}
         </div>
+
+        <aside className={styles.other}>
+          <PortalIcon name="brain" />
+          <div>
+            <strong>{t("other.text")}</strong>
+          </div>
+        </aside>
       </section>
 
       <section id={FREE_PATH_EXAMS_ANCHOR} className={styles.group} aria-labelledby="free-path-exams-title">
@@ -79,13 +86,6 @@ export function FreePathPage() {
           {exams.map((exam) => <PreparationCard key={exam.id} {...exam} />)}
         </div>
       </section>
-
-      <aside className={styles.other}>
-        <PortalIcon name="brain" />
-        <div>
-          <strong>{t("other.text")}</strong>
-        </div>
-      </aside>
     </div>
   );
 }

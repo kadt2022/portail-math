@@ -30,7 +30,7 @@
 /* La carte entière est cliquable via le lien. */
 .action::after { content:""; position:absolute; inset:0; border-radius:18px; }
 
-.other { display:flex; align-items:center; gap:14px; margin-top:20px; padding:16px 20px; border-radius:16px; background:#f1ecff; color:#4b2fb0; }
+.other { display:flex; align-items:center; gap:14px; margin-top:16px; padding:16px 20px; border-radius:16px; background:#f1ecff; color:#4b2fb0; }
 .other svg { width:22px; height:22px; flex:0 0 auto; }
 .other p { margin:2px 0 0; color:#5d4f8f; font-size:13.5px; }
 
