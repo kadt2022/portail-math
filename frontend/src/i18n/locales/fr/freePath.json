@@ -1,11 +1,11 @@
 {
   "section": {
     "title": "Parcours libre",
-    "description": "Teste tes acquis sous différents angles : TRM, QMT, MBD et l’EXETAT.",
+    "description": "Tests Mbuyamba et préparation de l’Examen d’État, à ton rythme.",
     "action": "Explorer le parcours libre"
   },
-  "title": "Parcours libre — Tests de raisonnement",
-  "description": "Après tes apprentissages, mesure ce que tu as retenu sous différents angles. Choisis un test et vois où tu en es.",
+  "title": "Parcours libre",
+  "description": "Mesure tes acquis avec les tests Mbuyamba, ou prépare un examen officiel.",
   "other": {
     "text": "D’autres tests arriveront bientôt."
   },
@@ -28,8 +28,23 @@
     "title": "EXETAT — Examen d’État",
     "description": "Préparation aux épreuves de mathématiques de l’Examen d’État de la RDC."
   },
-  "groups": {
-    "tests": "Tests de raisonnement",
-    "exams": "Préparations aux examens"
+  "choose": {
+    "open": "Ouvrir",
+    "tests": {
+      "title": "Tests de raisonnement",
+      "description": "Les tests Mbuyamba mesurent ce que tu as retenu sous différents angles : logique, calcul et bases."
+    },
+    "exams": {
+      "title": "Préparations aux examens",
+      "description": "Prépare un examen officiel, comme l’Examen d’État de la RDC."
+    }
+  },
+  "testsPage": {
+    "title": "Tests de raisonnement",
+    "description": "Après tes apprentissages, mesure ce que tu as retenu sous différents angles."
+  },
+  "examsPage": {
+    "title": "Préparations aux examens",
+    "description": "Prépare les examens officiels à ton rythme."
   }
 }

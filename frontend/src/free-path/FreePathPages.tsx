@@ -1,17 +1,13 @@
-import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
 import styles from "./FreePathPages.module.css";
 
-// Tests de raisonnement propres à Mbuyamba et préparation EXETAT, qui conserve sa route existante.
-// Sans route, un test s'affiche en « Contenu à venir » et n'est pas cliquable.
-// Ajouter un test = une entrée ici + ses textes dans freePath.json.
+// Deux familles distinctes : les tests de raisonnement propres à Mbuyamba, et les préparations aux
+// examens officiels (EXETAT, qui conserve sa route existante). Sans route, un test s'affiche en
+// « Contenu à venir » et n'est pas cliquable. Ajouter un test = une entrée ici + ses textes dans freePath.json.
 interface Preparation { id: string; route?: string; icon: PortalIconName; comingSoon: boolean; tone: string }
-
-export const FREE_PATH_TESTS_ANCHOR = "tests-de-raisonnement";
-export const FREE_PATH_EXAMS_ANCHOR = "preparations-examens";
 
 const tests: Preparation[] = [
   { id: "trm", icon: "brain", comingSoon: true, tone: styles.toneTrm },
@@ -22,6 +18,17 @@ const exams: Preparation[] = [
   { id: "exetat", route: "/exetat", icon: "cap", comingSoon: false, tone: styles.toneRdc },
 ];
 
+function Hero({ title, description }: { title: string; description: string }) {
+  return (
+    <header className={styles.hero}>
+      <div>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+    </header>
+  );
+}
+
 function PreparationCard({ id, route, icon, comingSoon, tone }: Preparation) {
   const { t } = useTranslation("freePath");
 
@@ -29,7 +36,7 @@ function PreparationCard({ id, route, icon, comingSoon, tone }: Preparation) {
     <article className={route ? `${styles.card} ${tone}` : `${styles.card} ${tone} ${styles.cardSoon}`}>
       <span className={styles.cardIcon} aria-hidden="true"><PortalIcon name={icon} /></span>
       <div className={styles.cardBody}>
-        <h3>{t(`${id}.title`)}</h3>
+        <h2>{t(`${id}.title`)}</h2>
         <p>{t(`${id}.description`)}</p>
         <span className={comingSoon ? styles.status : `${styles.status} ${styles.statusOn}`}>
           {comingSoon ? t("comingSoon") : t("available")}
@@ -48,44 +55,61 @@ function PreparationCard({ id, route, icon, comingSoon, tone }: Preparation) {
   );
 }
 
+// Page de choix : l'élève décide entre les tests Mbuyamba et les examens officiels.
 export function FreePathPage() {
   const { t } = useTranslation("freePath");
-  const { hash } = useLocation();
-
-  // Les sous-menus du menu latéral pointent vers les sections de cette page.
-  useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView?.();
-  }, [hash]);
+  const choices = [
+    { id: "tests", to: "/parcours-libre/tests", icon: "brain" as const, tone: styles.toneTrm },
+    { id: "exams", to: "/parcours-libre/examens", icon: "cap" as const, tone: styles.toneExams },
+  ];
 
   return (
     <div className={styles.page}>
-      <header className={styles.hero}>
-        <div>
-          <h1>{t("title")}</h1>
-          <p>{t("description")}</p>
-        </div>
-      </header>
+      <Hero title={t("title")} description={t("description")} />
+      <div className={styles.grid}>
+        {choices.map(({ id, to, icon, tone }) => (
+          <article key={id} className={`${styles.card} ${tone}`}>
+            <span className={styles.cardIcon} aria-hidden="true"><PortalIcon name={icon} /></span>
+            <div className={styles.cardBody}>
+              <h2>{t(`choose.${id}.title`)}</h2>
+              <p>{t(`choose.${id}.description`)}</p>
+            </div>
+            <Link to={to} className={styles.action} aria-label={`${t("choose.open")} : ${t(`choose.${id}.title`)}`}>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-      <section id={FREE_PATH_TESTS_ANCHOR} className={styles.group} aria-labelledby="free-path-tests-title">
-        <h2 id="free-path-tests-title" className={styles.groupTitle}>{t("groups.tests")}</h2>
-        <div className={styles.grid}>
-          {tests.map((test) => <PreparationCard key={test.id} {...test} />)}
-        </div>
+export function FreePathTestsPage() {
+  const { t } = useTranslation("freePath");
 
-        <aside className={styles.other}>
-          <PortalIcon name="brain" />
-          <div>
-            <strong>{t("other.text")}</strong>
-          </div>
-        </aside>
-      </section>
+  return (
+    <div className={styles.page}>
+      <Hero title={t("testsPage.title")} description={t("testsPage.description")} />
+      <div className={styles.grid}>
+        {tests.map((test) => <PreparationCard key={test.id} {...test} />)}
+      </div>
+      <aside className={styles.other}>
+        <PortalIcon name="brain" />
+        <div><strong>{t("other.text")}</strong></div>
+      </aside>
+    </div>
+  );
+}
 
-      <section id={FREE_PATH_EXAMS_ANCHOR} className={styles.group} aria-labelledby="free-path-exams-title">
-        <h2 id="free-path-exams-title" className={styles.groupTitle}>{t("groups.exams")}</h2>
-        <div className={styles.grid}>
-          {exams.map((exam) => <PreparationCard key={exam.id} {...exam} />)}
-        </div>
-      </section>
+export function FreePathExamsPage() {
+  const { t } = useTranslation("freePath");
+
+  return (
+    <div className={styles.page}>
+      <Hero title={t("examsPage.title")} description={t("examsPage.description")} />
+      <div className={styles.grid}>
+        {exams.map((exam) => <PreparationCard key={exam.id} {...exam} />)}
+      </div>
     </div>
   );
 }

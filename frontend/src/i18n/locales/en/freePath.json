@@ -1,11 +1,11 @@
 {
   "section": {
     "title": "Free learning path",
-    "description": "Test what you know from different angles: TRM, QMT, MBD and the EXETAT.",
+    "description": "Mbuyamba tests and State Examination preparation, at your own pace.",
     "action": "Explore the free learning path"
   },
-  "title": "Free learning path — Reasoning tests",
-  "description": "After your lessons, measure what you have retained from different angles. Choose a test and see where you stand.",
+  "title": "Free learning path",
+  "description": "Measure what you know with the Mbuyamba tests, or prepare for an official exam.",
   "other": {
     "text": "More tests are coming soon."
   },
@@ -28,8 +28,23 @@
     "title": "EXETAT — State Examination",
     "description": "Preparation for the mathematics papers of the DRC State Examination."
   },
-  "groups": {
-    "tests": "Reasoning tests",
-    "exams": "Exam preparation"
+  "choose": {
+    "open": "Open",
+    "tests": {
+      "title": "Reasoning tests",
+      "description": "The Mbuyamba tests measure what you have retained from different angles: logic, calculation and foundations."
+    },
+    "exams": {
+      "title": "Exam preparation",
+      "description": "Prepare for an official exam, such as the DRC State Examination."
+    }
+  },
+  "testsPage": {
+    "title": "Reasoning tests",
+    "description": "After your lessons, measure what you have retained from different angles."
+  },
+  "examsPage": {
+    "title": "Exam preparation",
+    "description": "Prepare for official exams at your own pace."
   }
 }

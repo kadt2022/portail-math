@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { PortalIcon, type PortalIconName } from "../components/PortalIcon";
 
-import { FREE_PATH_EXAMS_ANCHOR, FREE_PATH_TESTS_ANCHOR } from "../free-path/FreePathPages";
 import { PRIMARY_COURSES } from "./course-navigation";
 import { navigationLinks } from "./navigation";
 import styles from "./Sidebar.module.css";
@@ -23,11 +22,10 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
   const primaryActive = location.pathname.startsWith("/apprentissages/primaire/");
   const [primaryOpen, setPrimaryOpen] = useState(primaryActive);
   const [secondaryOpen, setSecondaryOpen] = useState(false);
-  const examsSelected =
-    location.pathname.startsWith("/exetat") ||
-    (location.pathname === "/parcours-libre" && location.hash === `#${FREE_PATH_EXAMS_ANCHOR}`);
-  const testsSelected = location.pathname === "/parcours-libre" && !examsSelected;
-  const freePathActive = testsSelected || examsSelected;
+  const navigate = useNavigate();
+  const examsSelected = location.pathname.startsWith("/exetat") || location.pathname.startsWith("/parcours-libre/examens");
+  const testsSelected = location.pathname.startsWith("/parcours-libre/tests");
+  const freePathActive = location.pathname.startsWith("/parcours-libre") || examsSelected;
   const [freePathOpen, setFreePathOpen] = useState(freePathActive);
   const [previousPath, setPreviousPath] = useState(location.pathname);
 
@@ -167,12 +165,14 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
                 aria-label={t("freePathMenu.sections")}
                 aria-expanded={freePathOpen && !collapsed}
                 title={collapsed ? t("freePathMenu.label") : undefined}
+                // Un clic amène à la page de choix ; un second clic depuis cette page replie le groupe.
                 onClick={() => {
-                  if (collapsed) {
-                    onExpand();
+                  if (collapsed) onExpand();
+                  if (collapsed || !freePathOpen || location.pathname !== "/parcours-libre") {
                     setFreePathOpen(true);
+                    navigate("/parcours-libre");
                   } else {
-                    setFreePathOpen((value) => !value);
+                    setFreePathOpen(false);
                   }
                 }}
               >
@@ -184,8 +184,8 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
               {freePathOpen && !collapsed ? (
                 <div className={styles.coursePanel}>
                   {[
-                    { id: "tests", to: `/parcours-libre#${FREE_PATH_TESTS_ANCHOR}`, selected: testsSelected, label: t("freePathMenu.tests") },
-                    { id: "exams", to: `/parcours-libre#${FREE_PATH_EXAMS_ANCHOR}`, selected: examsSelected, label: t("freePathMenu.exams") },
+                    { id: "tests", to: "/parcours-libre/tests", selected: testsSelected, label: t("freePathMenu.tests") },
+                    { id: "exams", to: "/parcours-libre/examens", selected: examsSelected, label: t("freePathMenu.exams") },
                   ].map(({ id, to, selected, label }) => (
                     <Link
                       key={id}
