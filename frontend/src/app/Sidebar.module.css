@@ -8,6 +8,8 @@
 
 .sidebar {
   --sidebar-ink: #33465b;
+  /* Sous-menus : la couleur du menu, un peu plus légère. */
+  --sidebar-sub-ink: #5a6e85;
   --sidebar-muted: #63758b;
   --sidebar-accent: #476b94;
   --sidebar-hover: #f1f5fa;
@@ -191,7 +193,7 @@
   min-height: 48px;
   padding: 10px 12px 10px 36px;
   border-radius: 12px;
-  color: var(--sidebar-ink);
+  color: var(--sidebar-sub-ink);
   font-size: 14px;
   font-weight: 650;
   line-height: 1.5;
@@ -253,7 +255,7 @@
   border-radius: var(--pm-radius-md);
   background: var(--sidebar-panel);
   box-shadow: none;
-  color: var(--sidebar-ink);
+  color: var(--sidebar-sub-ink);
   font-size: 14px;
   font-weight: 650;
   line-height: 1.5;
