@@ -81,6 +81,7 @@ export function DashboardPage() {
               </div>
             </section>
           </div>
+          <FreePathSection />
         </section>
 
         <section className={styles.welcome} aria-labelledby="welcome-title">
@@ -95,8 +96,6 @@ export function DashboardPage() {
           </div>
         </section>
       </div>
-
-      <FreePathSection />
 
       <div className={styles.featureGrid}>
         {features.map(({ id, to, icon, art }) => (

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type PortalIconName = "home" | "book" | "school" | "cap" | "file" | "library" | "game" | "progress" | "lock" | "info";
+export type PortalIconName = "home" | "book" | "school" | "cap" | "file" | "library" | "game" | "progress" | "lock" | "info" | "compass";
 
 export function PortalIcon({ name, className }: { name: PortalIconName; className?: string }) {
   const paths: Record<PortalIconName, ReactNode> = {
@@ -14,6 +14,7 @@ export function PortalIcon({ name, className }: { name: PortalIconName; classNam
     progress: <><path d="M4 20v-5h3v5M11 20v-9h3v9M18 20V6h3v14M3 10l6-5 5 2 6-5M17 2h3v3" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3" /></>,
     info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.1" /></>,
+    compass: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" /></>,
   };
   return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{paths[name]}</svg>;
 }

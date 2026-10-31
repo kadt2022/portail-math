@@ -25,11 +25,10 @@ describe("Parcours libre", () => {
   expect(screen.getByRole("link", { name: "Retour au Parcours libre" })).toHaveAttribute("href", "/parcours-libre");
   expect(fetch).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled(); storage.mockRestore();
  });
- it.each(["fr", "en"])("annonce les repères du parcours et les trois rubriques GRE à venir en %s", async language => {
+ it.each(["fr", "en"])("annonce les autres préparations et les trois rubriques GRE à venir en %s", async language => {
   await i18next.changeLanguage(language);
   const { unmount } = render(<MemoryRouter><FreePathPage /></MemoryRouter>);
-  expect(screen.getAllByRole("listitem")).toHaveLength(3);
-  expect(screen.getByText(language === "fr" ? "Sans compte supplémentaire" : "No extra account needed")).toBeInTheDocument();
+  expect(screen.getByText(language === "fr" ? "Autres préparations" : "More preparations")).toBeInTheDocument();
   unmount();
   render(<MemoryRouter><GrePage /></MemoryRouter>);
   const items = screen.getAllByRole("listitem");
@@ -39,8 +38,9 @@ describe("Parcours libre", () => {
  it("présente le Parcours libre comme section propre, hors des cartes primaire et secondaire", () => {
   window.history.pushState({}, "", "/app"); render(<AppRouter />);
   const section = screen.getByRole("region", { name: "Parcours libre" });
-  expect(within(section).getByRole("link", { name: /Explorer le Parcours libre/ })).toHaveAttribute("href", "/app/parcours-libre");
+  expect(within(section).getByRole("link", { name: /Explorer le parcours libre/i })).toHaveAttribute("href", "/app/parcours-libre");
   expect(screen.getByRole("region", { name: "Parcours primaire" })).not.toContainElement(section);
+  expect(screen.getByRole("region", { name: "Choisir un parcours" })).toContainElement(section);
   expect(screen.getByRole("region", { name: "Parcours secondaire" })).not.toContainElement(section);
  });
  it("relie tableau de bord, menu, GRE et retour avec changement FR/EN", async () => {
@@ -48,7 +48,7 @@ describe("Parcours libre", () => {
   const nav = screen.getByRole("navigation", { name: "Navigation principale" });
   expect(within(nav).getByRole("link", { name: "Parcours libre" })).toHaveAttribute("href", "/app/parcours-libre");
   expect(within(nav).getByRole("link", { name: "Préparer l'EXETAT" })).toHaveAttribute("href", "/app/exetat");
-  await user.click(screen.getByRole("link", { name: /Explorer le Parcours libre/ }));
+  await user.click(screen.getByRole("link", { name: /Explorer le parcours libre/i }));
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Parcours libre — Préparations aux examens");
   await user.click(screen.getByRole("link", { name: /Découvrir la préparation : GRE/ }));
   expect(window.location.pathname).toBe("/app/parcours-libre/gre");

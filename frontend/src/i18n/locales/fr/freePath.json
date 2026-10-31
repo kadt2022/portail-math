@@ -1,18 +1,15 @@
 {
   "section": {
-    "eyebrow": "Pour les candidats aux examens",
     "title": "Parcours libre",
-    "description": "Prépare tes examens à ton rythme : ressources, exercices et évaluations, GRE et EXETAT.",
-    "action": "Explorer le Parcours libre",
-    "tilesLabel": "Préparations"
+    "description": "Prépare tes examens à ton rythme : GRE et EXETAT.",
+    "action": "Explorer le parcours libre"
   },
-  "eyebrow": "Parcours libre",
   "title": "Parcours libre — Préparations aux examens",
   "description": "Prépare tes examens à ton rythme. Choisis une préparation pour découvrir progressivement les ressources, les exercices et les évaluations disponibles.",
-  "highlights": {
-    "pace": "À ton rythme",
-    "content": "Ressources, exercices, évaluations",
-    "noAccount": "Sans compte supplémentaire"
+  "preparationsTitle": "Nos préparations aux examens",
+  "other": {
+    "title": "Autres préparations",
+    "text": "D’autres préparations seront ajoutées progressivement."
   },
   "back": "Retour au tableau de bord",
   "discover": "Découvrir la préparation",

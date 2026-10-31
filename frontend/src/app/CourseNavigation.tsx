@@ -203,6 +203,15 @@ export function CourseNavigation() {
         </NavLink>
 
         <NavLink
+          to="/parcours-libre"
+          className={({ isActive }) =>
+            isActive ? `${styles.directLink} ${styles.active}` : styles.directLink
+          }
+        >
+          {t("nav.freePath")}
+        </NavLink>
+
+        <NavLink
           to="/progression"
           className={({ isActive }) =>
             isActive ? `${styles.directLink} ${styles.active}` : styles.directLink
