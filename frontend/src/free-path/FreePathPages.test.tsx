@@ -8,14 +8,18 @@ import { i18next } from "../i18n/i18n";
 
 afterEach(async () => { vi.unstubAllGlobals(); await i18next.changeLanguage("fr"); });
 describe("Parcours libre", () => {
- it.each(["fr", "en"])("affiche uniquement GRE et EXETAT en %s", async language => {
+ it.each(["fr", "en"])("affiche six préparations dont seules GRE et EXETAT sont ouvertes en %s", async language => {
   await i18next.changeLanguage(language);
   render(<MemoryRouter><FreePathPage /></MemoryRouter>);
   const cards = screen.getAllByRole("article");
-  expect(cards).toHaveLength(2);
-  expect(within(cards[0]).getByRole("link")).toHaveAttribute("href", "/parcours-libre/gre");
-  expect(within(cards[1]).getByRole("link")).toHaveAttribute("href", "/exetat");
-  expect(within(cards[0]).getByText(language === "fr" ? "Contenu à venir" : "Content coming soon")).toBeInTheDocument();
+  const linked = cards.filter(card => within(card).queryByRole("link"));
+  expect(linked).toHaveLength(2);
+  expect(cards.filter(card => !within(card).queryByRole("link"))).toHaveLength(4);
+  expect(cards).toHaveLength(6);
+  expect(within(linked[0]).getByRole("link")).toHaveAttribute("href", "/parcours-libre/gre");
+  expect(within(linked[1]).getByRole("link")).toHaveAttribute("href", "/exetat");
+  cards.slice(0, 5).forEach(card => expect(within(card).getByText(language === "fr" ? "Contenu à venir" : "Content coming soon")).toBeInTheDocument());
+  expect(within(cards[5]).getByText(language === "fr" ? "Disponible" : "Available")).toBeInTheDocument();
  });
  it("GRE reste vide sans appel API ni progression enregistrée", () => {
   const fetch = vi.fn(); vi.stubGlobal("fetch", fetch);

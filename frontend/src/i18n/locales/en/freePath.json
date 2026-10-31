@@ -28,6 +28,22 @@
       "assessments": "Assessments"
     }
   },
+  "sat": {
+    "title": "SAT — Scholastic Assessment Test",
+    "description": "Preparation for the SAT for university studies."
+  },
+  "act": {
+    "title": "ACT — American College Testing",
+    "description": "Preparation for the ACT for university studies."
+  },
+  "toefl": {
+    "title": "TOEFL — Test of English as a Foreign Language",
+    "description": "Preparation for the English as a foreign language test."
+  },
+  "ielts": {
+    "title": "IELTS — International English Language Testing System",
+    "description": "Preparation for the international English test."
+  },
   "exetat": {
     "sigil": "EXETAT",
     "title": "EXETAT — State Examination",
