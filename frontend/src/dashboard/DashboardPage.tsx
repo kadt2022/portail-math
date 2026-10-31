@@ -80,6 +80,14 @@ export function DashboardPage() {
               </div>
             </section>
           </div>
+          <Link to="/parcours-libre" className={styles.freePath}>
+            <PortalIcon name="cap" />
+            <div>
+              <h2>{t("home.freePath.title")}</h2>
+              <p>{t("home.freePath.description")}</p>
+              <strong>{t("home.freePath.action")} →</strong>
+            </div>
+          </Link>
         </section>
 
         <section className={styles.welcome} aria-labelledby="welcome-title">

@@ -13,6 +13,7 @@ export interface NavigationLink {
 // pointerait vers "/app/app".
 export const navigationLinks: NavigationLink[] = [
   { to: "/", labelKey: "nav.dashboard" },
+  { to: "/parcours-libre", labelKey: "nav.freePath" },
   { to: "/exetat", labelKey: "nav.exetat" },
   { to: "/bibliotheque", labelKey: "nav.library" },
   { to: "/jeux", labelKey: "nav.games" },

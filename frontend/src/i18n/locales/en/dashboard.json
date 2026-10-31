@@ -113,6 +113,11 @@
       "title": "Revise and test your knowledge",
       "description": "Questions, corrections and a way to track your results.",
       "cta": "Get started"
+    },
+    "freePath": {
+      "title": "Free learning path",
+      "description": "Prepare for exams at your own pace: GRE and EXETAT.",
+      "action": "Explore the free learning path"
     }
   }
 }

@@ -113,6 +113,11 @@
       "title": "Révise et teste tes connaissances",
       "description": "Des questions, des corrections et un suivi de tes résultats.",
       "cta": "Commencer"
+    },
+    "freePath": {
+      "title": "Parcours libre",
+      "description": "Prépare tes examens à ton rythme : GRE et EXETAT.",
+      "action": "Explorer le Parcours libre"
     }
   }
 }

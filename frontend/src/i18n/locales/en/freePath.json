@@ -1,0 +1,17 @@
+{
+  "title": "Free learning path — Exam preparation",
+  "description": "Prepare for your exams at your own pace. Choose a preparation to gradually discover the available resources, exercises and assessments.",
+  "back": "Back to dashboard",
+  "discover": "Explore preparation",
+  "comingSoon": "Content coming soon",
+  "gre": {
+    "title": "GRE — Graduate Record Examination",
+    "description": "Preparation for GRE quantitative reasoning.",
+    "empty": "Resources, exercises and assessments will be added gradually.",
+    "back": "Back to free learning path"
+  },
+  "exetat": {
+    "title": "EXETAT — State Examination",
+    "description": "Preparation for the mathematics papers of the DRC State Examination."
+  }
+}

@@ -200,3 +200,10 @@ a.level:focus-visible { outline: 3px solid #246b75; outline-offset: 2px; }
 .sectionHeading .iconBadge svg { width: 24px; height: 24px; }
 
 .sectionHeading .iconBadge { background: linear-gradient(135deg, #315475, #246b75); }
+
+.freePath { display:flex; gap:14px; margin-top:14px; padding:18px; border-radius:19px; background:#e6f5ef; color:#246b75; text-decoration:none; }
+.freePath > svg { width:36px; height:36px; flex:0 0 auto; }
+.freePath h2 { margin:0 0 8px; font-size:20px; }
+.freePath p { color:#5f6f77; line-height:1.6; }
+.freePath:hover { background:#d6eee5; }
+.freePath:focus-visible { outline:3px solid #246b75; outline-offset:3px; }

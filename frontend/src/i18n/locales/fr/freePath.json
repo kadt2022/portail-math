@@ -1,0 +1,17 @@
+{
+  "title": "Parcours libre — Préparations aux examens",
+  "description": "Prépare tes examens à ton rythme. Choisis une préparation pour découvrir progressivement les ressources, les exercices et les évaluations disponibles.",
+  "back": "Retour au tableau de bord",
+  "discover": "Découvrir la préparation",
+  "comingSoon": "Contenu à venir",
+  "gre": {
+    "title": "GRE — Graduate Record Examination",
+    "description": "Préparation au raisonnement quantitatif du GRE.",
+    "empty": "Les ressources, les exercices et les évaluations seront ajoutés progressivement.",
+    "back": "Retour au Parcours libre"
+  },
+  "exetat": {
+    "title": "EXETAT — Examen d’État",
+    "description": "Préparation aux épreuves de mathématiques de l’Examen d’État de la RDC."
+  }
+}
