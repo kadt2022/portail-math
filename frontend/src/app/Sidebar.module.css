@@ -11,11 +11,8 @@
   --sidebar-muted: #63758b;
   --sidebar-accent: #476b94;
   --sidebar-hover: #f1f5fa;
-  /* Fond des sous-menus : la teinte bleutée du menu, en plus léger, nettement distincte du fond du bloc. */
-  --sidebar-panel: #eef3fa;
-  --sidebar-sub-line: #dbe6f3;
-  --sidebar-sub-hover: #e3ecf8;
-  --sidebar-sub-active: #d9e6f6;
+  /* Fond des sous-menus : un niveau plus clair que le fond du menu. */
+  --sidebar-panel: #ffffff;
   --sidebar-active: #e8f0fa;
   --sidebar-active-ink: #244f7e;
   position: fixed;
@@ -80,7 +77,7 @@
 
 .navSection .coursePanel {
   margin-left: 0;
-  background: transparent;
+  background: var(--sidebar-panel);
 }
 
 .link {
@@ -184,7 +181,6 @@
   padding: 8px;
   border-radius: var(--pm-radius-md);
   background: var(--sidebar-panel);
-  border: 1px solid var(--sidebar-sub-line);
   box-shadow: none;
 }
 
@@ -212,12 +208,12 @@
 }
 
 .levelLink:hover {
-  background: var(--sidebar-sub-hover);
+  background: var(--sidebar-hover);
   color: var(--sidebar-active-ink);
 }
 
 .levelLinkActive {
-  background: var(--sidebar-sub-active);
+  background: var(--sidebar-active);
   color: var(--sidebar-active-ink);
   font-weight: 850;
 }
@@ -257,7 +253,6 @@
   padding: 10px 12px 10px 36px;
   border-radius: var(--pm-radius-md);
   background: var(--sidebar-panel);
-  border: 1px solid var(--sidebar-sub-line);
   box-shadow: none;
   color: var(--sidebar-ink);
   font-size: 14px;
