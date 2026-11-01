@@ -1,0 +1,53 @@
+{
+  "skipToContent": "Aller au contenu",
+  "backToPortal": "Retour au portail Mbuyamba",
+  "menu": {
+    "open": "Ouvrir le sommaire",
+    "close": "Fermer le sommaire"
+  },
+  "nav": {
+    "label": "Sommaire du cours",
+    "heading": "Parcours",
+    "start": "Bien démarrer",
+    "comingSoon": "À venir",
+    "lessonsOf": "Leçons du module {{number}}"
+  },
+  "progress": {
+    "label": "Votre progression",
+    "summary": "{{completed}} sur {{total}} leçons",
+    "aria": "Progression du cours"
+  },
+  "search": {
+    "button": "Rechercher",
+    "aria": "Rechercher dans le cours",
+    "title": "Rechercher dans le cours",
+    "placeholder": "Un module, une leçon…",
+    "hint": "Cherche un module ou une leçon de ce parcours.",
+    "none": "Aucun résultat. Essaie un autre mot.",
+    "close": "Fermer la recherche",
+    "module": "Module {{number}}",
+    "intro": "Bien démarrer"
+  },
+  "theme": {
+    "toLight": "Activer le thème clair",
+    "toDark": "Activer le thème sombre"
+  },
+  "moduleNav": {
+    "label": "Navigation entre les modules",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "intro": "Bien démarrer",
+    "module": "Module {{number}}"
+  },
+  "intro": {
+    "badgeModules_one": "{{count}} module",
+    "badgeModules_other": "{{count}} modules",
+    "badgeLessons_one": "{{count}} leçon disponible",
+    "badgeLessons_other": "{{count}} leçons disponibles",
+    "badgeEvaluations_one": "{{count}} évaluation disponible",
+    "badgeEvaluations_other": "{{count}} évaluations disponibles",
+    "statModules": "modules disponibles sur {{total}}",
+    "statLessons": "leçons disponibles",
+    "statEvaluations": "évaluations disponibles"
+  }
+}
