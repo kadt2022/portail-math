@@ -681,14 +681,19 @@
     display: block;
   }
 
+  /* Fermé, le tiroir est retiré de la navigation clavier et des lecteurs d'écran (pas seulement décalé hors écran) ;
+     la visibilité ne bascule qu'à la fin de l'animation de fermeture. */
   .sidebar {
     box-shadow: 10px 0 40px rgb(7 24 41 / 13%);
     transform: translateX(-102%);
-    transition: transform 0.23s ease;
+    transition: transform 0.23s ease, visibility 0s linear 0.23s;
+    visibility: hidden;
   }
 
   .sidebarOpen {
     transform: translateX(0);
+    transition: transform 0.23s ease, visibility 0s;
+    visibility: visible;
   }
 
   .backdropOpen {
