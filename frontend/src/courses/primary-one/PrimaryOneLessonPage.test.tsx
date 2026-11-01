@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import i18next from "i18next";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -51,6 +51,31 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     expect(screen.getByRole("link",{name:/leçon suivante/i})).toHaveAttribute("href",lessonPath(lesson.moduleId,PRIMARY_ONE_MODULES[0].lessons[1].id));
     expect(JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[lesson.id].completed).toBe(true);
     expect(Object.keys(JSON.parse(localStorage.getItem(RESULTS_KEY)!))).toHaveLength(6);
+  });
+  it("affiche la vidéo de Yamba seulement dans l’étape Je découvre de la première leçon",async () => {
+    const user=userEvent.setup();
+    const videoName="Vidéo de Yamba : Même ou différent ?";
+    const first=renderLesson();
+    expect(screen.getByText(/Étape 1 sur 6 — Je découvre/)).toBeInTheDocument();
+    expect(screen.getByLabelText(videoName)).toHaveAttribute("src",expect.stringContaining("meme-ou-different"));
+    await user.click(screen.getByRole("button",{name:"Continuer"}));
+    expect(screen.getByText(/Étape 2 sur 6 — Je comprends/)).toBeInTheDocument();
+    expect(screen.queryByLabelText(videoName)).not.toBeInTheDocument();
+    first.unmount();
+    const other=PRIMARY_ONE_MODULES[0].lessons[1];renderLesson(other.id,other.moduleId);
+    expect(screen.getByText(/Étape 1 sur 6 — Je découvre/)).toBeInTheDocument();
+    expect(document.querySelector("video")).toBeNull();
+  });
+  it("laisse la progression inchangée pendant et après la lecture de la vidéo",async () => {
+    const user=userEvent.setup();renderLesson();
+    const video=screen.getByLabelText("Vidéo de Yamba : Même ou différent ?");
+    fireEvent.play(video);fireEvent.ended(video);
+    const stored=()=>JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[lesson.id];
+    expect(stored().completedStepIds).toHaveLength(0);
+    expect(screen.getByRole("button",{name:"Continuer"})).toBeEnabled();
+    await user.click(screen.getByRole("button",{name:"Continuer"}));
+    expect(screen.getByText(/Étape 2 sur 6 — Je comprends/)).toBeInTheDocument();
+    expect(stored().completedStepIds).toHaveLength(1);
   });
   it("affiche les résultats d’une évaluation et un lien de révision après une erreur",async () => {
     const user=userEvent.setup();const item=PRIMARY_ONE_MODULES[9].evaluation;renderLesson(item.id,item.moduleId);

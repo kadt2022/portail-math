@@ -136,6 +136,11 @@
     "languageNotice": "This course uses the French RDC textbook. Switch to French to start or resume your activities.",
     "switchFrench": "Switch to French"
   },
+  "lessonVideo": {
+    "label": "Yamba's video: {{title}}",
+    "replay": "Watch again",
+    "unavailable": "The video is not available right now. You can still continue the lesson."
+  },
   "contentPending": {
     "title": "Teaching content to be completed",
     "moduleMessage": "The approved material does not yet include this module's lessons. No concepts or questions have been invented.",

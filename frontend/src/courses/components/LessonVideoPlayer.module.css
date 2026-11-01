@@ -1,0 +1,54 @@
+.player {
+  width: 100%;
+  margin: 0;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #cbe2d8;
+  border-radius: var(--pm-radius-lg);
+  background: #fff4dd;
+  box-shadow: var(--pm-shadow-md);
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  color: var(--pm-ink-soft);
+  font-size: 15px;
+}
+
+.replay {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--pm-brand);
+  border-radius: var(--pm-radius-sm);
+  background: transparent;
+  color: var(--pm-brand);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.replay:hover {
+  background: rgb(255 255 255 / 72%);
+}
+
+.replay:focus-visible {
+  outline: 3px solid var(--pm-accent);
+  outline-offset: 2px;
+}
+
+.unavailable {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px dashed #cfa980;
+  border-radius: var(--pm-radius-sm);
+  background: rgb(255 255 255 / 72%);
+}

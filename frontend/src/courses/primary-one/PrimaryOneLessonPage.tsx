@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { CourseActionIcon } from "../components/CourseActionIcon";
+import { LessonVideoPlayer } from "../components/LessonVideoPlayer";
 import { YambaGuide } from "../components/YambaGuide";
 import {
   getAllLearningItems,
@@ -19,6 +20,7 @@ import { useCourseProgress } from "./useCourseProgress";
 import { PrimaryOneActivity } from "./PrimaryOneActivity";
 import { AssessmentResult } from "./AssessmentResult";
 import { EVALUATIONS } from "./lesson-content";
+import { LESSON_VIDEOS } from "./lesson-videos";
 
 export function PrimaryOneLessonPage() {
   const { moduleId, lessonId } = useParams();
@@ -120,6 +122,7 @@ export function PrimaryOneLessonPage() {
   const questions = questionsForStep(item, step);
   const stepCompleted = Boolean(storedItem?.completedStepIds.includes(step.id));
   const canContinue = questions.length === 0 || stepCompleted;
+  const lessonVideo = step.kind === "discover" ? LESSON_VIDEOS[item.id] : undefined;
 
   const continueLesson = () => {
     if (!canContinue) return;
@@ -179,6 +182,12 @@ export function PrimaryOneLessonPage() {
           <h2 id="activity-step-title">{t(step.labelKey)}</h2>
           <p>{t(`content.${item.id}.${step.kind}`)}</p>
         </div>
+        {lessonVideo ? (
+          <LessonVideoPlayer
+            src={lessonVideo}
+            title={t("lessonVideo.label", { title: t(item.titleKey) })}
+          />
+        ) : null}
       </section>}
       {!canContinue ? <p aria-live="polite">{t("lesson.validationRequired")}</p> : null}
 
