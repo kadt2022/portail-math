@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PrimaryCoursePage } from "../courses/PrimaryCoursePage";
+import { CourseReaderLayout } from "../reader/CourseReaderLayout";
 import { PrimaryFourCoursePage } from "../courses/primary-four/PrimaryFourCoursePage";
 import { PrimaryFourLessonPage } from "../courses/primary-four/PrimaryFourLessonPage";
 import { PrimaryFourModulePage } from "../courses/primary-four/PrimaryFourModulePage";
@@ -54,34 +55,7 @@ export function AppRouter() {
   return (
     <BrowserRouter basename="/app">
       <Routes>
-        <Route element={<AppLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="parcours-libre" element={<FreePathPage />} />
-          <Route path="parcours-libre/tests" element={<FreePathTestsPage />} />
-          <Route path="parcours-libre/examens" element={<FreePathExamsPage />} />
-          <Route path="exetat" element={<ExetatCataloguePage />} />
-          <Route path="exetat/matieres/:subjectId" element={<ExetatSubjectPage />} />
-          <Route
-            path="exetat/matieres/:subjectId/entrainement"
-            element={<ExetatTrainingPage />}
-          />
-          <Route path="exetat/matieres/:subjectId/quiz" element={<ExetatQuizPage />} />
-          <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
-          <Route path="bibliotheque" element={<LibraryPage />} />
-          <Route path="bibliotheque/:bookId" element={<Suspense fallback={null}><LibraryReaderPage /></Suspense>} />
-          <Route path="jeux" element={<GamesCataloguePage />} />
-          <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
-          <Route
-            path="jeux/turbo-pulse"
-            element={
-              <Suspense fallback={null}>
-                <TurboPulsePage />
-              </Suspense>
-            }
-          />
-          <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
-          <Route path="progression" element={<ProgressionPage />} />
-          <Route path="a-propos" element={<AboutPage />} />
+        <Route element={<CourseReaderLayout />}>
           <Route
             path="apprentissages/primaire/1/mathematiques"
             element={<PrimaryOneCoursePage />}
@@ -130,6 +104,35 @@ export function AppRouter() {
             path="apprentissages/primaire/4/mathematiques/modules/:moduleId/lecons/:lessonId"
             element={<PrimaryFourLessonPage />}
           />
+        </Route>
+        <Route element={<AppLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="parcours-libre" element={<FreePathPage />} />
+          <Route path="parcours-libre/tests" element={<FreePathTestsPage />} />
+          <Route path="parcours-libre/examens" element={<FreePathExamsPage />} />
+          <Route path="exetat" element={<ExetatCataloguePage />} />
+          <Route path="exetat/matieres/:subjectId" element={<ExetatSubjectPage />} />
+          <Route
+            path="exetat/matieres/:subjectId/entrainement"
+            element={<ExetatTrainingPage />}
+          />
+          <Route path="exetat/matieres/:subjectId/quiz" element={<ExetatQuizPage />} />
+          <Route path="exetat/quizzes/:quizId/resultats" element={<ExetatResultsPage />} />
+          <Route path="bibliotheque" element={<LibraryPage />} />
+          <Route path="bibliotheque/:bookId" element={<Suspense fallback={null}><LibraryReaderPage /></Suspense>} />
+          <Route path="jeux" element={<GamesCataloguePage />} />
+          <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
+          <Route
+            path="jeux/turbo-pulse"
+            element={
+              <Suspense fallback={null}>
+                <TurboPulsePage />
+              </Suspense>
+            }
+          />
+          <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
+          <Route path="progression" element={<ProgressionPage />} />
+          <Route path="a-propos" element={<AboutPage />} />
           {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route
               key={course.id}
