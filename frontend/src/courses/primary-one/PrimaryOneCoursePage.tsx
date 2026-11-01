@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 
 import { CourseActionIcon } from "../components/CourseActionIcon";
 import { YambaGuide } from "../components/YambaGuide";
+import { CourseIntroduction } from "../../reader/CourseIntroduction";
 import {
   lessonPath,
   modulePath,
+  PRIMARY_ONE_COURSE_ID,
   PRIMARY_ONE_MODULES,
   PRIMARY_ONE_FINAL,
 } from "./course-catalogue";
@@ -45,43 +47,25 @@ export function PrimaryOneCoursePage() {
 
   return (
     <div className={styles.page}>
-      <section className={styles.courseHero} aria-labelledby="primary-one-title">
-        <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>{t("course.eyebrow")}</p>
-          <h1 id="primary-one-title">{t("course.title")}</h1>
-          <p className={styles.lead}>{t("course.lead")}</p>
-          <YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />
-        </div>
-
-        <div className={styles.overallProgress}>
-          <div className={styles.progressHeading}>
-            <div>
-              <span className={styles.progressLabel}>{t("progress.overall")}</span>
-              <strong>
-                {t("progress.lessons", {
-                  completed: summary.completedLessons,
-                  total: summary.totalLessons,
-                })}
-              </strong>
-            </div>
-            <span className={styles.percentage}>{summary.percentage} %</span>
-          </div>
-          <div
-            className={styles.progressTrack}
-            role="progressbar"
-            aria-label={t("progress.overall")}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={summary.percentage}
-          >
-            <span style={{ width: `${summary.percentage}%` }} />
-          </div>
-          <Link className={styles.primaryAction} to={actionHref(primaryAction)}>
-            <CourseActionIcon className={styles.actionIcon} name={primaryAction.type} />
-            {t(actionLabelKey(primaryAction))}
-          </Link>
-        </div>
-      </section>
+      <CourseIntroduction
+        courseId={PRIMARY_ONE_COURSE_ID}
+        titleId="primary-one-title"
+        eyebrow={t("course.eyebrow")}
+        title={t("course.title")}
+        lead={t("course.lead")}
+        action={{
+          label: t(actionLabelKey(primaryAction)),
+          to: actionHref(primaryAction),
+          icon: <CourseActionIcon className={styles.actionIcon} name={primaryAction.type} />,
+        }}
+        progress={{
+          label: t("progress.overall"),
+          text: t("progress.lessons", { completed: summary.completedLessons, total: summary.totalLessons }),
+          percentage: summary.percentage,
+          percentageText: `${summary.percentage} %`,
+        }}
+        guide={<YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />}
+      />
 
       <section className={styles.moduleHero} aria-label={t("evaluation.finalTitle")}>
         <div><h2>{t("evaluation.finalTitle")}</h2><p>{t("evaluation.finalLead")}</p></div>

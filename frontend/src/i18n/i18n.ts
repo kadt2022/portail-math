@@ -2,7 +2,9 @@ import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import freePathEn from "./locales/en/freePath.json";
+import readerEn from "./locales/en/reader.json";
 import freePathFr from "./locales/fr/freePath.json";
+import readerFr from "./locales/fr/reader.json";
 import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import exetatEn from "./locales/en/exetat.json";
@@ -37,6 +39,7 @@ void i18next
     supportedLngs: SUPPORTED_LANGUAGES,
     ns: [
       "freePath",
+      "reader",
       "common",
       "dashboard",
       "exetat",
@@ -55,6 +58,7 @@ void i18next
     resources: {
       fr: {
         freePath: freePathFr,
+        reader: readerFr,
         common: commonFr,
         dashboard: dashboardFr,
         exetat: exetatFr,
@@ -68,6 +72,7 @@ void i18next
       },
       en: {
         freePath: freePathEn,
+        reader: readerEn,
         common: commonEn,
         dashboard: dashboardEn,
         exetat: exetatEn,

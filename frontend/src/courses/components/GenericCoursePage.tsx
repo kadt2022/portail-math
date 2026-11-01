@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import type { CourseDefinition, CourseModule } from "../course-engine/course-model";
-import { getPublishedModuleItems } from "../course-engine/course-model";
 import {
   getCoursePrimaryAction,
   getCourseProgress,
@@ -11,6 +10,7 @@ import {
 } from "../course-engine/course-progress";
 import { useCourseProgress } from "../course-engine/useCourseProgress";
 import baseStyles from "../primary-one/PrimaryOneCourse.module.css";
+import { CourseIntroduction } from "../../reader/CourseIntroduction";
 import { CourseActionIcon } from "./CourseActionIcon";
 import { YambaGuide } from "./YambaGuide";
 
@@ -54,56 +54,28 @@ export function GenericCoursePage({
   const { progress } = useCourseProgress(course.id);
   const summary = getCourseProgress(progress, course);
   const primaryAction = getCoursePrimaryAction(progress, course);
-  // Le compteur « leçons disponibles » ne doit annoncer que des leçons : une
-  // évaluation publiée ne doit pas se compter comme une leçon en plus (sinon
-  // le module 1 affiche « 5 leçons » pour 4 leçons + 1 évaluation).
-  const publishedCount = modules.reduce(
-    (total, module) => total + getPublishedModuleItems(module).filter((item) => item.kind === "lesson").length,
-    0,
-  );
 
   return (
     <div className={baseStyles.page}>
-      <section className={baseStyles.courseHero} aria-labelledby="course-title">
-        <div className={baseStyles.heroCopy}>
-          <p className={baseStyles.eyebrow}>{t("course.eyebrow")}</p>
-          <h1 id="course-title">{t("course.title")}</h1>
-          <p className={baseStyles.lead}>{t("course.lead")}</p>
-          <p className={comingSoonClassName}>{t("course.published", { count: publishedCount })}</p>
-          <YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />
-        </div>
-
-        <div className={baseStyles.overallProgress}>
-          <div className={baseStyles.progressHeading}>
-            <div>
-              <span className={baseStyles.progressLabel}>{t("progress.overall")}</span>
-              <strong>
-                {t("progress.lessons", {
-                  completed: summary.completedLessons,
-                  total: summary.totalLessons,
-                })}
-              </strong>
-            </div>
-            <span className={baseStyles.percentage}>
-              {formatPercentage(summary.percentage, i18n.language)} %
-            </span>
-          </div>
-          <div
-            className={baseStyles.progressTrack}
-            role="progressbar"
-            aria-label={t("progress.overall")}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={summary.percentage}
-          >
-            <span style={{ width: `${summary.percentage}%` }} />
-          </div>
-          <Link className={baseStyles.primaryAction} to={actionHref(primaryAction, lessonPath, modulePath)}>
-            <CourseActionIcon className={baseStyles.actionIcon} name={primaryAction.type} />
-            {t(`actions.${primaryAction.type}`)}
-          </Link>
-        </div>
-      </section>
+      <CourseIntroduction
+        courseId={course.id}
+        titleId="course-title"
+        eyebrow={t("course.eyebrow")}
+        title={t("course.title")}
+        lead={t("course.lead")}
+        action={{
+          label: t(`actions.${primaryAction.type}`),
+          to: actionHref(primaryAction, lessonPath, modulePath),
+          icon: <CourseActionIcon className={baseStyles.actionIcon} name={primaryAction.type} />,
+        }}
+        progress={{
+          label: t("progress.overall"),
+          text: t("progress.lessons", { completed: summary.completedLessons, total: summary.totalLessons }),
+          percentage: summary.percentage,
+          percentageText: `${formatPercentage(summary.percentage, i18n.language)} %`,
+        }}
+        guide={<YambaGuide name={t("yamba.name")} message={t("yamba.courseWelcome")} />}
+      />
 
       <section className={baseStyles.modulesSection} aria-labelledby="course-modules">
         <div className={baseStyles.sectionHeading}>

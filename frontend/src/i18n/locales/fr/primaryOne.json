@@ -136,6 +136,11 @@
     "languageNotice": "Ce parcours utilise le manuel français de RDC.",
     "switchFrench": "Passer en français"
   },
+  "lessonVideo": {
+    "label": "Vidéo de Yamba : {{title}}",
+    "replay": "Revoir la vidéo",
+    "unavailable": "La vidéo n’est pas disponible pour le moment. Tu peux quand même continuer la leçon."
+  },
   "contentPending": {
     "title": "Contenu pédagogique à compléter",
     "moduleMessage": "Le support validé ne fournit pas encore les leçons de ce module. Aucune notion ni question n'a été inventée.",

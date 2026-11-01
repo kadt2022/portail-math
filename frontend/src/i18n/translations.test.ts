@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import freePathEn from "./locales/en/freePath.json";
+import readerEn from "./locales/en/reader.json";
 import freePathFr from "./locales/fr/freePath.json";
+import readerFr from "./locales/fr/reader.json";
 import commonEn from "./locales/en/common.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import exetatEn from "./locales/en/exetat.json";
@@ -31,6 +33,7 @@ function keyPaths(value: unknown, prefix = ""): string[] {
 
 const NAMESPACES = [
   { name: "freePath", fr: freePathFr, en: freePathEn },
+  { name: "reader", fr: readerFr, en: readerEn },
   { name: "common", fr: commonFr, en: commonEn },
   { name: "dashboard", fr: dashboardFr, en: dashboardEn },
   { name: "exetat", fr: exetatFr, en: exetatEn },

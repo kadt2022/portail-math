@@ -1,0 +1,53 @@
+{
+  "skipToContent": "Skip to content",
+  "backToPortal": "Back to the Mbuyamba portal",
+  "menu": {
+    "open": "Open the course outline",
+    "close": "Close the course outline"
+  },
+  "nav": {
+    "label": "Course outline",
+    "heading": "Learning path",
+    "start": "Getting started",
+    "comingSoon": "Coming soon",
+    "lessonsOf": "Lessons in module {{number}}"
+  },
+  "progress": {
+    "label": "Your progress",
+    "summary": "{{completed}} of {{total}} lessons",
+    "aria": "Course progress"
+  },
+  "search": {
+    "button": "Search",
+    "aria": "Search the course",
+    "title": "Search the course",
+    "placeholder": "A module, a lesson…",
+    "hint": "Look for a module or a lesson in this course.",
+    "none": "No result. Try another word.",
+    "close": "Close the search",
+    "module": "Module {{number}}",
+    "intro": "Getting started"
+  },
+  "theme": {
+    "toLight": "Switch to light theme",
+    "toDark": "Switch to dark theme"
+  },
+  "moduleNav": {
+    "label": "Navigation between modules",
+    "previous": "Previous",
+    "next": "Next",
+    "intro": "Getting started",
+    "module": "Module {{number}}"
+  },
+  "intro": {
+    "badgeModules_one": "{{count}} module",
+    "badgeModules_other": "{{count}} modules",
+    "badgeLessons_one": "{{count}} lesson available",
+    "badgeLessons_other": "{{count}} lessons available",
+    "badgeEvaluations_one": "{{count}} assessment available",
+    "badgeEvaluations_other": "{{count}} assessments available",
+    "statModules": "modules available out of {{total}}",
+    "statLessons": "lessons available",
+    "statEvaluations": "assessments available"
+  }
+}
