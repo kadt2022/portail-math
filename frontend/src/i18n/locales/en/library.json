@@ -47,6 +47,13 @@
       "level": "3rd year of primary",
       "subject": "Mathematics",
       "format": "PDF"
+    },
+    "mathPrimaryFive": {
+      "title": "Je découvre les maths autour de moi · Volume 1",
+      "description": "The first volume of the 5th year: the “Numbers and calculation” unit in 28 lessons. Numbers to 1,000,000 and decimals, Roman numerals, rounding, quick calculation, written operations, the check by 9, budgets and invoices, with an integration week, an assessment and answer keys.",
+      "level": "5th year of primary",
+      "subject": "Mathematics",
+      "format": "PDF"
     }
   },
   "reader": {

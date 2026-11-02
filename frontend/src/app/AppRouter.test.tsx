@@ -64,7 +64,7 @@ describe("Routeur du portail React", () => {
     renderAt("/app/bibliotheque");
     expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
     const bookLinks = await screen.findAllByRole("link", { name: /lire le livre/i });
-    expect(bookLinks).toHaveLength(3);
+    expect(bookLinks).toHaveLength(4);
     expect(bookLinks[0].getAttribute("href")).toMatch(
       /\/app\/bibliotheque\/math-primary-one$/,
     );

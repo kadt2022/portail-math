@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import mathPrimaryFiveCover from "../assets/library-math-primary-five-cover.webp";
 import mathPrimaryOneCover from "../assets/library-math-primary-one-cover.webp";
 import mathPrimaryThreeCover from "../assets/library-math-primary-three-cover.webp";
 import mathPrimaryTwoCover from "../assets/library-math-primary-two-cover.webp";
@@ -45,6 +46,7 @@ const covers: Record<string, string> = {
   "math-primary-one": mathPrimaryOneCover,
   "math-primary-two": mathPrimaryTwoCover,
   "math-primary-three": mathPrimaryThreeCover,
+  "math-primary-five": mathPrimaryFiveCover,
 };
 
 function toBook(dto: LibraryBookDto): LibraryBook {
