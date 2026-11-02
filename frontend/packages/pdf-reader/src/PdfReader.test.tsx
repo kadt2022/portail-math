@@ -2,12 +2,24 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const renderTask = { promise: Promise.resolve(), cancel: vi.fn() };
-const pdfPage = { getViewport: ({ scale }: { scale: number }) => ({ width: 595 * scale, height: 842 * scale }), render: vi.fn(() => renderTask) };
+// Format des pages du document simulé : A4 par défaut, modifiable par un test (livre A5, par exemple).
+const pageSize = { width: 595, height: 842 };
+const pdfPage = { getViewport: ({ scale }: { scale: number }) => ({ width: pageSize.width * scale, height: pageSize.height * scale }), render: vi.fn(() => renderTask) };
 const pdfDocument = { numPages: 75, getPage: vi.fn(async () => pdfPage), getOutline: vi.fn(async () => []), getDestination: vi.fn(), getPageIndex: vi.fn() };
 
 // jsdom ne fournit ni IntersectionObserver (mode continu) ni scrollIntoView.
 class NoopIntersectionObserver {
   observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+// Simule des pages déjà proches de l'écran : l'observateur signale aussitôt l'intersection.
+class VisibleIntersectionObserver {
+  constructor(private readonly callback: IntersectionObserverCallback) {}
+  observe(target: Element) {
+    this.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+  }
   unobserve() {}
   disconnect() {}
 }
@@ -60,6 +72,45 @@ describe("PdfReader", () => {
     vi.unstubAllGlobals();
     documentLoading.pending = false;
     lastTask = null;
+    pageSize.width = 595;
+    pageSize.height = 842;
+  });
+
+  it("enveloppe chaque page d'un cadre à la taille du PDF, pas à celle d'une feuille A4", async () => {
+    pageSize.width = 420;
+    pageSize.height = 595;
+    const { container } = render(<PdfReader url="/livre-a5.pdf" title="Livre A5" labels={labels} />);
+
+    await waitFor(() => expect(container.querySelector("article[data-page='1']")).not.toBeNull());
+    await waitFor(() => {
+      const frame = container.querySelector<HTMLElement>("article[data-page='1']")!;
+      // Le rapport largeur / hauteur du cadre est celui de l'A5 (420 / 595), pas celui de l'A4 (595 / 842).
+      expect(Number.parseFloat(frame.style.height) / Number.parseFloat(frame.style.width)).toBeCloseTo(595 / 420, 1);
+      expect(Number.parseFloat(frame.style.width)).toBeLessThan(595 * 0.9);
+    });
+  });
+
+  it("fait épouser la page exacte par son cadre une fois la page chargée, sans blanc autour", async () => {
+    pageSize.width = 420;
+    pageSize.height = 595;
+    vi.stubGlobal("IntersectionObserver", VisibleIntersectionObserver);
+    const { container } = render(<PdfReader url="/livre-a5.pdf" title="Livre A5" labels={labels} />);
+
+    await waitFor(() => expect(container.querySelector("article[data-page='1'] canvas")).not.toBeNull());
+    const frame = container.querySelector<HTMLElement>("article[data-page='1']")!;
+    const canvas = frame.querySelector<HTMLCanvasElement>("canvas")!;
+    expect(frame.style.width).toBe(canvas.style.width);
+    expect(frame.style.height).toBe(canvas.style.height);
+  });
+
+  it("garde le format A4 inchangé pour les livres A4", async () => {
+    vi.stubGlobal("IntersectionObserver", VisibleIntersectionObserver);
+    const { container } = render(<PdfReader url="/livre-a4.pdf" title="Livre A4" labels={labels} />);
+
+    await waitFor(() => expect(container.querySelector("article[data-page='1'] canvas")).not.toBeNull());
+    const frame = container.querySelector<HTMLElement>("article[data-page='1']")!;
+    expect(Number.parseFloat(frame.style.height) / Number.parseFloat(frame.style.width)).toBeCloseTo(842 / 595, 1);
+    expect(frame.style.width).toBe(frame.querySelector<HTMLCanvasElement>("canvas")!.style.width);
   });
 
   it("ne télécharge que les octets des pages affichées", async () => {
