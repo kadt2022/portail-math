@@ -41,6 +41,27 @@ describe("Bibliothèque", () => {
     expect(links.at(-1)?.getAttribute("href")).toContain("/bibliotheque/math-primary-five");
   });
 
+  it("ancre les libellés masqués des métadonnées dans leur carte, sans créer de second ascenseur", async () => {
+    mockLibraryCatalogue();
+    render(<MemoryRouter><LibraryPage /></MemoryRouter>);
+    await screen.findByText("1re primaire");
+
+    const terms = document.querySelectorAll("dt");
+    expect(terms.length).toBeGreaterThan(0);
+    for (const term of terms) {
+      // Un élément en position absolue se place par rapport à son premier ancêtre positionné. S'il n'y en a
+      // aucun dans la carte, il se repère sur la page entière : il échappe au conteneur de défilement du portail
+      // et allonge le document, ce qui ajoute une seconde barre de défilement à droite.
+      let anchor = term.parentElement;
+      while (anchor && getComputedStyle(anchor).position === "static") {
+        anchor = anchor.parentElement;
+      }
+      const card = term.closest("article");
+      expect(anchor).not.toBeNull();
+      expect(card?.contains(anchor)).toBe(true);
+    }
+  });
+
   it("prévient l'élève quand le catalogue est indisponible", async () => {
     mockLibraryCatalogue(undefined, false);
     render(<MemoryRouter><LibraryPage /></MemoryRouter>);

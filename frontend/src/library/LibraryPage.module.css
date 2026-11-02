@@ -125,6 +125,9 @@
 }
 
 .metadata {
+  /* Ancre des libellés masqués (dt, position absolue) : sans elle, ils se repèrent sur la page entière,
+     échappent au conteneur de défilement du portail et ajoutent une seconde barre de défilement. */
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
