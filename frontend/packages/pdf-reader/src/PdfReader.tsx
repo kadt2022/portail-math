@@ -15,6 +15,15 @@ const ZOOM_LEVELS = [0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2] as const;
 const DEFAULT_ZOOM = 1;
 const CHROME_LIKE_PAGE_WIDTH = 850;
 const LARGE_SCREEN_QUERY = "(min-width: 1200px)";
+
+interface PageSize {
+  width: number;
+  height: number;
+}
+
+// Taille de repli (A4) utilisée uniquement tant qu'aucune page n'est connue. Dès qu'une page est
+// chargée, c'est sa taille réelle qui sert : un livre A5 ne doit pas être enfermé dans un cadre A4.
+const FALLBACK_PAGE_SIZE: PageSize = { width: 595, height: 842 };
 type ReaderMode = "page" | "continuous";
 type FitMode = "page" | "width" | "custom";
 type OutlineNode = { title: string; pageNumber: number | null; items: OutlineNode[] };
@@ -163,9 +172,12 @@ function CanvasPage({ page, scale, label }: { page: PDFPageProxy; scale: number;
   return <canvas ref={canvasRef} aria-label={label} />;
 }
 
-function ContinuousPage({ pdfDocument, number, scale, label, root }: { pdfDocument: PDFDocumentProxy; number: number; scale: number; label: string; root: HTMLDivElement | null }) {
+function ContinuousPage({ pdfDocument, number, scale, label, root, placeholderSize }: { pdfDocument: PDFDocumentProxy; number: number; scale: number; label: string; root: HTMLDivElement | null; placeholderSize: PageSize }) {
   const hostRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<PDFPageProxy | null>(null);
+  // Taille réelle de cette page, conservée une fois connue : le cadre garde sa hauteur de défilement
+  // même après le démontage du canvas.
+  const [size, setSize] = useState<PageSize | null>(null);
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !root) return;
@@ -180,7 +192,10 @@ function ContinuousPage({ pdfDocument, number, scale, label, root }: { pdfDocume
         return;
       }
       void pdfDocument.getPage(number).then((nextPage) => {
-        if (active && nearby) setPage(nextPage);
+        if (!active || !nearby) return;
+        const base = nextPage.getViewport({ scale: 1 });
+        setSize({ width: base.width, height: base.height });
+        setPage(nextPage);
       }).catch(() => undefined);
     }, { root, rootMargin: "500px 0px" });
     observer.observe(host);
@@ -190,8 +205,9 @@ function ContinuousPage({ pdfDocument, number, scale, label, root }: { pdfDocume
       setPage(null);
     };
   }, [pdfDocument, number, root]);
+  const frame = size ?? placeholderSize;
   return (
-    <article ref={hostRef} className={styles.continuousPage} data-page={number} style={{ width: `${595 * scale}px`, minHeight: `${842 * scale}px` }}>
+    <article ref={hostRef} className={styles.continuousPage} data-page={number} style={{ width: `${Math.floor(frame.width * scale)}px`, height: `${Math.floor(frame.height * scale)}px` }}>
       {page ? <CanvasPage page={page} scale={scale} label={`${label} ${number}`} /> : null}
     </article>
   );
@@ -245,6 +261,12 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
   const [error, setError] = useState(false);
 
   const pageCount = pdfDocument?.numPages ?? 0;
+  // Format de référence des cadres de page non encore chargés : celui de la page affichée.
+  const placeholderSize = useMemo<PageSize>(() => {
+    if (!singlePage) return FALLBACK_PAGE_SIZE;
+    const base = singlePage.getViewport({ scale: 1 });
+    return { width: base.width, height: base.height };
+  }, [singlePage]);
   const setViewport = useCallback((node: HTMLDivElement | null) => { viewportRef.current = node; setViewportElement(node); }, []);
   const goToPage = useCallback((value: number) => {
     const validPage = clampPage(value, pageCount);
@@ -491,7 +513,7 @@ export function PdfReader({ url, title, subtitle, backLabel, onBack, labels }: P
           ) : null}
           {error ? <p className={styles.error} role="alert">{labels.error}</p> : null}
           {mode === "page" && singlePage ? <CanvasPage page={singlePage} scale={scale} label={`${labels.page} ${pageNumber}`} /> : null}
-          {mode === "continuous" && pdfDocument ? continuousPages.map((number) => <ContinuousPage key={number} pdfDocument={pdfDocument} number={number} scale={scale} label={labels.page} root={viewportElement} />) : null}
+          {mode === "continuous" && pdfDocument ? continuousPages.map((number) => <ContinuousPage key={number} pdfDocument={pdfDocument} number={number} scale={scale} label={labels.page} root={viewportElement} placeholderSize={placeholderSize} />) : null}
         </div>
       </div>
     </section>
