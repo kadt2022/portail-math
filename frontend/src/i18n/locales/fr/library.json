@@ -47,6 +47,13 @@
       "level": "3e primaire",
       "subject": "Mathématiques",
       "format": "PDF"
+    },
+    "mathPrimaryFive": {
+      "title": "Je découvre les maths autour de moi · Volume 1",
+      "description": "Le premier volume de la 5e année : l’unité « Nombres et calcul » en 28 leçons. Nombres jusqu’à 1 000 000 et nombres à virgule, chiffres romains, arrondis, calcul rapide, opérations écrites, preuve par 9, budget et facture, avec une semaine d’intégration, une évaluation et les corrigés.",
+      "level": "5e primaire",
+      "subject": "Mathématiques",
+      "format": "PDF"
     }
   },
   "reader": {

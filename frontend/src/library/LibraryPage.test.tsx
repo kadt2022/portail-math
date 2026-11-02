@@ -17,15 +17,28 @@ describe("Bibliothèque", () => {
     expect(await screen.findByText("1re primaire")).toBeInTheDocument();
     expect(screen.getByText("2e primaire")).toBeInTheDocument();
     expect(screen.getByText("3e primaire")).toBeInTheDocument();
+    expect(screen.getByText("5e primaire")).toBeInTheDocument();
     expect(screen.getAllByText("96 pages")).toHaveLength(3);
+    expect(screen.getByText("93 pages")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/v1/resources", expect.anything());
 
     const [readLink] = screen.getAllByRole("link", { name: /lire le livre/i });
-    expect(screen.getAllByRole("link", { name: /lire le livre/i })).toHaveLength(3);
+    expect(screen.getAllByRole("link", { name: /lire le livre/i })).toHaveLength(4);
     expect(screen.queryByRole("link", { name: /télécharger/i })).not.toBeInTheDocument();
     expect(readLink.getAttribute("href")).toMatch(
       /\/bibliotheque\/math-primary-one$/,
     );
+  });
+
+  it("annonce le livre de 5e comme premier volume, avec sa couverture et son lecteur", async () => {
+    mockLibraryCatalogue();
+    render(<MemoryRouter><LibraryPage /></MemoryRouter>);
+
+    expect(await screen.findByRole("img", { name: /Volume 1/ })).toBeInTheDocument();
+    expect(screen.getByText(/Nombres et calcul/)).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: /Couverture/i })).toHaveLength(4);
+    const links = screen.getAllByRole("link", { name: /lire le livre/i });
+    expect(links.at(-1)?.getAttribute("href")).toContain("/bibliotheque/math-primary-five");
   });
 
   it("prévient l'élève quand le catalogue est indisponible", async () => {

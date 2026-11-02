@@ -22,7 +22,8 @@ class ControlledContentDeliveryTests {
     private static final List<String> BOOKS = List.of(
             "mbuyamba-1re-primaire-livre-complet.pdf",
             "mbuyamba-2e-primaire-livre-complet.pdf",
-            "mbuyamba-3e-primaire-livre-complet.pdf"
+            "mbuyamba-3e-primaire-livre-complet.pdf",
+            "mbuyamba-5e-primaire-livre-complet.pdf"
     );
 
     @Test

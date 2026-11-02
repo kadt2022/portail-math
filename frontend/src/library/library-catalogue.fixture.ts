@@ -35,6 +35,16 @@ export const catalogueResponse = {
       pages: 96,
       fileUrl: "/api/v1/resources/books/math-primary-three/file",
     },
+    {
+      id: "math-primary-five",
+      titleKey: "books.mathPrimaryFive.title",
+      descriptionKey: "books.mathPrimaryFive.description",
+      levelKey: "books.mathPrimaryFive.level",
+      subjectKey: "books.mathPrimaryFive.subject",
+      formatKey: "books.mathPrimaryFive.format",
+      pages: 93,
+      fileUrl: "/api/v1/resources/books/math-primary-five/file",
+    },
   ],
   gameQuestionBanks: [],
 };
