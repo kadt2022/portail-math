@@ -25,3 +25,6 @@ src/main/resources/static/images/games/fraction-river/prototype/
 
 # Script local de déploiement manuel OpenShift.
 /deploy-openshift.bat
+
+# Sources et fichiers de travail des montages vidéo.
+/media/hyperframes/
