@@ -62,8 +62,22 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     expect(screen.getByText(/Étape 2 sur 6 — Je comprends/)).toBeInTheDocument();
     expect(screen.queryByLabelText(videoName)).not.toBeInTheDocument();
     first.unmount();
-    const other=PRIMARY_ONE_MODULES[0].lessons[1];renderLesson(other.id,other.moduleId);
+    const other=PRIMARY_ONE_MODULES[0].lessons[2];renderLesson(other.id,other.moduleId);
     expect(screen.getByText(/Étape 1 sur 6 — Je découvre/)).toBeInTheDocument();
+    expect(document.querySelector("video")).toBeNull();
+  });
+  it("intègre la vidéo du tri uniquement à la découverte et conserve la progression pendant sa lecture",async () => {
+    const user=userEvent.setup();
+    const sorting=PRIMARY_ONE_MODULES[0].lessons[1];
+    renderLesson(sorting.id,sorting.moduleId);
+    const video=screen.getByLabelText("Vidéo de Yamba : Je trie par couleur ou par forme");
+    expect(video).toHaveAttribute("src",expect.stringContaining("tri-couleur-forme"));
+    expect(video).toHaveAttribute("controls");
+    expect(video).toHaveAttribute("playsinline");
+    fireEvent.play(video);fireEvent.ended(video);
+    expect(JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[sorting.id].completedStepIds).toHaveLength(0);
+    await user.click(screen.getByRole("button",{name:"Continuer"}));
+    expect(screen.getByText(/Étape 2 sur 6 — Je comprends/)).toBeInTheDocument();
     expect(document.querySelector("video")).toBeNull();
   });
   it("laisse la progression inchangée pendant et après la lecture de la vidéo",async () => {
