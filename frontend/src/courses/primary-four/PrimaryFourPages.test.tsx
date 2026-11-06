@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AppRouter } from "../../app/AppRouter";
 import { i18next } from "../../i18n/i18n";
 import { completeLearningStep, createEmptyCourseProgress } from "../course-engine/course-progress";
-import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
+import { getSessionCourseProgress, resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
 import { PRIMARY_FOUR_COURSE, PRIMARY_FOUR_MODULES } from "./course-catalogue";
 import { formatNumber } from "./number-words";
 import { InteractiveExercise } from "./exercises/InteractiveExercise";
@@ -45,6 +45,7 @@ function renderAt(path: string) {
 describe("Pages du parcours de 4e primaire", () => {
   beforeEach(async () => {
     cleanup();
+    resetSessionCourseProgress();
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
@@ -122,7 +123,7 @@ describe("Pages du parcours de 4e primaire", () => {
       createEmptyCourseProgress(PRIMARY_FOUR_COURSE.id),
     );
     progress = completeLearningStep(progress, l2, l2.steps[0].id, true);
-    createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).save(progress);
+    setSessionCourseProgress(progress);
 
     renderAt("/app/apprentissages/primaire/4/mathematiques/modules/MATH-4P-U01");
     const articles = screen.getAllByRole("article");
@@ -233,7 +234,7 @@ describe("Pages du parcours de 4e primaire", () => {
       await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
       expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
 
-      const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).load();
+      const stored = getSessionCourseProgress(PRIMARY_FOUR_COURSE.id);
       expect(stored.items["MATH-4P-U01-L01"].completed).toBe(true);
     },
     30_000,
@@ -245,7 +246,7 @@ describe("Pages du parcours de 4e primaire", () => {
       (progress, step) => completeLearningStep(progress, lesson, step.id, true),
       createEmptyCourseProgress(PRIMARY_FOUR_COURSE.id),
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).save(completed);
+    setSessionCourseProgress(completed);
 
     renderAt("/app/apprentissages/primaire/4/mathematiques");
     expect(screen.getByText("1 / 40 leçons")).toBeInTheDocument();
@@ -258,7 +259,7 @@ describe("Pages du parcours de 4e primaire", () => {
       (progress, step) => completeLearningStep(progress, lesson, step.id, true),
       createEmptyCourseProgress(PRIMARY_FOUR_COURSE.id),
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).save(completed);
+    setSessionCourseProgress(completed);
 
     renderAt(
       "/app/apprentissages/primaire/4/mathematiques/modules/MATH-4P-U01/lecons/MATH-4P-U01-L01",
@@ -595,7 +596,7 @@ describe("Pages du parcours de 4e primaire", () => {
     for (const lesson of [l1, l2, l3, l4]) {
       progress = lesson.steps.reduce((current, step) => completeLearningStep(current, lesson, step.id, true), progress);
     }
-    createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).save(progress);
+    setSessionCourseProgress(progress);
 
     const user = userEvent.setup();
     renderAt(
@@ -632,7 +633,7 @@ describe("Pages du parcours de 4e primaire", () => {
     await user.click(finishButton);
 
     expect(await screen.findByRole("heading", { name: /évaluation réussie/i })).toBeInTheDocument();
-    const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_FOUR_COURSE.id).load();
+    const stored = getSessionCourseProgress(PRIMARY_FOUR_COURSE.id);
     expect(stored.items["MATH-4P-U01-EVAL"].completed).toBe(true);
 
     // L'unité 1 est intégralement terminée : l'action principale propose le module suivant.

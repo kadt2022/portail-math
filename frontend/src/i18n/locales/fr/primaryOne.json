@@ -2,13 +2,13 @@
   "course": {
     "eyebrow": "Parcours de mathématiques",
     "title": "1re primaire",
-    "lead": "Quarante leçons, dix évaluations et un grand bilan. Avance à ton rythme ; tes réponses sont enregistrées sur cet appareil."
+    "lead": "Quarante leçons, dix évaluations et un grand bilan. Avance à ton rythme ; tes réponses restent disponibles pendant cette session."
   },
   "yamba": {
     "name": "Yamba",
     "courseWelcome": "Je t’accompagne dans ce parcours. Choisis ton point de départ et avançons ensemble !",
     "lessonTip": "Prends ton temps. Je reste près de toi pendant cette première étape.",
-    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+    "lessonComplete": "Bravo ! Cette étape est terminée, on continue quand tu veux."
   },
   "status": {
     "not-started": "À commencer",
@@ -79,7 +79,7 @@
     "pendingLead": "Ce module est accessible. Ses leçons seront ajoutées à partir du support pédagogique validé.",
     "pathEyebrow": "Petites étapes",
     "pathTitle": "Les leçons du module",
-    "pathHint": "Ta progression est enregistrée automatiquement sur cet appareil."
+    "pathHint": "Ton avancement reste disponible pendant cette session."
   },
   "lessons": {
     "number": "Leçon {{number}}",
@@ -145,13 +145,13 @@
     "title": "Contenu pédagogique à compléter",
     "moduleMessage": "Le support validé ne fournit pas encore les leçons de ce module. Aucune notion ni question n'a été inventée.",
     "activityMessage": "L'énoncé exact de cette activité n'est pas disponible dans le support fourni. Il sera intégré après validation pédagogique.",
-    "prototypeNote": "Tu peux continuer pour vérifier le parcours et la sauvegarde de ta progression."
+    "prototypeNote": "Tu peux continuer pour vérifier le parcours pendant cette session."
   },
   "lessonComplete": {
     "eyebrow": "Étape réussie",
     "title": "Bravo, la leçon est terminée !",
     "evaluationTitle": "Bravo, le module est évalué !",
-    "message": "Ta progression est enregistrée. Tu peux continuer ou revoir cette leçon plus tard.",
+    "message": "Cette étape est terminée. Tu peux continuer ou revoir cette leçon pendant la session.",
     "backToModule": "Retour au module",
     "nextLesson": "Leçon suivante",
     "nextModule": "Module suivant",

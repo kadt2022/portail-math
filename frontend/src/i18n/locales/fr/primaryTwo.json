@@ -2,14 +2,14 @@
   "course": {
     "eyebrow": "Parcours de mathématiques",
     "title": "2e primaire",
-    "lead": "Retrouve les nombres autour de toi et avance par petites activités. Ta place est enregistrée sur cet appareil.",
+    "lead": "Retrouve les nombres autour de toi et avance par petites activités. Ton avancement reste disponible pendant cette session.",
     "published": "{{count}} leçon disponible aujourd’hui"
   },
   "yamba": {
     "name": "Yamba",
     "courseWelcome": "Je t’accompagne dans ce parcours, à ton rythme. On commence quand tu veux !",
     "lessonTip": "Prends ton temps. Je reste près de toi pendant cette première étape.",
-    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+    "lessonComplete": "Bravo ! Cette étape est terminée, on continue quand tu veux."
   },
   "status": {
     "not-started": "À commencer",
@@ -168,7 +168,7 @@
   "lessonComplete": {
     "eyebrow": "Leçon réussie",
     "title": "Bravo, tu sais compter sans te perdre !",
-    "message": "Ta progression est enregistrée : 1 leçon terminée sur les 40 prévues.",
+    "message": "Cette session affiche 1 leçon terminée sur les 40 prévues.",
     "nextComing": "La prochaine leçon arrive bientôt. Elle ne peut pas encore être commencée.",
     "backToModule": "Retour à mes modules"
   },

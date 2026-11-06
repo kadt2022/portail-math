@@ -4,8 +4,8 @@ import { getAllLearningItems, getLearningItems, PRIMARY_ONE_FINAL, PRIMARY_ONE_M
 import { completeLearningStep, createEmptyCourseProgress, getCoursePrimaryAction, getCourseProgress } from "./course-progress";
 import { isCorrect, solutionResponse } from "./exercise-model";
 import { EVALUATIONS, LESSON_CONTENT } from "./lesson-content";
-import { getAssessmentSummary, getResult, recordResponse, restartQuestion, RESULTS_KEY } from "./learning-results";
-import { normalizePrimaryOneProgress } from "./normalize-progress";
+import { getAssessmentSummary, getResult, recordResponse, resetSessionLearningResults, restartQuestion } from "./learning-results";
+import { resetSessionCourseProgress } from "../course-engine/useCourseProgress";
 
 const allQuestions = getAllLearningItems().flatMap((item) => item.steps.flatMap((step) => questionsForStep(item,step)));
 function finish(item: ReturnType<typeof getAllLearningItems>[number], progress = createEmptyCourseProgress()) {
@@ -16,7 +16,7 @@ function finish(item: ReturnType<typeof getAllLearningItems>[number], progress =
 }
 
 describe("Contenu RDC et validation des exercices", () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => { resetSessionCourseProgress(); resetSessionLearningResults(); localStorage.clear(); });
   it("offre les 40 leçons, 10 évaluations et 8 questions finales avec leurs textes français", () => {
     expect(PRIMARY_ONE_MODULES.map((m) => m.lessons.length)).toEqual([4,4,4,4,5,5,4,4,4,2]);
     expect(Object.keys(LESSON_CONTENT)).toHaveLength(40);
@@ -52,16 +52,6 @@ describe("Contenu RDC et validation des exercices", () => {
     expect(getAssessmentSummary(qs)).toMatchObject({correct:1,firstTry:0,total:4});
     expect(getAssessmentSummary(qs).reviewLessonIds).toContain(qs[0].reviewLessonId);
   });
-  it("reprend les prototypes sans transformer leurs clics en acquis", () => {
-    const lesson=PRIMARY_ONE_MODULES[0].lessons[0];
-    const progress=createEmptyCourseProgress();
-    progress.items[lesson.id]={moduleId:lesson.moduleId,itemId:lesson.id,currentStepId:`${lesson.id}-S03`,completedStepIds:[`${lesson.id}-S01`,`${lesson.id}-S02`,`${lesson.id}-S03`],completed:true,lastActivityAt:"2026-01-01"};
-    const migrated=normalizePrimaryOneProgress(progress).items[lesson.id];
-    expect(migrated.completed).toBe(false);
-    expect(migrated.completedStepIds).toEqual([`${lesson.id}-S01`]);
-    expect(migrated.currentStepId).toBe(`${lesson.id}-S04`);
-    expect(progress.items[lesson.id].completed).toBe(true);
-  });
   it("ne donne pas 100 % pour les quatre premières leçons et exige le bilan final", () => {
     let p=createEmptyCourseProgress();
     for (const item of getLearningItems(PRIMARY_ONE_MODULES[0])) p=finish(item,p);
@@ -72,10 +62,8 @@ describe("Contenu RDC et validation des exercices", () => {
     expect(getCoursePrimaryAction(p)).toMatchObject({itemId:PRIMARY_ONE_FINAL.id});
     p=finish(PRIMARY_ONE_FINAL,p);
     expect(getCourseProgress(p)).toMatchObject({percentage:100,completed:true});
-    expect(normalizePrimaryOneProgress(p)).toEqual(p);
   });
-  it("ignore un stockage illisible et refuse les réponses de format invalide", () => {
-    localStorage.setItem(RESULTS_KEY,"{invalide");
+  it("refuse les réponses de format invalide", () => {
     expect(getResult(allQuestions[0])).toBeUndefined();
     expect(isCorrect(allQuestions[0],{numbers:"bad"} as never)).toBe(false);
     const zero=LESSON_CONTENT["MATH-1P-U02-L03"].practice[0];

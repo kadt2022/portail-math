@@ -16,7 +16,7 @@ import {
 import { recordResponse } from "./learning-results";
 import { solutionResponse } from "./exercise-model";
 import { PrimaryOneModulePage } from "./PrimaryOneModulePage";
-import { createLocalCourseProgressStorage } from "./progress-storage";
+import { resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
 
 function renderModule(moduleId: string) {
   return render(
@@ -49,6 +49,7 @@ describe("Page d'un module de 1re primaire", () => {
   const moduleOne = PRIMARY_ONE_MODULES[0];
 
   beforeEach(async () => {
+    resetSessionCourseProgress();
     localStorage.clear();
     await act(() => i18next.changeLanguage("fr"));
   });
@@ -73,7 +74,7 @@ describe("Page d'un module de 1re primaire", () => {
       firstLesson,
       firstLesson.steps[0].id,
     );
-    createLocalCourseProgressStorage(localStorage).save(progress);
+    setSessionCourseProgress(progress);
 
     renderModule(moduleOne.id);
 
@@ -88,7 +89,7 @@ describe("Page d'un module de 1re primaire", () => {
       completeItem,
       createEmptyCourseProgress(),
     );
-    createLocalCourseProgressStorage(localStorage).save(completedProgress);
+    setSessionCourseProgress(completedProgress);
 
     renderModule(moduleOne.id);
 

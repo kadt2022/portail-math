@@ -1,46 +1,51 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { CourseItemLike } from "./course-model";
 import {
   completeLearningStep,
+  createEmptyCourseProgress,
   startLearningItem,
   type CourseProgress,
 } from "./course-progress";
-import { createLocalCourseProgressStorage } from "./progress-storage";
+const sessionProgress = new Map<string, CourseProgress>();
 
-const identityProgress = (progress: CourseProgress) => progress;
+export function getSessionCourseProgress(courseId: string) {
+  return sessionProgress.get(courseId) ?? createEmptyCourseProgress(courseId);
+}
 
-export function useCourseProgress(courseId: string, prepareProgress = identityProgress) {
-  const storage = useMemo(
-    () => createLocalCourseProgressStorage(window.localStorage, courseId),
-    [courseId],
+export function setSessionCourseProgress(progress: CourseProgress) {
+  sessionProgress.set(progress.courseId, progress);
+}
+
+export function resetSessionCourseProgress() {
+  sessionProgress.clear();
+}
+
+export function useCourseProgress(courseId: string) {
+  const [progress, setProgress] = useState<CourseProgress>(
+    () => getSessionCourseProgress(courseId),
   );
-  const [progress, setProgress] = useState<CourseProgress>(() => prepareProgress(storage.load()));
 
   const startItem = useCallback(
     (item: CourseItemLike) => {
       setProgress((current) => {
-        const next = startLearningItem(prepareProgress(current), item);
-        if (next !== current) {
-          storage.save(next);
-        }
+        const next = startLearningItem(current, item);
+        if (next !== current) sessionProgress.set(courseId, next);
         return next;
       });
     },
-    [storage, prepareProgress],
+    [courseId],
   );
 
   const completeStep = useCallback(
     (item: CourseItemLike, stepId: string, validated: boolean) => {
       setProgress((current) => {
-        const next = completeLearningStep(prepareProgress(current), item, stepId, validated);
-        if (next !== current) {
-          storage.save(next);
-        }
+        const next = completeLearningStep(current, item, stepId, validated);
+        if (next !== current) sessionProgress.set(courseId, next);
         return next;
       });
     },
-    [storage, prepareProgress],
+    [courseId],
   );
 
   return { progress, startItem, completeStep };

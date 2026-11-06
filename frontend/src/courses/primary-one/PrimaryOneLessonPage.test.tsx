@@ -3,17 +3,18 @@ import userEvent from "@testing-library/user-event";
 import i18next from "i18next";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { PRIMARY_ONE_MODULES, lessonPath } from "./course-catalogue";
+import { PRIMARY_ONE_MODULES, lessonPath, questionsForStep } from "./course-catalogue";
 import { PrimaryOneLessonPage } from "./PrimaryOneLessonPage";
-import { PRIMARY_ONE_PROGRESS_KEY } from "./progress-storage";
-import { RESULTS_KEY } from "./learning-results";
+import { getAssessmentSummary, resetSessionLearningResults } from "./learning-results";
+import { getSessionCourseProgress, resetSessionCourseProgress } from "../course-engine/useCourseProgress";
+import { PRIMARY_ONE_COURSE_ID } from "./course-catalogue";
 
 const lesson=PRIMARY_ONE_MODULES[0].lessons[0];
 function renderLesson(id=lesson.id,moduleId=lesson.moduleId) {
   return render(<MemoryRouter initialEntries={[lessonPath(moduleId,id)]}><Routes><Route path="/apprentissages/primaire/1/mathematiques/modules/:moduleId/lecons/:lessonId" element={<PrimaryOneLessonPage />} /></Routes></MemoryRouter>);
 }
 describe("Parcours d’une leçon avec réponses vérifiées", () => {
-  beforeEach(async () => {localStorage.clear();await act(() => i18next.changeLanguage("fr"));});
+  beforeEach(async () => {resetSessionCourseProgress();resetSessionLearningResults();localStorage.clear();await act(() => i18next.changeLanguage("fr"));});
   it("reprend l’étape et conserve une mauvaise tentative après rechargement",async () => {
     const user=userEvent.setup();
     const first=renderLesson();
@@ -24,7 +25,7 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     await user.click(screen.getByRole("button",{name:"Bouchon bleu"}));
     await user.click(screen.getByRole("button",{name:"Vérifier ma réponse"}));
     expect(screen.getByRole("button",{name:"Continuer"})).toBeDisabled();
-    expect(JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[lesson.id].completedStepIds).toHaveLength(2);
+    expect(getSessionCourseProgress(PRIMARY_ONE_COURSE_ID).items[lesson.id].completedStepIds).toHaveLength(2);
     first.unmount();renderLesson();
     expect(screen.getByText(/Étape 3 sur 6 — Je manipule/)).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Bouchon bleu"})).toHaveAttribute("aria-pressed","true");
@@ -49,8 +50,8 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     await user.click(screen.getByRole("button",{name:"Terminer la leçon"}));
     expect(screen.getByRole("heading",{name:/bravo, la leçon est terminée/i})).toBeInTheDocument();
     expect(screen.getByRole("link",{name:/leçon suivante/i})).toHaveAttribute("href",lessonPath(lesson.moduleId,PRIMARY_ONE_MODULES[0].lessons[1].id));
-    expect(JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[lesson.id].completed).toBe(true);
-    expect(Object.keys(JSON.parse(localStorage.getItem(RESULTS_KEY)!))).toHaveLength(6);
+    expect(getSessionCourseProgress(PRIMARY_ONE_COURSE_ID).items[lesson.id].completed).toBe(true);
+    expect(getAssessmentSummary(lesson.steps.flatMap((step) => questionsForStep(lesson, step)))).toMatchObject({ correct: 6, total: 6 });
   });
   it("affiche la vidéo de Yamba seulement dans l’étape Je découvre de la première leçon",async () => {
     const user=userEvent.setup();
@@ -75,7 +76,7 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     expect(video).toHaveAttribute("controls");
     expect(video).toHaveAttribute("playsinline");
     fireEvent.play(video);fireEvent.ended(video);
-    expect(JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[sorting.id].completedStepIds).toHaveLength(0);
+    expect(getSessionCourseProgress(PRIMARY_ONE_COURSE_ID).items[sorting.id].completedStepIds).toHaveLength(0);
     await user.click(screen.getByRole("button",{name:"Continuer"}));
     expect(screen.getByText(/Étape 2 sur 6 — Je comprends/)).toBeInTheDocument();
     expect(document.querySelector("video")).toBeNull();
@@ -84,7 +85,7 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     const user=userEvent.setup();renderLesson();
     const video=screen.getByLabelText("Vidéo de Yamba : Même ou différent ?");
     fireEvent.play(video);fireEvent.ended(video);
-    const stored=()=>JSON.parse(localStorage.getItem(PRIMARY_ONE_PROGRESS_KEY)!).items[lesson.id];
+    const stored=()=>getSessionCourseProgress(PRIMARY_ONE_COURSE_ID).items[lesson.id];
     expect(stored().completedStepIds).toHaveLength(0);
     expect(screen.getByRole("button",{name:"Continuer"})).toBeEnabled();
     await user.click(screen.getByRole("button",{name:"Continuer"}));

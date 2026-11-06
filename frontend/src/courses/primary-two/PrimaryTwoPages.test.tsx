@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { AppRouter } from "../../app/AppRouter";
 import { i18next } from "../../i18n/i18n";
 import { completeLearningStep, createEmptyCourseProgress } from "../course-engine/course-progress";
-import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
+import { getSessionCourseProgress, resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
 import { PRIMARY_TWO_COURSE, PRIMARY_TWO_MODULES } from "./course-catalogue";
 
 function renderAt(path: string) {
@@ -16,6 +16,7 @@ function renderAt(path: string) {
 describe("Pages du parcours de 2e primaire", () => {
   beforeEach(async () => {
     cleanup();
+    resetSessionCourseProgress();
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
@@ -55,7 +56,7 @@ describe("Pages du parcours de 2e primaire", () => {
     await waitFor(() => expect(screen.getAllByRole("button", { name: /compter la graine/i })).toHaveLength(18));
 
     await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
-    let stored = createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).load();
+    let stored = getSessionCourseProgress(PRIMARY_TWO_COURSE.id);
     expect(stored.items["MATH-2P-U01-L01"].completedStepIds).toEqual([]);
 
     for (const seed of screen.getAllByRole("button", { name: /compter la graine/i })) {
@@ -64,7 +65,7 @@ describe("Pages du parcours de 2e primaire", () => {
     fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
 
     expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
-    stored = createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).load();
+    stored = getSessionCourseProgress(PRIMARY_TWO_COURSE.id);
     expect(stored.items["MATH-2P-U01-L01"].completedStepIds).toEqual([
       "MATH-2P-U01-L01-S01",
     ]);
@@ -79,7 +80,7 @@ describe("Pages du parcours de 2e primaire", () => {
       lesson.steps[0].id,
       true,
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).save(afterDiscover);
+    setSessionCourseProgress(afterDiscover);
     const user = userEvent.setup();
 
     renderAt(
@@ -89,7 +90,7 @@ describe("Pages du parcours de 2e primaire", () => {
     await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
 
     expect(screen.getByText(/cherche d’abord une dizaine/i)).toBeInTheDocument();
-    const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).load();
+    const stored = getSessionCourseProgress(PRIMARY_TWO_COURSE.id);
     expect(stored.items[lesson.id].currentStepId).toBe(lesson.steps[1].id);
     expect(stored.items[lesson.id].completedStepIds).toEqual([lesson.steps[0].id]);
   });
@@ -100,7 +101,7 @@ describe("Pages du parcours de 2e primaire", () => {
       (progress, step) => completeLearningStep(progress, lesson, step.id, true),
       createEmptyCourseProgress(PRIMARY_TWO_COURSE.id),
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).save(completed);
+    setSessionCourseProgress(completed);
 
     renderAt("/app/apprentissages/primaire/2/mathematiques");
     expect(screen.getByText("1 / 40 leçons")).toBeInTheDocument();
@@ -139,6 +140,6 @@ describe("Pages du parcours de 2e primaire", () => {
     );
 
     expect(screen.getByRole("heading", { name: /content coming soon in english/i })).toBeInTheDocument();
-    expect(createLocalCourseProgressStorage(localStorage, PRIMARY_TWO_COURSE.id).load().items).toEqual({});
+    expect(getSessionCourseProgress(PRIMARY_TWO_COURSE.id).items).toEqual({});
   });
 });

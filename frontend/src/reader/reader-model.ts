@@ -38,9 +38,6 @@ export interface ReaderCourse {
   namespace: string;
   basePath: string;
   modules: readonly ReaderModule[];
-  // Adapte une progression déjà stockée sur l'appareil à ce parcours. Le lecteur
-  // ne fait que lire : il n'écrit jamais de progression.
-  prepareProgress?: (progress: CourseProgress) => CourseProgress;
   summarizeProgress: (progress: CourseProgress) => ReaderProgressSummary;
 }
 
