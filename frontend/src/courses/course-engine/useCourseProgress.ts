@@ -4,6 +4,7 @@ import type { CourseItemLike } from "./course-model";
 import {
   completeLearningStep,
   createEmptyCourseProgress,
+  invalidateLearningStep,
   startLearningItem,
   type CourseProgress,
 } from "./course-progress";
@@ -48,5 +49,16 @@ export function useCourseProgress(courseId: string) {
     [courseId],
   );
 
-  return { progress, startItem, completeStep };
+  const invalidateStep = useCallback(
+    (item: CourseItemLike, stepId: string) => {
+      setProgress((current) => {
+        const next = invalidateLearningStep(current, item, stepId);
+        if (next !== current) sessionProgress.set(courseId, next);
+        return next;
+      });
+    },
+    [courseId],
+  );
+
+  return { progress, startItem, completeStep, invalidateStep };
 }

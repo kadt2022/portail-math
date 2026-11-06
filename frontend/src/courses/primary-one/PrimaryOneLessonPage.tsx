@@ -26,7 +26,7 @@ export function PrimaryOneLessonPage() {
   const { moduleId, lessonId } = useParams();
   const { t, i18n } = useTranslation("primaryOne");
   const frenchContent = (i18n.resolvedLanguage ?? i18n.language).startsWith("fr");
-  const { progress, startItem, completeStep } = useCourseProgress();
+  const { progress, startItem, completeStep, invalidateStep } = useCourseProgress();
   const module = getPrimaryOneModule(moduleId);
   const item = module ? getLearningItem(module, lessonId) : undefined;
   const [viewByItem, setViewByItem] = useState<Record<string, string | "done">>({});
@@ -175,7 +175,7 @@ export function PrimaryOneLessonPage() {
 
       {questions.length > 0 ? <>
         {step.kind === "remember" ? <p>{t(`content.${item.id}.remember`)}</p> : null}
-        <PrimaryOneActivity key={`${item.id}:${step.id}`} questions={questions} completed={stepCompleted} onRestart={() => { setView(step.id); completeStep(item,step.id,false); }} onValidated={() => { setView(step.id); completeStep(item, step.id, true); }} />
+        <PrimaryOneActivity key={`${item.id}:${step.id}`} questions={questions} completed={stepCompleted} onRestart={() => { setView(step.id); invalidateStep(item, step.id); }} onValidated={() => { setView(step.id); completeStep(item, step.id, true); }} />
       </> : <section className={styles.activityCard} aria-labelledby="activity-step-title">
         <div className={styles.activityCopy}>
           <p className={styles.eyebrow}>{t(`content.${item.id}.objective`)}</p>

@@ -11,6 +11,7 @@ import {
   getCourseProgress,
   getLearningState,
   getModuleProgress,
+  invalidateLearningStep,
   startLearningItem,
 } from "./course-progress";
 
@@ -90,5 +91,18 @@ describe("Progression du parcours de 1re primaire", () => {
       moduleId: moduleOne.id,
       itemId: secondLesson.id,
     });
+  });
+
+  it("réouvre une étape quand l'apprenant recommence une question validée", () => {
+    let progress = createEmptyCourseProgress();
+    progress = completeLearningStep(progress, firstLesson, firstLesson.steps[0].id);
+    progress = invalidateLearningStep(progress, firstLesson, firstLesson.steps[0].id);
+
+    expect(progress.items[firstLesson.id]).toMatchObject({
+      currentStepId: firstLesson.steps[0].id,
+      completedStepIds: [],
+      completed: false,
+    });
+    expect(getLearningState(progress, firstLesson)).toBe("in-progress");
   });
 });
