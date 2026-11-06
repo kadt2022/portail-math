@@ -5,12 +5,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PrimaryOneActivity, PrimaryOneQuestion } from "./PrimaryOneActivity";
 import { LESSON_CONTENT } from "./lesson-content";
 import { solutionResponse, type Question } from "./exercise-model";
-import { getResult, recordResponse } from "./learning-results";
+import { getResult, recordResponse, resetSessionLearningResults } from "./learning-results";
 
 const kinds=new Map<string,Question>();
 Object.values(LESSON_CONTENT).flatMap((l)=>[...l.manipulate,...l.practice,...l.play,...l.remember]).forEach((q)=>{if(!kinds.has(q.kind))kinds.set(q.kind,q);});
 describe("Interactions accessibles de 1re primaire",()=>{
-  beforeEach(async()=>{cleanup();localStorage.clear();await act(()=>i18next.changeLanguage("fr"));});
+  beforeEach(async()=>{cleanup();resetSessionLearningResults();localStorage.clear();await act(()=>i18next.changeLanguage("fr"));});
   it.each([...kinds.values()])("$kind exige une réponse et permet de réussir avec les contrôles",async(q)=>{
     const user=userEvent.setup();const onValidated=vi.fn();render(<PrimaryOneQuestion question={q} onValidated={onValidated}/>);
     const verify=()=>user.click(screen.getByRole("button",{name:"Vérifier ma réponse"}));

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { AppRouter } from "../../app/AppRouter";
 import { i18next } from "../../i18n/i18n";
 import { completeLearningStep, createEmptyCourseProgress } from "../course-engine/course-progress";
-import { createLocalCourseProgressStorage } from "../course-engine/progress-storage";
+import { getSessionCourseProgress, resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
 import { PRIMARY_THREE_COURSE, PRIMARY_THREE_MODULES } from "./course-catalogue";
 
 function renderAt(path: string) {
@@ -16,6 +16,7 @@ function renderAt(path: string) {
 describe("Pages du parcours de 3e primaire", () => {
   beforeEach(async () => {
     cleanup();
+    resetSessionCourseProgress();
     localStorage.clear();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
@@ -62,7 +63,7 @@ describe("Pages du parcours de 3e primaire", () => {
       createEmptyCourseProgress(PRIMARY_THREE_COURSE.id),
     );
     progress = completeLearningStep(progress, l2, l2.steps[0].id, true);
-    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(progress);
+    setSessionCourseProgress(progress);
 
     renderAt("/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01");
     const articles = screen.getAllByRole("article");
@@ -105,7 +106,7 @@ describe("Pages du parcours de 3e primaire", () => {
     await user.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
     expect(await screen.findByText(/activité est réussie/i)).toBeInTheDocument();
 
-    let stored = createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).load();
+    let stored = getSessionCourseProgress(PRIMARY_THREE_COURSE.id);
     expect(stored.items["MATH-3P-U01-L01"].completedStepIds).toEqual([
       "MATH-3P-U01-L01-S01",
       "MATH-3P-U01-L01-S02",
@@ -168,7 +169,7 @@ describe("Pages du parcours de 3e primaire", () => {
     await user.click(screen.getByRole("button", { name: /terminer la leçon/i }));
     expect(await screen.findByRole("heading", { name: /leçon réussie/i })).toBeInTheDocument();
 
-    stored = createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).load();
+    stored = getSessionCourseProgress(PRIMARY_THREE_COURSE.id);
     expect(stored.items["MATH-3P-U01-L01"].completed).toBe(true);
   }, 20000);
 
@@ -178,7 +179,7 @@ describe("Pages du parcours de 3e primaire", () => {
       (progress, step) => completeLearningStep(progress, lesson, step.id, true),
       createEmptyCourseProgress(PRIMARY_THREE_COURSE.id),
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(completed);
+    setSessionCourseProgress(completed);
 
     renderAt("/app/apprentissages/primaire/3/mathematiques");
     expect(screen.getByText("1 / 40 leçons")).toBeInTheDocument();
@@ -191,7 +192,7 @@ describe("Pages du parcours de 3e primaire", () => {
       (progress, step) => completeLearningStep(progress, lesson, step.id, true),
       createEmptyCourseProgress(PRIMARY_THREE_COURSE.id),
     );
-    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(completed);
+    setSessionCourseProgress(completed);
 
     renderAt(
       "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U01/lecons/MATH-3P-U01-L01",
@@ -419,7 +420,7 @@ describe("Pages du parcours de 3e primaire", () => {
     for (const lesson of [l1, l2, l3, l4]) {
       progress = lesson.steps.reduce((current, step) => completeLearningStep(current, lesson, step.id, true), progress);
     }
-    createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).save(progress);
+    setSessionCourseProgress(progress);
 
     const user = userEvent.setup();
     renderAt(
@@ -456,7 +457,7 @@ describe("Pages du parcours de 3e primaire", () => {
     await user.click(finishButton);
 
     expect(await screen.findByRole("heading", { name: /évaluation réussie/i })).toBeInTheDocument();
-    const stored = createLocalCourseProgressStorage(localStorage, PRIMARY_THREE_COURSE.id).load();
+    const stored = getSessionCourseProgress(PRIMARY_THREE_COURSE.id);
     expect(stored.items["MATH-3P-U01-EVAL"].completed).toBe(true);
 
     // L'unité 1 est intégralement terminée : l'action principale propose le module suivant (pas de leçon suivante).

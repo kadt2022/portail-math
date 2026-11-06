@@ -7,7 +7,7 @@ import { AppRouter } from "../app/AppRouter";
 import type { CourseDefinition } from "../courses/course-engine/course-model";
 import { evaluation, lesson, plannedModule } from "../courses/course-engine/course-scaffold";
 import { completeLearningStep, createEmptyCourseProgress } from "../courses/course-engine/course-progress";
-import { createLocalCourseProgressStorage } from "../courses/course-engine/progress-storage";
+import { resetSessionCourseProgress, setSessionCourseProgress } from "../courses/course-engine/useCourseProgress";
 import { PRIMARY_FOUR_COURSE } from "../courses/primary-four/course-catalogue";
 import { i18next } from "../i18n/i18n";
 import { READER_COURSES } from "./reader-courses";
@@ -66,6 +66,7 @@ describe("Lecteur pédagogique", () => {
   beforeEach(async () => {
     cleanup();
     localStorage.clear();
+    resetSessionCourseProgress();
     await i18next.changeLanguage("fr");
   });
 
@@ -303,12 +304,11 @@ describe("Lecteur pédagogique", () => {
     it("relit la progression déjà stockée sur l'appareil, sans jamais l'écrire", () => {
       const course = readerCourseFromDefinition(PRIMARY_FOUR_COURSE, "primaryFour");
       const firstLesson = PRIMARY_FOUR_COURSE.modules[0].lessons[0];
-      const storage = createLocalCourseProgressStorage(window.localStorage, PRIMARY_FOUR_COURSE.id);
       let progress = createEmptyCourseProgress(PRIMARY_FOUR_COURSE.id);
       for (const step of firstLesson.steps) {
         progress = completeLearningStep(progress, firstLesson, step.id, true);
       }
-      storage.save(progress);
+      setSessionCourseProgress(progress);
 
       const write = vi.spyOn(Storage.prototype, "setItem");
       renderShell(course);
@@ -325,6 +325,7 @@ describe("Lecteur intégré au portail", () => {
   beforeEach(async () => {
     cleanup();
     localStorage.clear();
+    resetSessionCourseProgress();
     await i18next.changeLanguage("fr");
     window.history.pushState({}, "", "/app");
   });

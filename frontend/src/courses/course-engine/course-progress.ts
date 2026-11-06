@@ -191,6 +191,38 @@ export function completeLearningStep(
   };
 }
 
+/**
+ * Reopens a step in the temporary session state when an activity is retried.
+ * This is intentionally separate from `completeLearningStep(..., false)`,
+ * whose no-op behavior is part of the generic course engine contract.
+ */
+export function invalidateLearningStep(
+  progress: CourseProgress,
+  item: CourseItemLike,
+  stepId: string,
+  now = new Date().toISOString(),
+): CourseProgress {
+  const current = progress.items[item.id];
+  if (!current || !item.steps.some((step) => step.id === stepId)) {
+    return progress;
+  }
+
+  const completedStepIds = current.completedStepIds.filter((id) => id !== stepId);
+  return {
+    ...progress,
+    items: {
+      ...progress.items,
+      [item.id]: {
+        ...current,
+        currentStepId: stepId,
+        completedStepIds,
+        completed: false,
+        lastActivityAt: now,
+      },
+    },
+  };
+}
+
 export function getCoursePrimaryAction(
   progress: CourseProgress,
   course: CourseDefinitionLike,

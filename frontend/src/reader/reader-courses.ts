@@ -7,7 +7,6 @@ import {
   PRIMARY_ONE_MODULES,
 } from "../courses/primary-one/course-catalogue";
 import { getCourseProgress as getPrimaryOneCourseProgress } from "../courses/primary-one/course-progress";
-import { normalizePrimaryOneProgress } from "../courses/primary-one/normalize-progress";
 import { PRIMARY_FOUR_COURSE } from "../courses/primary-four/course-catalogue";
 import { PRIMARY_THREE_COURSE } from "../courses/primary-three/course-catalogue";
 import { PRIMARY_TWO_COURSE } from "../courses/primary-two/course-catalogue";
@@ -33,7 +32,6 @@ const primaryOne: ReaderCourse = {
       published: item.steps.length > 0,
     })),
   })),
-  prepareProgress: normalizePrimaryOneProgress,
   summarizeProgress: (progress) => getPrimaryOneCourseProgress(progress),
 };
 

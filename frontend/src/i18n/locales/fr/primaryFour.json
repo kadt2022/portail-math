@@ -2,14 +2,14 @@
   "course": {
     "eyebrow": "Parcours de mathématiques",
     "title": "4e primaire",
-    "lead": "Cette année, les nombres deviennent plus grands et les problèmes plus riches. Observe, représente, estime, calcule et vérifie tes réponses. Ta place est enregistrée sur cet appareil.",
+    "lead": "Cette année, les nombres deviennent plus grands et les problèmes plus riches. Observe, représente, estime, calcule et vérifie tes réponses. Ton avancement reste disponible pendant cette session.",
     "published": "{{count}} leçons disponibles aujourd’hui"
   },
   "yamba": {
     "name": "Yamba",
     "courseWelcome": "Bienvenue en 4e primaire ! Je reste près de toi, mais je te laisse chercher avant de t'aider.",
     "lessonTip": "Avant de calculer, essaie d'estimer le résultat. Je reste près de toi pendant cette première étape.",
-    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+    "lessonComplete": "Bravo ! Cette étape est terminée, on continue quand tu veux."
   },
   "status": {
     "not-started": "À commencer",
@@ -213,7 +213,7 @@
     "eyebrow": "Bravo",
     "title": "Leçon réussie !",
     "evaluationTitle": "Évaluation réussie !",
-    "message": "Ta progression est enregistrée.",
+    "message": "Cette étape est terminée pendant la session.",
     "backToModule": "Retour au module",
     "nextLesson": "Leçon suivante",
     "nextEvaluation": "Passer l'évaluation",

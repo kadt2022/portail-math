@@ -5,6 +5,7 @@ import {
   getCourseProgress as getGenericCourseProgress,
   getLearningState as getGenericLearningState,
   getModuleProgress as getGenericModuleProgress,
+  invalidateLearningStep as invalidateGenericLearningStep,
   startLearningItem as startGenericLearningItem,
   type CoursePrimaryAction,
   type CourseProgress,
@@ -76,6 +77,15 @@ export function completeLearningStep(
   now = new Date().toISOString(),
 ): CourseProgress {
   return completeGenericLearningStep(progress, item, stepId, true, now);
+}
+
+export function invalidateLearningStep(
+  progress: CourseProgress,
+  item: LearningItem,
+  stepId: string,
+  now = new Date().toISOString(),
+): CourseProgress {
+  return invalidateGenericLearningStep(progress, item, stepId, now);
 }
 
 export function getCoursePrimaryAction(progress: CourseProgress): CoursePrimaryAction {

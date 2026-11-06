@@ -2,14 +2,14 @@
   "course": {
     "eyebrow": "Parcours de mathématiques",
     "title": "3e primaire",
-    "lead": "Les nombres grandissent, mais tu gardes la même méthode : observer, représenter, calculer, vérifier, expliquer. Ta place est enregistrée sur cet appareil.",
+    "lead": "Les nombres grandissent, mais tu gardes la même méthode : observer, représenter, calculer, vérifier, expliquer. Ton avancement reste disponible pendant cette session.",
     "published": "{{count}} leçons disponibles aujourd’hui"
   },
   "yamba": {
     "name": "Yamba",
     "courseWelcome": "Bienvenue dans le degré moyen ! Je reste à côté de toi, tu avances à ton rythme.",
     "lessonTip": "Prends ton temps, utilise du matériel si tu en as besoin. Je reste près de toi pendant cette première étape.",
-    "lessonComplete": "Bravo ! Ta progression est enregistrée, on continue quand tu veux."
+    "lessonComplete": "Bravo ! Cette étape est terminée, on continue quand tu veux."
   },
   "status": {
     "not-started": "À commencer",
@@ -367,7 +367,7 @@
     "eyebrow": "Bravo",
     "title": "Leçon réussie !",
     "evaluationTitle": "Évaluation réussie !",
-    "message": "Ta progression est enregistrée.",
+    "message": "Cette étape est terminée pendant la session.",
     "backToModule": "Retour au module",
     "nextLesson": "Leçon suivante",
     "nextEvaluation": "Passer l'évaluation",
