@@ -1127,6 +1127,7 @@
   }
 
   .numberLine {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 3px;
     padding-right: 2px;
     padding-left: 2px;

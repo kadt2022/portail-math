@@ -161,6 +161,39 @@ describe("Activités interactives de la première leçon de 2e primaire", () => 
     expect(onValidated).not.toHaveBeenCalled();
   });
 
+  it("libère une carte placée par erreur puis valide le bon ordre dans la deuxième leçon", () => {
+    const onValidated = renderActivity("play", false, "MATH-2P-U01-L02");
+    const slots = () => screen.getAllByRole("button", { name: /nombre entre/i });
+
+    for (const [card, slot] of [["16", 0], ["19", 1], ["13", 2]] as const) {
+      fireEvent.click(screen.getByRole("button", { name: card }));
+      fireEvent.click(slots()[slot]);
+    }
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).not.toHaveBeenCalled();
+
+    for (const slot of [0, 1, 2]) fireEvent.click(slots()[slot]);
+    for (const [card, slot] of [["13", 0], ["16", 1], ["19", 2]] as const) {
+      fireEvent.click(screen.getByRole("button", { name: card }));
+      fireEvent.click(slots()[slot]);
+    }
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("remplace la carte d'une case occupée quand une autre carte est choisie", () => {
+    renderActivity("play", false, "MATH-2P-U01-L02");
+    const slots = () => screen.getAllByRole("button", { name: /nombre entre/i });
+
+    fireEvent.click(screen.getByRole("button", { name: "13" }));
+    fireEvent.click(slots()[0]);
+    fireEvent.click(screen.getByRole("button", { name: "16" }));
+    fireEvent.click(slots()[0]);
+
+    expect(screen.getByRole("button", { name: "13" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "16" })).not.toBeInTheDocument();
+  });
+
   it("rend le panier gauche sélectionnable directement sur l'image de la troisième leçon", () => {
     const onValidated = renderActivity("discover", false, "MATH-2P-U01-L03");
     const leftChoices = screen.getAllByRole("button", { name: /panier de gauche/i });
@@ -236,5 +269,53 @@ describe("Activités interactives de la première leçon de 2e primaire", () => 
     fireEvent.drop(screen.getByRole("button", { name: "Position 1, vide" }), { dataTransfer });
 
     expect(screen.getByRole("button", { name: "Position 1, nombre 5" })).toBeInTheDocument();
+  });
+});
+
+describe("Étapes des leçons 2 à 4 de 2e primaire", () => {
+  const kinds: LessonStepKind[] = ["discover", "manipulate", "understand", "practice", "play", "remember"];
+  const lessons = ["MATH-2P-U01-L02", "MATH-2P-U01-L03", "MATH-2P-U01-L04"];
+
+  beforeEach(async () => {
+    cleanup();
+    await i18next.changeLanguage("fr");
+  });
+
+  afterEach(() => cleanup());
+
+  for (const lessonId of lessons) {
+    for (const kind of kinds) {
+      it(`refuse une validation vide pour ${lessonId} / ${kind}`, () => {
+        const onValidated = renderActivity(kind, false, lessonId);
+        fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+        expect(onValidated).not.toHaveBeenCalled();
+      });
+
+      it(`affiche ${lessonId} / ${kind} comme terminée`, () => {
+        const onValidated = renderActivity(kind, true, lessonId);
+        expect(onValidated).not.toHaveBeenCalled();
+        expect(screen.queryByRole("button", { name: /vérifier ma réponse/i })).not.toBeInTheDocument();
+      });
+    }
+  }
+
+  it("valide la relation entre 9 et 11 puis la règle à retenir de la leçon 2", () => {
+    const onValidated = renderActivity("understand", false, "MATH-2P-U01-L02");
+    fireEvent.click(screen.getByRole("radio", { name: /entre/i }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("corrige puis valide les trois champs numériques de la leçon 2", () => {
+    const onValidated = renderActivity("practice", false, "MATH-2P-U01-L02");
+    const inputs = screen.getAllByRole("spinbutton");
+    fireEvent.change(inputs[0], { target: { value: "14" } });
+    fireEvent.change(inputs[1], { target: { value: "17" } });
+    fireEvent.change(inputs[2], { target: { value: "10" } });
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).not.toHaveBeenCalled();
+    fireEvent.change(screen.getAllByRole("spinbutton")[1], { target: { value: "18" } });
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).toHaveBeenCalledOnce();
   });
 });

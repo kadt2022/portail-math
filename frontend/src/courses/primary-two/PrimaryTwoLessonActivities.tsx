@@ -674,6 +674,9 @@ function LessonTwoActivity({ kind, completed, onValidated }: LessonActivityProps
                       return next;
                     });
                     setSelectedCard(null);
+                  } else if (placements[index] !== undefined) {
+                    // Sans carte choisie, toucher une case occupée rend sa carte à la banque.
+                    setPlacements((current) => current.map((card, position) => (position === index ? undefined : card)) as number[]);
                   }
                   setFeedback("");
                 }}
