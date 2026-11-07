@@ -58,7 +58,7 @@
     "m10": { "title": "Time, calendar and problems" }
   },
   "module": {
-    "referenceLead": "Start by counting to 20. The other three lessons and the assessment will be published later.",
+    "referenceLead": "All four module lessons are available: counting, finding neighbours, comparing and ordering numbers.",
     "pendingLead": "This module is planned. Its activities will be added after educational review.",
     "pathEyebrow": "Small steps",
     "pathTitle": "Module lessons",
@@ -92,8 +92,10 @@
     "label": "Lesson",
     "objectiveLabel": "My goal",
     "objective": "I can count a collection without missing or counting anything twice.",
+    "objectiveL2": "I can find the number just before, just after and between two numbers.",
     "duration": "About 25 minutes",
     "situation": "The class is preparing 18 seeds for a game.",
+    "situationL2": "The houses on a street are numbered 8, 9, 10 and 11. One plaque is missing.",
     "stepProgress": "Step {{current}} of {{total}} — {{label}}",
     "progressLabel": "Lesson progress",
     "back": "Back to module",

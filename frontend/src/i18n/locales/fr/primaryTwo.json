@@ -58,7 +58,7 @@
     "m10": { "title": "Temps, calendrier et problèmes" }
   },
   "module": {
-    "referenceLead": "Commence par compter jusqu’à 20. Les trois autres leçons et l’évaluation seront publiées ensuite.",
+    "referenceLead": "Les quatre leçons du module sont disponibles : compter, repérer les voisins, comparer et ranger les nombres.",
     "pendingLead": "Ce module est planifié. Ses activités seront ajoutées après validation pédagogique.",
     "pathEyebrow": "Petites étapes",
     "pathTitle": "Les leçons du module",
@@ -92,8 +92,14 @@
     "label": "Leçon",
     "objectiveLabel": "Mon objectif",
     "objective": "Je peux compter une collection sans oublier ni compter deux fois.",
+    "objectiveL2": "Je peux trouver le nombre juste avant, juste après et entre deux nombres.",
+    "objectiveL3": "Je peux comparer deux nombres et utiliser =, < et >.",
+    "objectiveL4": "Je peux ranger plusieurs nombres du plus petit au plus grand et expliquer ma méthode.",
     "duration": "Environ 25 minutes",
     "situation": "La classe prépare 18 graines pour un jeu. Trouve comment vérifier le nombre sans te perdre.",
+    "situationL2": "Les maisons d'une rue portent les numéros 8, 9, 10 et 11. Une plaque manque.",
+    "situationL3": "Deux paniers contiennent 14 et 9 oranges. Lequel en contient le plus ?",
+    "situationL4": "Quatre autobus-jouets portent les nombres 17, 5, 12 et 9. Mets-les dans l'ordre.",
     "stepProgress": "Étape {{current}} sur {{total}} — {{label}}",
     "progressLabel": "Progression dans la leçon",
     "back": "Retour au module",
@@ -146,7 +152,7 @@
     },
     "play": {
       "title": "Replace les cartes sur le sentier",
-      "instruction": "Choisis une carte-nombre, puis la maison vide située entre ses deux voisines.",
+      "instruction": "Glisse une carte-nombre vers la maison vide située entre ses deux voisines. Tu peux aussi choisir une carte, puis toucher sa maison.",
       "cards": "Mes cartes",
       "path": "Le sentier de 0 à 20",
       "selectCard": "Choisir la carte {{number}}",
@@ -163,6 +169,149 @@
       "leave": "Je le laisse au milieu des autres.",
       "double": "Je le compte encore une fois pour être sûr.",
       "hint": "Pense aux deux paniers utilisés au début de la leçon."
+    },
+    "lessonTwo": {
+      "discover": {
+        "title": "Retrouve la plaque manquante",
+        "instruction": "Quelle plaque vient après 9 et avant 11 ?",
+        "rowLabel": "Maisons numérotées de 8 à 11",
+        "hint": "Le nombre entre 9 et 11 est un seul nombre."
+      },
+      "manipulate": {
+        "title": "Construis la suite de 6 à 12",
+        "instruction": "Touche les nombres dans l'ordre, de 6 jusqu'à 12.",
+        "lineLabel": "Ligne numérique de 6 à 12",
+        "empty": "La suite apparaîtra ici.",
+        "orderHint": "Cherche d'abord le nombre {{number}}.",
+        "hint": "Commence par 6, puis avance d'un pas à la fois jusqu'à 12."
+      },
+      "understand": {
+        "title": "Comprends le mot entre",
+        "instruction": "Le nombre 10 est-il avant, après ou entre 9 et 11 ?",
+        "before": "Avant 9",
+        "after": "Après 11",
+        "between": "Entre 9 et 11",
+        "hint": "10 est plus grand que 9 et plus petit que 11."
+      },
+      "practice": {
+        "title": "Complète trois suites",
+        "instruction": "Écris le nombre qui manque dans chaque suite.",
+        "after": "Après 13",
+        "missing": "16, 17, __, 19",
+        "between": "Entre 9 et 11",
+        "hint": "Compte un pas à partir du nombre voisin."
+      },
+      "play": {
+        "title": "Répare le sentier des nombres",
+        "instruction": "Place 13 entre 12 et 14, 16 entre 15 et 17, puis 19 entre 18 et 20.",
+        "cards": "Cartes-nombres à placer",
+        "slot": "Nombre entre {{before}} et {{after}}",
+        "hint": "Le nombre placé doit être juste avant et juste après ses voisins."
+      },
+      "remember": {
+        "title": "Je retiens",
+        "instruction": "Quel nombre vient juste après 8 ?",
+        "promptLabel": "Suite numérique : huit puis un nombre manquant",
+        "before": "7",
+        "after": "9",
+        "random": "Un nombre choisi au hasard",
+        "hint": "Après 8, on avance d'un pas : on arrive à 9."
+      }
+    },
+    "lessonThree": {
+      "imageAlt": "Deux paniers d'oranges réalistes : le panier de gauche en contient 14 et celui de droite en contient 9.",
+      "imageChoices": "Choisis directement un panier sur l'image",
+      "leftBasket": "Le panier de gauche : 14 oranges",
+      "rightBasket": "Le panier de droite : 9 oranges",
+      "discover": {
+        "title": "Compare les deux paniers",
+        "instruction": "Touche le panier qui contient le plus d'oranges.",
+        "hint": "Compte les oranges : 14 est plus grand que 9."
+      },
+      "manipulate": {
+        "title": "Choisis le bon signe",
+        "instruction": "Compare 12 et 16, puis choisis le signe qui convient.",
+        "hint": "12 est plus petit que 16 : le signe s'ouvre vers 16."
+      },
+      "understand": {
+        "title": "Compare avec une stratégie",
+        "instruction": "Pour comparer 14 et 9, quelle stratégie est la plus sûre ?",
+        "tens": "Je compare d'abord les dizaines, puis les unités.",
+        "guess": "Je devine en regardant très vite.",
+        "shape": "Je choisis le nombre écrit le plus grand.",
+        "hint": "Regarde d'abord les dizaines, puis les unités."
+      },
+      "practice": {
+        "title": "Vérifie trois comparaisons",
+        "instruction": "Observe chaque comparaison et vérifie-la avec les objets ou la ligne numérique.",
+        "check": "Comparaison correcte",
+        "action": "J'ai vérifié les trois comparaisons",
+        "hint": "Compare les deux côtés avant de valider."
+      },
+      "play": {
+        "title": "Oriente le pont vers le plus grand panier",
+        "instruction": "Choisis le panier qui contient le plus d'oranges.",
+        "hint": "Le panier de gauche contient 14 oranges ; celui de droite en contient 9."
+      },
+      "remember": {
+        "title": "Je retiens",
+        "instruction": "Comment comparer deux nombres ?",
+        "tens": "Je compare d'abord les dizaines, puis les unités.",
+        "random": "Je choisis au hasard.",
+        "color": "Je regarde seulement la couleur.",
+        "hint": "Les dizaines et les unités donnent une comparaison sûre."
+      }
+    },
+    "lessonFour": {
+      "busAlt": "Quatre autobus-jouets réalistes et colorés, avec une grande zone claire sur chacun.",
+      "marketAlt": "Quatre paniers réalistes contenant des mangues, des bananes, des avocats et des tomates.",
+      "currentOrder": "Ordre construit du plus petit au plus grand",
+      "orderHint": "Cherche maintenant le nombre {{number}}.",
+      "discover": {
+        "title": "Trouve le plus petit nombre",
+        "instruction": "Lis les étiquettes 17, 5, 12 et 9. Touche l'étiquette qui porte le plus petit nombre. La couleur et la taille des autobus ne comptent pas.",
+        "hint": "Compare seulement les nombres : parmi 17, 5, 12 et 9, le plus petit est 5."
+      },
+      "manipulate": {
+        "title": "Glisse les cartes dans le bon ordre",
+        "instruction": "Glisse chaque carte dans une case, du plus petit nombre au plus grand. Sur téléphone, touche une carte puis une case.",
+        "cardsLabel": "Cartes-nombres à déplacer",
+        "slotsLabel": "Quatre positions, du plus petit nombre au plus grand",
+        "emptySlot": "Position {{position}}, vide",
+        "filledSlot": "Position {{position}}, nombre {{number}}",
+        "hint": "L'ordre attendu commence par 5 et se termine par 17."
+      },
+      "understand": {
+        "title": "Choisis une stratégie sûre",
+        "instruction": "Comment ranger plusieurs nombres sans en oublier ?",
+        "smallest": "Je cherche le plus petit parmi ceux qui restent.",
+        "largest": "Je prends toujours le plus grand en premier.",
+        "random": "Je choisis les nombres au hasard.",
+        "hint": "Commence par le plus petit, puis recommence avec les nombres restants."
+      },
+      "practice": {
+        "title": "Range les paniers de bananes",
+        "instruction": "Compte les bananes de chaque panier. Glisse ensuite chaque panier vers la case qui affiche la même quantité. Sur téléphone, touche un panier puis sa case.",
+        "basketsLabel": "Paniers contenant exactement 2, 7, 8 et 10 bananes",
+        "basketLabel": "Panier contenant {{count}} bananes",
+        "destinationsLabel": "Cases portant les nombres 2, 7, 8 et 10",
+        "emptyDestination": "Case {{destination}}, vide",
+        "filledDestination": "Case {{destination}}, panier de {{count}} bananes",
+        "hint": "Compte chaque banane une seule fois, puis associe le panier à la même quantité."
+      },
+      "play": {
+        "title": "Forme le convoi des autobus",
+        "instruction": "Touche 20, 14, 19 et 10 dans l'ordre croissant.",
+        "hint": "Le premier autobus doit porter le plus petit nombre : 10."
+      },
+      "remember": {
+        "title": "Je retiens",
+        "instruction": "Quelle méthode permet de ranger les nombres du plus petit au plus grand ?",
+        "smallest": "Je cherche le plus petit parmi ceux qui restent.",
+        "color": "Je les range seulement par couleur.",
+        "random": "Je les place au hasard.",
+        "hint": "La couleur ne change pas la valeur du nombre. Cherche le plus petit."
+      }
     }
   },
   "lessonComplete": {

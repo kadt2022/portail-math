@@ -5,11 +5,12 @@ import { i18next } from "../../i18n/i18n";
 import type { LessonStepKind } from "../course-engine/course-model";
 import { PrimaryTwoLessonActivity } from "./PrimaryTwoLessonActivities";
 
-function renderActivity(kind: LessonStepKind, completed = false) {
+function renderActivity(kind: LessonStepKind, completed = false, lessonId?: string) {
   const onValidated = vi.fn();
   render(
     <PrimaryTwoLessonActivity
       kind={kind}
+      lessonId={lessonId}
       completed={completed}
       onValidated={onValidated}
     />,
@@ -107,6 +108,19 @@ describe("Activités interactives de la première leçon de 2e primaire", () => 
     expect(onValidated).toHaveBeenCalledOnce();
   });
 
+  it("accepte aussi une carte glissée vers la bonne maison", () => {
+    renderActivity("play");
+
+    const card = screen.getByRole("button", { name: "Choisir la carte 4" });
+    expect(card).toHaveAttribute("draggable", "true");
+    fireEvent.drop(
+      screen.getByRole("button", { name: "Maison vide entre 3 et 5" }),
+      { dataTransfer: { getData: () => "4" } },
+    );
+
+    expect(screen.getByRole("button", { name: "Carte 4 placée entre 3 et 5" })).toBeInTheDocument();
+  });
+
   it("refuse une mauvaise règle puis valide la règle à retenir", () => {
     const onValidated = renderActivity("remember");
 
@@ -127,5 +141,100 @@ describe("Activités interactives de la première leçon de 2e primaire", () => 
     expect(screen.queryByRole("button", { name: /choisir la carte/i })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /carte .* placée entre/i })).toHaveLength(4);
     expect(onValidated).not.toHaveBeenCalled();
+  });
+
+  it("retrouve le nombre entre 9 et 11 dans la deuxième leçon", () => {
+    const onValidated = renderActivity("discover", false, "MATH-2P-U01-L02");
+
+    fireEvent.click(screen.getByRole("button", { name: "10" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("refuse de valider la suite de la deuxième leçon dans le désordre", () => {
+    const onValidated = renderActivity("manipulate", false, "MATH-2P-U01-L02");
+
+    fireEvent.click(screen.getByRole("button", { name: "7" }));
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(screen.getByText(/commence par 6/i)).toBeInTheDocument();
+    expect(onValidated).not.toHaveBeenCalled();
+  });
+
+  it("rend le panier gauche sélectionnable directement sur l'image de la troisième leçon", () => {
+    const onValidated = renderActivity("discover", false, "MATH-2P-U01-L03");
+    const leftChoices = screen.getAllByRole("button", { name: /panier de gauche/i });
+
+    fireEvent.click(leftChoices[0]);
+
+    expect(leftChoices[1]).toHaveAttribute("aria-pressed", "true");
+    expect(leftChoices[1]).toHaveTextContent("✓");
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("affiche clairement le signe inférieur sélectionné quand l'étape est terminée", () => {
+    renderActivity("manipulate", true, "MATH-2P-U01-L03");
+
+    expect(screen.getByRole("button", { name: "<" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "=" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: ">" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("fait choisir l'autobus portant le plus petit nombre dans la quatrième leçon", () => {
+    const onValidated = renderActivity("discover", false, "MATH-2P-U01-L04");
+
+    fireEvent.click(screen.getByRole("button", { name: "5" }));
+    expect(screen.getByRole("button", { name: "5" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("compose les paniers avec exactement 2, 7, 8 et 10 bananes", () => {
+    renderActivity("practice", false, "MATH-2P-U01-L04");
+
+    for (const count of [2, 7, 8, 10]) {
+      const basket = screen.getByRole("button", { name: `Panier contenant ${count} bananes` });
+      expect(basket.querySelectorAll("img")).toHaveLength(count + 1);
+      expect(screen.getByRole("button", { name: `Case ${count}, vide` })).toBeInTheDocument();
+    }
+    expect(screen.queryByRole("button", { name: "Case 6, vide" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Case 11, vide" })).not.toBeInTheDocument();
+  });
+
+  it("associe un panier de bananes à la case de même quantité", () => {
+    renderActivity("practice", false, "MATH-2P-U01-L04");
+
+    fireEvent.click(screen.getByRole("button", { name: "Panier contenant 2 bananes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Case 2, vide" }));
+
+    expect(screen.getByRole("button", { name: "Case 2, panier de 2 bananes" })).toBeInTheDocument();
+  });
+
+  it("permet de ranger les cartes de la quatrième leçon par toucher", () => {
+    const onValidated = renderActivity("manipulate", false, "MATH-2P-U01-L04");
+
+    for (const [number, position] of [[5, 1], [9, 2], [12, 3], [17, 4]] as const) {
+      fireEvent.click(screen.getByRole("button", { name: String(number) }));
+      fireEvent.click(screen.getByRole("button", { name: `Position ${position}, vide` }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
+
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
+  it("accepte le glisser-déposer d'une carte vers une case", () => {
+    renderActivity("manipulate", false, "MATH-2P-U01-L04");
+    const values: Record<string, string> = {};
+    const dataTransfer = {
+      setData: (type: string, value: string) => { values[type] = value; },
+      getData: (type: string) => values[type] ?? "",
+    };
+
+    fireEvent.dragStart(screen.getByRole("button", { name: "5" }), { dataTransfer });
+    fireEvent.drop(screen.getByRole("button", { name: "Position 1, vide" }), { dataTransfer });
+
+    expect(screen.getByRole("button", { name: "Position 1, nombre 5" })).toBeInTheDocument();
   });
 });

@@ -20,6 +20,9 @@ function step(id: string, kind: LessonStepKind, index: number) {
 
 const MODULE_ONE_ID = "MATH-2P-U01";
 const LESSON_ONE_ID = "MATH-2P-U01-L01";
+const LESSON_TWO_ID = "MATH-2P-U01-L02";
+const LESSON_THREE_ID = "MATH-2P-U01-L03";
+const LESSON_FOUR_ID = "MATH-2P-U01-L04";
 
 const lessonOne: CourseItem = {
   id: LESSON_ONE_ID,
@@ -29,6 +32,39 @@ const lessonOne: CourseItem = {
   publication: "available",
   steps: (["discover", "manipulate", "understand", "practice", "play", "remember"] as const).map(
     (kind, index) => step(LESSON_ONE_ID, kind, index),
+  ),
+};
+
+const lessonTwo: CourseItem = {
+  id: LESSON_TWO_ID,
+  moduleId: MODULE_ONE_ID,
+  kind: "lesson",
+  titleKey: "lessons.l2.title",
+  publication: "available",
+  steps: (["discover", "manipulate", "understand", "practice", "play", "remember"] as const).map(
+    (kind, index) => step(LESSON_TWO_ID, kind, index),
+  ),
+};
+
+const lessonThree: CourseItem = {
+  id: LESSON_THREE_ID,
+  moduleId: MODULE_ONE_ID,
+  kind: "lesson",
+  titleKey: "lessons.l3.title",
+  publication: "available",
+  steps: (["discover", "manipulate", "understand", "practice", "play", "remember"] as const).map(
+    (kind, index) => step(LESSON_THREE_ID, kind, index),
+  ),
+};
+
+const lessonFour: CourseItem = {
+  id: LESSON_FOUR_ID,
+  moduleId: MODULE_ONE_ID,
+  kind: "lesson",
+  titleKey: "lessons.l4.title",
+  publication: "available",
+  steps: (["discover", "manipulate", "understand", "practice", "play", "remember"] as const).map(
+    (kind, index) => step(LESSON_FOUR_ID, kind, index),
   ),
 };
 
@@ -82,9 +118,9 @@ export const PRIMARY_TWO_MODULES: readonly CourseModule[] = [
     plannedLessonCount: 4,
     lessons: [
       lessonOne,
-      comingLesson(MODULE_ONE_ID, 2, "lessons.l2.title"),
-      comingLesson(MODULE_ONE_ID, 3, "lessons.l3.title"),
-      comingLesson(MODULE_ONE_ID, 4, "lessons.l4.title"),
+      lessonTwo,
+      lessonThree,
+      lessonFour,
     ],
     evaluation: comingEvaluation(MODULE_ONE_ID),
   },

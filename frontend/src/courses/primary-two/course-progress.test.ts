@@ -71,7 +71,7 @@ describe("Catalogue et progression de 2e primaire", () => {
       completed: false,
     });
     expect(getLearningState(progress, firstLesson)).toBe("not-started");
-    expect(getLearningState(progress, moduleOne.lessons[1])).toBeNull();
+    expect(getLearningState(progress, moduleOne.lessons[1])).toBe("not-started");
     expect(getModuleProgress(progress, PRIMARY_TWO_MODULES[1])).toMatchObject({
       publication: "coming-soon",
       state: null,
@@ -94,8 +94,9 @@ describe("Catalogue et progression de 2e primaire", () => {
       percentage: 25,
     });
     expect(getCoursePrimaryAction(completed, PRIMARY_TWO_COURSE)).toEqual({
-      type: "return-to-modules",
+      type: "next-lesson",
       moduleId: moduleOne.id,
+      itemId: moduleOne.lessons[1].id,
     });
   });
 
@@ -121,7 +122,7 @@ describe("Catalogue et progression de 2e primaire", () => {
 
   it("refuse de démarrer ou valider un contenu à venir, vide ou incorrect", () => {
     const empty = createEmptyCourseProgress(PRIMARY_TWO_COURSE.id);
-    const coming = moduleOne.lessons[1];
+    const coming = PRIMARY_TWO_MODULES[1].lessons[0];
 
     expect(startLearningItem(empty, coming)).toBe(empty);
     expect(completeLearningStep(empty, coming, "inexistant", true)).toBe(empty);
