@@ -33,12 +33,21 @@ export function PrimaryTwoLessonPage() {
       : storedItem?.currentStepId ?? item.steps[0]?.id
     : undefined;
   const view = item ? viewByItem[item.id] ?? defaultView : undefined;
+  const isLessonTwo = item?.id === "MATH-2P-U01-L02";
+  const isLessonThree = item?.id === "MATH-2P-U01-L03";
+  const isLessonFour = item?.id === "MATH-2P-U01-L04";
 
   useEffect(() => {
     if (frenchContent && item && isPublished(item) && !progress.items[item.id]) {
       startItem(item);
     }
   }, [frenchContent, item, progress.items, startItem]);
+
+  useEffect(() => {
+    if (!view || view === "done") return;
+    const heading = document.getElementById("activity-title");
+    heading?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+  }, [view]);
 
   if (!module || !item || !isPublished(item) || !view) {
     return (
@@ -120,8 +129,8 @@ export function PrimaryTwoLessonPage() {
           <span className={styles.duration}>{t("lesson.duration")}</span>
         </div>
         <div className={styles.lessonContext}>
-          <p><strong>{t("lesson.objectiveLabel")} :</strong> {t("lesson.objective")}</p>
-          <p>{t("lesson.situation")}</p>
+          <p><strong>{t("lesson.objectiveLabel")} :</strong> {t(isLessonTwo ? "lesson.objectiveL2" : isLessonThree ? "lesson.objectiveL3" : isLessonFour ? "lesson.objectiveL4" : "lesson.objective")}</p>
+          <p>{t(isLessonTwo ? "lesson.situationL2" : isLessonThree ? "lesson.situationL3" : isLessonFour ? "lesson.situationL4" : "lesson.situation")}</p>
         </div>
         {safeStepIndex === 0 ? (
           <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonTip")} />
@@ -150,6 +159,7 @@ export function PrimaryTwoLessonPage() {
       <PrimaryTwoLessonActivity
         key={step.id}
         kind={step.kind}
+        lessonId={item.id}
         completed={stepCompleted}
         onValidated={() => {
           setView(step.id);

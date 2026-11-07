@@ -38,14 +38,17 @@ describe("Pages du parcours de 2e primaire", () => {
     }
   });
 
-  it("montre les quatre leçons et l’évaluation du module 1, une seule étant disponible", () => {
+  it("montre les quatre leçons disponibles et l’évaluation à venir du module 1", () => {
     renderAt("/app/apprentissages/primaire/2/mathematiques/modules/MATH-2P-U01");
 
     const articles = screen.getAllByRole("article");
     expect(articles).toHaveLength(5);
     expect(within(articles[0]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
-    expect(articles.slice(1).every((article) => within(article).queryByRole("link") === null)).toBe(true);
-    expect(screen.getAllByText("À venir").length).toBeGreaterThanOrEqual(4);
+    expect(within(articles[1]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    expect(within(articles[2]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    expect(within(articles[3]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    expect(within(articles[4]).queryByRole("link")).toBeNull();
+    expect(screen.getAllByText("À venir").length).toBeGreaterThanOrEqual(1);
   });
 
   it("ne valide pas l’étape de comptage vide, puis enregistre les 18 graines réellement comptées", async () => {
@@ -107,8 +110,7 @@ describe("Pages du parcours de 2e primaire", () => {
     expect(screen.getByText("1 / 40 leçons")).toBeInTheDocument();
     expect(screen.getByText("2,5 %")).toBeInTheDocument();
     expect(within(screen.getAllByRole("article")[0]).getByText("1 / 4 leçons")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /retour à mes modules/i })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /leçon suivante/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /leçon suivante/i })).toBeInTheDocument();
   });
 
   it("garde la zone visuelle et les actions dans le DOM à 320 px", async () => {
