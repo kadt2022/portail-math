@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -88,6 +89,8 @@ interface GenericModulePageProps {
   lessonPath: (moduleId: string, lessonId: string) => string;
   comingSoonClassName: string;
   unavailableLabelClassName: string;
+  /** Action principale facultative du module (ex. « Continuer » en 2e primaire). */
+  renderHeroAction?: (module: CourseModule, progress: CourseProgress) => ReactNode;
 }
 
 // Page d'un module (fil d'Ariane, en-tête de progression, liste des leçons),
@@ -101,6 +104,7 @@ export function GenericModulePage({
   lessonPath,
   comingSoonClassName,
   unavailableLabelClassName,
+  renderHeroAction,
 }: GenericModulePageProps) {
   const { moduleId } = useParams();
   const { t } = useTranslation(namespace);
@@ -162,6 +166,7 @@ export function GenericModulePage({
               <span style={{ width: `${summary.percentage}%` }} />
             </div>
           ) : null}
+          {renderHeroAction?.(module, progress)}
         </div>
       </section>
 
