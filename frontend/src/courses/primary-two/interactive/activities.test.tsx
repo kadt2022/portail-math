@@ -14,6 +14,19 @@ function renderActivity(spec: ActivitySpec, onValidated = vi.fn()) {
   return { ...result, onValidated };
 }
 
+const MATCH_SPEC: ActivitySpec = {
+  type: "match",
+  text: "u02l02.play",
+  items: [
+    { id: "a", visual: { kind: "tens", tens: 3, units: 5 }, bin: "35" },
+    { id: "b", visual: { kind: "tens", tens: 5, units: 3 }, bin: "53" },
+  ],
+  bins: [
+    { id: "35", label: 35 },
+    { id: "53", label: 53 },
+  ],
+};
+
 const validate = () => fireEvent.click(screen.getByRole("button", { name: /vérifier ma réponse/i }));
 
 describe("Règles pures", () => {
@@ -92,18 +105,7 @@ describe("Composants d’activité", () => {
   });
 
   it("place un panier par toucher (sans glisser) et par glisser-déposer", () => {
-    const { container, onValidated } = renderActivity({
-      type: "match",
-      text: "u02l02.play",
-      items: [
-        { id: "a", visual: { kind: "tens", tens: 3, units: 5 }, bin: "35" },
-        { id: "b", visual: { kind: "tens", tens: 5, units: 3 }, bin: "53" },
-      ],
-      bins: [
-        { id: "35", label: 35 },
-        { id: "53", label: 53 },
-      ],
-    });
+    const { container, onValidated } = renderActivity(MATCH_SPEC);
     // Alternative accessible : choisir la carte, puis la case.
     fireEvent.click(container.querySelector('[data-item="a"]') as HTMLElement);
     expect(screen.getByText(/est choisie/i)).toBeInTheDocument();
@@ -124,18 +126,7 @@ describe("Composants d’activité", () => {
   });
 
   it("signale une carte mal placée sans révéler laquelle, et permet de recommencer", () => {
-    const { container, onValidated } = renderActivity({
-      type: "match",
-      text: "u02l02.play",
-      items: [
-        { id: "a", visual: { kind: "tens", tens: 3, units: 5 }, bin: "35" },
-        { id: "b", visual: { kind: "tens", tens: 5, units: 3 }, bin: "53" },
-      ],
-      bins: [
-        { id: "35", label: 35 },
-        { id: "53", label: 53 },
-      ],
-    });
+    const { container, onValidated } = renderActivity(MATCH_SPEC);
     fireEvent.click(container.querySelector('[data-item="a"]') as HTMLElement);
     fireEvent.click(container.querySelector('[data-bin="53"]') as HTMLElement);
     fireEvent.click(container.querySelector('[data-item="b"]') as HTMLElement);
@@ -198,5 +189,12 @@ describe("Composants d’activité", () => {
     fireEvent.click(container.querySelector('[data-action="plus"]') as HTMLElement);
     validate();
     expect(onValidated).toHaveBeenCalledTimes(1);
+  });
+
+  it("décrit le modèle de symétrie aux lecteurs d’écran", () => {
+    renderActivity({ type: "symmetry", text: "u09l03.manipulate", half: 3, rows: 2, left: [[1, 0], [3, 1]] });
+    expect(screen.getByRole("img", { name: "Modèle à gauche de l’axe : colonne 1, ligne 1, colorée" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Modèle à gauche de l’axe : colonne 2, ligne 1, vide" })).toBeInTheDocument();
+    expect(screen.getByText(/cases colorées du modèle.*colonne 1, ligne 1 ; colonne 3, ligne 2/i)).toBeInTheDocument();
   });
 });

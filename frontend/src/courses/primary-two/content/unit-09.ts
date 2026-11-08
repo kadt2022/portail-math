@@ -1,6 +1,18 @@
-import type { LessonContent } from "../interactive/types";
+import type { BuildSpec, LessonContent, ShapeName } from "../interactive/types";
 
 // Unité 9 — Formes, solides et symétrie (L33 à L36 + évaluation).
+
+/** Reconstruire un motif : compter les pièces de chaque forme du modèle. */
+function rebuild(text: string, shapes: readonly ShapeName[]): BuildSpec {
+  const count = (shape: ShapeName) => shapes.filter((candidate) => candidate === shape).length;
+  return {
+    type: "build",
+    text,
+    visual: { kind: "composite", shapes },
+    controls: (["square", "triangle", "rectangle"] as const).map((shape) => ({ id: shape, labelKey: shape, min: 0, max: 4 })),
+    goal: { square: count("square"), triangle: count("triangle"), rectangle: count("rectangle") },
+  };
+}
 
 export const UNIT_09: readonly LessonContent[] = [
   {
@@ -265,28 +277,8 @@ export const UNIT_09: readonly LessonContent[] = [
         type: "rounds",
         text: "u09l04.play",
         rounds: [
-          {
-            type: "build",
-            text: "u09l04.play.r1",
-            visual: { kind: "composite", shapes: ["square", "triangle", "triangle", "rectangle"] },
-            controls: [
-              { id: "square", labelKey: "square", min: 0, max: 4 },
-              { id: "triangle", labelKey: "triangle", min: 0, max: 4 },
-              { id: "rectangle", labelKey: "rectangle", min: 0, max: 4 },
-            ],
-            goal: { square: 1, triangle: 2, rectangle: 1 },
-          },
-          {
-            type: "build",
-            text: "u09l04.play.r2",
-            visual: { kind: "composite", shapes: ["triangle", "triangle", "triangle", "square", "square"] },
-            controls: [
-              { id: "square", labelKey: "square", min: 0, max: 4 },
-              { id: "triangle", labelKey: "triangle", min: 0, max: 4 },
-              { id: "rectangle", labelKey: "rectangle", min: 0, max: 4 },
-            ],
-            goal: { square: 2, triangle: 3, rectangle: 0 },
-          },
+          rebuild("u09l04.play.r1", ["square", "triangle", "triangle", "rectangle"]),
+          rebuild("u09l04.play.r2", ["triangle", "triangle", "triangle", "square", "square"]),
         ],
       },
       {

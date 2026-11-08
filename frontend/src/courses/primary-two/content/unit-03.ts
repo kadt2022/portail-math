@@ -1,4 +1,4 @@
-import type { LessonContent } from "../interactive/types";
+import type { BuildSpec, LessonContent } from "../interactive/types";
 
 // Unité 3 — J'additionne avec des stratégies (L09 à L12 + évaluation).
 
@@ -6,6 +6,17 @@ const tensControls = [
   { id: "tens", labelKey: "tens", min: 0, max: 9 },
   { id: "units", labelKey: "units", min: 0, max: 9 },
 ];
+
+/** Compléter un cadre de dix déjà rempli de `base` jetons. */
+function completeTen(text: string, base: number, max = 9): BuildSpec {
+  return {
+    type: "build",
+    text,
+    controls: [{ id: "added", labelKey: "added", min: 0, max }],
+    preview: { kind: "tenFrame", count: "added", base },
+    goal: { added: 10 - base },
+  };
+}
 
 export const UNIT_03: readonly LessonContent[] = [
   {
@@ -77,20 +88,8 @@ export const UNIT_03: readonly LessonContent[] = [
     id: "MATH-2P-U03-L02",
     text: "u03l02",
     activities: [
-      {
-        type: "build",
-        text: "u03l02.discover",
-        controls: [{ id: "added", labelKey: "added", min: 0, max: 6 }],
-        preview: { kind: "tenFrame", count: "added", base: 8 },
-        goal: { added: 2 },
-      },
-      {
-        type: "build",
-        text: "u03l02.manipulate",
-        controls: [{ id: "added", labelKey: "added", min: 0, max: 6 }],
-        preview: { kind: "tenFrame", count: "added", base: 7 },
-        goal: { added: 3 },
-      },
+      completeTen("u03l02.discover", 8, 6),
+      completeTen("u03l02.manipulate", 7, 6),
       {
         type: "choice",
         text: "u03l02.understand",
@@ -110,29 +109,7 @@ export const UNIT_03: readonly LessonContent[] = [
       {
         type: "rounds",
         text: "u03l02.play",
-        rounds: [
-          {
-            type: "build",
-            text: "u03l02.play.r1",
-            controls: [{ id: "added", labelKey: "added", min: 0, max: 9 }],
-            preview: { kind: "tenFrame", count: "added", base: 5 },
-            goal: { added: 5 },
-          },
-          {
-            type: "build",
-            text: "u03l02.play.r2",
-            controls: [{ id: "added", labelKey: "added", min: 0, max: 9 }],
-            preview: { kind: "tenFrame", count: "added", base: 3 },
-            goal: { added: 7 },
-          },
-          {
-            type: "build",
-            text: "u03l02.play.r3",
-            controls: [{ id: "added", labelKey: "added", min: 0, max: 9 }],
-            preview: { kind: "tenFrame", count: "added", base: 9 },
-            goal: { added: 1 },
-          },
-        ],
+        rounds: [completeTen("u03l02.play.r1", 5), completeTen("u03l02.play.r2", 3), completeTen("u03l02.play.r3", 9)],
       },
       {
         type: "choice",
@@ -274,13 +251,7 @@ export const UNIT_03: readonly LessonContent[] = [
     text: "u03eval",
     activities: [
       { type: "numeric", text: "u03eval.q1", fields: [{ key: "q", accept: 49, check: "42 + 7" }] },
-      {
-        type: "build",
-        text: "u03eval.q2",
-        controls: [{ id: "added", labelKey: "added", min: 0, max: 5 }],
-        preview: { kind: "tenFrame", count: "added", base: 9 },
-        goal: { added: 1 },
-      },
+      completeTen("u03eval.q2", 9, 5),
       { type: "numeric", text: "u03eval.q3", fields: [{ key: "q", accept: 44, check: "36 + 8" }] },
       { type: "numeric", text: "u03eval.q4", fields: [{ key: "q", accept: 79, check: "45 + 34" }] },
       { type: "selfcheck", text: "u03eval.check", recap: ["r1", "r2", "r3", "r4"] },

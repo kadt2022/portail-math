@@ -1,4 +1,4 @@
-import type { LessonContent } from "../interactive/types";
+import type { BuildSpec, LessonContent } from "../interactive/types";
 
 // Unité 2 — Dizaines et nombres jusqu'à 100 (L05 à L08 + évaluation).
 
@@ -6,6 +6,31 @@ const tensControls = (max = 9) => [
   { id: "tens", labelKey: "tens", min: 0, max },
   { id: "units", labelKey: "units", min: 0, max: 9 },
 ];
+
+function sticksRound(text: string, count: number): BuildSpec {
+  return {
+    type: "build",
+    text,
+    visual: { kind: "collection", item: "stick", count, container: "none" },
+    controls: tensControls(2),
+    preview: { kind: "tens", tens: "tens", units: "units" },
+    goal: { tens: Math.floor(count / 10), units: count % 10 },
+  };
+}
+
+function granaryRound(text: string, seeds: number): BuildSpec {
+  return {
+    type: "build",
+    text,
+    visual: { kind: "expression", value: String(seeds) },
+    controls: [
+      { id: "bags", labelKey: "bags", min: 0, max: 10 },
+      { id: "seeds", labelKey: "seeds", min: 0, max: 9 },
+    ],
+    preview: { kind: "tens", tens: "bags", units: "seeds", item: "bag" },
+    goal: { bags: Math.floor(seeds / 10), seeds: seeds % 10 },
+  };
+}
 
 export const UNIT_02: readonly LessonContent[] = [
   {
@@ -49,32 +74,7 @@ export const UNIT_02: readonly LessonContent[] = [
       {
         type: "rounds",
         text: "u02l01.play",
-        rounds: [
-          {
-            type: "build",
-            text: "u02l01.play.r1",
-            visual: { kind: "collection", item: "stick", count: 13, container: "none" },
-            controls: tensControls(2),
-            preview: { kind: "tens", tens: "tens", units: "units" },
-            goal: { tens: 1, units: 3 },
-          },
-          {
-            type: "build",
-            text: "u02l01.play.r2",
-            visual: { kind: "collection", item: "stick", count: 17, container: "none" },
-            controls: tensControls(2),
-            preview: { kind: "tens", tens: "tens", units: "units" },
-            goal: { tens: 1, units: 7 },
-          },
-          {
-            type: "build",
-            text: "u02l01.play.r3",
-            visual: { kind: "collection", item: "stick", count: 20, container: "none" },
-            controls: tensControls(2),
-            preview: { kind: "tens", tens: "tens", units: "units" },
-            goal: { tens: 2, units: 0 },
-          },
-        ],
+        rounds: [sticksRound("u02l01.play.r1", 13), sticksRound("u02l01.play.r2", 17), sticksRound("u02l01.play.r3", 20)],
       },
       {
         type: "choice",
@@ -187,41 +187,7 @@ export const UNIT_02: readonly LessonContent[] = [
       {
         type: "rounds",
         text: "u02l03.play",
-        rounds: [
-          {
-            type: "build",
-            text: "u02l03.play.r1",
-            visual: { kind: "expression", value: "80" },
-            controls: [
-              { id: "bags", labelKey: "bags", min: 0, max: 10 },
-              { id: "seeds", labelKey: "seeds", min: 0, max: 9 },
-            ],
-            preview: { kind: "tens", tens: "bags", units: "seeds", item: "bag" },
-            goal: { bags: 8, seeds: 0 },
-          },
-          {
-            type: "build",
-            text: "u02l03.play.r2",
-            visual: { kind: "expression", value: "76" },
-            controls: [
-              { id: "bags", labelKey: "bags", min: 0, max: 10 },
-              { id: "seeds", labelKey: "seeds", min: 0, max: 9 },
-            ],
-            preview: { kind: "tens", tens: "bags", units: "seeds", item: "bag" },
-            goal: { bags: 7, seeds: 6 },
-          },
-          {
-            type: "build",
-            text: "u02l03.play.r3",
-            visual: { kind: "expression", value: "100" },
-            controls: [
-              { id: "bags", labelKey: "bags", min: 0, max: 10 },
-              { id: "seeds", labelKey: "seeds", min: 0, max: 9 },
-            ],
-            preview: { kind: "tens", tens: "bags", units: "seeds", item: "bag" },
-            goal: { bags: 10, seeds: 0 },
-          },
-        ],
+        rounds: [granaryRound("u02l03.play.r1", 80), granaryRound("u02l03.play.r2", 76), granaryRound("u02l03.play.r3", 100)],
       },
       {
         type: "choice",

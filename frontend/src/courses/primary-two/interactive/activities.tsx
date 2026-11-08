@@ -709,12 +709,28 @@ function SymmetryBody({ spec, solved, register, touch }: BodyProps<SymmetrySpec>
     return fail(`${tx("hint")} ${t("common.feedback.symmetry", { extra, missing })}`);
   });
 
+  // Le modèle de gauche est décrit pour les lecteurs d'écran : chaque case
+  // annonce sa colonne (distance à l'axe), sa ligne et si elle est colorée.
+  const model = [...spec.left]
+    .sort(([columnA, rowA], [columnB, rowB]) => rowA - rowB || columnA - columnB)
+    .map(([column, row]) => t("common.modelCell", { column, row: row + 1 }))
+    .join(" ; ");
   return (
+    <>
+    <p className={styles.srOnly}>{t("common.modelSummary", { cells: model })}</p>
     <div className={styles.symmetryGrid} style={{ gridTemplateColumns: `repeat(${spec.half}, 40px) 6px repeat(${spec.half}, 40px)`, ["--half" as string]: spec.half }}>
       {Array.from({ length: spec.rows }, (_, row) => [
         ...Array.from({ length: spec.half }, (_, index) => {
           const distance = spec.half - index;
-          return <span key={`l-${index}-${row}`} className={left.has(`${distance},${row}`) ? styles.cellFilled : styles.cell} aria-hidden="true" />;
+          const filled = left.has(`${distance},${row}`);
+          return (
+            <span
+              key={`l-${index}-${row}`}
+              role="img"
+              aria-label={t(filled ? "common.leftCellFilled" : "common.leftCellEmpty", { column: distance, row: row + 1 })}
+              className={filled ? styles.cellFilled : styles.cell}
+            />
+          );
         }),
         <span key={`axis-${row}`} className={styles.axis} aria-hidden="true" />,
         ...Array.from({ length: spec.half }, (_, index) => {
@@ -743,6 +759,7 @@ function SymmetryBody({ spec, solved, register, touch }: BodyProps<SymmetrySpec>
         }),
       ])}
     </div>
+    </>
   );
 }
 

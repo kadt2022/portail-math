@@ -138,6 +138,10 @@
       "minuteOn6": "Grande aiguille sur 6"
     },
     "cell": "Case à droite de l’axe : colonne {{column}}, ligne {{row}}",
+    "leftCellFilled": "Modèle à gauche de l’axe : colonne {{column}}, ligne {{row}}, colorée",
+    "leftCellEmpty": "Modèle à gauche de l’axe : colonne {{column}}, ligne {{row}}, vide",
+    "modelCell": "colonne {{column}}, ligne {{row}}",
+    "modelSummary": "Cases colorées du modèle, à gauche de l’axe (colonne 1 = contre l’axe) : {{cells}}.",
     "selfcheck": {
       "alone": "J’ai réussi seul.",
       "material": "J’ai réussi avec du matériel ou de l’aide.",

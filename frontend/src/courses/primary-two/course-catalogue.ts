@@ -1,23 +1,10 @@
-import type {
-  CourseDefinition,
-  CourseItem,
-  CourseModule,
-  LessonStepKind,
-} from "../course-engine/course-model";
+import type { CourseDefinition, CourseItem, CourseModule } from "../course-engine/course-model";
 import { courseLessonPath, courseModulePath, getModuleItems } from "../course-engine/course-model";
+import { comingEvaluation, comingLesson, plannedModule, step } from "../course-engine/course-scaffold";
 import { getInteractiveContent } from "./content";
 
 export const PRIMARY_TWO_COURSE_ID = "MATH-2P";
 export const PRIMARY_TWO_BASE_PATH = "/apprentissages/primaire/2/mathematiques";
-
-function step(id: string, kind: LessonStepKind, index: number) {
-  return {
-    id: `${id}-S${String(index + 1).padStart(2, "0")}`,
-    kind,
-    labelKey: `steps.${kind}`,
-    required: true,
-  } as const;
-}
 
 const MODULE_ONE_ID = "MATH-2P-U01";
 const LESSON_ONE_ID = "MATH-2P-U01-L01";
@@ -69,60 +56,34 @@ const lessonFour: CourseItem = {
   ),
 };
 
-function comingLesson(moduleId: string, lessonNumber: number, titleKey = "lessons.plannedTitle"): CourseItem {
-  return {
-    id: `${moduleId}-L${String(lessonNumber).padStart(2, "0")}`,
-    moduleId,
-    kind: "lesson",
-    titleKey,
-    publication: "coming-soon",
-    steps: [],
-  };
-}
-
-function comingEvaluation(moduleId: string): CourseItem {
-  return {
-    id: `${moduleId}-EVAL`,
-    moduleId,
-    kind: "evaluation",
-    titleKey: "evaluation.title",
-    publication: "coming-soon",
-    steps: [],
-  };
-}
-
 const LESSON_STEP_KINDS = ["discover", "manipulate", "understand", "practice", "play", "remember"] as const;
 
-// Leçons L05 à L40 : publiées dès que leurs six activités existent dans le
-// registre `content/`. Sinon elles restent « à venir », sans progression.
-function interactiveLesson(moduleId: string, lessonNumber: number): CourseItem {
-  const id = `${moduleId}-L${String(lessonNumber).padStart(2, "0")}`;
-  const content = getInteractiveContent(id);
-  if (!content) return comingLesson(moduleId, lessonNumber);
-  return {
-    id,
-    moduleId,
-    kind: "lesson",
-    titleKey: `lessons.${content.text}.title`,
-    publication: "available",
-    steps: LESSON_STEP_KINDS.map((kind, index) => step(id, kind, index)),
-  };
-}
-
-// Évaluations : une étape par question, puis l'autoévaluation.
-function interactiveEvaluation(id: string, moduleId: string, titleKey: string): CourseItem | undefined {
+// Leçons L05 à L40, évaluations et bilan : publiés dès que leurs activités
+// existent dans le registre `content/`. Sinon ils restent « à venir ».
+// Évaluation : une étape par question, puis l'autoévaluation.
+function interactiveItem(id: string, moduleId: string, kind: CourseItem["kind"], titleKey?: string): CourseItem | undefined {
   const content = getInteractiveContent(id);
   if (!content) return undefined;
   return {
     id,
     moduleId,
-    kind: "evaluation",
-    titleKey,
+    kind,
+    titleKey: titleKey ?? `lessons.${content.text}.title`,
     publication: "available",
-    steps: content.activities.map((activity, index) =>
-      step(id, activity.type === "selfcheck" ? "check" : "assess", index),
-    ),
+    steps: content.activities.map((activity, index) => {
+      if (kind === "lesson") return step(id, LESSON_STEP_KINDS[index], index);
+      return step(id, activity.type === "selfcheck" ? "check" : "assess", index);
+    }),
   };
+}
+
+function interactiveLesson(moduleId: string, lessonNumber: number): CourseItem {
+  const id = `${moduleId}-L${String(lessonNumber).padStart(2, "0")}`;
+  return interactiveItem(id, moduleId, "lesson") ?? comingLesson(moduleId, lessonNumber);
+}
+
+function interactiveEvaluation(id: string, moduleId: string, titleKey: string): CourseItem | undefined {
+  return interactiveItem(id, moduleId, "evaluation", titleKey);
 }
 
 function interactiveModule(number: number, titleKey: string, illustration: string): CourseModule {
@@ -132,7 +93,7 @@ function interactiveModule(number: number, titleKey: string, illustration: strin
     interactiveEvaluation(`${moduleId}-EVAL`, moduleId, "evaluation.title") ?? comingEvaluation(moduleId);
   const published = lessons.some((lesson) => lesson.publication === "available");
   return {
-    ...plannedModule(number, titleKey, illustration),
+    ...plannedModule("MATH-2P-U", number, titleKey, illustration),
     publication: published ? "available" : "coming-soon",
     lessons,
     evaluation,
@@ -144,24 +105,6 @@ export const PRIMARY_TWO_FINAL_ASSESSMENT_ID = "MATH-2P-BILAN";
 function withFinalAssessment(module: CourseModule): CourseModule {
   const finalEvaluation = interactiveEvaluation(PRIMARY_TWO_FINAL_ASSESSMENT_ID, module.id, "evaluation.finalTitle");
   return finalEvaluation ? { ...module, finalEvaluation } : module;
-}
-
-function plannedModule(
-  number: number,
-  titleKey: string,
-  illustration: string,
-): CourseModule {
-  const moduleId = `MATH-2P-U${String(number).padStart(2, "0")}`;
-  return {
-    id: moduleId,
-    number,
-    titleKey,
-    illustration,
-    publication: "coming-soon",
-    plannedLessonCount: 4,
-    lessons: [1, 2, 3, 4].map((lessonNumber) => comingLesson(moduleId, lessonNumber)),
-    evaluation: comingEvaluation(moduleId),
-  };
 }
 
 export const PRIMARY_TWO_MODULES: readonly CourseModule[] = [

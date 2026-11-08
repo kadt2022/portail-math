@@ -1,10 +1,18 @@
-import type { CollectSpec, CollectSupply, LessonContent } from "../interactive/types";
+import type { CollectSpec, CollectSupply, LessonContent, ProductName } from "../interactive/types";
 
 // Unité 7 — Argent et petits achats (L25 à L28 + évaluation).
 // Monnaie factice uniquement : aucune somme réelle n'est manipulée.
 
 const coin = (value: number): CollectSupply => ({ id: `c${value}`, value, visual: { kind: "money", values: [value] } });
 const COINS = [coin(50), coin(100), coin(200)];
+
+const article = (id: string, value: number, product: ProductName): CollectSupply => ({
+  id,
+  value,
+  limit: 1,
+  visual: { kind: "product", product, price: value },
+});
+const ARTICLES = [article("p200", 200, "pencil"), article("p300", 300, "notebook"), article("p400", 400, "ball"), article("p500", 500, "book")];
 
 function pay(text: string, equals: number, solution: Record<string, number>): CollectSpec {
   return { type: "collect", text, unit: "FC", supply: COINS, goal: { equals }, solution };
@@ -192,12 +200,7 @@ export const UNIT_07: readonly LessonContent[] = [
         type: "collect",
         text: "u07l04.manipulate",
         unit: "FC",
-        supply: [
-          { id: "p200", value: 200, limit: 1, visual: { kind: "product", product: "pencil", price: 200 } },
-          { id: "p300", value: 300, limit: 1, visual: { kind: "product", product: "notebook", price: 300 } },
-          { id: "p400", value: 400, limit: 1, visual: { kind: "product", product: "ball", price: 400 } },
-          { id: "p500", value: 500, limit: 1, visual: { kind: "product", product: "book", price: 500 } },
-        ],
+        supply: ARTICLES,
         goal: { atMost: 900, minItems: 2 },
         solution: { p400: 1, p500: 1 },
       },
@@ -224,12 +227,7 @@ export const UNIT_07: readonly LessonContent[] = [
         type: "collect",
         text: "u07l04.play",
         unit: "FC",
-        supply: [
-          { id: "p200", value: 200, limit: 1, visual: { kind: "product", product: "pencil", price: 200 } },
-          { id: "p300", value: 300, limit: 1, visual: { kind: "product", product: "notebook", price: 300 } },
-          { id: "p400", value: 400, limit: 1, visual: { kind: "product", product: "ball", price: 400 } },
-          { id: "p500", value: 500, limit: 1, visual: { kind: "product", product: "book", price: 500 } },
-        ],
+        supply: ARTICLES,
         goal: { equals: 700 },
         twoWays: true,
         solution: { p200: 1, p500: 1 },
