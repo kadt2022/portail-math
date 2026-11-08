@@ -714,3 +714,9 @@ Demandée par le Capitaine après la mise en dev : le passage entre leçons et e
 - **Page du module** : un gros bouton Commencer / Reprendre / Continuer / Module suivant vers ce qu’il faut faire maintenant (emplacement facultatif `renderHeroAction` ajouté à `GenericModulePage`, sans effet sur les autres cours).
 - Libellé corrigé : « Retour au module ». Textes faux supprimés de l’écran de fin de L01-L04 (« 1 leçon sur 40 », « La prochaine leçon arrive bientôt »).
 - Tests : `journey.test.tsx` (chemin complet, chaque passage, bouton du module, écrans de fin, passage réel évaluation U03 → U04-L01). Vérification visuelle à 320 px : chemin sur une ligne, aucun débordement.
+
+## Même navigation pour la 1re primaire (branche `feature/1re-primaire-navigation-enfant`)
+
+- La logique et l’affichage du chemin sont devenus **communs** (`courses/components/journey/`) et servent aux deux parcours. La 2e primaire garde exactement le même comportement (tests inchangés).
+- 1re primaire : chemin de ronds dans chaque leçon et sur la page du module, gros bouton « Continuer ▶ » en fin de leçon, fête de fin de module, « Tu as terminé la 1re primaire ! 🎓 » après le bilan. Le résultat d’évaluation (`AssessmentResult`) reste affiché.
+- Modules de 1re de 2 à 5 leçons : le chemin s’adapte (jusqu’à 6 ronds), vérifié à 320 px.

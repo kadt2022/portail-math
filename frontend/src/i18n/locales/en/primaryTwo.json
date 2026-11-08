@@ -167,6 +167,10 @@
   },
   "journey": {
     "trailLabel": "My path in module {{number}}",
+    "progress_one": "This session shows {{count}} lesson completed out of {{total}} planned.",
+    "progress_other": "This session shows {{count}} lessons completed out of {{total}} planned.",
+    "backToModule": "Back to the module",
+    "evaluationName": "Module {{number}} assessment",
     "stopLabel": "{{title}}: {{state}}",
     "state": {
       "current": "you are here",

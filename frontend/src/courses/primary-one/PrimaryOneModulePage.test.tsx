@@ -95,10 +95,12 @@ describe("Page d'un module de 1re primaire", () => {
 
     expect(screen.getAllByText("Terminé").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("4 leçons terminées sur 4")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /module suivant/i })).toHaveAttribute(
-      "href",
-      expect.stringContaining(PRIMARY_ONE_MODULES[1].id),
-    );
+    // Le gros bouton du haut et le lien du bas mènent tous deux au module 2.
+    const nextModuleLinks = screen.getAllByRole("link", { name: /module suivant/i });
+    expect(nextModuleLinks).toHaveLength(2);
+    for (const link of nextModuleLinks) {
+      expect(link).toHaveAttribute("href", expect.stringContaining(PRIMARY_ONE_MODULES[1].id));
+    }
   });
 
   it("présente les leçons et l’évaluation du deuxième module", () => {
