@@ -5,6 +5,7 @@ import type {
   LessonStepKind,
 } from "../course-engine/course-model";
 import { courseLessonPath, courseModulePath, getModuleItems } from "../course-engine/course-model";
+import { getInteractiveContent } from "./content";
 
 export const PRIMARY_TWO_COURSE_ID = "MATH-2P";
 export const PRIMARY_TWO_BASE_PATH = "/apprentissages/primaire/2/mathematiques";
@@ -90,6 +91,61 @@ function comingEvaluation(moduleId: string): CourseItem {
   };
 }
 
+const LESSON_STEP_KINDS = ["discover", "manipulate", "understand", "practice", "play", "remember"] as const;
+
+// Leçons L05 à L40 : publiées dès que leurs six activités existent dans le
+// registre `content/`. Sinon elles restent « à venir », sans progression.
+function interactiveLesson(moduleId: string, lessonNumber: number): CourseItem {
+  const id = `${moduleId}-L${String(lessonNumber).padStart(2, "0")}`;
+  const content = getInteractiveContent(id);
+  if (!content) return comingLesson(moduleId, lessonNumber);
+  return {
+    id,
+    moduleId,
+    kind: "lesson",
+    titleKey: `lessons.${content.text}.title`,
+    publication: "available",
+    steps: LESSON_STEP_KINDS.map((kind, index) => step(id, kind, index)),
+  };
+}
+
+// Évaluations : une étape par question, puis l'autoévaluation.
+function interactiveEvaluation(id: string, moduleId: string, titleKey: string): CourseItem | undefined {
+  const content = getInteractiveContent(id);
+  if (!content) return undefined;
+  return {
+    id,
+    moduleId,
+    kind: "evaluation",
+    titleKey,
+    publication: "available",
+    steps: content.activities.map((activity, index) =>
+      step(id, activity.type === "selfcheck" ? "check" : "assess", index),
+    ),
+  };
+}
+
+function interactiveModule(number: number, titleKey: string, illustration: string): CourseModule {
+  const moduleId = `MATH-2P-U${String(number).padStart(2, "0")}`;
+  const lessons = [1, 2, 3, 4].map((lessonNumber) => interactiveLesson(moduleId, lessonNumber));
+  const evaluation =
+    interactiveEvaluation(`${moduleId}-EVAL`, moduleId, "evaluation.title") ?? comingEvaluation(moduleId);
+  const published = lessons.some((lesson) => lesson.publication === "available");
+  return {
+    ...plannedModule(number, titleKey, illustration),
+    publication: published ? "available" : "coming-soon",
+    lessons,
+    evaluation,
+  };
+}
+
+export const PRIMARY_TWO_FINAL_ASSESSMENT_ID = "MATH-2P-BILAN";
+
+function withFinalAssessment(module: CourseModule): CourseModule {
+  const finalEvaluation = interactiveEvaluation(PRIMARY_TWO_FINAL_ASSESSMENT_ID, module.id, "evaluation.finalTitle");
+  return finalEvaluation ? { ...module, finalEvaluation } : module;
+}
+
 function plannedModule(
   number: number,
   titleKey: string,
@@ -122,17 +178,18 @@ export const PRIMARY_TWO_MODULES: readonly CourseModule[] = [
       lessonThree,
       lessonFour,
     ],
-    evaluation: comingEvaluation(MODULE_ONE_ID),
+    evaluation:
+      interactiveEvaluation(`${MODULE_ONE_ID}-EVAL`, MODULE_ONE_ID, "evaluation.title") ?? comingEvaluation(MODULE_ONE_ID),
   },
-  plannedModule(2, "modules.m2.title", "10 · 100"),
-  plannedModule(3, "modules.m3.title", "+"),
-  plannedModule(4, "modules.m4.title", "−"),
-  plannedModule(5, "modules.m5.title", "3 × 4"),
-  plannedModule(6, "modules.m6.title", "12 ÷ 3"),
-  plannedModule(7, "modules.m7.title", "FC"),
-  plannedModule(8, "modules.m8.title", "cm · m"),
-  plannedModule(9, "modules.m9.title", "○ □ △"),
-  plannedModule(10, "modules.m10.title", "◷"),
+  interactiveModule(2, "modules.m2.title", "10 · 100"),
+  interactiveModule(3, "modules.m3.title", "+"),
+  interactiveModule(4, "modules.m4.title", "−"),
+  interactiveModule(5, "modules.m5.title", "3 × 4"),
+  interactiveModule(6, "modules.m6.title", "12 ÷ 3"),
+  interactiveModule(7, "modules.m7.title", "FC"),
+  interactiveModule(8, "modules.m8.title", "cm · m"),
+  interactiveModule(9, "modules.m9.title", "○ □ △"),
+  withFinalAssessment(interactiveModule(10, "modules.m10.title", "◷")),
 ] as const;
 
 export const PRIMARY_TWO_COURSE: CourseDefinition = {

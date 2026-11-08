@@ -39,6 +39,8 @@ export interface CourseModule {
   plannedLessonCount: number;
   lessons: readonly CourseItem[];
   evaluation: CourseItem;
+  /** Bilan de fin de parcours, rattaché au dernier module (optionnel). */
+  finalEvaluation?: CourseItem;
 }
 
 export interface CourseDefinition {
@@ -63,6 +65,7 @@ export interface CourseModuleLike {
   plannedLessonCount?: number;
   lessons: readonly CourseItemLike[];
   evaluation?: CourseItemLike;
+  finalEvaluation?: CourseItemLike;
 }
 
 export interface CourseDefinitionLike {
@@ -76,7 +79,11 @@ export function isPublished(item: CourseItemLike) {
 }
 
 export function getModuleItems(module: CourseModuleLike): readonly CourseItemLike[] {
-  return module.evaluation ? [...module.lessons, module.evaluation] : module.lessons;
+  return [
+    ...module.lessons,
+    ...(module.evaluation ? [module.evaluation] : []),
+    ...(module.finalEvaluation ? [module.finalEvaluation] : []),
+  ];
 }
 
 export function getPublishedModuleItems(module: CourseModuleLike) {

@@ -1,0 +1,1106 @@
+{
+  "common": {
+    "items": {
+      "seed": "graine",
+      "stick": "bâtonnet",
+      "banana": "banane",
+      "orange": "orange",
+      "mango": "mangue",
+      "tomato": "tomate",
+      "chalk": "craie",
+      "cap": "bouchon",
+      "token": "jeton",
+      "nut": "noix",
+      "bottle": "bouteille",
+      "beignet": "beignet",
+      "plant": "plant",
+      "notebook": "cahier",
+      "bag": "sac de dix",
+      "bird": "oiseau",
+      "flower": "fleur"
+    },
+    "products": {
+      "pencil": "Crayon",
+      "eraser": "Gomme",
+      "notebook": "Cahier",
+      "ball": "Ballon",
+      "bread": "Pain",
+      "soap": "Savon",
+      "juice": "Jus",
+      "book": "Livre"
+    },
+    "shapes": {
+      "triangle": "triangle",
+      "square": "carré",
+      "rectangle": "rectangle",
+      "circle": "cercle",
+      "pentagon": "pentagone",
+      "hexagon": "hexagone",
+      "oval": "ovale"
+    },
+    "shapeLooks": {
+      "triangle": "figure fermée avec 3 côtés droits",
+      "square": "figure fermée avec 4 côtés droits de même longueur",
+      "rectangle": "figure fermée avec 4 côtés droits, deux longs et deux courts",
+      "circle": "figure ronde au bord courbe",
+      "pentagon": "figure fermée avec 5 côtés droits",
+      "hexagon": "figure fermée avec 6 côtés droits",
+      "oval": "figure allongée au bord courbe"
+    },
+    "solidLooks": {
+      "cube": "solide aux faces carrées, comme un dé",
+      "cuboid": "solide en forme de boîte allongée",
+      "sphere": "solide tout rond, comme une balle",
+      "cylinder": "solide avec deux bases rondes, comme une boîte de conserve"
+    },
+    "tensLabel": "{{tens}} paquets de dix et {{units}} unités",
+    "tenFrameLabel": "Cadre de dix avec {{count}} jetons",
+    "money": "{{value}} FC",
+    "clockLabel": "Horloge : petite aiguille sur {{hourHand}}, grande aiguille sur {{minuteHand}}",
+    "rulerLabel": "Objet posé sur la règle, du repère {{start}} au repère {{end}}",
+    "numberLineLabel": "Ligne des nombres de {{from}} à {{to}}",
+    "containerLabel": "Récipient de {{liters}} L contenant {{filled}} L",
+    "liters": "{{count}} L",
+    "weekdaysShort": [
+      "Lun",
+      "Mar",
+      "Mer",
+      "Jeu",
+      "Ven",
+      "Sam",
+      "Dim"
+    ],
+    "calendarCaption": "Calendrier du mois",
+    "fractionEqual": "Galette coupée en {{parts}} parts égales, {{shaded}} part(s) colorée(s)",
+    "fractionUnequal": "Galette coupée en {{parts}} parts de tailles différentes, {{shaded}} part(s) colorée(s)",
+    "houseLabel": "Maison dessinée : un toit, un mur et une porte",
+    "compositeLabel": "Modèle composé de : {{list}}",
+    "groupsLabel": "{{count}} groupes",
+    "arrayLabel": "{{rows}} rangées de {{cols}} ({{item}})",
+    "balance": {
+      "left": "Balance : le côté de {{left}} descend, le côté de {{right}} monte",
+      "right": "Balance : le côté de {{right}} descend, le côté de {{left}} monte",
+      "equal": "Balance en équilibre entre {{left}} et {{right}}"
+    },
+    "card": "Carte {{letter}}",
+    "bank": "Cartes à placer",
+    "bankEmpty": "Toutes les cartes sont placées.",
+    "selected": "{{name}} est choisie. Touche maintenant la bonne case.",
+    "selectFirst": "Touche une carte, puis la case où tu veux la poser. Tu peux aussi la faire glisser.",
+    "binTarget": "Case {{label}}, {{count}} carte(s) posée(s)",
+    "decrease": "Enlever : {{label}}",
+    "increase": "Ajouter : {{label}}",
+    "overflow": "Ça déborde !",
+    "formats": {
+      "kg": "{{value}} kg",
+      "cm": "{{value}} cm",
+      "fc": "{{value}} FC",
+      "l": "{{value}} L",
+      "h": "{{value}} h"
+    },
+    "ascending": "Du plus petit au plus grand →",
+    "descending": "Du plus grand au plus petit →",
+    "emptySlot": "Place {{position}}, vide",
+    "filledSlot": "Place {{position}} : {{value}}",
+    "symbols": {
+      "lt": "{{a}} est plus petit que {{b}} (<)",
+      "gt": "{{a}} est plus grand que {{b}} (>)",
+      "eq": "{{a}} est égal à {{b}} (=)"
+    },
+    "comparePair": "Comparer {{a}} et {{b}}",
+    "pile": "Il reste {{count}} objet(s) à distribuer",
+    "pileEmpty": "Tout est distribué.",
+    "give": {
+      "plate": "Donner un objet à l’assiette {{n}}",
+      "bowl": "Donner un objet au bol {{n}}",
+      "basket": "Donner un objet au panier {{n}}",
+      "child": "Donner un objet à l’enfant {{n}}"
+    },
+    "recipient": {
+      "plate": "Assiette {{n}}",
+      "bowl": "Bol {{n}}",
+      "basket": "Panier {{n}}",
+      "child": "Enfant {{n}}"
+    },
+    "takeBack": "Reprendre un objet de la part {{n}}",
+    "eachQuestion": "Combien chacun reçoit-il ?",
+    "restQuestion": "Combien en reste-t-il ?",
+    "wayNumber": "Façon n° {{number}}",
+    "supply": "Ce que tu peux prendre",
+    "addSupply": "Ajouter : {{name}}",
+    "removeSupply": "Retirer : {{name}}",
+    "basket": "Mon panier",
+    "basketEmpty": "Ton panier est vide.",
+    "clock": {
+      "hourBack": "◀ Petite aiguille : 1 h avant",
+      "hourForward": "Petite aiguille : 1 h après ▶",
+      "minuteOn12": "Grande aiguille sur 12",
+      "minuteOn6": "Grande aiguille sur 6"
+    },
+    "cell": "Case à droite de l’axe : colonne {{column}}, ligne {{row}}",
+    "selfcheck": {
+      "alone": "J’ai réussi seul.",
+      "material": "J’ai réussi avec du matériel ou de l’aide.",
+      "review": "Je veux reprendre une leçon."
+    },
+    "round": "Manche {{current}} sur {{total}}",
+    "actions": {
+      "restart": "Recommencer"
+    },
+    "feedback": {
+      "fillAll": "Réponds à toutes les questions.",
+      "reviewQuestions_one": "Revois la question {{list}}.",
+      "reviewQuestions_other": "Revois les questions {{list}}.",
+      "placeAll": "Place d’abord toutes les cartes.",
+      "wrongPlaced_one": "Une carte n’est pas à la bonne place.",
+      "wrongPlaced_other": "{{count}} cartes ne sont pas à la bonne place.",
+      "orderPair": "Regarde {{a}} et {{b}} : lequel est le plus petit ?",
+      "orderPairDesc": "Regarde {{a}} et {{b}} : lequel est le plus grand ?",
+      "chooseOne": "Fais d’abord un choix.",
+      "missingChoice": "Il manque encore une bonne réponse.",
+      "reviewPair": "Revois la comparaison de {{a}} et {{b}}.",
+      "keepGiving": "Continue : tu peux encore donner un objet à chacun.",
+      "unfair": "Les parts ne sont pas égales.",
+      "countEach": "Le partage est juste. Compte maintenant ce que reçoit chacun.",
+      "countRest": "Compte bien les objets qui restent.",
+      "tooMuch": "C’est trop : retire quelque chose.",
+      "tooLittle": "Ce n’est pas encore assez.",
+      "overBudget": "Tu dépasses le budget.",
+      "anotherWay": "Bravo ! Trouve maintenant une autre façon.",
+      "sameWay": "C’est la même façon que la première. Change de pièces.",
+      "symmetry": "Cases en trop : {{extra}}. Cases manquantes : {{missing}}.",
+      "roundDone": "Manche {{current}} réussie ! Passe à la suivante.",
+      "sequencePair": "« {{b}} » vient avant « {{a}} »."
+    },
+    "sequence": "De la première étape à la dernière ↓"
+  },
+  "u01eval": {
+    "objective": "Je montre que je sais compter, trouver un voisin, comparer et ranger.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 1 terminée !",
+    "q1": {
+      "title": "Question 1 · Trois groupes de 5",
+      "instruction": "Prépare 15 ronds en trois groupes de 5.",
+      "hint": "Il faut 3 assiettes, et 5 ronds dans chaque assiette.",
+      "groups": "Assiettes",
+      "size": "Ronds par assiette"
+    },
+    "q2": {
+      "title": "Question 2 · Le nombre qui manque",
+      "instruction": "Complète la suite.",
+      "hint": "Le nombre qui vient juste après 17 est plus grand de 1.",
+      "missing": "16, 17, …, 19 : quel nombre manque ?"
+    },
+    "q3": {
+      "title": "Question 3 · Je compare",
+      "instruction": "Choisis le bon signe entre 7 et 15.",
+      "hint": "15 a une dizaine ; 7 n’en a pas. Le côté ouvert du signe regarde le plus grand nombre."
+    },
+    "q4": {
+      "title": "Question 4 · Je range",
+      "instruction": "Range 20, 14, 19 et 10 du plus petit au plus grand.",
+      "hint": "Cherche le plus petit parmi les nombres qui restent, puis place-le."
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis ce que tu as fait, puis choisis la phrase qui te ressemble.",
+      "r1": "15 ronds, c’est 3 groupes de 5.",
+      "r2": "16, 17, 18, 19 : le nombre manquant est 18.",
+      "r3": "7 < 15.",
+      "r4": "10, 14, 19, 20."
+    }
+  },
+  "u02l01": {
+    "objective": "Je peux échanger 10 unités contre 1 dizaine.",
+    "situation": "Au marché, on attache les bâtonnets par paquets de dix pour les compter vite.",
+    "complete": "Bravo, tu sais faire des paquets de dix !",
+    "discover": {
+      "title": "Les bâtonnets du marché",
+      "instruction": "Compte les bâtonnets, puis dis combien de paquets de dix complets on peut attacher.",
+      "hint": "Compte un par un sans en oublier. Un paquet complet contient exactement 10 bâtonnets.",
+      "total": "Combien de bâtonnets en tout ?",
+      "bundles": "Combien de paquets de dix complets ?"
+    },
+    "manipulate": {
+      "title": "Je range 26 graines",
+      "instruction": "Avec ces 26 graines, remplis des sacs de dix et laisse les autres graines seules.",
+      "hint": "Chaque sac contient 10 graines. Après deux sacs, combien de graines reste-t-il hors des sacs ?",
+      "tens": "Sacs de dix",
+      "units": "Graines seules"
+    },
+    "understand": {
+      "title": "Dix unités, une dizaine",
+      "instruction": "Le paquet attaché contient 10 bâtonnets. Que forment ces 10 unités ?",
+      "hint": "Un paquet de dix bâtonnets compte pour un seul groupe.",
+      "options": {
+        "ten": "1 dizaine",
+        "tenTens": "10 dizaines",
+        "one": "1 unité"
+      },
+      "why": {
+        "tenTens": "10 dizaines, ce serait 100 bâtonnets. Ici il n’y en a que 10 dans le paquet.",
+        "one": "Une unité, c’est un seul bâtonnet. Le paquet en contient 10."
+      }
+    },
+    "practice": {
+      "title": "Dizaines et unités",
+      "instruction": "Réponds aux quatre questions.",
+      "hint": "Pense aux paquets : une dizaine = 10 unités.",
+      "q1": "Combien d’unités dans une dizaine ?",
+      "q2": "3 dizaines font combien ?",
+      "q3": "28 contient combien de dizaines complètes ?",
+      "q4": "Et combien d’unités en plus ?"
+    },
+    "play": {
+      "title": "Le jeu des fagots",
+      "instruction": "Dès que tu as dix bâtonnets, échange-les contre un fagot.",
+      "r1": {
+        "instruction": "Range ces bâtonnets en fagots de dix et en bâtonnets seuls.",
+        "hint": "Fais un fagot dès que tu as 10 bâtonnets. Combien en reste-t-il ?"
+      },
+      "r2": {
+        "instruction": "Nouvelle livraison : fais les fagots possibles.",
+        "hint": "Il ne peut pas rester 10 bâtonnets seuls ou plus."
+      },
+      "r3": {
+        "instruction": "Dernière livraison : fais les fagots possibles.",
+        "hint": "Quand tout est en fagots, il ne reste aucun bâtonnet seul."
+      },
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au paquet attaché au marché.",
+      "options": {
+        "rule": "Dix unités forment une dizaine.",
+        "five": "Cinq unités forment une dizaine.",
+        "hundred": "Une dizaine, c’est cent unités."
+      }
+    }
+  },
+  "u02l02": {
+    "objective": "Je peux relier écriture, parole et matériel jusqu’à 69.",
+    "situation": "Une boîte contient 4 paquets de dix craies et 3 craies seules.",
+    "complete": "Bravo, tu lis et tu écris les nombres jusqu’à 69 !",
+    "discover": {
+      "title": "La boîte de craies",
+      "instruction": "Observe les paquets de dix et les craies seules.",
+      "hint": "Compte d’abord les paquets de dix, puis les craies seules. 4 dizaines, c’est 40.",
+      "tens": "Combien de paquets de dix ?",
+      "units": "Combien d’unités seules ?",
+      "number": "Combien de craies en tout ?"
+    },
+    "manipulate": {
+      "title": "Je montre 52",
+      "instruction": "Montre le nombre 52 avec des fagots et des bâtonnets seuls.",
+      "hint": "Le chiffre 5 dit le nombre de fagots, le chiffre 2 le nombre de bâtonnets seuls.",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "La valeur des chiffres",
+      "instruction": "On lit 43 : quatre dizaines et trois unités. Que vaut le chiffre 4 dans 43 ?",
+      "hint": "Le chiffre 4 compte des paquets de dix.",
+      "options": {
+        "forty": "40",
+        "four": "4",
+        "fortyThree": "43"
+      },
+      "why": {
+        "four": "Le 4 n’est pas seul : il compte 4 paquets de dix.",
+        "fortyThree": "43, c’est le nombre entier. Le chiffre 4 ne vaut qu’une partie."
+      }
+    },
+    "practice": {
+      "title": "Lire et décomposer",
+      "instruction": "Réponds aux quatre questions.",
+      "hint": "Dans un nombre à deux chiffres, le premier chiffre compte les dizaines.",
+      "q1": "2 dizaines et 7 unités donnent quel nombre ?",
+      "q2": "64, c’est combien de dizaines ?",
+      "q3": "64, c’est combien d’unités en plus ?",
+      "q4": "Dans 58, que vaut le chiffre 5 ?"
+    },
+    "play": {
+      "title": "Le bon nombre pour chaque boîte",
+      "instruction": "Pose chaque boîte de bâtonnets sur le nombre qu’elle représente.",
+      "hint": "Compte les fagots (dizaines) avant les bâtonnets seuls (unités). Attention : 35 et 53 ne sont pas pareils."
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase est juste ?",
+      "hint": "Pense à la boîte de craies : 4 paquets et 3 craies seules.",
+      "options": {
+        "rule": "On lit 43 : quatre dizaines et trois unités.",
+        "swap": "43 et 34, c’est le même nombre.",
+        "sum": "43, c’est 4 + 3."
+      }
+    }
+  },
+  "u02l03": {
+    "objective": "Je peux former et décomposer les grands nombres de l’année, de 70 à 100.",
+    "situation": "Chaque sac contient 10 graines. On continue jusqu’à dix sacs.",
+    "complete": "Bravo, tu connais les nombres jusqu’à 100 !",
+    "discover": {
+      "title": "Les sacs de graines",
+      "instruction": "Chaque sac contient 10 graines. Observe les sacs.",
+      "hint": "Compte de 10 en 10 : 10, 20, 30…",
+      "seventy": "Combien de graines dans ces sacs ?",
+      "hundred": "Et si on avait 10 sacs ?"
+    },
+    "manipulate": {
+      "title": "Je montre 94",
+      "instruction": "Aligne des cartes de dizaine et des unités pour montrer 94.",
+      "hint": "94, c’est 9 dizaines et 4 unités.",
+      "tens": "Cartes de dizaine",
+      "units": "Unités"
+    },
+    "understand": {
+      "title": "Cent",
+      "instruction": "Voici 10 sacs de 10 graines. Que vaut 100 ?",
+      "hint": "Compte les sacs : chaque sac est une dizaine.",
+      "options": {
+        "tenTens": "100, c’est 10 dizaines.",
+        "hundredTens": "100, c’est 100 dizaines.",
+        "oneTen": "100, c’est 1 dizaine."
+      },
+      "why": {
+        "hundredTens": "100 dizaines, ce serait 100 sacs. Ici, 10 sacs suffisent.",
+        "oneTen": "Une dizaine, c’est un seul sac de 10."
+      }
+    },
+    "practice": {
+      "title": "Jusqu’à 100",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Pense aux sacs de 10 graines.",
+      "q1": "8 dizaines font combien ?",
+      "q2": "97 = 90 + … ?",
+      "q3": "Combien manque-t-il de dizaines à 70 pour atteindre 100 ?"
+    },
+    "play": {
+      "title": "Le grenier",
+      "instruction": "Remplis le grenier avec exactement la quantité de graines demandée.",
+      "r1": {
+        "instruction": "Le grenier doit contenir 80 graines.",
+        "hint": "80, c’est 8 dizaines : 8 sacs, aucune graine seule."
+      },
+      "r2": {
+        "instruction": "Le grenier doit contenir 76 graines.",
+        "hint": "76 : 7 sacs et 6 graines seules."
+      },
+      "r3": {
+        "instruction": "Le grenier doit contenir 100 graines.",
+        "hint": "100, c’est 10 dizaines."
+      },
+      "bags": "Sacs de 10",
+      "seeds": "Graines seules"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase est juste ?",
+      "hint": "Compte les dizaines de 70.",
+      "options": {
+        "rule": "70, c’est 7 dizaines.",
+        "seven": "70, c’est 7 unités.",
+        "seventeen": "70, c’est 17 dizaines."
+      }
+    }
+  },
+  "u02l04": {
+    "objective": "Je peux comparer les nombres jusqu’à 100 selon la valeur des chiffres.",
+    "situation": "Deux équipes ont récolté 48 et 52 bouchons.",
+    "complete": "Bravo, tu compares les nombres jusqu’à 100 !",
+    "discover": {
+      "title": "Quelle équipe en a le plus ?",
+      "instruction": "L’équipe rouge a 48 bouchons, l’équipe bleue en a 52. Laquelle en a le plus ?",
+      "hint": "Regarde d’abord les paquets de dix de chaque équipe.",
+      "options": {
+        "red": "Équipe rouge : 48 bouchons",
+        "blue": "Équipe bleue : 52 bouchons"
+      },
+      "why": {
+        "red": "48 a 8 unités, mais seulement 4 dizaines. 52 a 5 dizaines."
+      }
+    },
+    "manipulate": {
+      "title": "46 et 49",
+      "instruction": "Les deux nombres ont 4 dizaines. Compare-les, puis choisis le signe.",
+      "hint": "Les dizaines sont égales : compare les unités, 6 et 9."
+    },
+    "understand": {
+      "title": "Ma méthode",
+      "instruction": "Pour comparer 73 et 68, que regardes-tu d’abord ?",
+      "hint": "Le chiffre de gauche compte les paquets de dix.",
+      "options": {
+        "tens": "Les dizaines, puis les unités si elles sont égales.",
+        "units": "Les unités d’abord.",
+        "digits": "Le nombre de chiffres seulement."
+      },
+      "why": {
+        "units": "68 a plus d’unités que 73, mais 73 a plus de dizaines : il est plus grand.",
+        "digits": "73 et 68 ont tous deux deux chiffres : cela ne suffit pas."
+      }
+    },
+    "practice": {
+      "title": "Comparer et chercher",
+      "instruction": "Deux manches : compare, puis trouve un nombre.",
+      "r1": {
+        "instruction": "Choisis le bon signe pour chaque paire.",
+        "hint": "Compare les dizaines d’abord."
+      },
+      "r2": {
+        "instruction": "Trouve un nombre à deux chiffres qui a 6 dizaines et qui est plus grand que 66.",
+        "hint": "Le nombre commence par 6 et ses unités sont plus grandes que 6.",
+        "q": "Mon nombre :"
+      }
+    },
+    "play": {
+      "title": "La course des coureurs",
+      "instruction": "Range les dossards 45, 54, 40 et 49 du plus petit au plus grand.",
+      "hint": "Sépare les nombres de 4 dizaines et ceux de 5 dizaines."
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle règle t’aide à comparer ?",
+      "hint": "Pense à 48 et 52.",
+      "options": {
+        "rule": "Le nombre qui a le plus de dizaines est le plus grand.",
+        "units": "Le nombre qui a le plus d’unités est le plus grand.",
+        "last": "Le nombre écrit en dernier est le plus grand."
+      }
+    }
+  },
+  "u02eval": {
+    "objective": "Je montre que je sais construire les nombres avec des dizaines et des unités.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 2 terminée !",
+    "q1": {
+      "title": "Question 1 · Des dizaines",
+      "instruction": "Réponds.",
+      "hint": "Une dizaine vaut 10.",
+      "q": "3 dizaines font combien ?"
+    },
+    "q2": {
+      "title": "Question 2 · Je décompose 64",
+      "instruction": "Décompose 64 en dizaines et unités.",
+      "hint": "Le premier chiffre compte les dizaines.",
+      "tens": "Dizaines",
+      "units": "Unités"
+    },
+    "q3": {
+      "title": "Question 3 · Je décompose 97",
+      "instruction": "Complète l’égalité.",
+      "hint": "97, c’est 9 dizaines et 7 unités.",
+      "q": "97 = … + 7"
+    },
+    "q4": {
+      "title": "Question 4 · Je range",
+      "instruction": "Range 45, 54, 40 et 49 du plus petit au plus grand.",
+      "hint": "Compare les dizaines d’abord, puis les unités."
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "3 dizaines = 30.",
+      "r2": "64 = 6 dizaines et 4 unités.",
+      "r3": "97 = 90 + 7.",
+      "r4": "40, 45, 49, 54."
+    }
+  },
+  "u03l01": {
+    "objective": "Je peux additionner sans former une nouvelle dizaine.",
+    "situation": "Une vendeuse a rangé 23 tomates, puis elle en ajoute 5.",
+    "complete": "Bravo, tu ajoutes des unités sans te tromper !",
+    "discover": {
+      "title": "Les tomates de la vendeuse",
+      "instruction": "Observe les 23 tomates rangées et les 5 tomates ajoutées, puis réponds.",
+      "hint": "Les 2 dizaines ne changent pas. On ajoute seulement les unités : 3 + 5.",
+      "tens": "Combien de dizaines dans 23 ?",
+      "units": "3 unités + 5 unités = ?",
+      "total": "Combien de tomates en tout ?"
+    },
+    "manipulate": {
+      "title": "J’ajoute 4 unités à 34",
+      "instruction": "Le nombre 34 est déjà construit. Ajoute 4 unités, puis montre le résultat.",
+      "hint": "Ne touche pas aux dizaines : ajoute seulement 4 bâtonnets seuls.",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "Qu’est-ce qui change ?",
+      "instruction": "Dans 23 + 5, quelle partie du nombre change ?",
+      "hint": "On ajoute 5 objets seuls, pas des paquets de dix.",
+      "options": {
+        "units": "Seulement les unités : 3 devient 8.",
+        "tens": "Seulement les dizaines.",
+        "both": "Les dizaines et les unités changent toutes les deux."
+      },
+      "why": {
+        "tens": "On n’ajoute aucun paquet de dix : les dizaines restent 2.",
+        "both": "3 + 5 = 8 : on ne forme pas de nouvelle dizaine, donc les dizaines ne changent pas."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Garde les dizaines et additionne les unités. Pour la question 3, pense à ce qu’il y avait avant d’ajouter.",
+      "q1": "21 + 6 = ?",
+      "q2": "42 + 7 = ?",
+      "q3": "Mado obtient 38 après avoir ajouté 5. Combien avait-elle avant ?"
+    },
+    "play": {
+      "title": "Les wagons du train",
+      "instruction": "Calcule chaque addition, puis pose le wagon sur la bonne gare.",
+      "hint": "Garde les dizaines, ajoute les unités.",
+      "a": "31 + 4",
+      "b": "52 + 6",
+      "c": "44 + 5",
+      "d": "23 + 3"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle méthode faut-il retenir ?",
+      "hint": "Pense aux tomates : 23 + 5.",
+      "options": {
+        "rule": "On garde les dizaines et on additionne les unités : 23 + 5 = 20 + 8 = 28.",
+        "tens": "On ajoute toujours aux dizaines : 23 + 5 = 73.",
+        "count": "On recompte tout depuis 1 à chaque fois."
+      }
+    }
+  },
+  "u03l02": {
+    "objective": "Je peux utiliser les compléments à 10.",
+    "situation": "Il y a 8 mangues dans un panier prévu pour 10.",
+    "complete": "Bravo, tu connais les compléments à 10 !",
+    "discover": {
+      "title": "Le panier de mangues",
+      "instruction": "Le cadre montre les 8 mangues déjà dans le panier. Ajoute juste ce qu’il faut pour remplir le panier de 10.",
+      "hint": "Compte les cases vides du cadre de dix.",
+      "added": "Mangues ajoutées"
+    },
+    "manipulate": {
+      "title": "Je complète 7",
+      "instruction": "Il y a 7 graines. Ajoute juste ce qu’il faut pour former 10.",
+      "hint": "Le cadre est plein quand il y a 10 graines. Ne dépasse pas.",
+      "added": "Graines ajoutées"
+    },
+    "understand": {
+      "title": "Combien manque-t-il ?",
+      "instruction": "Pour atteindre 10 depuis 8, combien manque-t-il ?",
+      "hint": "Compte les cases vides du cadre.",
+      "options": {
+        "two": "Il manque 2.",
+        "eighteen": "Il manque 18.",
+        "ten": "Il manque 10."
+      },
+      "why": {
+        "eighteen": "18, c’est 8 + 10. On cherche ce qu’il faut ajouter à 8 pour arriver à 10.",
+        "ten": "Si on ajoutait 10, on aurait 18, plus que 10."
+      }
+    },
+    "practice": {
+      "title": "Compléments",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Cherche ce qu’il faut ajouter pour arriver juste au nombre rond.",
+      "q1": "6 + … = 10",
+      "q2": "9 + … = 10",
+      "q3": "Amina a 14 craies et veut en avoir 20. Combien en manque-t-il ?"
+    },
+    "play": {
+      "title": "Ferme les cadres de dix",
+      "instruction": "Ajoute le nombre exact de jetons pour fermer chaque cadre.",
+      "r1": {
+        "instruction": "Ce cadre a déjà 5 jetons.",
+        "hint": "5 + 5 = 10."
+      },
+      "r2": {
+        "instruction": "Ce cadre a déjà 3 jetons.",
+        "hint": "Compte les cases vides."
+      },
+      "r3": {
+        "instruction": "Ce cadre a déjà 9 jetons.",
+        "hint": "Il ne manque presque rien."
+      },
+      "added": "Jetons ajoutés"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase est juste ?",
+      "hint": "Pense au panier de mangues.",
+      "options": {
+        "rule": "Pour atteindre 10 depuis 8, il manque 2.",
+        "eight": "Pour atteindre 10 depuis 8, il manque 8.",
+        "add": "Pour atteindre 10 depuis 8, on fait 8 + 10."
+      }
+    }
+  },
+  "u03l03": {
+    "objective": "Je peux additionner en regroupant 10 unités.",
+    "situation": "Un panier contient 28 fruits. On ajoute 5 fruits.",
+    "complete": "Bravo, tu sais passer une dizaine !",
+    "discover": {
+      "title": "Je passe par 30",
+      "instruction": "Sur la ligne, on part de 28 et on ajoute 5 en deux bonds.",
+      "hint": "Le premier bond va jusqu’au nombre rond 30. Le second bond ajoute ce qui reste des 5.",
+      "toTen": "De 28 à 30, combien ?",
+      "rest": "Il reste combien à ajouter ?",
+      "total": "28 + 5 = ?"
+    },
+    "manipulate": {
+      "title": "16 + 7 avec un échange",
+      "instruction": "16 est construit. Ajoute 7 unités. Quand tu as 10 bâtonnets seuls, échange-les contre un fagot.",
+      "hint": "6 + 7 = 13 unités : on fait un fagot avec 10, il reste 3 bâtonnets seuls.",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "48 + 6 en passant par 50",
+      "instruction": "Quelle explication est juste ?",
+      "hint": "Regarde les deux bonds sur la ligne.",
+      "options": {
+        "bridge": "48 + 2 = 50, puis 50 + 4 = 54.",
+        "concat": "48 + 6 = 414.",
+        "drop": "40 + 6 = 46."
+      },
+      "why": {
+        "concat": "On n’écrit pas les chiffres côte à côte : 8 + 6 fait 14, soit une dizaine et 4 unités.",
+        "drop": "On a oublié les 8 unités de 48."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions. Passe par le nombre rond.",
+      "hint": "Complète d’abord jusqu’à la dizaine suivante, puis ajoute le reste.",
+      "q1": "17 + 4 = ?",
+      "q2": "36 + 8 = ?",
+      "q3": "48 + 6 = ?"
+    },
+    "play": {
+      "title": "L’échange des dix",
+      "instruction": "Calcule chaque addition (attention, on passe une dizaine) et pose la carte sur le bon résultat.",
+      "hint": "Complète jusqu’à la dizaine, puis ajoute le reste.",
+      "a": "27 + 5",
+      "b": "39 + 3",
+      "c": "45 + 7",
+      "d": "18 + 4"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle méthode faut-il retenir ?",
+      "hint": "Pense à 28 + 5.",
+      "options": {
+        "rule": "On complète 28 jusqu’à 30 avec 2, puis on ajoute les 3 restants : 28 + 5 = 33.",
+        "units": "On écrit 8 + 5 à côté du 2 : 213.",
+        "guess": "On choisit un nombre rond au hasard."
+      }
+    }
+  },
+  "u03l04": {
+    "objective": "Je peux additionner deux nombres : les dizaines, puis les unités.",
+    "situation": "Deux classes apportent 24 et 32 cahiers.",
+    "complete": "Bravo, tu additionnes deux nombres !",
+    "discover": {
+      "title": "Les cahiers des deux classes",
+      "instruction": "Additionne les dizaines, puis les unités.",
+      "hint": "24 = 20 + 4 et 32 = 30 + 2.",
+      "tens": "20 + 30 = ?",
+      "units": "4 + 2 = ?",
+      "total": "24 + 32 = ?"
+    },
+    "manipulate": {
+      "title": "Je réunis 23 et 35",
+      "instruction": "Montre le résultat de 23 + 35 avec des fagots et des bâtonnets seuls.",
+      "hint": "2 fagots + 3 fagots, puis 3 bâtonnets + 5 bâtonnets.",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "Dans quel ordre ?",
+      "instruction": "Remets les étapes de la méthode dans l’ordre.",
+      "hint": "On commence par les grands paquets.",
+      "steps": {
+        "1": "J’additionne les dizaines : 20 + 30 = 50.",
+        "2": "J’additionne les unités : 4 + 2 = 6.",
+        "3": "Je réunis les deux résultats : 50 + 6 = 56."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Dizaines avec dizaines, unités avec unités. Pour 27 + 18, 7 + 8 fait plus de 10.",
+      "q1": "31 + 26 = ?",
+      "q2": "45 + 34 = ?",
+      "q3": "Une équipe a 27 points et l’autre 18. Combien en tout ?"
+    },
+    "play": {
+      "title": "Les deux convois",
+      "instruction": "Réunis chaque paire de convois et pose la carte sur le bon total.",
+      "hint": "Additionne les dizaines, puis les unités.",
+      "a": "41 + 25",
+      "b": "32 + 15",
+      "c": "52 + 17",
+      "d": "24 + 34"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle méthode faut-il retenir ?",
+      "hint": "Pense aux cahiers : 24 + 32.",
+      "options": {
+        "rule": "On additionne les dizaines, puis les unités : 20 + 30 = 50 et 4 + 2 = 6 ; total 56.",
+        "glue": "On colle les nombres : 24 + 32 = 2432.",
+        "biggest": "On garde seulement le plus grand nombre."
+      }
+    }
+  },
+  "u03eval": {
+    "objective": "Je montre que je sais calculer des sommes et choisir une méthode.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 3 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Calcule.",
+      "hint": "Garde les dizaines, additionne les unités.",
+      "q": "42 + 7 = ?"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "9 + … = 10. Ajoute juste ce qu’il faut dans le cadre.",
+      "hint": "Compte les cases vides.",
+      "added": "Jetons ajoutés"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Calcule en passant par le nombre rond.",
+      "hint": "36 + 4 = 40, puis ajoute le reste.",
+      "q": "36 + 8 = ?"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Calcule.",
+      "hint": "Dizaines, puis unités.",
+      "q": "45 + 34 = ?"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "42 + 7 = 49.",
+      "r2": "9 + 1 = 10.",
+      "r3": "36 + 8 = 44.",
+      "r4": "45 + 34 = 79."
+    }
+  },
+  "u04l01": {
+    "objective": "Je peux soustraire sans casser une dizaine.",
+    "situation": "Une boîte contient 38 craies. On en utilise 6.",
+    "complete": "Bravo, tu enlèves des unités sans te tromper !",
+    "discover": {
+      "title": "La boîte de craies",
+      "instruction": "La boîte contient 38 craies : 3 paquets de dix et 8 craies seules. On utilise 6 craies seules.",
+      "hint": "On enlève les 6 craies parmi les 8 craies seules. Les paquets de dix ne bougent pas.",
+      "rest": "Combien de craies restent ?",
+      "tens": "Combien de paquets de dix restent ?"
+    },
+    "manipulate": {
+      "title": "Je retire 5 unités de 47",
+      "instruction": "47 est construit. Retire 5 bâtonnets seuls, puis montre ce qui reste.",
+      "hint": "Ne défais pas de fagot : 7 bâtonnets seuls − 5 = ?",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "Où est-ce que j’enlève ?",
+      "instruction": "Pour calculer 38 − 6, que fait-on ?",
+      "hint": "6 est un petit nombre d’objets seuls.",
+      "options": {
+        "units": "On enlève 6 aux unités : 8 − 6 = 2, donc 32.",
+        "tens": "On enlève 6 aux dizaines.",
+        "add": "On ajoute 6."
+      },
+      "why": {
+        "tens": "Il n’y a que 3 dizaines dans 38 : on ne peut pas enlever 6 dizaines, et ce sont 6 objets seuls.",
+        "add": "Utiliser des craies, c’est en enlever, pas en ajouter."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Garde les dizaines et enlève les unités. Pour la question 3, refais le chemin à l’envers en ajoutant.",
+      "q1": "29 − 4 = ?",
+      "q2": "66 − 3 = ?",
+      "q3": "Il reste 42 après avoir enlevé 7. Quel était le nombre de départ ?"
+    },
+    "play": {
+      "title": "Le magasin",
+      "instruction": "Un client passe une commande. Retire-la du stock et annonce ce qui reste.",
+      "r1": {
+        "instruction": "Stock : 59 cahiers. Commande : 4 cahiers.",
+        "hint": "9 − 4 aux unités.",
+        "q": "Stock restant :"
+      },
+      "r2": {
+        "instruction": "Stock : 76 cahiers. Commande : 5 cahiers.",
+        "hint": "6 − 5 aux unités.",
+        "q": "Stock restant :"
+      },
+      "r3": {
+        "instruction": "Stock : 88 cahiers. Commande : 8 cahiers.",
+        "hint": "Il ne reste plus d’unités seules.",
+        "q": "Stock restant :"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle méthode faut-il retenir ?",
+      "hint": "Pense à la boîte de craies.",
+      "options": {
+        "rule": "On garde les dizaines et on enlève les unités : 38 − 6 = 32.",
+        "tens": "On enlève toujours aux dizaines : 38 − 6 = 0.",
+        "both": "On enlève 6 aux dizaines et 6 aux unités."
+      }
+    }
+  },
+  "u04l02": {
+    "objective": "Je peux soustraire en passant par un nombre rond.",
+    "situation": "Kito a 32 graines et en donne 5.",
+    "complete": "Bravo, tu sais reculer jusqu’à la dizaine !",
+    "discover": {
+      "title": "Kito recule sur la ligne",
+      "instruction": "Kito part de 32 et recule de 5 en deux bonds. Observe la ligne.",
+      "hint": "Le premier bond s’arrête au nombre rond 30. Ensuite, il reste à reculer de ce qui manque pour faire 5.",
+      "first": "32 − 2 = ?",
+      "left": "Il reste combien à enlever ?",
+      "result": "32 − 5 = ?"
+    },
+    "manipulate": {
+      "title": "41 − 6 en deux bonds",
+      "instruction": "Choisis le premier bond pour arriver juste à 40, puis le second pour finir de reculer de 6.",
+      "hint": "De 41 à 40, on recule de 1. Ensuite il reste 5 à enlever.",
+      "first": "Premier bond (jusqu’à la dizaine)",
+      "second": "Second bond"
+    },
+    "understand": {
+      "title": "64 − 8 en passant par 60",
+      "instruction": "Quelle explication est juste ?",
+      "hint": "Regarde les deux bonds sur la ligne.",
+      "options": {
+        "bridge": "64 − 4 = 60, puis 60 − 4 = 56.",
+        "add": "64 − 8 = 72.",
+        "drop": "60 − 8 = 52."
+      },
+      "why": {
+        "add": "72 est plus grand que 64 : en enlevant, on doit obtenir un nombre plus petit.",
+        "drop": "On a oublié les 4 unités de 64."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions en passant par le nombre rond.",
+      "hint": "Recule d’abord jusqu’à la dizaine, puis enlève le reste.",
+      "q1": "23 − 5 = ?",
+      "q2": "50 − 7 = ?",
+      "q3": "64 − 8 = ?"
+    },
+    "play": {
+      "title": "Le pion qui recule",
+      "instruction": "Fais reculer le pion en deux bonds bien choisis : le premier s’arrête à la dizaine.",
+      "r1": {
+        "instruction": "Calcule 32 − 5.",
+        "hint": "32 → 30, puis encore 3."
+      },
+      "r2": {
+        "instruction": "Calcule 53 − 6.",
+        "hint": "53 → 50, puis encore 3."
+      },
+      "r3": {
+        "instruction": "Calcule 71 − 4.",
+        "hint": "71 → 70, puis encore 3."
+      },
+      "first": "Premier bond (jusqu’à la dizaine)",
+      "second": "Second bond"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle méthode faut-il retenir ?",
+      "hint": "Pense aux graines de Kito.",
+      "options": {
+        "rule": "On enlève d’abord 2 pour atteindre 30, puis encore 3 : 32 − 5 = 27.",
+        "forward": "On avance de 5 : 32 − 5 = 37.",
+        "big": "On enlève 5 dizaines."
+      }
+    }
+  },
+  "u04l03": {
+    "objective": "Je peux retirer des groupes de dix.",
+    "situation": "Un dépôt contient 75 sacs. On retire 30 sacs.",
+    "complete": "Bravo, tu soustrais des dizaines !",
+    "discover": {
+      "title": "Le dépôt",
+      "instruction": "Le dépôt contient 75 sacs : 7 piles de dix et 5 sacs seuls. On retire 30 sacs, donc 3 piles de dix.",
+      "hint": "30, ce sont 3 dizaines. On retire 3 piles, les 5 sacs seuls ne bougent pas.",
+      "removed": "Combien de dizaines retire-t-on ?",
+      "left": "Combien de dizaines restent ?",
+      "result": "75 − 30 = ?"
+    },
+    "manipulate": {
+      "title": "Je retire 2 fagots",
+      "instruction": "Tu as 6 fagots et 2 bâtonnets seuls. Retire 2 fagots.",
+      "hint": "On retire des fagots entiers : les bâtonnets seuls ne changent pas.",
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "understand": {
+      "title": "Qu’est-ce qui change ?",
+      "instruction": "Dans 75 − 30, quelle partie du nombre change ?",
+      "hint": "30 n’a aucune unité seule.",
+      "options": {
+        "tens": "Seulement les dizaines : 7 dizaines − 3 dizaines = 4 dizaines.",
+        "units": "Seulement les unités.",
+        "both": "Les dizaines et les unités."
+      },
+      "why": {
+        "units": "30 n’a pas d’unités : les 5 unités de 75 restent.",
+        "both": "Les 5 unités de 75 ne changent pas, car 30 n’a pas d’unités."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Retire les dizaines, garde les unités. Pour la question 3, compare les dizaines de 87 et 57.",
+      "q1": "48 − 20 = ?",
+      "q2": "90 − 40 = ?",
+      "q3": "Combien faut-il retirer de 87 pour obtenir 57 ?"
+    },
+    "play": {
+      "title": "Le camion de fagots",
+      "instruction": "Décharge du camion exactement les fagots demandés.",
+      "r1": {
+        "instruction": "Le camion porte 53 bâtonnets. Décharge 20 bâtonnets (2 fagots).",
+        "hint": "5 fagots − 2 fagots."
+      },
+      "r2": {
+        "instruction": "Le camion porte 81 bâtonnets. Décharge 50 bâtonnets.",
+        "hint": "50 = 5 fagots."
+      },
+      "r3": {
+        "instruction": "Le camion porte 96 bâtonnets. Décharge 40 bâtonnets.",
+        "hint": "40 = 4 fagots."
+      },
+      "tens": "Fagots de dix",
+      "units": "Bâtonnets seuls"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au dépôt de sacs.",
+      "options": {
+        "rule": "Trois dizaines retirées de sept dizaines en laissent quatre : 75 − 30 = 45.",
+        "units": "75 − 30 = 72, car on enlève aux unités.",
+        "all": "Quand on retire des dizaines, il ne reste rien."
+      }
+    }
+  },
+  "u04l04": {
+    "objective": "Je peux comparer deux quantités par soustraction.",
+    "situation": "Une équipe a 54 points, l’autre 39.",
+    "complete": "Bravo, tu sais chercher la différence !",
+    "discover": {
+      "title": "L’écart entre les équipes",
+      "instruction": "Compte de 39 à 54 en faisant des bonds sur la ligne.",
+      "hint": "De 39 à 40 : 1. De 40 à 50 : 10. De 50 à 54 : 4. Ajoute les bonds.",
+      "gap": "Combien de points d’écart ?"
+    },
+    "manipulate": {
+      "title": "Les jetons sans partenaire",
+      "instruction": "Une boîte a 15 jetons, l’autre 11. Associe en pensée un jeton de chaque boîte. Combien de jetons restent sans partenaire ?",
+      "hint": "La différence, c’est ce qui dépasse : 15 − 11.",
+      "alone": "Jetons sans partenaire :"
+    },
+    "understand": {
+      "title": "Trouver la différence",
+      "instruction": "Comment trouve-t-on la différence entre 54 et 39 ?",
+      "hint": "La différence mesure l’écart entre les deux nombres.",
+      "options": {
+        "gap": "En comptant de 39 à 54, ou en calculant 54 − 39.",
+        "sum": "En calculant 54 + 39.",
+        "count": "En comptant tous les nombres de 1 à 54."
+      },
+      "why": {
+        "sum": "54 + 39 réunit les deux équipes. On cherche ce qui les sépare.",
+        "count": "Compter jusqu’à 54 donne 54, pas l’écart avec 39."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Cherche l’écart. Pour Lina et Sifa : Sifa a 9 cartes de moins que Lina.",
+      "q1": "Différence entre 18 et 13 ?",
+      "q2": "Combien 62 dépasse-t-il 50 ?",
+      "q3": "Lina a 47 cartes, soit 9 de plus que Sifa. Combien Sifa en a-t-elle ?"
+    },
+    "play": {
+      "title": "Égalise les paniers",
+      "instruction": "Déplace des mangues du panier de gauche vers celui de droite pour que les deux en aient autant.",
+      "r1": {
+        "instruction": "Panier A : 12 mangues. Panier B : 8 mangues.",
+        "hint": "L’écart est 4 : déplace la moitié de l’écart."
+      },
+      "r2": {
+        "instruction": "Panier A : 15 mangues. Panier B : 9 mangues.",
+        "hint": "L’écart est 6."
+      },
+      "r3": {
+        "instruction": "Panier A : 10 mangues. Panier B : 4 mangues.",
+        "hint": "Compte les mangues de chaque panier après ton déplacement."
+      },
+      "move": "Mangues déplacées de A vers B"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux deux équipes.",
+      "options": {
+        "rule": "La différence indique combien les nombres sont éloignés.",
+        "add": "La différence, c’est la somme des deux nombres.",
+        "biggest": "La différence, c’est le plus grand des deux nombres."
+      }
+    }
+  },
+  "u04eval": {
+    "objective": "Je montre que je sais résoudre des retraits, des écarts et des compléments.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 4 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Calcule.",
+      "hint": "Garde les dizaines, enlève les unités.",
+      "q": "66 − 3 = ?"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Calcule.",
+      "hint": "50, c’est 5 dizaines. Casse une dizaine : 10 − 7 = 3. Il reste 4 dizaines et 3 unités.",
+      "q": "50 − 7 = ?"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Calcule.",
+      "hint": "9 dizaines − 4 dizaines.",
+      "q": "90 − 40 = ?"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Cherche l’écart.",
+      "hint": "Compte de 50 à 62.",
+      "q": "Combien 62 dépasse-t-il 50 ?"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "66 − 3 = 63.",
+      "r2": "50 − 7 = 43.",
+      "r3": "90 − 40 = 50.",
+      "r4": "62 dépasse 50 de 12."
+    }
+  }
+}
