@@ -1728,5 +1728,704 @@
       "r3": "Le quart de 12, c’est 3.",
       "r4": "12 par groupes de 3 : 4 groupes."
     }
+  },
+  "u07l01": {
+    "objective": "Je peux former une même valeur de plusieurs façons.",
+    "situation": "Au jeu du marché, des étiquettes indiquent des prix en francs congolais. On joue avec de la monnaie factice.",
+    "complete": "Bravo, tu reconnais une somme d’argent !",
+    "discover": {
+      "title": "Combien vaut ma monnaie ?",
+      "instruction": "Observe les pièces et les billets factices, puis calcule leur valeur.",
+      "hint": "Additionne les valeurs écrites sur la monnaie, pas le nombre de pièces.",
+      "q1": "100 FC et 50 FC valent :",
+      "q2": "Deux cartes de 200 FC valent :"
+    },
+    "manipulate": {
+      "title": "300 FC de deux façons",
+      "instruction": "Forme exactement 300 FC avec la monnaie factice. Ensuite, trouve une deuxième façon différente.",
+      "hint": "Additionne les valeurs. Essaie avec 200 FC, puis seulement avec des pièces de 100 FC.",
+      "supply": {
+        "c50": "une pièce de 50 FC",
+        "c100": "une pièce de 100 FC",
+        "c200": "une pièce de 200 FC"
+      }
+    },
+    "understand": {
+      "title": "Qu’est-ce qu’une somme ?",
+      "instruction": "Une somme d’argent, c’est…",
+      "hint": "Ici, trois pièces font 350 FC.",
+      "options": {
+        "value": "La valeur totale des billets et des pièces.",
+        "count": "Le nombre de billets et de pièces.",
+        "biggest": "La valeur du plus gros billet."
+      },
+      "why": {
+        "count": "Trois pièces ne font pas 3 FC : on additionne leurs valeurs.",
+        "biggest": "Toutes les pièces comptent, pas seulement la plus grosse."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions. N’oublie pas l’unité FC.",
+      "hint": "Additionne les valeurs, comme des centaines : 100 + 50 = 150.",
+      "q1": "100 FC + 50 FC = ?",
+      "q2": "Deux cartes de 200 FC valent combien ?",
+      "q3": "100 FC + 100 FC + 100 FC = ?"
+    },
+    "play": {
+      "title": "Le prix exact",
+      "instruction": "Compose exactement le prix affiché avec la monnaie factice.",
+      "r1": {
+        "instruction": "Le prix affiché est 250 FC.",
+        "hint": "200 FC + … = 250 FC."
+      },
+      "r2": {
+        "instruction": "Le prix affiché est 450 FC.",
+        "hint": "Commence par les plus grosses pièces."
+      },
+      "r3": {
+        "instruction": "Le prix affiché est 350 FC.",
+        "hint": "350 = 200 + 100 + 50."
+      },
+      "supply": {
+        "c50": "une pièce de 50 FC",
+        "c100": "une pièce de 100 FC",
+        "c200": "une pièce de 200 FC"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au jeu du marché.",
+      "options": {
+        "rule": "Une somme est la valeur totale des billets et pièces factices.",
+        "count": "Une somme, c’est le nombre de pièces.",
+        "real": "Pour jouer en classe, on utilise de l’argent réel."
+      }
+    }
+  },
+  "u07l02": {
+    "objective": "Je peux additionner des prix simples.",
+    "situation": "Un crayon coûte 200 FC et une gomme 100 FC (prix fictifs).",
+    "complete": "Bravo, tu calcules le prix d’un achat !",
+    "discover": {
+      "title": "Le crayon et la gomme",
+      "instruction": "Tu achètes les deux objets. Combien payes-tu ?",
+      "hint": "Pour plusieurs achats, on additionne les prix.",
+      "total": "Prix total :"
+    },
+    "manipulate": {
+      "title": "Le jeu du marché",
+      "instruction": "Mets dans ton panier des objets dont le total fait exactement 450 FC. Chaque objet ne peut être pris qu’une fois.",
+      "hint": "Essaie des paires d’objets et additionne leurs prix.",
+      "supply": {
+        "notebook": "le cahier à 250 FC",
+        "pencil": "le crayon à 200 FC",
+        "eraser": "la gomme à 100 FC",
+        "ball": "le ballon à 300 FC"
+      }
+    },
+    "understand": {
+      "title": "Plusieurs achats",
+      "instruction": "Pour connaître le prix de plusieurs achats, que fait-on ?",
+      "hint": "On paie chaque objet.",
+      "options": {
+        "add": "On additionne les prix.",
+        "biggest": "On prend le prix le plus élevé.",
+        "subtract": "On soustrait les prix."
+      },
+      "why": {
+        "biggest": "On paie tous les objets, pas seulement le plus cher.",
+        "subtract": "Acheter plus coûte plus : on additionne."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Additionne les prix. Deux cahiers à 250 FC, c’est 250 + 250.",
+      "q1": "100 FC + 300 FC = ?",
+      "q2": "Deux cahiers à 250 FC chacun coûtent combien ?",
+      "q3": "Un article vaut 150 FC et l’autre 200 FC. Total ?"
+    },
+    "play": {
+      "title": "À la caisse",
+      "instruction": "Le client dépose ses objets. Calcule le total.",
+      "r1": {
+        "instruction": "Le pain et le jus.",
+        "hint": "150 + 200.",
+        "q": "Total :"
+      },
+      "r2": {
+        "instruction": "Le savon et le livre.",
+        "hint": "250 + 300.",
+        "q": "Total :"
+      },
+      "r3": {
+        "instruction": "Le ballon, le crayon et la gomme.",
+        "hint": "Additionne les trois prix.",
+        "q": "Total :"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au crayon et à la gomme.",
+      "options": {
+        "rule": "Pour plusieurs achats, on additionne les prix, et on écrit l’unité FC.",
+        "biggest": "On paie seulement l’objet le plus cher.",
+        "nounit": "On n’a jamais besoin d’écrire FC."
+      }
+    }
+  },
+  "u07l03": {
+    "objective": "Je peux calculer ce qui reste après un paiement fictif : la monnaie rendue.",
+    "situation": "Un livre fictif coûte 300 FC. On donne une carte de 500 FC.",
+    "complete": "Bravo, tu sais rendre la monnaie !",
+    "discover": {
+      "title": "Le livre à 300 FC",
+      "instruction": "Tu paies le livre avec un billet de 500 FC. Combien le marchand doit-il te rendre ?",
+      "hint": "Cherche l’écart entre ce que tu donnes et le prix : de 300 à 500.",
+      "change": "Monnaie rendue :"
+    },
+    "manipulate": {
+      "title": "Je rends la monnaie",
+      "instruction": "Un client achète un objet à 350 FC et paie avec 500 FC. Rends-lui exactement la monnaie.",
+      "hint": "De 350 à 500 : il manque 150 FC.",
+      "supply": {
+        "c50": "une pièce de 50 FC",
+        "c100": "une pièce de 100 FC",
+        "c200": "une pièce de 200 FC"
+      }
+    },
+    "understand": {
+      "title": "La monnaie rendue",
+      "instruction": "La monnaie rendue, c’est…",
+      "hint": "500 − 300 = 200 FC.",
+      "options": {
+        "difference": "La différence entre la somme donnée et le prix.",
+        "sum": "La somme donnée plus le prix.",
+        "price": "Le prix de l’objet."
+      },
+      "why": {
+        "sum": "En ajoutant, on obtiendrait plus que ce qu’on a donné.",
+        "price": "Le prix, on l’a déjà payé ; on cherche ce qui revient au client."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Rendu = somme donnée − prix. Pour vérifier, prix + rendu = somme donnée.",
+      "q1": "Prix 200 FC, paiement 500 FC : rendu ?",
+      "q2": "Prix 650 FC, paiement 1 000 FC : rendu ?",
+      "q3": "Je vérifie un rendu de 250 FC sur un prix de 750 FC : 750 FC + 250 FC = ?"
+    },
+    "play": {
+      "title": "Ma petite caisse",
+      "instruction": "Tu tiens la caisse. Rends la somme exacte à chaque client.",
+      "r1": {
+        "instruction": "Prix : 300 FC. Le client donne 500 FC.",
+        "hint": "De 300 à 500."
+      },
+      "r2": {
+        "instruction": "Prix : 650 FC. Le client donne 1 000 FC.",
+        "hint": "De 650 à 700 : 50. De 700 à 1 000 : 300."
+      },
+      "r3": {
+        "instruction": "Prix : 750 FC. Le client donne 1 000 FC.",
+        "hint": "De 750 à 1 000."
+      },
+      "supply": {
+        "c50": "une pièce de 50 FC",
+        "c100": "une pièce de 100 FC",
+        "c200": "une pièce de 200 FC"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au livre à 300 FC.",
+      "options": {
+        "rule": "La monnaie rendue est la différence entre la somme donnée et le prix : 500 − 300 = 200 FC.",
+        "add": "La monnaie rendue, c’est 500 + 300.",
+        "keep": "On ne rend jamais la monnaie."
+      }
+    }
+  },
+  "u07l04": {
+    "objective": "Je peux choisir des achats sans dépasser une somme.",
+    "situation": "Une famille fictive dispose de 1 000 FC pour acheter trois articles.",
+    "complete": "Bravo, tu prépares un budget !",
+    "discover": {
+      "title": "Les courses de la famille",
+      "instruction": "Choisis trois articles ou plus sans dépasser 1 000 FC. Chaque article ne se prend qu’une fois.",
+      "hint": "Additionne les prix choisis et compare le total à 1 000 FC.",
+      "supply": {
+        "bread": "le pain à 300 FC",
+        "soap": "le savon à 250 FC",
+        "juice": "le jus à 200 FC",
+        "book": "le livre à 500 FC",
+        "ball": "le ballon à 400 FC"
+      }
+    },
+    "manipulate": {
+      "title": "Sans dépasser 900 FC",
+      "instruction": "Choisis au moins deux articles parmi 200, 300, 400 et 500 FC sans dépasser 900 FC.",
+      "hint": "Calcule le total de ton panier : il doit être égal ou inférieur à 900 FC.",
+      "supply": {
+        "p200": "l’article à 200 FC",
+        "p300": "l’article à 300 FC",
+        "p400": "l’article à 400 FC",
+        "p500": "l’article à 500 FC"
+      }
+    },
+    "understand": {
+      "title": "La règle du budget",
+      "instruction": "Avec un budget, qu’a-t-on le droit de faire ?",
+      "hint": "Le budget est la somme disponible.",
+      "options": {
+        "atMost": "Dépenser moins que le budget ou exactement le budget.",
+        "exceed": "Dépasser un peu le budget.",
+        "all": "Acheter tout ce qu’on veut."
+      },
+      "why": {
+        "exceed": "Dépasser n’est pas permis : on n’a pas cet argent.",
+        "all": "On doit additionner et comparer au budget avant d’acheter."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : vérifie, puis calcule le reste.",
+      "r1": {
+        "instruction": "Avec 600 FC, peut-on acheter un article à 250 FC et un article à 300 FC ?",
+        "hint": "250 + 300 = 550. Compare à 600.",
+        "options": {
+          "yes": "Oui, le total fait 550 FC et il reste 50 FC.",
+          "no": "Non, c’est trop cher."
+        },
+        "why": {
+          "no": "550 FC est moins que 600 FC : c’est possible."
+        }
+      },
+      "r2": {
+        "instruction": "Budget 800 FC, achat 450 FC.",
+        "hint": "Reste = budget − achat.",
+        "q": "Combien reste-t-il ?"
+      }
+    },
+    "play": {
+      "title": "Exactement 700 FC",
+      "instruction": "Remplis le panier avec deux articles pour exactement 700 FC. Puis trouve une autre paire.",
+      "hint": "Cherche deux prix dont la somme fait 700.",
+      "supply": {
+        "p200": "l’article à 200 FC",
+        "p300": "l’article à 300 FC",
+        "p400": "l’article à 400 FC",
+        "p500": "l’article à 500 FC"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux courses de la famille.",
+      "options": {
+        "rule": "On additionne les prix choisis puis on compare au budget.",
+        "spendAll": "Il faut toujours dépenser tout le budget.",
+        "biggest": "On choisit toujours l’article le plus cher."
+      }
+    }
+  },
+  "u07eval": {
+    "objective": "Je montre que je sais utiliser la monnaie dans des situations simulées.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser de la monnaie factice. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 7 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Calcule la valeur.",
+      "hint": "200 + 200.",
+      "q": "Deux cartes de 200 FC valent :"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Calcule le prix.",
+      "hint": "250 + 250.",
+      "q": "Deux cahiers à 250 FC chacun coûtent :"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Calcule la monnaie rendue.",
+      "hint": "De 650 à 1 000.",
+      "q": "Prix 650 FC, paiement 1 000 FC : rendu ?"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Calcule le reste du budget.",
+      "hint": "800 − 450.",
+      "q": "Budget 800 FC, achat 450 FC : reste ?"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "Deux cartes de 200 FC : 400 FC.",
+      "r2": "Deux cahiers à 250 FC : 500 FC.",
+      "r3": "1 000 FC − 650 FC = 350 FC rendus.",
+      "r4": "800 FC − 450 FC = 350 FC restants."
+    }
+  },
+  "u08l01": {
+    "objective": "Je peux mesurer une petite longueur avec une règle, en centimètres.",
+    "situation": "Deux crayons semblent avoir presque la même longueur.",
+    "complete": "Bravo, tu mesures en centimètres !",
+    "discover": {
+      "title": "Deux crayons presque pareils",
+      "instruction": "Chaque crayon commence au zéro de la règle. Lis où il se termine.",
+      "hint": "Le crayon commence à 0 : sa longueur est le nombre lu au bout de la pointe.",
+      "a": "Longueur du premier crayon :",
+      "b": "Longueur du second crayon :"
+    },
+    "manipulate": {
+      "title": "Quand on ne part pas de zéro",
+      "instruction": "Le crayon n’est pas posé au zéro. Compte les centimètres entre le début et la fin.",
+      "r1": {
+        "instruction": "Le crayon commence à 2 et finit à 8.",
+        "hint": "Compte les espaces de 2 à 8, ou calcule 8 − 2.",
+        "q": "Longueur :"
+      },
+      "r2": {
+        "instruction": "Le crayon commence à 3 et finit à 10.",
+        "hint": "Calcule 10 − 3.",
+        "q": "Longueur :"
+      }
+    },
+    "understand": {
+      "title": "La règle cassée",
+      "instruction": "Cette règle est cassée : elle commence à 2. Pourquoi ne faut-il pas commencer au bord cassé ?",
+      "hint": "Au bord cassé, il n’y a pas de zéro.",
+      "options": {
+        "known": "Le repère serait faux : il faut partir d’une graduation connue.",
+        "edge": "On peut toujours lire le nombre au bout de l’objet, même sans zéro.",
+        "end": "Il faut toujours lire le premier nombre de la règle."
+      },
+      "why": {
+        "edge": "Si l’objet commence à 2, le nombre lu au bout est trop grand de 2.",
+        "end": "Le premier nombre ne donne pas la longueur de l’objet."
+      }
+    },
+    "practice": {
+      "title": "Je mesure",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Longueur = repère de fin − repère de début.",
+      "q1": "Une ligne va de 0 à 7 cm. Longueur ?",
+      "q2": "Une ligne commence à 2 cm et finit à 8 cm. Longueur ?",
+      "q3": "Sur la règle cassée, ce crayon va de 2 à 7. Longueur ?"
+    },
+    "play": {
+      "title": "Chaque crayon à sa place",
+      "instruction": "Mesure chaque crayon et pose-le sur sa longueur.",
+      "hint": "Regarde bien où chaque crayon commence : ce n’est pas toujours 0.",
+      "cm4": "4 cm",
+      "cm5": "5 cm",
+      "cm6": "6 cm",
+      "cm9": "9 cm"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux deux crayons.",
+      "options": {
+        "rule": "Le centimètre est une unité de longueur. On place le zéro de la règle au début de l’objet.",
+        "mass": "Le centimètre sert à peser.",
+        "edge": "On place le bord de la règle n’importe où."
+      }
+    }
+  },
+  "u08l02": {
+    "objective": "Je peux choisir une unité adaptée : le centimètre ou le mètre.",
+    "situation": "On veut mesurer la longueur de la classe.",
+    "complete": "Bravo, tu choisis la bonne unité !",
+    "discover": {
+      "title": "Mesurer la classe",
+      "instruction": "Pour mesurer la longueur de la classe, quel outil est le plus pratique ?",
+      "hint": "La classe est bien plus longue qu’une règle d’écolier.",
+      "options": {
+        "metre": "Un mètre ruban, en mètres.",
+        "ruler": "Une petite règle de 20 cm."
+      },
+      "why": {
+        "ruler": "Il faudrait poser la petite règle des dizaines de fois : on risque de se tromper."
+      }
+    },
+    "manipulate": {
+      "title": "La ficelle d’un mètre",
+      "instruction": "Un adulte a préparé une ficelle d’un mètre, soit 100 cm. On la mesure par bonds de 10 cm.",
+      "hint": "Compte les bonds de 10 en 10 de 0 à 100.",
+      "q": "Combien de bonds de 10 cm dans 1 mètre ?"
+    },
+    "understand": {
+      "title": "Mètre et centimètres",
+      "instruction": "Combien de centimètres y a-t-il dans 1 mètre ?",
+      "hint": "Pense aux 10 bonds de 10 cm.",
+      "options": {
+        "hundred": "1 m = 100 cm.",
+        "ten": "1 m = 10 cm.",
+        "thousand": "1 m = 1 000 cm."
+      },
+      "why": {
+        "ten": "10 cm, c’est seulement un bond.",
+        "thousand": "1 000 cm, ce serait 10 mètres."
+      }
+    },
+    "practice": {
+      "title": "Je convertis",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "1 m = 100 cm.",
+      "q1": "2 mètres valent combien de centimètres ?",
+      "q2": "3 mètres valent combien de centimètres ?",
+      "q3": "1 m et 50 cm valent combien de centimètres ?"
+    },
+    "play": {
+      "title": "Centimètre ou mètre ?",
+      "instruction": "Choisis l’unité adaptée avant de mesurer : pose chaque objet dans la bonne colonne.",
+      "hint": "Ce qui tient dans la main se mesure en centimètres ; les grandes distances en mètres.",
+      "notebook": "Un cahier",
+      "pencil": "Un crayon",
+      "classroom": "La salle de classe",
+      "field": "Le terrain de football",
+      "eraser": "Une gomme",
+      "corridor": "Le couloir de l’école",
+      "cm": "Centimètres (cm)",
+      "m": "Mètres (m)"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense à la classe et au cahier.",
+      "options": {
+        "rule": "Le mètre convient aux objets ou distances plus grands. Cent centimètres font un mètre.",
+        "small": "Le mètre sert pour les petits objets.",
+        "same": "Le mètre et le centimètre ont la même longueur."
+      }
+    }
+  },
+  "u08l03": {
+    "objective": "Je peux comparer et ordonner des masses.",
+    "situation": "Trois sacs fermés n’ont pas la même masse.",
+    "complete": "Bravo, tu compares les masses !",
+    "bagA": "Sac A",
+    "bagB": "Sac B",
+    "box": "Carton vide",
+    "rice": "Sac de riz",
+    "beans": "2 kg de haricots",
+    "maize": "2 kg de maïs",
+    "discover": {
+      "title": "Les sacs fermés",
+      "instruction": "On pose deux sacs sur la balance. Quel sac est le plus lourd ?",
+      "hint": "Le côté qui descend porte l’objet le plus lourd.",
+      "options": {
+        "a": "Le sac A",
+        "b": "Le sac B",
+        "same": "Ils ont la même masse"
+      },
+      "why": {
+        "b": "Le côté du sac B monte : il est plus léger.",
+        "same": "La balance n’est pas en équilibre."
+      }
+    },
+    "manipulate": {
+      "title": "Je compare avec la balance",
+      "instruction": "Observe chaque balance et réponds.",
+      "r1": {
+        "instruction": "Un grand carton vide et un petit sac de riz. Lequel est le plus lourd ?",
+        "hint": "Ne regarde pas la taille : regarde le côté qui descend.",
+        "options": {
+          "box": "Le grand carton vide",
+          "rice": "Le petit sac de riz"
+        },
+        "why": {
+          "box": "Le carton est grand mais vide : son côté monte. L’apparence peut tromper."
+        }
+      },
+      "r2": {
+        "instruction": "Les haricots et le maïs. Que montre la balance ?",
+        "hint": "Quand la balance est droite, elle est en équilibre.",
+        "options": {
+          "beans": "Les haricots sont plus lourds",
+          "maize": "Le maïs est plus lourd",
+          "same": "Ils ont la même masse"
+        },
+        "why": {
+          "beans": "Aucun côté ne descend.",
+          "maize": "Aucun côté ne descend."
+        }
+      }
+    },
+    "understand": {
+      "title": "Lire une balance",
+      "instruction": "Sur une balance, le côté qui descend porte…",
+      "hint": "Ce qui est lourd tire vers le bas.",
+      "options": {
+        "heavy": "L’objet le plus lourd.",
+        "light": "L’objet le plus léger.",
+        "big": "L’objet le plus grand."
+      },
+      "why": {
+        "light": "L’objet léger fait monter son côté.",
+        "big": "Un grand objet peut être léger, comme un carton vide."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : range, puis calcule.",
+      "r1": {
+        "instruction": "Range 1 kg, 3 kg et 2 kg du plus léger au plus lourd.",
+        "hint": "Compare les nombres de kilogrammes."
+      },
+      "r2": {
+        "instruction": "Le sac A pèse 3 kg et le sac B pèse 5 kg.",
+        "hint": "Calcule l’écart : 5 − 3.",
+        "q": "Combien de kilogrammes de plus pèse le sac B ?"
+      }
+    },
+    "play": {
+      "title": "Équilibre la balance",
+      "instruction": "Pose des masses sur le plateau vide pour équilibrer la balance.",
+      "r1": {
+        "instruction": "Sur l’autre plateau : un sac de 5 kg.",
+        "hint": "Il faut exactement 5 kg."
+      },
+      "r2": {
+        "instruction": "Sur l’autre plateau : un sac de 7 kg.",
+        "hint": "5 kg + 2 kg."
+      },
+      "r3": {
+        "instruction": "Sur l’autre plateau : un sac de 4 kg.",
+        "hint": "Deux masses de 2 kg, ou d’autres combinaisons."
+      },
+      "supply": {
+        "kg1": "une masse de 1 kg",
+        "kg2": "une masse de 2 kg",
+        "kg5": "une masse de 5 kg"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au carton vide et au sac de riz.",
+      "options": {
+        "rule": "Une balance compare les masses : le côté qui descend porte l’objet le plus lourd.",
+        "size": "Le plus grand objet est toujours le plus lourd.",
+        "colour": "La couleur montre la masse."
+      }
+    }
+  },
+  "u08l04": {
+    "objective": "Je peux comparer ce que des récipients peuvent contenir, en litres.",
+    "situation": "Au point d’eau, on remplit des bidons propres de tailles différentes.",
+    "complete": "Bravo, tu compares les capacités !",
+    "discover": {
+      "title": "Les bidons du point d’eau",
+      "instruction": "Quel bidon peut contenir le plus d’eau ?",
+      "hint": "Compare les nombres de litres écrits sous les bidons.",
+      "options": {
+        "three": "Le bidon de 3 L",
+        "five": "Le bidon de 5 L"
+      },
+      "why": {
+        "three": "3 L, c’est moins que 5 L."
+      }
+    },
+    "manipulate": {
+      "title": "Je remplis le bidon",
+      "instruction": "Remplis exactement le bidon de 5 L avec des bouteilles de 1 L, sans faire déborder.",
+      "hint": "Chaque bouteille verse 1 litre. Il en faut autant que de litres dans le bidon.",
+      "bottles": "Bouteilles de 1 L versées"
+    },
+    "understand": {
+      "title": "La même tasse",
+      "instruction": "Pour comparer deux seaux sans graduation, pourquoi utiliser toujours la même tasse ?",
+      "hint": "Pense à la règle : on compte avec une unité qui ne change pas.",
+      "options": {
+        "unit": "Pour utiliser la même unité et pouvoir comparer.",
+        "faster": "Pour aller plus vite.",
+        "nice": "Parce que la tasse est jolie."
+      },
+      "why": {
+        "faster": "Ce n’est pas la vitesse qui compte : avec deux tasses différentes, les comptes ne se comparent pas.",
+        "nice": "La couleur ou la beauté ne change pas la mesure."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Additionne ou compare les litres.",
+      "q1": "Le bidon de 5 L contient combien de litres de plus que celui de 3 L ?",
+      "q2": "Deux bouteilles de 1 L donnent combien ?",
+      "q3": "4 bouteilles de 1 L remplissent un seau. Quelle est sa capacité ?"
+    },
+    "play": {
+      "title": "Remplis à la capacité demandée",
+      "instruction": "Verse le bon nombre de bouteilles pour remplir chaque récipient sans déborder.",
+      "r1": {
+        "instruction": "Un seau de 4 L, avec des bouteilles de 1 L.",
+        "hint": "1 L par bouteille."
+      },
+      "r2": {
+        "instruction": "Un bidon de 6 L, avec des bouteilles de 2 L.",
+        "hint": "2, 4, 6…"
+      },
+      "r3": {
+        "instruction": "Un fût de 10 L, avec des bidons de 5 L.",
+        "hint": "5 + 5."
+      },
+      "bottles": "Récipients versés"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux bidons du point d’eau.",
+      "options": {
+        "rule": "Le litre est une unité de capacité.",
+        "length": "Le litre sert à mesurer une longueur.",
+        "mass": "Le litre sert à peser."
+      }
+    }
+  },
+  "u08eval": {
+    "objective": "Je montre que je sais mesurer des longueurs, des masses et des capacités.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 8 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Mesure la ligne.",
+      "hint": "Elle commence à 2 : calcule 8 − 2.",
+      "q": "Longueur :"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Pour la longueur d’une salle, quelle unité choisis-tu ?",
+      "hint": "Une salle est une grande distance.",
+      "options": {
+        "cm": "Le centimètre (cm)",
+        "m": "Le mètre (m)"
+      }
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Range 1 kg, 3 kg et 2 kg du plus léger au plus lourd.",
+      "hint": "Compare les nombres de kilogrammes."
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Voici deux bouteilles de 1 L.",
+      "hint": "1 L + 1 L.",
+      "q": "Ensemble, elles contiennent :"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "De 2 cm à 8 cm : 6 cm.",
+      "r2": "Une salle se mesure en mètres.",
+      "r3": "1 kg, 2 kg, 3 kg.",
+      "r4": "Deux bouteilles de 1 L : 2 L."
+    }
   }
 }

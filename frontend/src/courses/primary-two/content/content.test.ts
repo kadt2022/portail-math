@@ -57,23 +57,23 @@ function checkTexts(spec: SingleActivitySpec, inRound: boolean) {
   };
   switch (spec.type) {
     case "numeric":
-      spec.fields.forEach((field) => expectText(`${base}.${field.key}`));
+      spec.fields.forEach((field) => label(field.key));
       break;
     case "match":
-      spec.items.forEach((item) => item.labelKey && expectText(`${base}.${item.labelKey}`));
-      spec.bins.forEach((bin) => typeof bin.label === "string" && expectText(`${base}.${bin.label}`));
+      spec.items.forEach((item) => item.labelKey && label(item.labelKey));
+      spec.bins.forEach((bin) => typeof bin.label === "string" && label(bin.label));
       break;
     case "build":
       spec.controls.forEach((control) => label(control.labelKey));
       break;
     case "choice":
-      spec.options.forEach((option) => expectText(`${base}.options.${option.id}`));
+      spec.options.forEach((option) => label(`options.${option.id}`));
       break;
     case "collect":
-      spec.supply.forEach((supply) => expectText(`${base}.supply.${supply.id}`));
+      spec.supply.forEach((supply) => label(`supply.${supply.id}`));
       break;
     case "selfcheck":
-      spec.recap.forEach((key) => expectText(`${base}.${key}`));
+      spec.recap.forEach((key) => label(key));
       break;
     default:
       break;
