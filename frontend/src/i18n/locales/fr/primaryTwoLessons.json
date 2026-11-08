@@ -1102,5 +1102,631 @@
       "r3": "90 − 40 = 50.",
       "r4": "62 dépasse 50 de 12."
     }
+  },
+  "u05l01": {
+    "objective": "Je peux reconnaître des collections régulières : des groupes égaux.",
+    "situation": "Trois assiettes reçoivent chacune 2 beignets.",
+    "complete": "Bravo, tu reconnais les groupes égaux !",
+    "discover": {
+      "title": "Les assiettes de beignets",
+      "instruction": "Observe les assiettes, puis réponds.",
+      "hint": "Compte les assiettes, puis les beignets d’une seule assiette. Ajoute ensuite 2 + 2 + 2.",
+      "plates": "Combien d’assiettes ?",
+      "each": "Combien de beignets dans chaque assiette ?",
+      "total": "Combien de beignets en tout ?"
+    },
+    "manipulate": {
+      "title": "Je fais 4 groupes de 3",
+      "instruction": "Prépare 4 assiettes avec 3 graines dans chacune.",
+      "hint": "Le nombre d’assiettes, c’est le nombre de groupes. Le nombre de graines par assiette doit être le même partout.",
+      "groups": "Assiettes",
+      "size": "Graines par assiette"
+    },
+    "understand": {
+      "title": "Groupes égaux ou non ?",
+      "instruction": "Coche toutes les images qui montrent des groupes égaux.",
+      "hint": "Compte les objets de chaque assiette : sont-ils tous pareils ?",
+      "options": {
+        "a": "Les bouchons",
+        "b": "Les noix",
+        "c": "Les jetons"
+      },
+      "why": {
+        "b": "Regarde les noix : la dernière assiette en a 4 au lieu de 3. Les groupes ne sont pas égaux."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : calcule, puis explique.",
+      "r1": {
+        "instruction": "Calcule.",
+        "hint": "Additionne la même quantité autant de fois qu’il y a de groupes.",
+        "q1": "2 groupes de 4 font combien ?",
+        "q2": "3 groupes de 5 : 5 + 5 + 5 = ?"
+      },
+      "r2": {
+        "instruction": "Peut-on appeler « groupes égaux » des groupes de 3, 3 et 4 ?",
+        "hint": "Des groupes égaux ont tous le même nombre d’objets.",
+        "options": {
+          "no": "Non, le dernier groupe est différent.",
+          "yes": "Oui, ce sont trois groupes."
+        },
+        "why": {
+          "yes": "Avoir trois groupes ne suffit pas : il faut le même nombre d’objets dans chacun."
+        }
+      }
+    },
+    "play": {
+      "title": "Les assiettes de la fête",
+      "instruction": "Distribue les 12 beignets un par un pour que toutes les assiettes aient la même quantité.",
+      "hint": "Donne un beignet à chaque assiette, tour après tour."
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux assiettes de beignets.",
+      "options": {
+        "rule": "Des groupes égaux contiennent tous le même nombre d’objets.",
+        "many": "Des groupes égaux, ce sont beaucoup de groupes.",
+        "big": "Des groupes égaux ont tous la même couleur."
+      }
+    }
+  },
+  "u05l02": {
+    "objective": "Je peux utiliser le signe × pour des groupes égaux.",
+    "situation": "Dans le jardin, quatre rangées ont chacune 2 plants.",
+    "complete": "Bravo, tu lis les multiplications !",
+    "discover": {
+      "title": "Les rangées du jardin",
+      "instruction": "Observe les rangées de plants, puis réponds.",
+      "hint": "4 × 2 signifie 4 groupes de 2 : 2 + 2 + 2 + 2.",
+      "rows": "Combien de rangées ?",
+      "each": "Combien de plants par rangée ?",
+      "total": "4 × 2 = ?"
+    },
+    "manipulate": {
+      "title": "Je représente 3 × 4",
+      "instruction": "Représente 3 × 4 avec des groupes de bouchons.",
+      "hint": "3 × 4 se lit « 3 groupes de 4 ».",
+      "groups": "Groupes",
+      "size": "Bouchons par groupe"
+    },
+    "understand": {
+      "title": "Que veut dire × ?",
+      "instruction": "Que signifie 3 × 2 ?",
+      "hint": "Le premier nombre dit combien de groupes, le second combien dans chaque groupe.",
+      "options": {
+        "groups": "3 groupes de 2, soit 2 + 2 + 2.",
+        "plus": "3 + 2.",
+        "glue": "Le nombre 32."
+      },
+      "why": {
+        "plus": "3 + 2 réunit seulement 3 et 2 objets. 3 × 2, ce sont trois groupes de 2.",
+        "glue": "Le signe × ne colle pas les chiffres."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions. Compare bien les deux dernières.",
+      "hint": "Dessine les groupes dans ta tête : 2 × 5, c’est 5 + 5.",
+      "q1": "2 × 5 = ?",
+      "q2": "3 × 2 = ?",
+      "q3": "3 + 2 = ?"
+    },
+    "play": {
+      "title": "Le jardinier",
+      "instruction": "Construis exactement les rangées demandées.",
+      "r1": {
+        "instruction": "Plante 4 × 3 : 4 rangées de 3 plants.",
+        "hint": "Le premier nombre donne les rangées."
+      },
+      "r2": {
+        "instruction": "Plante 2 × 5.",
+        "hint": "2 rangées de 5 plants."
+      },
+      "r3": {
+        "instruction": "Plante 5 × 2.",
+        "hint": "5 rangées de 2 plants."
+      },
+      "rows": "Rangées",
+      "cols": "Plants par rangée"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux rangées du jardin.",
+      "options": {
+        "rule": "4 × 2 signifie 4 groupes de 2.",
+        "plus": "4 × 2 signifie 4 + 2.",
+        "fortyTwo": "4 × 2 signifie 42."
+      }
+    }
+  },
+  "u05l03": {
+    "objective": "Je peux calculer deux fois une quantité : le double.",
+    "situation": "Chaque enfant reçoit deux craies. Il y a 6 enfants.",
+    "complete": "Bravo, tu connais les doubles et la table de 2 !",
+    "discover": {
+      "title": "Deux craies par enfant",
+      "instruction": "Chaque boîte appartient à un enfant. Observe, puis réponds.",
+      "hint": "6 enfants reçoivent chacun 2 craies : 6 × 2.",
+      "children": "Combien d’enfants ?",
+      "total": "Combien de craies en tout ?"
+    },
+    "manipulate": {
+      "title": "Deux rangées de 7",
+      "instruction": "Fais deux rangées de 7 graines.",
+      "hint": "2 rangées, et 7 graines dans chaque rangée.",
+      "rows": "Rangées",
+      "cols": "Graines par rangée"
+    },
+    "understand": {
+      "title": "Le double",
+      "instruction": "Les deux rangées montrent le double de 6. Que vaut le double de 6 ?",
+      "hint": "Le double, c’est deux fois la même quantité.",
+      "options": {
+        "double": "6 + 6 = 12.",
+        "plusTwo": "6 + 2 = 8.",
+        "minus": "6 − 2 = 4."
+      },
+      "why": {
+        "plusTwo": "Ajouter 2 n’est pas doubler : on doit ajouter 6 à 6.",
+        "minus": "Doubler fait grandir la quantité."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Le double de 9, c’est 9 + 9. Pour la question 3, cherche le nombre qui, ajouté à lui-même, donne 14.",
+      "q1": "2 × 4 = ?",
+      "q2": "Le double de 9 ?",
+      "q3": "Quel nombre a pour double 14 ?"
+    },
+    "play": {
+      "title": "Le jeu des doubles",
+      "instruction": "Calcule chaque double et pose la carte sur le bon nombre.",
+      "hint": "Le double d’un nombre, c’est ce nombre ajouté à lui-même.",
+      "a": "Double de 3",
+      "b": "Double de 5",
+      "c": "Double de 8",
+      "d": "Double de 10"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux deux craies par enfant.",
+      "options": {
+        "rule": "Multiplier par 2, c’est prendre le double.",
+        "plusTwo": "Multiplier par 2, c’est ajouter 2.",
+        "half": "Multiplier par 2, c’est couper en deux."
+      }
+    }
+  },
+  "u05l04": {
+    "objective": "Je peux compter rapidement par 5 et par 10.",
+    "situation": "Les doigts de deux mains forment un groupe de 10.",
+    "complete": "Bravo, tu comptes par 5 et par 10 !",
+    "discover": {
+      "title": "Les doigts des mains",
+      "instruction": "Chaque groupe de 5 jetons représente les doigts d’une main.",
+      "hint": "Compte de 5 en 5 : 5, 10, 15, 20…",
+      "two": "Combien de doigts pour deux mains ?",
+      "four": "Et pour quatre mains ?"
+    },
+    "manipulate": {
+      "title": "4 groupes de 5",
+      "instruction": "Fais 4 groupes de 5 bâtonnets.",
+      "hint": "4 groupes, et 5 bâtonnets dans chacun.",
+      "groups": "Groupes",
+      "size": "Bâtonnets par groupe"
+    },
+    "understand": {
+      "title": "Je compte de 5 en 5",
+      "instruction": "Range ces nombres pour compter de 5 en 5.",
+      "hint": "On ajoute 5 à chaque pas."
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Compte de 5 en 5 ou de 10 en 10.",
+      "q1": "3 × 5 = ?",
+      "q2": "6 × 10 = ?",
+      "q3": "Deux paniers de 10 et un panier de 5 contiennent combien de mangues ?"
+    },
+    "play": {
+      "title": "Le chargement du camion",
+      "instruction": "Charge des paniers complets de 5 ou de 10 mangues pour envoyer exactement 35 mangues.",
+      "hint": "Compte de 10 en 10, puis ajoute 5 si besoin.",
+      "supply": {
+        "five": "un panier de 5 mangues",
+        "ten": "un panier de 10 mangues"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux doigts des mains.",
+      "options": {
+        "rule": "Les groupes de 5 se comptent 5, 10, 15, 20.",
+        "ones": "Les groupes de 5 se comptent 5, 6, 7, 8.",
+        "double": "Les groupes de 5 se comptent 5, 10, 20, 40."
+      }
+    }
+  },
+  "u05eval": {
+    "objective": "Je montre que je comprends la multiplication comme une addition répétée.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 5 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Écris l’addition pour 3 groupes de 5.",
+      "hint": "Ajoute 5 trois fois.",
+      "q": "5 + 5 + 5 = ?"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Construis 4 × 3.",
+      "hint": "4 rangées de 3 jetons.",
+      "rows": "Rangées",
+      "cols": "Jetons par rangée"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Calcule.",
+      "hint": "Le double, c’est deux fois le même nombre.",
+      "q": "Le double de 9 ?"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Calcule.",
+      "hint": "Compte de 10 en 10, six fois.",
+      "q": "6 × 10 = ?"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "5 + 5 + 5 = 15.",
+      "r2": "4 × 3 : 4 groupes de 3, soit 12 objets.",
+      "r3": "Le double de 9 est 18.",
+      "r4": "6 × 10 = 60."
+    }
+  },
+  "u06l01": {
+    "objective": "Je peux partager par distribution.",
+    "situation": "12 noix doivent être partagées entre 3 enfants.",
+    "complete": "Bravo, tu partages équitablement !",
+    "discover": {
+      "title": "Les noix des trois enfants",
+      "instruction": "Touche un enfant pour lui donner une noix. Donne à chacun à tour de rôle jusqu’à ce qu’il n’y en ait plus.",
+      "hint": "Donne une noix à l’enfant 1, puis à l’enfant 2, puis à l’enfant 3, et recommence."
+    },
+    "manipulate": {
+      "title": "Les bouchons dans deux bols",
+      "instruction": "Distribue les 10 bouchons dans les 2 bols pour que chacun en ait autant.",
+      "hint": "Un bouchon par bol, tour après tour."
+    },
+    "understand": {
+      "title": "Comment partager ?",
+      "instruction": "Pour partager équitablement, que fait-on ?",
+      "hint": "Chacun doit recevoir la même quantité.",
+      "options": {
+        "turns": "On donne un objet à chacun, à tour de rôle, jusqu’à épuisement.",
+        "first": "On donne tout au premier enfant.",
+        "handful": "On donne une poignée au hasard à chacun."
+      },
+      "why": {
+        "first": "Si le premier reçoit tout, les autres n’ont rien : ce n’est pas équitable.",
+        "handful": "Avec des poignées au hasard, les parts risquent d’être différentes."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : calcule, puis vérifie un partage difficile.",
+      "r1": {
+        "instruction": "Calcule chaque part.",
+        "hint": "Imagine la distribution un par un.",
+        "q1": "8 objets entre 2 enfants : combien chacun ?",
+        "q2": "15 fruits entre 3 paniers : combien par panier ?"
+      },
+      "r2": {
+        "instruction": "Peut-on partager 7 oranges également entre 2 enfants sans les couper ? Fais la distribution.",
+        "hint": "Distribue tant que tu peux donner une orange à chacun. Ce qui ne peut plus être donné à tous reste."
+      }
+    },
+    "play": {
+      "title": "Personne n’est oublié",
+      "instruction": "Distribue les objets un par un sans oublier personne.",
+      "r1": {
+        "instruction": "9 mangues dans 3 paniers.",
+        "hint": "Une mangue par panier, à chaque tour."
+      },
+      "r2": {
+        "instruction": "16 jetons pour 4 enfants.",
+        "hint": "Fais des tours complets."
+      },
+      "r3": {
+        "instruction": "11 beignets sur 2 assiettes.",
+        "hint": "À la fin, il peut rester un beignet qu’on ne peut pas donner aux deux."
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux noix des trois enfants.",
+      "options": {
+        "rule": "Pour partager équitablement, on donne un objet à chacun à tour de rôle jusqu’à épuisement.",
+        "biggest": "Le plus grand enfant reçoit le plus.",
+        "random": "Chacun prend ce qu’il veut."
+      }
+    }
+  },
+  "u06l02": {
+    "objective": "Je peux chercher combien de groupes on peut former.",
+    "situation": "On range 18 craies par paquets de 3.",
+    "complete": "Bravo, tu sais faire des paquets !",
+    "discover": {
+      "title": "Les paquets de craies",
+      "instruction": "Range les 18 craies dans des boîtes de 3. Combien de boîtes faut-il ?",
+      "hint": "Ajoute une boîte de 3 craies à la fois et compte les craies rangées jusqu’à 18.",
+      "groups": "Boîtes de 3 craies"
+    },
+    "manipulate": {
+      "title": "Des groupes de 4",
+      "instruction": "Fais des groupes de 4 avec les 16 graines.",
+      "hint": "4, 8, 12, 16 : compte de 4 en 4 et compte les groupes.",
+      "groups": "Groupes de 4 graines"
+    },
+    "understand": {
+      "title": "Grouper, c’est…",
+      "instruction": "Quand on fait des paquets de 3 avec 18 craies, que cherche-t-on ?",
+      "hint": "La taille du paquet est déjà donnée : 3.",
+      "options": {
+        "count": "Combien de groupes on peut former.",
+        "size": "Combien il y a d’objets dans chaque groupe.",
+        "total": "Combien il y a d’objets en tout."
+      },
+      "why": {
+        "size": "On sait déjà qu’il y a 3 craies par paquet.",
+        "total": "On sait déjà qu’il y a 18 craies."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Compte par bonds de la taille du groupe. Pour la question 3, on connaît les groupes et on cherche le total.",
+      "q1": "Combien de groupes de 2 dans 10 ?",
+      "q2": "Combien de groupes de 5 dans 20 ?",
+      "q3": "On forme 3 groupes de 4. Combien d’objets utilise-t-on ?"
+    },
+    "play": {
+      "title": "Les caisses de l’entrepôt",
+      "instruction": "Pour chaque commande, combien de caisses pleines faut-il ? Pose la carte sur le bon nombre.",
+      "hint": "Compte par bonds de la taille de la caisse.",
+      "a": "10 bouteilles, caisses de 5",
+      "b": "12 bouteilles, caisses de 4",
+      "c": "16 bouteilles, caisses de 4",
+      "d": "10 bouteilles, caisses de 2"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux paquets de craies.",
+      "options": {
+        "rule": "On forme des groupes de la taille demandée, puis on compte les groupes.",
+        "share": "On donne une craie à chacun.",
+        "add": "On ajoute 3 à 18."
+      }
+    }
+  },
+  "u06l03": {
+    "objective": "Je peux trouver des parts égales simples : la moitié et le quart.",
+    "situation": "Une orange est partagée en deux parts égales.",
+    "complete": "Bravo, tu reconnais la moitié et le quart !",
+    "discover": {
+      "title": "Quelle orange est coupée en deux moitiés ?",
+      "instruction": "Observe les découpages. Lequel montre deux moitiés ?",
+      "hint": "Deux moitiés : deux parts, et de la même taille.",
+      "options": {
+        "equal": "L’orange de Kito",
+        "unequal": "L’orange de Lina",
+        "three": "L’orange de Sifa"
+      },
+      "why": {
+        "unequal": "Lina a coupé un petit et un grand morceau : ce ne sont pas des moitiés.",
+        "three": "Sifa a coupé trois parts : ce sont des tiers, pas des moitiés."
+      }
+    },
+    "manipulate": {
+      "title": "Moitié et quart d’une collection",
+      "instruction": "Partage les objets en parts égales.",
+      "r1": {
+        "instruction": "Prends la moitié de 10 oranges : partage-les entre 2 assiettes.",
+        "hint": "Moitié = 2 parts égales."
+      },
+      "r2": {
+        "instruction": "Prends le quart de 12 beignets : partage-les entre 4 assiettes.",
+        "hint": "Quart = une des 4 parts égales."
+      }
+    },
+    "understand": {
+      "title": "Le quart",
+      "instruction": "La galette est coupée en 4 parts égales. Une part colorée, qu’est-ce que c’est ?",
+      "hint": "Compte les parts et vérifie qu’elles sont égales.",
+      "options": {
+        "quarter": "Un quart : une des quatre parts égales.",
+        "anyFour": "N’importe quel morceau, même plus grand.",
+        "half": "Une moitié."
+      },
+      "why": {
+        "anyFour": "Un quart doit avoir la même taille que les trois autres parts.",
+        "half": "Une moitié est une des deux parts égales."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : calcule, puis explique.",
+      "r1": {
+        "instruction": "Calcule.",
+        "hint": "Moitié : partager en 2. Quart : partager en 4.",
+        "q1": "La moitié de 10 objets ?",
+        "q2": "Le quart de 12 objets ?"
+      },
+      "r2": {
+        "instruction": "Deux morceaux d’une même orange, l’un grand et l’autre petit, sont-ils des moitiés ?",
+        "hint": "Des moitiés ont la même taille.",
+        "options": {
+          "no": "Non, les parts ne sont pas égales.",
+          "yes": "Oui, il y a deux morceaux."
+        },
+        "why": {
+          "yes": "Avoir deux morceaux ne suffit pas : ils doivent être de même taille."
+        }
+      }
+    },
+    "play": {
+      "title": "Le découpage des galettes",
+      "instruction": "Classe chaque galette : moitiés, quarts, ou parts pas égales.",
+      "hint": "Compte les parts, puis vérifie qu’elles ont toutes la même taille.",
+      "half": "Moitiés",
+      "quarter": "Quarts",
+      "unequal": "Parts pas égales"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense à l’orange coupée.",
+      "options": {
+        "rule": "Une moitié est une des deux parts égales.",
+        "two": "Une moitié, c’est n’importe quel morceau.",
+        "big": "Une moitié, c’est le plus gros morceau."
+      }
+    }
+  },
+  "u06l04": {
+    "objective": "Je peux interpréter une situation de division concrète : grouper ou partager.",
+    "situation": "Il y a 20 bouteilles : soit on les partage entre 4 tables, soit on fait des caisses de 4.",
+    "complete": "Bravo, tu sais choisir entre grouper et partager !",
+    "discover": {
+      "title": "Partager ou grouper ?",
+      "instruction": "Pose chaque situation dans la bonne colonne.",
+      "hint": "Partager : on connaît le nombre de parts. Grouper : on connaît la taille de chaque groupe.",
+      "a": "20 bouteilles partagées entre 4 tables",
+      "b": "20 bouteilles rangées en caisses de 4",
+      "c": "12 noix pour 3 enfants",
+      "d": "12 craies en paquets de 3",
+      "share": "Partager",
+      "group": "Grouper"
+    },
+    "manipulate": {
+      "title": "12 jetons, deux questions",
+      "instruction": "Avec les mêmes 12 jetons, réponds aux deux questions possibles avec 3.",
+      "r1": {
+        "instruction": "Partager : donne les 12 jetons à 3 enfants.",
+        "hint": "Un jeton par enfant, tour après tour."
+      },
+      "r2": {
+        "instruction": "Grouper : fais des groupes de 3 jetons. Combien de groupes ?",
+        "hint": "3, 6, 9, 12…",
+        "groups": "Groupes de 3 jetons"
+      }
+    },
+    "understand": {
+      "title": "Ce que l’on cherche",
+      "instruction": "Quand on partage, que cherche-t-on ?",
+      "hint": "Pense aux noix des enfants.",
+      "options": {
+        "size": "La taille de chaque part.",
+        "count": "Le nombre de groupes.",
+        "same": "Partager et grouper, c’est toujours chercher la même chose."
+      },
+      "why": {
+        "count": "Le nombre de groupes, on le cherche quand on groupe.",
+        "same": "Les deux questions utilisent les mêmes nombres, mais ne cherchent pas la même chose."
+      }
+    },
+    "practice": {
+      "title": "Je calcule",
+      "instruction": "Réponds aux trois questions.",
+      "hint": "Demande-toi d’abord : est-ce que je partage ou est-ce que je groupe ?",
+      "q1": "12 objets partagés entre 3 : combien chacun ?",
+      "q2": "12 objets par groupes de 3 : combien de groupes ?",
+      "q3": "20 bouteilles en caisses de 4 : combien de caisses ?"
+    },
+    "play": {
+      "title": "Le rangement de la classe",
+      "instruction": "Choisis la bonne action, puis réalise-la.",
+      "r1": {
+        "instruction": "15 mangues pour 3 enfants. Que faut-il faire ?",
+        "hint": "On connaît le nombre d’enfants.",
+        "options": {
+          "share": "Partager",
+          "group": "Grouper"
+        }
+      },
+      "r2": {
+        "instruction": "Partage maintenant les 15 mangues entre 3 enfants.",
+        "hint": "Une mangue par enfant à chaque tour."
+      },
+      "r3": {
+        "instruction": "16 craies à ranger en boîtes de 4. Que faut-il faire ?",
+        "hint": "On connaît la taille de la boîte.",
+        "options": {
+          "share": "Partager",
+          "group": "Grouper"
+        }
+      },
+      "r4": {
+        "instruction": "Range maintenant les 16 craies en boîtes de 4.",
+        "hint": "4, 8, 12, 16…",
+        "groups": "Boîtes de 4 craies"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux 20 bouteilles.",
+      "options": {
+        "rule": "Partager cherche la taille de chaque part ; grouper cherche le nombre de groupes.",
+        "inverse": "Partager cherche le nombre de groupes ; grouper cherche la taille de chaque part.",
+        "same": "Partager et grouper, c’est additionner."
+      }
+    }
+  },
+  "u06eval": {
+    "objective": "Je montre que je comprends le partage et le groupement.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 6 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Partage.",
+      "hint": "Distribue un fruit par panier, tour après tour.",
+      "q": "15 fruits entre 3 paniers : combien par panier ?"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Groupe.",
+      "hint": "Compte de 5 en 5 jusqu’à 20.",
+      "q": "Combien de groupes de 5 dans 20 ?"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Observe les 12 oranges.",
+      "hint": "Le quart : partager en 4 parts égales.",
+      "q": "Le quart de 12 objets ?"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Groupe.",
+      "hint": "Compte de 3 en 3 jusqu’à 12.",
+      "q": "12 objets par groupes de 3 : combien de groupes ?"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "15 fruits entre 3 paniers : 5 par panier.",
+      "r2": "20 contient 4 groupes de 5.",
+      "r3": "Le quart de 12, c’est 3.",
+      "r4": "12 par groupes de 3 : 4 groupes."
+    }
   }
 }

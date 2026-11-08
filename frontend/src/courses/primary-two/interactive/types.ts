@@ -32,7 +32,7 @@ export type ProductName = "pencil" | "eraser" | "notebook" | "ball" | "bread" | 
 
 export type Visual =
   | { kind: "collection"; item: ItemName; count: number; container?: "basket" | "plate" | "bag" | "box" | "none" }
-  | { kind: "groups"; item: ItemName; groups: readonly number[]; container?: "plate" | "bag" | "box" | "basket" }
+  | { kind: "groups"; item: ItemName; groups: readonly number[]; container?: "plate" | "bag" | "box" | "basket" | "none" }
   | { kind: "tens"; tens: number; units: number; item?: "stick" | "bag" }
   | { kind: "array"; rows: number; cols: number; item: ItemName }
   | { kind: "tenFrame"; filled: number; frames?: number }
