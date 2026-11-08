@@ -49,7 +49,8 @@ describe("Parcours interactifs de 2e primaire (U01-EVAL à U10 et bilan)", () =>
         fireEvent.click(screen.getByRole("button", { name: index === content.activities.length - 1 ? /terminer/i : /continuer/i }));
       });
 
-      expect(screen.getByRole("heading", { level: 1, name: i18next.t(`${content.text}.complete`, { ns: "primaryTwoLessons" }) })).toBeInTheDocument();
+      const finalTitle = id === "MATH-2P-BILAN" ? i18next.t("journey.courseFinished", { ns: "primaryTwo" }) : i18next.t(`${content.text}.complete`, { ns: "primaryTwoLessons" });
+      expect(screen.getByRole("heading", { level: 1, name: finalTitle })).toBeInTheDocument();
       expect(getSessionCourseProgress(PRIMARY_TWO_COURSE.id).items[id].completed).toBe(true);
       expect(localStorage.length).toBe(0);
       expect(sessionStorage.length).toBe(0);

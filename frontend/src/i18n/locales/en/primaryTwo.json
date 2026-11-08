@@ -148,15 +148,45 @@
     "title": "Well done! You can count without losing your place.",
     "message": "Your progress is saved: 1 completed lesson out of 40 planned.",
     "nextComing": "The next lesson is coming soon and cannot be started yet.",
-    "backToModule": "Back to my modules",
+    "backToModule": "Back to the module",
     "evaluationEyebrow": "Assessment complete",
     "progressMessage_one": "This session shows {{count}} lesson completed out of {{total}} planned.",
     "progressMessage_other": "This session shows {{count}} lessons completed out of {{total}} planned.",
     "nextLesson": "Next lesson",
-    "nextEvaluation": "Go to the assessment"
+    "nextEvaluation": "Go to the assessment",
+    "titles": {
+      "MATH-2P-U01-L01": "Well done, you can count without getting lost!",
+      "MATH-2P-U01-L02": "Well done, you find neighbouring numbers!",
+      "MATH-2P-U01-L03": "Well done, you can compare!",
+      "MATH-2P-U01-L04": "Well done, you can order and explain!"
+    }
   },
   "errors": {
     "moduleNotFound": "This module does not exist.",
     "lessonNotFound": "This lesson is not available."
+  },
+  "journey": {
+    "trailLabel": "My path in module {{number}}",
+    "stopLabel": "{{title}}: {{state}}",
+    "state": {
+      "current": "you are here",
+      "completed": "done",
+      "in-progress": "started",
+      "not-started": "not done yet"
+    },
+    "continue": "Continue",
+    "backToCourse": "Back to the course",
+    "module": {
+      "start": "Start",
+      "resume": "Resume",
+      "continue": "Continue",
+      "next-module": "Next module"
+    },
+    "nextModuleName": "Module {{number}} · {{title}}",
+    "moduleSuccess": "Module {{number}} completed!",
+    "courseFinished": "You finished Grade 2!",
+    "yambaNext": "Well done! Next adventure: {{title}}.",
+    "yambaNextModule": "Well done! On to module {{number}}: {{title}}.",
+    "yambaFinished": "What a journey! Be proud of yourself. Show your work to an adult."
   }
 }

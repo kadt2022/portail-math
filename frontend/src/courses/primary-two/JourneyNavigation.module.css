@@ -1,0 +1,179 @@
+/* Chemin du module et écran de fin, pensés pour un enfant : gros éléments,
+   un seul bouton principal, rien qui déborde sur un téléphone. */
+
+.trail ol {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trail li {
+  display: flex;
+  align-items: center;
+}
+
+.trail li + li::before {
+  content: "";
+  width: 14px;
+  height: 4px;
+  margin-right: 10px;
+  border-radius: 2px;
+  background: #cfdcd5;
+}
+
+.stop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 3px solid #9db8ad;
+  border-radius: 50%;
+  background: #fff;
+  color: #24433a;
+  font-size: 18px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.done {
+  border-color: #e0a80a;
+  background: #fff3c9;
+  color: #a06c00;
+}
+
+.current {
+  border-color: #0f7a5c;
+  background: #0f7a5c;
+  color: #fff;
+  box-shadow: 0 0 0 5px rgb(15 122 92 / 22%);
+}
+
+.stop:focus-visible,
+.continue:focus-visible,
+.quiet:focus-visible {
+  outline: 3px solid #f2a20c;
+  outline-offset: 3px;
+}
+
+.completion {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(22px, 5vw, 40px);
+  border-radius: 28px;
+  background: linear-gradient(160deg, #f4fbf7, #fff8e6);
+  box-shadow: 0 18px 40px rgb(36 67 58 / 12%);
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 20px rgb(224 168 10 / 30%);
+  color: #e0a80a;
+  font-size: 48px;
+}
+
+.completion h1 {
+  margin: 0;
+  color: #1c3a30;
+  font-size: clamp(26px, 6vw, 36px);
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: -6px 0 0;
+  color: #47645a;
+  font-weight: 700;
+}
+
+.yamba {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: #fff;
+  color: #24433a;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.yamba strong {
+  display: block;
+  color: #b0570f;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.count {
+  margin: 0;
+  color: #6b8178;
+  font-size: 14px;
+}
+
+.continue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(100%, 360px);
+  min-height: 64px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: #0f7a5c;
+  box-shadow: 0 10px 22px rgb(15 122 92 / 30%);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.nextName {
+  margin-top: -8px;
+  color: #47645a;
+  font-weight: 700;
+}
+
+.quiet {
+  color: #47645a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.moduleContinue {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+/* Sur téléphone, le chemin (jusqu'à 6 ronds en module 10) tient sur une ligne. */
+@media (max-width: 480px) {
+  .trail ol {
+    flex-wrap: nowrap;
+    gap: 2px;
+  }
+
+  .trail li + li::before {
+    width: 6px;
+    margin-right: 2px;
+  }
+
+  .stop {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+    font-size: 14px;
+  }
+}

@@ -702,3 +702,15 @@ Branche locale : `feature/2e-primaire-parcours-complet` (créée depuis `origin/
 - Traductions anglaises du nouvel espace `primaryTwoLessons` (la page anglaise affiche déjà un message d’attente).
 - Relecture pédagogique des 47 éléments par un enseignant ; décision sur les problèmes signalés ci-dessus.
 - Revue de code, puis push / PR / fusion / déploiement : **uniquement sur accord explicite du Capitaine**.
+
+## Navigation de l’enfant (branche `feature/2e-primaire-navigation-enfant`)
+
+Demandée par le Capitaine après la mise en dev : le passage entre leçons et entre modules était difficile à suivre pour un enfant.
+
+- **Un seul chemin** (`primary-two/journey.ts`) : L01 → L02 → L03 → L04 → évaluation, module après module, puis le grand bilan (51 arrêts).
+- **Un seul gros bouton « Continuer ▶ »** sur l’écran de fin de chaque leçon et évaluation, y compris L01 à L04 de Crochet (seul l’écran de fin change, pas ses exercices). Il mène à la leçon suivante, à l’évaluation, puis à la première leçon du module suivant.
+- **Fin de module fêtée** (« Module N réussi ! 🏅 » quand ses 4 leçons sont faites) ; **fin de parcours** après le bilan (« Tu as terminé la 2e primaire ! 🎓 »). Plus aucun cul-de-sac.
+- **Petit chemin de ronds** (1 2 3 4 🏅, et 🎓 au module 10) en haut de chaque leçon, sur l’écran de fin et sur la page du module : étoile = terminé, rond plein = « tu es ici ».
+- **Page du module** : un gros bouton Commencer / Reprendre / Continuer / Module suivant vers ce qu’il faut faire maintenant (emplacement facultatif `renderHeroAction` ajouté à `GenericModulePage`, sans effet sur les autres cours).
+- Libellé corrigé : « Retour au module ». Textes faux supprimés de l’écran de fin de L01-L04 (« 1 leçon sur 40 », « La prochaine leçon arrive bientôt »).
+- Tests : `journey.test.tsx` (chemin complet, chaque passage, bouton du module, écrans de fin, passage réel évaluation U03 → U04-L01). Vérification visuelle à 320 px : chemin sur une ligne, aucun débordement.
