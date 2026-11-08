@@ -4,16 +4,19 @@ import { useTranslation } from "react-i18next";
 
 import { CourseActionIcon } from "../components/CourseActionIcon";
 import { YambaGuide } from "../components/YambaGuide";
-import { isPublished } from "../course-engine/course-model";
+import { getModuleItems, isPublished } from "../course-engine/course-model";
 import { useCourseProgress } from "../course-engine/useCourseProgress";
 import baseStyles from "../primary-one/PrimaryOneCourse.module.css";
 import {
   getPrimaryTwoItem,
   getPrimaryTwoModule,
+  lessonPath,
   modulePath,
   PRIMARY_TWO_BASE_PATH,
   PRIMARY_TWO_COURSE,
 } from "./course-catalogue";
+import { getInteractiveContent } from "./content";
+import { InteractiveActivity } from "./interactive/activities";
 import { PrimaryTwoLessonActivity } from "./PrimaryTwoLessonActivities";
 import styles from "./PrimaryTwoLesson.module.css";
 
@@ -36,6 +39,10 @@ export function PrimaryTwoLessonPage() {
   const isLessonTwo = item?.id === "MATH-2P-U01-L02";
   const isLessonThree = item?.id === "MATH-2P-U01-L03";
   const isLessonFour = item?.id === "MATH-2P-U01-L04";
+  // Leçons et évaluations pilotées par données (U01-EVAL à U10 et bilan).
+  const content = getInteractiveContent(item?.id);
+  const contentText = (key: string, options?: Record<string, unknown>) =>
+    t(`${content?.text}.${key}`, { ns: "primaryTwoLessons", ...options });
 
   useEffect(() => {
     if (frenchContent && item && isPublished(item) && !progress.items[item.id]) {
@@ -82,6 +89,37 @@ export function PrimaryTwoLessonPage() {
     setViewByItem((current) => ({ ...current, [item.id]: next }));
   };
 
+  if (view === "done" && content) {
+    const items = getModuleItems(module);
+    const next = items[items.findIndex((candidate) => candidate.id === item.id) + 1];
+    const completedLessons = PRIMARY_TWO_COURSE.modules
+      .flatMap((candidate) => candidate.lessons)
+      .filter((lesson) => progress.items[lesson.id]?.completed).length;
+    return (
+      <div className={baseStyles.lessonPage}>
+        <section className={baseStyles.completionCard} aria-live="polite">
+          <span className={baseStyles.completionMark} aria-hidden="true">✓</span>
+          <p className={baseStyles.eyebrow}>{t(item.kind === "evaluation" ? "lessonComplete.evaluationEyebrow" : "lessonComplete.eyebrow")}</p>
+          <h1>{contentText("complete")}</h1>
+          <p>{t("lessonComplete.progressMessage", { count: completedLessons, total: PRIMARY_TWO_COURSE.plannedLessonCount })}</p>
+          <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonComplete")} />
+          <div className={baseStyles.completionActions}>
+            {next && isPublished(next) ? (
+              <Link className={baseStyles.primaryAction} to={lessonPath(module.id, next.id)}>
+                <CourseActionIcon className={baseStyles.actionIcon} name="continue" />
+                {t(next.kind === "evaluation" ? "lessonComplete.nextEvaluation" : "lessonComplete.nextLesson")}
+              </Link>
+            ) : null}
+            <Link className={next && isPublished(next) ? baseStyles.secondaryAction : baseStyles.primaryAction} to={modulePath(module.id)}>
+              <CourseActionIcon className={baseStyles.actionIcon} name="back" />
+              {t("lessonComplete.backToModule")}
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   if (view === "done") {
     return (
       <div className={baseStyles.lessonPage}>
@@ -123,14 +161,14 @@ export function PrimaryTwoLessonPage() {
         </nav>
         <div className={baseStyles.lessonTitleRow}>
           <div>
-            <p className={baseStyles.eyebrow}>{t("lesson.label")}</p>
+            <p className={baseStyles.eyebrow}>{t(item.kind === "evaluation" ? "evaluation.label" : "lesson.label")}</p>
             <h1>{t(item.titleKey)}</h1>
           </div>
           <span className={styles.duration}>{t("lesson.duration")}</span>
         </div>
         <div className={styles.lessonContext}>
-          <p><strong>{t("lesson.objectiveLabel")} :</strong> {t(isLessonTwo ? "lesson.objectiveL2" : isLessonThree ? "lesson.objectiveL3" : isLessonFour ? "lesson.objectiveL4" : "lesson.objective")}</p>
-          <p>{t(isLessonTwo ? "lesson.situationL2" : isLessonThree ? "lesson.situationL3" : isLessonFour ? "lesson.situationL4" : "lesson.situation")}</p>
+          <p><strong>{t("lesson.objectiveLabel")} :</strong> {content ? contentText("objective") : t(isLessonTwo ? "lesson.objectiveL2" : isLessonThree ? "lesson.objectiveL3" : isLessonFour ? "lesson.objectiveL4" : "lesson.objective")}</p>
+          <p>{content ? contentText("situation") : t(isLessonTwo ? "lesson.situationL2" : isLessonThree ? "lesson.situationL3" : isLessonFour ? "lesson.situationL4" : "lesson.situation")}</p>
         </div>
         {safeStepIndex === 0 ? (
           <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonTip")} />
@@ -156,6 +194,17 @@ export function PrimaryTwoLessonPage() {
         </div>
       </header>
 
+      {content ? (
+        <InteractiveActivity
+          key={step.id}
+          spec={content.activities[safeStepIndex]}
+          completed={stepCompleted}
+          onValidated={() => {
+            setView(step.id);
+            completeStep(item, step.id, true);
+          }}
+        />
+      ) : (
       <PrimaryTwoLessonActivity
         key={step.id}
         kind={step.kind}
@@ -166,6 +215,7 @@ export function PrimaryTwoLessonPage() {
           completeStep(item, step.id, true);
         }}
       />
+      )}
 
       <div className={`${baseStyles.lessonActions} ${styles.lessonActions}`}>
         <Link className={baseStyles.secondaryAction} to={modulePath(module.id)}>

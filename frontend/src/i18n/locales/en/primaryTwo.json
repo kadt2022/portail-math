@@ -58,7 +58,7 @@
     "m10": { "title": "Time, calendar and problems" }
   },
   "module": {
-    "referenceLead": "All four module lessons are available: counting, finding neighbours, comparing and ordering numbers.",
+    "referenceLead": "The module's four lessons and its assessment are available. Go at your own pace, one step at a time.",
     "pendingLead": "This module is planned. Its activities will be added after educational review.",
     "pathEyebrow": "Small steps",
     "pathTitle": "Module lessons",
@@ -70,11 +70,48 @@
     "l1": { "title": "I count to 20" },
     "l2": { "title": "Before, after, between" },
     "l3": { "title": "I compare" },
-    "l4": { "title": "I order and explain" }
+    "l4": { "title": "I order and explain" },
+    "u02l01": { "title": "I make bundles of ten" },
+    "u02l02": { "title": "I read and write up to 69" },
+    "u02l03": { "title": "Numbers from 70 to 100" },
+    "u02l04": { "title": "I compare up to 100" },
+    "u03l01": { "title": "I add ones" },
+    "u03l02": { "title": "I complete to the next ten" },
+    "u03l03": { "title": "I bridge a ten" },
+    "u03l04": { "title": "I add two numbers" },
+    "u04l01": { "title": "I take away ones" },
+    "u04l02": { "title": "I count back to a ten" },
+    "u04l03": { "title": "I subtract tens" },
+    "u04l04": { "title": "I find the difference" },
+    "u05l01": { "title": "I make equal groups" },
+    "u05l02": { "title": "I read a multiplication" },
+    "u05l03": { "title": "Doubles and the 2 times table" },
+    "u05l04": { "title": "Groups of 5 and 10" },
+    "u06l01": { "title": "A share for everyone" },
+    "u06l02": { "title": "I make packs" },
+    "u06l03": { "title": "Half and quarter" },
+    "u06l04": { "title": "Grouping or sharing" },
+    "u07l01": { "title": "I recognise an amount" },
+    "u07l02": { "title": "I work out a purchase" },
+    "u07l03": { "title": "I find the change" },
+    "u07l04": { "title": "I plan a small budget" },
+    "u08l01": { "title": "The centimetre" },
+    "u08l02": { "title": "The metre" },
+    "u08l03": { "title": "Mass: light and heavy" },
+    "u08l04": { "title": "Capacity: litres and containers" },
+    "u09l01": { "title": "Familiar polygons" },
+    "u09l02": { "title": "Cube, cuboid, sphere and cylinder" },
+    "u09l03": { "title": "I complete a symmetry" },
+    "u09l04": { "title": "I build and describe" },
+    "u10l01": { "title": "Hours and half hours" },
+    "u10l02": { "title": "Days, weeks and months" },
+    "u10l03": { "title": "I solve in several steps" },
+    "u10l04": { "title": "I create and check a problem" }
   },
   "evaluation": {
     "label": "Module assessment",
-    "title": "Module assessment"
+    "title": "Module assessment",
+    "finalTitle": "Final review"
   },
   "steps": {
     "discover": "I discover",
@@ -82,7 +119,9 @@
     "understand": "I understand",
     "practice": "I practise",
     "play": "I play",
-    "remember": "I remember"
+    "remember": "I remember",
+    "assess": "I show what I know",
+    "check": "I assess myself"
   },
   "breadcrumbs": {
     "label": "Course breadcrumb",
@@ -109,7 +148,12 @@
     "title": "Well done! You can count without losing your place.",
     "message": "Your progress is saved: 1 completed lesson out of 40 planned.",
     "nextComing": "The next lesson is coming soon and cannot be started yet.",
-    "backToModule": "Back to my modules"
+    "backToModule": "Back to my modules",
+    "evaluationEyebrow": "Assessment complete",
+    "progressMessage_one": "This session shows {{count}} lesson completed out of {{total}} planned.",
+    "progressMessage_other": "This session shows {{count}} lessons completed out of {{total}} planned.",
+    "nextLesson": "Next lesson",
+    "nextEvaluation": "Go to the assessment"
   },
   "errors": {
     "moduleNotFound": "This module does not exist.",

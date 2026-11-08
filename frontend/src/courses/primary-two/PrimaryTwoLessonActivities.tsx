@@ -25,7 +25,7 @@ interface ActivityFrameProps extends ActivityProps {
   children: ReactNode;
 }
 
-function ActivityFrame({
+export function ActivityFrame({
   completed,
   title,
   instruction,
