@@ -49,7 +49,8 @@ describe("Parcours d’une leçon avec réponses vérifiées", () => {
     await user.click(screen.getByRole("button",{name:"Petit cercle"}));await user.click(screen.getByRole("button",{name:"Grand cercle"}));await verify();
     await user.click(screen.getByRole("button",{name:"Terminer la leçon"}));
     expect(screen.getByRole("heading",{name:/bravo, la leçon est terminée/i})).toBeInTheDocument();
-    expect(screen.getByRole("link",{name:/leçon suivante/i})).toHaveAttribute("href",lessonPath(lesson.moduleId,PRIMARY_ONE_MODULES[0].lessons[1].id));
+    // Un seul gros bouton « Continuer » mène à la leçon suivante.
+    expect(screen.getByRole("link",{name:/continuer/i})).toHaveAttribute("href",lessonPath(lesson.moduleId,PRIMARY_ONE_MODULES[0].lessons[1].id));
     expect(getSessionCourseProgress(PRIMARY_ONE_COURSE_ID).items[lesson.id].completed).toBe(true);
     expect(getAssessmentSummary(lesson.steps.flatMap((step) => questionsForStep(lesson, step)))).toMatchObject({ correct: 6, total: 6 });
   });

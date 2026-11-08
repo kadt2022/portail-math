@@ -1759,5 +1759,33 @@
     "retryQuestion": "Refaire cette question",
     "noObstacles": "aucun",
     "traceGrid": "Les points sont rangés en trois lignes : 1, 2, 3 en haut ; 4, 5, 6 au milieu ; 7, 8, 9 en bas."
+  },
+  "journey": {
+    "trailLabel": "My path in module {{number}}",
+    "progress_one": "This session shows {{count}} lesson completed out of {{total}} planned.",
+    "progress_other": "This session shows {{count}} lessons completed out of {{total}} planned.",
+    "backToModule": "Back to the module",
+    "evaluationName": "Module {{number}} assessment",
+    "stopLabel": "{{title}}: {{state}}",
+    "state": {
+      "current": "you are here",
+      "completed": "done",
+      "in-progress": "started",
+      "not-started": "not done yet"
+    },
+    "continue": "Continue",
+    "backToCourse": "Back to the course",
+    "module": {
+      "start": "Start",
+      "resume": "Resume",
+      "continue": "Continue",
+      "next-module": "Next module"
+    },
+    "nextModuleName": "Module {{number}} · {{title}}",
+    "moduleSuccess": "Module {{number}} completed!",
+    "courseFinished": "You finished Grade 1!",
+    "yambaNext": "Well done! Next adventure: {{title}}.",
+    "yambaNextModule": "Well done! On to module {{number}}: {{title}}.",
+    "yambaFinished": "What a journey! Be proud of yourself. Show your work to an adult."
   }
 }

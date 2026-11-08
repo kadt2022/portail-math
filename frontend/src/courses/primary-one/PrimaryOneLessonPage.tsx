@@ -6,19 +6,17 @@ import { CourseActionIcon } from "../components/CourseActionIcon";
 import { LessonVideoPlayer } from "../components/LessonVideoPlayer";
 import { YambaGuide } from "../components/YambaGuide";
 import {
-  getAllLearningItems,
   getLearningItem,
   getPrimaryOneModule,
-  lessonPath,
   modulePath,
   PRIMARY_ONE_BASE_PATH,
-  PRIMARY_ONE_MODULES,
   questionsForStep,
 } from "./course-catalogue";
 import styles from "./PrimaryOneCourse.module.css";
 import { useCourseProgress } from "./useCourseProgress";
 import { PrimaryOneActivity } from "./PrimaryOneActivity";
 import { AssessmentResult } from "./AssessmentResult";
+import { PrimaryOneCompletion, PrimaryOneTrail } from "./PrimaryOneJourney";
 import { EVALUATIONS } from "./lesson-content";
 import { LESSON_VIDEOS } from "./lesson-videos";
 
@@ -67,49 +65,14 @@ export function PrimaryOneLessonPage() {
   };
 
   if (view === "done") {
-    const allItems = getAllLearningItems();
-    const itemIndex = allItems.findIndex((candidate) => candidate.id === item.id);
-    const nextItem = allItems[itemIndex + 1];
-    const nextModule = PRIMARY_ONE_MODULES[module.number];
-    const primaryHref = nextItem
-      ? lessonPath(nextItem.moduleId, nextItem.id)
-      : nextModule
-        ? modulePath(nextModule.id)
-        : PRIMARY_ONE_BASE_PATH;
-    const primaryLabel = nextItem
-      ? "lessonComplete.nextLesson"
-      : nextModule
-        ? "lessonComplete.nextModule"
-        : "lessonComplete.reviewCourse";
-
+    // Un seul gros bouton « Continuer » : leçon suivante, évaluation, puis
+    // module suivant, jusqu'au bilan final (chemin commun de la navigation).
+    const title = item.kind === "evaluation" ? t("lessonComplete.evaluationTitle") : t("lessonComplete.title");
     return (
       <div className={styles.lessonPage}>
-        <section className={styles.completionCard} aria-live="polite">
-          <span className={styles.completionMark} aria-hidden="true">✓</span>
-          <p className={styles.eyebrow}>{t("lessonComplete.eyebrow")}</p>
-          <h1>
-            {item.id === "MATH-1P-FINAL" ? t("lessonComplete.finalTitle") : item.kind === "evaluation"
-              ? t("lessonComplete.evaluationTitle")
-              : t("lessonComplete.title")}
-          </h1>
-          <p>{t("lessonComplete.message")}</p>
+        <PrimaryOneCompletion module={module} item={item} progress={progress} title={title} modulePath={modulePath(module.id)}>
           {item.kind === "evaluation" ? <AssessmentResult questions={EVALUATIONS[item.id]} /> : null}
-          <YambaGuide
-            compact
-            name={t("yamba.name")}
-            message={t("yamba.lessonComplete")}
-          />
-          <div className={styles.completionActions}>
-            <Link className={styles.secondaryAction} to={modulePath(module.id)}>
-              <CourseActionIcon className={styles.actionIcon} name="back" />
-              {t("lessonComplete.backToModule")}
-            </Link>
-            <Link className={styles.primaryAction} to={primaryHref}>
-              <CourseActionIcon className={styles.actionIcon} name="continue" />
-              {t(primaryLabel)}
-            </Link>
-          </div>
-        </section>
+        </PrimaryOneCompletion>
       </div>
     );
   }
@@ -149,6 +112,7 @@ export function PrimaryOneLessonPage() {
             <span className={`${styles.status} ${styles.completed}`}>{t("status.completed")}</span>
           ) : null}
         </div>
+        <PrimaryOneTrail module={module} currentItemId={item.id} progress={progress} />
         {safeStepIndex === 0 ? (
           <YambaGuide compact name={t("yamba.name")} message={t("yamba.lessonTip")} />
         ) : null}

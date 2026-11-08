@@ -16,6 +16,7 @@ import {
   getModuleProgress,
   type CourseProgress,
 } from "./course-progress";
+import { PrimaryOneModuleContinue } from "./PrimaryOneJourney";
 import styles from "./PrimaryOneCourse.module.css";
 import { useCourseProgress } from "./useCourseProgress";
 import { AssessmentResult } from "./AssessmentResult";
@@ -127,6 +128,7 @@ export function PrimaryOneModulePage() {
           >
             <span style={{ width: `${moduleProgress.percentage}%` }} />
           </div>
+          <PrimaryOneModuleContinue module={module} progress={progress} />
         </div>
       </section>
 
