@@ -72,11 +72,28 @@ describe("Catalogue et progression de 2e primaire", () => {
     });
     expect(getLearningState(progress, firstLesson)).toBe("not-started");
     expect(getLearningState(progress, moduleOne.lessons[1])).toBe("not-started");
+    // Les dix modules sont publiés : un module non commencé reste à 0, sans progression.
     expect(getModuleProgress(progress, PRIMARY_TWO_MODULES[1])).toMatchObject({
-      publication: "coming-soon",
-      state: null,
+      publication: "available",
+      state: "not-started",
+      completedLessons: 0,
       totalLessons: 4,
     });
+    expect(PRIMARY_TWO_MODULES.every((module) => module.publication === "available")).toBe(true);
+    expect(PRIMARY_TWO_MODULES.flatMap((module) => module.lessons).filter((lesson) => lesson.publication === "available")).toHaveLength(40);
+  });
+
+  it("compte le bilan final hors des 40 leçons et l’exige pour terminer le parcours", () => {
+    const lastModule = PRIMARY_TWO_MODULES[9];
+    expect(lastModule.finalEvaluation?.id).toBe("MATH-2P-BILAN");
+    let progress = createEmptyCourseProgress(PRIMARY_TWO_COURSE.id);
+    for (const module of PRIMARY_TWO_MODULES) {
+      for (const item of [...module.lessons, module.evaluation]) progress = completeItem(progress, item);
+    }
+    expect(getCourseProgress(progress, PRIMARY_TWO_COURSE)).toMatchObject({ completedLessons: 40, totalLessons: 40 });
+    expect(getModuleProgress(progress, lastModule).state).toBe("in-progress");
+    progress = completeItem(progress, lastModule.finalEvaluation as CourseItem);
+    expect(getModuleProgress(progress, lastModule).state).toBe("completed");
   });
 
   it("calcule 1 / 40 = 2,5 % et 1 / 4 = 25 % sans terminer le module", () => {
@@ -122,7 +139,8 @@ describe("Catalogue et progression de 2e primaire", () => {
 
   it("refuse de démarrer ou valider un contenu à venir, vide ou incorrect", () => {
     const empty = createEmptyCourseProgress(PRIMARY_TWO_COURSE.id);
-    const coming = PRIMARY_TWO_MODULES[1].lessons[0];
+    // Un contenu « à venir » fabriqué pour le test : tout le catalogue est désormais publié.
+    const coming: CourseItem = { ...PRIMARY_TWO_MODULES[1].lessons[0], publication: "coming-soon", steps: [] };
 
     expect(startLearningItem(empty, coming)).toBe(empty);
     expect(completeLearningStep(empty, coming, "inexistant", true)).toBe(empty);

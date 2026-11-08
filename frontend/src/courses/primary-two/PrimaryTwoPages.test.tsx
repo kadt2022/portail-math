@@ -31,14 +31,18 @@ describe("Pages du parcours de 2e primaire", () => {
     expect(screen.getAllByRole("article")).toHaveLength(10);
     expect(screen.getByText("0 / 40 leçons")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /commencer mon parcours/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /voir le module/i })).toHaveLength(9);
+    // Les dix modules sont publiés : chaque carte propose de commencer, aucune n'est « à venir ».
+    for (const card of screen.getAllByRole("article")) {
+      expect(within(card).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    }
+    expect(screen.queryByRole("link", { name: /voir le module/i })).toBeNull();
     expect(screen.getByRole("complementary", { name: /Yamba.*à ton rythme/i })).toBeInTheDocument();
     for (const card of screen.getAllByRole("article")) {
       expect(within(card).queryByText("Yamba")).not.toBeInTheDocument();
     }
   });
 
-  it("montre les quatre leçons disponibles et l’évaluation à venir du module 1", () => {
+  it("montre les quatre leçons et l’évaluation disponibles du module 1", () => {
     renderAt("/app/apprentissages/primaire/2/mathematiques/modules/MATH-2P-U01");
 
     const articles = screen.getAllByRole("article");
@@ -47,8 +51,9 @@ describe("Pages du parcours de 2e primaire", () => {
     expect(within(articles[1]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
     expect(within(articles[2]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
     expect(within(articles[3]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
-    expect(within(articles[4]).queryByRole("link")).toBeNull();
-    expect(screen.getAllByText("À venir").length).toBeGreaterThanOrEqual(1);
+    expect(within(articles[4]).getByText("Évaluation du module", { selector: "span" })).toBeInTheDocument();
+    expect(within(articles[4]).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    expect(screen.queryByText("À venir")).toBeNull();
   });
 
   it("ne valide pas l’étape de comptage vide, puis enregistre les 18 graines réellement comptées", async () => {

@@ -14,7 +14,7 @@ import type {
 
 /** Lit une saisie d'enfant : chiffres seulement, espaces tolérés (« 1 000 »). */
 export function parseAnswer(raw: string): number | null {
-  const cleaned = raw.replace(/[\s  ]/g, "");
+  const cleaned = raw.replace(/[\s\u00a0\u202f]/g, "");
   if (!/^-?\d+$/.test(cleaned)) return null;
   return Number(cleaned);
 }

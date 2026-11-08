@@ -174,8 +174,8 @@ function Clock({ hour, minute, size = 150 }: { hour: number; minute: number; siz
           </text>
         );
       })}
-      <line x1="60" y1="60" x2="60" y2="32" stroke="#b83930" strokeWidth="6" strokeLinecap="round" transform={`rotate(${hourAngle} 60 60)`} />
-      <line x1="60" y1="60" x2="60" y2="14" stroke="#24433a" strokeWidth="3.5" strokeLinecap="round" transform={`rotate(${minuteAngle} 60 60)`} />
+      <line x1="60" y1="60" x2="60" y2="36" stroke="#b83930" strokeWidth="6" strokeLinecap="round" transform={`rotate(${hourAngle} 60 60)`} />
+      <line x1="60" y1="60" x2="60" y2="24" stroke="#24433a" strokeWidth="3.5" strokeLinecap="round" transform={`rotate(${minuteAngle} 60 60)`} />
       <circle cx="60" cy="60" r="4" fill="#24433a" />
     </svg>
   );

@@ -2427,5 +2427,826 @@
       "r3": "1 kg, 2 kg, 3 kg.",
       "r4": "Deux bouteilles de 1 L : 2 L."
     }
+  },
+  "u09l01": {
+    "objective": "Je peux décrire le triangle, le carré et le rectangle.",
+    "situation": "Des motifs de tissu utilisent des formes simples.",
+    "complete": "Bravo, tu reconnais les polygones !",
+    "discover": {
+      "title": "Les motifs du tissu",
+      "instruction": "Coche toutes les formes qui sont des polygones : fermées, avec des côtés droits.",
+      "hint": "Passe ton doigt sur le bord : s’il est courbe, ce n’est pas un polygone.",
+      "options": {
+        "triangle": "Le triangle",
+        "circle": "Le cercle",
+        "square": "Le carré",
+        "oval": "L’ovale",
+        "rectangle": "Le rectangle"
+      },
+      "why": {
+        "circle": "Le cercle a un bord courbe : ce n’est pas un polygone.",
+        "oval": "L’ovale a un bord courbe : ce n’est pas un polygone."
+      }
+    },
+    "manipulate": {
+      "title": "Je nomme les formes",
+      "instruction": "Pose chaque forme sur son nom.",
+      "hint": "Compte les côtés. Le carré a 4 côtés égaux ; le rectangle a 2 côtés longs et 2 côtés courts.",
+      "triangle": "Triangle",
+      "square": "Carré",
+      "rectangle": "Rectangle"
+    },
+    "understand": {
+      "title": "Le cercle",
+      "instruction": "Un cercle est-il un polygone ?",
+      "hint": "Un polygone a seulement des côtés droits.",
+      "options": {
+        "no": "Non, son bord est courbe.",
+        "yes": "Oui, il est fermé."
+      },
+      "why": {
+        "yes": "Être fermé ne suffit pas : il faut aussi des côtés droits."
+      }
+    },
+    "practice": {
+      "title": "Côtés et sommets",
+      "instruction": "Compte, puis réponds.",
+      "hint": "Un sommet est un coin, là où deux côtés se rencontrent.",
+      "q1": "Combien de côtés a un triangle ?",
+      "q2": "Combien de sommets a un rectangle ?",
+      "q3": "Combien de côtés a cet hexagone ?"
+    },
+    "play": {
+      "title": "Je classe les formes",
+      "instruction": "Classe les formes selon leur nombre de côtés.",
+      "hint": "Compte les côtés de chaque forme avec ton doigt.",
+      "sides3": "3 côtés",
+      "sides4": "4 côtés",
+      "sides5": "5 côtés",
+      "sides6": "6 côtés"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au cercle.",
+      "options": {
+        "rule": "Un polygone est fermé et formé de côtés droits.",
+        "round": "Un polygone est toujours rond.",
+        "open": "Un polygone peut rester ouvert."
+      }
+    }
+  },
+  "u09l02": {
+    "objective": "Je peux reconnaître quelques solides : cube, pavé, boule et cylindre.",
+    "situation": "On observe une boîte, un dé, une balle et une boîte de conserve.",
+    "complete": "Bravo, tu reconnais les solides !",
+    "discover": {
+      "title": "Les objets de la maison",
+      "instruction": "Pose chaque objet sur le solide auquel il ressemble.",
+      "hint": "Le dé a des faces carrées ; la boîte est allongée ; la balle est toute ronde ; la conserve a deux bases rondes.",
+      "die": "Un dé",
+      "box": "Une boîte de sucre",
+      "ball": "Une balle",
+      "tin": "Une boîte de conserve",
+      "cube": "Cube",
+      "cuboid": "Pavé",
+      "sphere": "Boule",
+      "cylinder": "Cylindre"
+    },
+    "manipulate": {
+      "title": "Rouler ou pas ?",
+      "instruction": "Imagine que tu poses chaque solide sur une table et que tu le pousses. Classe-le.",
+      "hint": "Une boule roule dans tous les sens ; un cylindre couché roule dans un seul sens ; les solides à faces plates ne roulent pas.",
+      "all": "Roule dans toutes les directions",
+      "one": "Roule dans un seul sens",
+      "none": "Ne roule pas"
+    },
+    "understand": {
+      "title": "Le cube",
+      "instruction": "Qu’est-ce qui caractérise le cube ?",
+      "hint": "Pense au dé.",
+      "options": {
+        "squares": "Toutes ses faces sont des carrés.",
+        "round": "Il est tout rond.",
+        "two": "Il a deux bases rondes."
+      },
+      "why": {
+        "round": "C’est la boule qui est toute ronde.",
+        "two": "Deux bases rondes, c’est le cylindre."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : compte, puis cherche des objets.",
+      "r1": {
+        "instruction": "Observe les solides et compte.",
+        "hint": "Un dé a une face sur le dessus, une dessous et quatre autour.",
+        "q1": "Combien de faces a un cube ?",
+        "q2": "Combien de bases rondes a un cylindre ?"
+      },
+      "r2": {
+        "instruction": "Coche les objets qui ressemblent à un cylindre.",
+        "hint": "Un cylindre a deux bases rondes et peut rouler.",
+        "options": {
+          "tin": "Une boîte de conserve",
+          "pipe": "Un morceau de tuyau",
+          "book": "Un livre",
+          "orange": "Une orange"
+        },
+        "why": {
+          "book": "Un livre ressemble à un pavé.",
+          "orange": "Une orange ressemble à une boule."
+        }
+      }
+    },
+    "play": {
+      "title": "Rouler ou empiler",
+      "instruction": "Classe les solides virtuels : ceux qui roulent, ceux qu’on empile, ceux qui font les deux.",
+      "hint": "On empile les solides qui ont des faces plates. Le cylindre a des faces plates et peut aussi rouler.",
+      "roll": "Roule seulement",
+      "stack": "S’empile seulement",
+      "both": "Roule et s’empile"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au dé, à la boîte, à la balle et à la conserve.",
+      "options": {
+        "rule": "Un solide occupe de la place : le cube a des faces carrées, le pavé ressemble à une boîte, la boule roule, le cylindre a deux bases rondes.",
+        "flat": "Un solide est une figure plate dessinée sur une feuille.",
+        "same": "Tous les solides roulent de la même façon."
+      }
+    }
+  },
+  "u09l03": {
+    "objective": "Je peux reconnaître et compléter deux moitiés en miroir.",
+    "situation": "Un papillon a des motifs semblables de chaque côté.",
+    "complete": "Bravo, tu complètes une symétrie !",
+    "discover": {
+      "title": "Les ailes du papillon",
+      "instruction": "La ligne rouge est l’axe. Quel motif est symétrique ?",
+      "hint": "Plie en pensée sur la ligne rouge : chaque case colorée doit tomber sur une autre case colorée.",
+      "options": {
+        "sym": "Le motif de Lina",
+        "notSym": "Le motif de Kito"
+      },
+      "why": {
+        "notSym": "Dans le motif de Kito, certaines cases n’ont pas leur jumelle de l’autre côté de l’axe."
+      }
+    },
+    "manipulate": {
+      "title": "Je complète le motif",
+      "instruction": "Colorie les cases de droite pour que le motif soit symétrique par rapport à l’axe rouge.",
+      "hint": "Une case collée à l’axe à gauche a sa jumelle collée à l’axe à droite, sur la même ligne."
+    },
+    "understand": {
+      "title": "Toujours un axe ?",
+      "instruction": "Une figure a-t-elle toujours un axe de symétrie ?",
+      "hint": "Pense à une tache d’encre au hasard.",
+      "options": {
+        "no": "Non, certaines figures n’en ont pas.",
+        "yes": "Oui, toutes les figures en ont un."
+      },
+      "why": {
+        "yes": "Une forme quelconque, comme le motif de Kito, n’a pas d’axe de symétrie."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : complète, puis compte.",
+      "r1": {
+        "instruction": "Deux points sont placés à 2 cases à gauche de l’axe. Place les autres.",
+        "hint": "À 2 cases à droite de l’axe, sur les mêmes lignes."
+      },
+      "r2": {
+        "instruction": "Un rectangle qui n’est pas un carré a combien d’axes de symétrie simples ?",
+        "hint": "On peut le plier en deux dans la longueur, et en deux dans la largeur.",
+        "q": "Nombre d’axes :"
+      }
+    },
+    "play": {
+      "title": "Le miroir magique",
+      "instruction": "Place les pièces manquantes de l’autre côté du miroir.",
+      "r1": {
+        "instruction": "Complète ce motif.",
+        "hint": "Même ligne, même distance à l’axe."
+      },
+      "r2": {
+        "instruction": "Un motif plus grand : complète-le.",
+        "hint": "Compte la distance de chaque case jusqu’à l’axe."
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense au papillon plié.",
+      "options": {
+        "rule": "Une figure symétrique peut être pliée sur un axe pour que ses deux parties se superposent.",
+        "colour": "Une figure symétrique a deux couleurs.",
+        "always": "Toutes les figures sont symétriques."
+      }
+    }
+  },
+  "u09l04": {
+    "objective": "Je peux assembler des formes selon un modèle et le décrire.",
+    "situation": "Une maison dessinée utilise un rectangle et un triangle.",
+    "complete": "Bravo, tu construis et tu décris des figures !",
+    "discover": {
+      "title": "La maison dessinée",
+      "instruction": "Coche les formes que tu vois dans la maison.",
+      "hint": "Regarde le toit, le mur et la porte.",
+      "options": {
+        "triangle": "Un triangle",
+        "rectangle": "Un rectangle",
+        "circle": "Un cercle",
+        "oval": "Un ovale"
+      },
+      "why": {
+        "circle": "Il n’y a aucune forme ronde dans la maison.",
+        "oval": "Il n’y a aucune forme ronde dans la maison."
+      }
+    },
+    "manipulate": {
+      "title": "Les pièces de la maison",
+      "instruction": "Combien de pièces de chaque forme faut-il pour reconstruire cette maison ?",
+      "hint": "Le toit est un triangle. Le mur et la porte sont deux rectangles.",
+      "triangle": "Triangles",
+      "rectangle": "Rectangles",
+      "circle": "Cercles"
+    },
+    "understand": {
+      "title": "Je découpe un carré",
+      "instruction": "Un carré coupé par une diagonale (d’un coin au coin opposé) donne quelles formes ?",
+      "hint": "Chaque morceau a 3 côtés.",
+      "options": {
+        "triangles": "Deux triangles.",
+        "squares": "Deux carrés.",
+        "rectangles": "Deux rectangles."
+      },
+      "why": {
+        "squares": "Chaque morceau n’a que 3 côtés.",
+        "rectangles": "Une diagonale ne donne pas de rectangles : chaque morceau a 3 côtés."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : compte, puis choisis une bonne description.",
+      "r1": {
+        "instruction": "Observe le modèle.",
+        "hint": "Compte toutes les pièces, puis seulement les triangles.",
+        "q1": "Combien de pièces en tout ?",
+        "q2": "Combien de triangles ?"
+      },
+      "r2": {
+        "instruction": "Quelle description permet à un camarade de reconstruire la maison sans la voir ?",
+        "hint": "Une bonne description dit quelles formes et où elles sont.",
+        "options": {
+          "precise": "Un grand rectangle en bas, un triangle posé dessus comme toit, un petit rectangle au milieu du bas pour la porte.",
+          "vague": "C’est une maison.",
+          "colour": "Elle est rouge et marron."
+        },
+        "why": {
+          "vague": "Ton camarade ne sait pas quelles formes utiliser.",
+          "colour": "Les couleurs ne disent pas quelles formes poser ni où."
+        }
+      }
+    },
+    "play": {
+      "title": "Je reconstruis le motif",
+      "instruction": "Prends exactement les pièces nécessaires pour reconstruire chaque motif.",
+      "r1": {
+        "instruction": "Reconstruis ce motif.",
+        "hint": "Compte chaque forme du modèle."
+      },
+      "r2": {
+        "instruction": "Reconstruis ce nouveau motif.",
+        "hint": "Il n’y a pas de rectangle cette fois."
+      },
+      "square": "Carrés",
+      "triangle": "Triangles",
+      "rectangle": "Rectangles"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense à la maison.",
+      "options": {
+        "rule": "Une figure complexe peut être décomposée en formes simples.",
+        "never": "On ne peut jamais découper une figure.",
+        "one": "Une figure est toujours faite d’une seule forme."
+      }
+    }
+  },
+  "u09eval": {
+    "objective": "Je montre que je sais observer et construire des objets géométriques.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 9 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "Observe le rectangle.",
+      "hint": "Compte les coins.",
+      "q": "Combien de sommets a un rectangle ?"
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Lequel roule dans toutes les directions ?",
+      "hint": "Imagine-les poussés sur une table.",
+      "options": {
+        "sphere": "La boule",
+        "cuboid": "Le pavé"
+      }
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "Deux points sont placés à 2 cases à gauche de l’axe. Place les autres.",
+      "hint": "À 2 cases à droite, aux mêmes hauteurs."
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Coche deux formes possibles pour dessiner une maison simple.",
+      "hint": "Un mur et un toit.",
+      "options": {
+        "rectangle": "Un rectangle",
+        "triangle": "Un triangle",
+        "circle": "Un cercle"
+      }
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "Un rectangle a 4 sommets.",
+      "r2": "La boule roule dans toutes les directions.",
+      "r3": "Les points se placent à 2 cases à droite de l’axe, aux mêmes hauteurs.",
+      "r4": "Une maison simple : un rectangle et un triangle."
+    }
+  },
+  "u10l01": {
+    "objective": "Je peux lire une horloge simple : heures entières et demies.",
+    "situation": "L’école commence à l’heure indiquée par l’horloge.",
+    "complete": "Bravo, tu lis l’heure !",
+    "discover": {
+      "title": "L’horloge de l’école",
+      "instruction": "Regarde l’horloge : la grande aiguille est sur 12. Lis la petite aiguille.",
+      "hint": "Quand la grande aiguille est sur 12, la petite aiguille montre l’heure exacte.",
+      "q": "L’école commence à :"
+    },
+    "manipulate": {
+      "title": "Je règle l’horloge",
+      "instruction": "Règle l’horloge sur 7 heures : tourne la petite aiguille et place la grande aiguille.",
+      "hint": "Petite aiguille sur 7, grande aiguille sur 12."
+    },
+    "understand": {
+      "title": "La demie",
+      "instruction": "Cette horloge montre trois heures et demie. Où est la grande aiguille à la demie ?",
+      "hint": "Une demi-heure, c’est la moitié du tour de la grande aiguille.",
+      "options": {
+        "six": "Sur 6.",
+        "twelve": "Sur 12.",
+        "three": "Sur 3."
+      },
+      "why": {
+        "twelve": "Sur 12, c’est l’heure entière.",
+        "three": "La grande aiguille n’est pas sur le nombre de l’heure."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : lis l’heure, puis trouve la demie.",
+      "r1": {
+        "instruction": "Réponds aux deux questions.",
+        "hint": "Après 9 h vient 10 h.",
+        "q1": "Grande aiguille sur 12, petite sur 8 : quelle heure ?",
+        "q2": "Une heure après 9 h ?"
+      },
+      "r2": {
+        "instruction": "Quelle horloge montre l’heure à mi-chemin entre 3 h et 4 h ?",
+        "hint": "À mi-chemin : la grande aiguille est sur 6, et la petite entre 3 et 4.",
+        "options": {
+          "half": "L’horloge de Lina",
+          "four": "L’horloge de Kito",
+          "three": "L’horloge de Sifa"
+        },
+        "why": {
+          "four": "Cette horloge montre 4 h 30, entre 4 h et 5 h.",
+          "three": "Cette horloge montre 3 h pile."
+        }
+      }
+    },
+    "play": {
+      "title": "Tourne les aiguilles",
+      "instruction": "Tourne les aiguilles jusqu’à l’heure annoncée.",
+      "r1": {
+        "instruction": "Il est 10 heures.",
+        "hint": "Grande aiguille sur 12."
+      },
+      "r2": {
+        "instruction": "Il est 2 heures et demie.",
+        "hint": "Grande aiguille sur 6, petite aiguille entre 2 et 3."
+      },
+      "r3": {
+        "instruction": "Il est 6 heures et demie.",
+        "hint": "Grande aiguille sur 6."
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense à l’horloge de l’école.",
+      "options": {
+        "rule": "À l’heure entière, la grande aiguille est sur 12 ; à la demie, elle est sur 6.",
+        "six": "À l’heure entière, la grande aiguille est sur 6.",
+        "small": "La grande aiguille montre toujours l’heure."
+      }
+    }
+  },
+  "u10l02": {
+    "objective": "Je peux utiliser un calendrier : jours, semaines et mois.",
+    "situation": "Une activité est prévue deux jours après lundi.",
+    "complete": "Bravo, tu utilises un calendrier !",
+    "discover": {
+      "title": "Les jours de la semaine",
+      "instruction": "Remets les sept jours de la semaine dans l’ordre, en commençant par lundi.",
+      "hint": "Récite la semaine : lundi, mardi…",
+      "steps": {
+        "1": "Lundi",
+        "2": "Mardi",
+        "3": "Mercredi",
+        "4": "Jeudi",
+        "5": "Vendredi",
+        "6": "Samedi",
+        "7": "Dimanche"
+      }
+    },
+    "manipulate": {
+      "title": "Je lis le calendrier",
+      "instruction": "Sur le calendrier, le 10 est un mardi. Trouve les autres mardis.",
+      "hint": "Descends d’une ligne pour avancer d’une semaine (7 jours), monte d’une ligne pour reculer.",
+      "next": "Date du mardi suivant :",
+      "previous": "Date du mardi précédent :"
+    },
+    "understand": {
+      "title": "Une semaine plus tard",
+      "instruction": "Si le 10 est un mardi, quel jour est le 17 ?",
+      "hint": "Du 10 au 17, il y a 7 jours : une semaine entière.",
+      "options": {
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "sunday": "Dimanche"
+      },
+      "why": {
+        "wednesday": "Mercredi, ce serait le 11 ou le 18.",
+        "monday": "Lundi, ce serait le 9 ou le 16.",
+        "sunday": "Dimanche, ce serait le 15."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Deux manches : avance dans la semaine, puis calcule.",
+      "r1": {
+        "instruction": "Quel jour est deux jours après lundi ?",
+        "hint": "Lundi → mardi → …",
+        "options": {
+          "tuesday": "Mardi",
+          "wednesday": "Mercredi",
+          "thursday": "Jeudi"
+        },
+        "why": {
+          "tuesday": "Mardi, c’est un seul jour après lundi.",
+          "thursday": "Jeudi, c’est trois jours après lundi."
+        }
+      },
+      "r2": {
+        "instruction": "Calcule.",
+        "hint": "Une semaine = 7 jours.",
+        "q1": "Combien de jours dans deux semaines ?",
+        "q2": "Le 10 est un mardi. Le mardi suivant est le :"
+      }
+    },
+    "play": {
+      "title": "Les événements de la semaine",
+      "instruction": "Place chaque événement sur son jour.",
+      "hint": "Compte les jours un par un sur la semaine.",
+      "party": "Fête de l’école : 3 jours après lundi",
+      "match": "Match de football : la veille de dimanche",
+      "market": "Marché : 2 jours avant vendredi",
+      "visit": "Visite chez mamie : le lendemain de lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "saturday": "Samedi"
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux mardis du calendrier.",
+      "options": {
+        "rule": "Sept jours forment une semaine. Un calendrier organise les jours en semaines et les mois dans l’année.",
+        "ten": "Une semaine a dix jours.",
+        "month": "Une semaine et un mois, c’est la même chose."
+      }
+    }
+  },
+  "u10l03": {
+    "objective": "Je peux enchaîner deux actions pour résoudre un problème.",
+    "situation": "Au jardin, on cueille 26 tomates le matin et 18 l’après-midi, puis on en donne 12.",
+    "complete": "Bravo, tu résous des problèmes en plusieurs étapes !",
+    "discover": {
+      "title": "Les tomates du jardin",
+      "instruction": "Traite les actions dans l’ordre : d’abord la cueillette, ensuite le don des 12 tomates.",
+      "hint": "Étape 1 : 26 + 18. Étape 2 : enlève les 12 tomates données au résultat de l’étape 1.",
+      "picked": "Tomates cueillies en tout :",
+      "left": "Tomates qui restent :"
+    },
+    "manipulate": {
+      "title": "Les oiseaux sur la branche",
+      "instruction": "Il y a 10 oiseaux sur la branche. 5 oiseaux arrivent, puis 3 partent. Modifie le nombre d’oiseaux pour montrer la fin de l’histoire.",
+      "hint": "Fais les actions l’une après l’autre : ajoute 5, puis enlève 3.",
+      "birds": "Oiseaux sur la branche"
+    },
+    "understand": {
+      "title": "Ma méthode",
+      "instruction": "Remets les étapes de la méthode dans l’ordre.",
+      "hint": "On commence par lire le problème.",
+      "steps": {
+        "1": "Je lis le problème et je repère chaque action.",
+        "2": "Je fais la première action et j’écris le résultat intermédiaire.",
+        "3": "Je fais l’action suivante, puis je réponds à la question."
+      }
+    },
+    "practice": {
+      "title": "Je calcule étape par étape",
+      "instruction": "Réponds aux questions.",
+      "hint": "Écris toujours le résultat de la première étape avant de continuer.",
+      "q1": "10 oiseaux, 5 arrivent, 3 partent : combien restent ?",
+      "q2": "24 fruits et 16 fruits : combien en tout ?",
+      "q3": "Puis on distribue 10 de ces fruits : combien restent ?",
+      "q4": "Une boîte a 4 rangées de 5 craies. On en utilise 7. Combien restent ?"
+    },
+    "play": {
+      "title": "La mission des jetons",
+      "instruction": "Chaque action change la quantité. Garde le compte d’une manche à l’autre.",
+      "r1": {
+        "instruction": "Tu as 15 jetons. Tu en gagnes 8.",
+        "hint": "15 + 8.",
+        "q": "Tu as maintenant :"
+      },
+      "r2": {
+        "instruction": "Tu perds 6 jetons.",
+        "hint": "Pars du résultat de la manche 1.",
+        "q": "Tu as maintenant :"
+      },
+      "r3": {
+        "instruction": "Tu reçois 2 sacs de 5 jetons.",
+        "hint": "2 sacs de 5 = 10. Ajoute-les à ton résultat.",
+        "q": "Tu as maintenant :"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux tomates du jardin.",
+      "options": {
+        "rule": "On traite les actions dans l’ordre et on écrit un résultat intermédiaire.",
+        "last": "On ne fait que la dernière action.",
+        "biggest": "On additionne tous les nombres du problème."
+      }
+    }
+  },
+  "u10l04": {
+    "objective": "Je peux inventer des données cohérentes et contrôler la réponse d’un problème.",
+    "situation": "La classe veut créer un défi pour une autre classe.",
+    "complete": "Bravo, tu crées et tu vérifies des problèmes !",
+    "discover": {
+      "title": "Un problème incomplet",
+      "instruction": "Lis ce défi : « Marie a 12 billes. Elle en gagne. Combien en a-t-elle ? » Que manque-t-il ?",
+      "hint": "Peut-on calculer sans savoir combien de billes elle gagne ?",
+      "options": {
+        "missing": "Le nombre de billes gagnées.",
+        "colour": "La couleur des billes.",
+        "nothing": "Rien, on peut répondre."
+      },
+      "why": {
+        "colour": "La couleur ne change pas le calcul.",
+        "nothing": "Sans le nombre de billes gagnées, on ne peut pas calculer."
+      }
+    },
+    "manipulate": {
+      "title": "Les trois parties d’un problème",
+      "instruction": "Pose chaque phrase dans la bonne colonne : ce qui est connu, ce qui change, ce qui est demandé.",
+      "hint": "La question se termine par un point d’interrogation. Ce qui change contient « reçoit », « donne », « mange »…",
+      "a1": "Paul a 23 cartes.",
+      "a2": "Il en reçoit 14.",
+      "a3": "Combien de cartes a-t-il maintenant ?",
+      "b1": "Un panier contient 30 mangues.",
+      "b2": "On en vend 8.",
+      "b3": "Combien de mangues restent ?",
+      "known": "Ce qui est connu",
+      "change": "Ce qui change",
+      "asked": "Ce qui est demandé"
+    },
+    "understand": {
+      "title": "Avant de proposer un défi",
+      "instruction": "Avant de proposer un problème à une autre classe, que dois-tu faire ?",
+      "hint": "Il faut être sûr qu’il a une réponse.",
+      "options": {
+        "solve": "Le résoudre moi-même pour vérifier qu’il a une réponse.",
+        "hard": "Le rendre le plus difficile possible.",
+        "noanswer": "Ne jamais écrire la réponse quelque part."
+      },
+      "why": {
+        "hard": "Un bon problème doit d’abord être clair et juste.",
+        "noanswer": "Il faut connaître la réponse pour corriger le défi."
+      }
+    },
+    "practice": {
+      "title": "Je m’entraîne",
+      "instruction": "Trois manches : choisis une histoire, une question, puis vérifie un calcul.",
+      "r1": {
+        "instruction": "Quelle histoire correspond au calcul 30 − 8 ?",
+        "hint": "« − » : on enlève, on donne, on mange…",
+        "options": {
+          "good": "J’ai 30 bonbons, j’en mange 8. Combien m’en reste-t-il ?",
+          "add": "J’ai 30 bonbons, on m’en donne 8. Combien en ai-je ?",
+          "times": "J’ai 30 sacs de 8 bonbons. Combien de bonbons ?"
+        },
+        "why": {
+          "add": "Recevoir des bonbons, c’est une addition : 30 + 8.",
+          "times": "Des sacs de 8, c’est une multiplication."
+        }
+      },
+      "r2": {
+        "instruction": "Quelle question va avec « 5 paniers de 4 fruits » ?",
+        "hint": "5 groupes égaux de 4.",
+        "options": {
+          "good": "Combien de fruits y a-t-il en tout ?",
+          "plus": "Combien font 5 + 4 ?",
+          "share": "Combien de paniers faut-il pour 4 fruits ?"
+        },
+        "why": {
+          "plus": "5 + 4 ne compte pas tous les fruits de chaque panier.",
+          "share": "On connaît déjà le nombre de paniers."
+        }
+      },
+      "r3": {
+        "instruction": "Pour vérifier 46 − 19 = 27, on fait l’opération inverse.",
+        "hint": "Si on ajoute à 27 ce qu’on a enlevé, on doit retrouver 46.",
+        "q": "27 + 19 = ?"
+      }
+    },
+    "play": {
+      "title": "Je corrige les défis",
+      "instruction": "Une autre classe t’envoie des défis. Corrige-les.",
+      "r1": {
+        "instruction": "Classe chaque réponse : juste ou fausse.",
+        "hint": "Refais chaque calcul toi-même.",
+        "a": "25 + 13 = 38",
+        "b": "40 − 15 = 35",
+        "c": "3 × 5 = 15",
+        "d": "18 + 7 = 24",
+        "right": "Juste",
+        "wrong": "Faux"
+      },
+      "r2": {
+        "instruction": "Corrige les deux réponses fausses.",
+        "hint": "40 − 10 = 30, puis enlève encore 5. Pour 18 + 7, passe par 20.",
+        "q1": "40 − 15 = ?",
+        "q2": "18 + 7 = ?"
+      }
+    },
+    "remember": {
+      "title": "Je retiens",
+      "instruction": "Quelle phrase faut-il retenir ?",
+      "hint": "Pense aux trois colonnes.",
+      "options": {
+        "rule": "Un bon problème dit ce qui est connu, ce qui change et ce qui est demandé.",
+        "long": "Un bon problème est toujours très long.",
+        "numbers": "Un bon problème contient beaucoup de nombres."
+      }
+    }
+  },
+  "u10eval": {
+    "objective": "Je montre que je sais me repérer dans le temps et raisonner.",
+    "situation": "Travaille seul d’abord. Tu peux utiliser du matériel. Explique au moins une réponse à un adulte.",
+    "complete": "Évaluation du module 10 terminée !",
+    "q1": {
+      "title": "Question 1",
+      "instruction": "L’horloge montre 9 h. Règle-la une heure plus tard.",
+      "hint": "Avance la petite aiguille d’une heure ; la grande reste sur 12."
+    },
+    "q2": {
+      "title": "Question 2",
+      "instruction": "Calcule.",
+      "hint": "Une semaine = 7 jours.",
+      "q": "Combien de jours dans deux semaines ?"
+    },
+    "q3": {
+      "title": "Question 3",
+      "instruction": "24 fruits et 16 fruits, puis 10 sont distribués.",
+      "hint": "D’abord l’addition, ensuite la soustraction.",
+      "q1": "Fruits en tout :",
+      "q2": "Fruits qui restent :"
+    },
+    "q4": {
+      "title": "Question 4",
+      "instruction": "Quelle question va avec « 5 groupes de 4 » ?",
+      "hint": "Il y a 5 groupes égaux de 4.",
+      "options": {
+        "good": "5 paniers ont 4 fruits chacun. Combien de fruits en tout ?",
+        "plus": "Combien font 5 + 4 ?",
+        "nothing": "Quelle est la couleur des paniers ?"
+      }
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "Une heure après 9 h : 10 h.",
+      "r2": "Deux semaines : 14 jours.",
+      "r3": "24 + 16 = 40 ; 40 − 10 = 30.",
+      "r4": "5 paniers de 4 fruits : combien de fruits ? Réponse : 20."
+    }
+  },
+  "bilan": {
+    "objective": "Je montre tout ce que j’ai appris en 2e primaire.",
+    "situation": "Utilise du matériel ou un dessin si nécessaire. Pour les problèmes, écris les étapes.",
+    "complete": "Bravo, tu as terminé le grand bilan de 2e primaire !",
+    "q1": {
+      "title": "Question 1 · Je range",
+      "instruction": "Range 72, 27, 70 et 29 du plus petit au plus grand.",
+      "hint": "Compare d’abord les dizaines."
+    },
+    "q2": {
+      "title": "Question 2 · Je décompose",
+      "instruction": "Montre 86 en dizaines et unités.",
+      "hint": "Le chiffre 8 compte les dizaines.",
+      "tens": "Dizaines",
+      "units": "Unités"
+    },
+    "q3": {
+      "title": "Question 3 · J’additionne",
+      "instruction": "Calcule.",
+      "hint": "47 + 3 = 50, puis ajoute le reste.",
+      "q": "47 + 8 = ?"
+    },
+    "q4": {
+      "title": "Question 4 · Je soustrais",
+      "instruction": "Calcule.",
+      "hint": "63 − 20 = 43, puis enlève encore 7.",
+      "q": "63 − 27 = ?"
+    },
+    "q5": {
+      "title": "Question 5 · Groupes égaux",
+      "instruction": "Observe les assiettes.",
+      "hint": "Compte de 5 en 5.",
+      "q": "Quatre groupes de 5 contiennent combien ?"
+    },
+    "q6": {
+      "title": "Question 6 · Je partage",
+      "instruction": "Partage 18 noix entre 3 enfants.",
+      "hint": "Une noix par enfant, tour après tour."
+    },
+    "q7": {
+      "title": "Question 7 · Monnaie rendue",
+      "instruction": "Un achat fictif de 650 FC est payé avec 1 000 FC.",
+      "hint": "De 650 à 1 000.",
+      "q": "Monnaie rendue :"
+    },
+    "q8": {
+      "title": "Question 8 · Je mesure",
+      "instruction": "Une ligne va de 0 à 9 cm.",
+      "hint": "Elle commence au zéro.",
+      "q": "Quelle est sa longueur ?"
+    },
+    "q9": {
+      "title": "Question 9 · Les solides",
+      "instruction": "Quel solide ressemble à un dé ?",
+      "hint": "Un dé a des faces carrées.",
+      "options": {
+        "cube": "Le cube",
+        "sphere": "La boule",
+        "cylinder": "Le cylindre"
+      }
+    },
+    "q10": {
+      "title": "Question 10 · Problème",
+      "instruction": "24 fruits sont réunis à 16 fruits, puis 9 sont distribués.",
+      "hint": "Étape 1 : l’addition. Étape 2 : la soustraction.",
+      "q1": "Fruits réunis :",
+      "q2": "Fruits qui restent :"
+    },
+    "check": {
+      "title": "Je m’évalue",
+      "instruction": "Relis toutes les réponses, puis choisis la phrase qui te ressemble.",
+      "r1": "27, 29, 70, 72.",
+      "r2": "86 = 8 dizaines et 6 unités.",
+      "r3": "47 + 8 = 55.",
+      "r4": "63 − 27 = 36.",
+      "r5": "4 groupes de 5 = 20.",
+      "r6": "18 objets entre 3 enfants : 6 chacun.",
+      "r7": "1 000 FC − 650 FC = 350 FC.",
+      "r8": "La ligne mesure 9 cm.",
+      "r9": "Le dé ressemble au cube.",
+      "r10": "24 + 16 = 40 ; 40 − 9 = 31 fruits."
+    }
   }
 }
