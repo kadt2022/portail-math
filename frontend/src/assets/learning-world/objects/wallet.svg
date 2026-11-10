@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 115">
+  <defs><linearGradient id="wallet-leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d68a45"/><stop offset="1" stop-color="#8f4b25"/></linearGradient><filter id="wallet-shadow"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0f332b" flood-opacity=".24"/></filter></defs>
+  <g filter="url(#wallet-shadow)" stroke="#603319" stroke-width="4" stroke-linejoin="round">
+    <path d="M18 31c0-10 8-17 18-17h84c9 0 16 7 16 16v68H33c-8 0-15-7-15-15Z" fill="url(#wallet-leather)"/>
+    <path d="M18 34h103c8 0 15 7 15 15v12H91c-12 0-21-9-21-20v-7" fill="#b96632"/>
+    <rect x="83" y="39" width="59" height="35" rx="10" fill="#e3a165"/>
+    <circle cx="124" cy="56" r="5" fill="#f2c230" stroke-width="2"/>
+    <path d="M31 79h75" stroke="#e9b781" stroke-width="5" stroke-linecap="round" opacity=".65"/>
+  </g>
+</svg>

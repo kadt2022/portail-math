@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120">
+  <defs><filter id="book-shadow"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0f332b" flood-opacity=".22"/></filter></defs>
+  <g filter="url(#book-shadow)" stroke="#17493f" stroke-width="4" stroke-linejoin="round">
+    <path d="M12 22c22-7 42-4 58 9v77c-17-12-36-16-58-9Z" fill="#fff7e6"/>
+    <path d="M128 22c-22-7-42-4-58 9v77c17-12 36-16 58-9Z" fill="#fff7e6"/>
+    <path d="M12 22c22-7 42-4 58 9v18C53 37 34 34 12 41ZM128 22c-22-7-42-4-58 9v18c17-12 36-15 58-8Z" fill="#ff8a3d"/>
+    <path d="M24 61h32M24 75h32M84 61h32M84 75h32" stroke="#c7ad87" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

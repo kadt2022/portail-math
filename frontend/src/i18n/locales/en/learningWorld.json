@@ -1,0 +1,41 @@
+{
+  "prototype": {
+    "eyebrow": "Reusable technical demonstration",
+    "title": "Yamba's mangoes",
+    "intro": "Help Yamba organize the 24 mangoes. This demonstration checks selection, movement, counting and correction without imposing a new lesson.",
+    "yamba": "Choose a mango, then choose the basket where you want to place it. You can also take it back to correct your choice.",
+    "catalogTitle": "First set of visual objects",
+    "catalogIntro": "The objects are independent from the backgrounds and can be reused in the market, the school shop and future adventures.",
+    "environmentTitle": "Modular backgrounds"
+  },
+  "scene": {
+    "eyebrow": "I explore",
+    "title": "Share the mangoes",
+    "instruction": "Select a mango, then choose a basket. With a mouse, you can also drag it.",
+    "stock": "Starting basket",
+    "basket": "Basket {{number}}",
+    "mangoCount_one": "{{count}} mango",
+    "mangoCount_other": "{{count}} mangoes",
+    "selectMango": "Select mango {{number}}",
+    "deselectMango": "Deselect mango {{number}}",
+    "placeIn": "Place in {{zone}}",
+    "summaryPart": "{{zone}}: {{count}}",
+    "reset": "Start again"
+  },
+  "objects": {
+    "mango": "Mango",
+    "basket": "Basket",
+    "notebook": "Notebook",
+    "pencil": "Pencil",
+    "eraser": "Eraser",
+    "book": "Book",
+    "banknote": "Congolese franc banknote",
+    "wallet": "Wallet",
+    "cashRegister": "Cash register",
+    "marketStall": "Market stall"
+  },
+  "environments": {
+    "market": "Neighborhood market",
+    "schoolShop": "School shop"
+  }
+}

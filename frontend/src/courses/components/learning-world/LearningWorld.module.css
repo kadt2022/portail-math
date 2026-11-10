@@ -1,0 +1,253 @@
+.sceneShell {
+  box-sizing: border-box;
+  display: grid;
+  gap: 14px;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-md);
+}
+
+.sceneShell * {
+  box-sizing: border-box;
+}
+
+.sceneHeading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sceneHeading p,
+.sceneHeading h2,
+.sceneInstruction,
+.sceneSummary,
+.zoneHeader h3 {
+  margin: 0;
+}
+
+.sceneHeading p {
+  color: var(--pm-accent-dark);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sceneHeading h2 {
+  color: var(--pm-brand-dark);
+  font-size: clamp(24px, 5vw, 36px);
+}
+
+.sceneInstruction {
+  color: var(--pm-ink-soft);
+  font-size: clamp(16px, 2.4vw, 19px);
+  font-weight: 700;
+}
+
+.sceneStage {
+  display: grid;
+  grid-template-columns: minmax(250px, .8fr) minmax(0, 1.6fr);
+  gap: clamp(12px, 2vw, 22px);
+  min-height: 560px;
+  padding: clamp(14px, 3vw, 28px);
+  border-radius: var(--pm-radius-lg);
+  background-position: center;
+  background-size: cover;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 45%);
+}
+
+.sourceZone,
+.basketGrid {
+  display: grid;
+  align-content: end;
+}
+
+.basketGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.zone {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(88px, 1fr) auto;
+  min-width: 0;
+  min-height: 210px;
+  padding: 12px;
+  overflow: hidden;
+  border: 2px solid rgb(255 255 255 / 78%);
+  border-radius: var(--pm-radius-md);
+  background: rgb(255 255 255 / 88%);
+  box-shadow: var(--pm-shadow-md);
+  backdrop-filter: blur(4px);
+}
+
+.zoneFeatured {
+  min-height: 430px;
+}
+
+.zoneHeader {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--pm-brand-dark);
+}
+
+.zoneHeader h3 {
+  font-size: clamp(16px, 2.3vw, 20px);
+}
+
+.zoneHeader strong {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--pm-success-soft);
+  color: var(--pm-brand-dark);
+  white-space: nowrap;
+}
+
+.zoneDecoration {
+  position: absolute;
+  right: -8px;
+  bottom: 38px;
+  width: min(64%, 150px);
+  opacity: .2;
+  pointer-events: none;
+}
+
+.zoneObjects {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: flex-start;
+  padding: 10px 0;
+}
+
+.objectButton,
+.objectSelected {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 3px;
+  place-items: center;
+  border: 2px solid transparent;
+  border-radius: 14px 6px 14px 6px;
+  background: rgb(255 255 255 / 82%);
+  box-shadow: 0 2px 7px rgb(15 51 43 / 16%);
+  cursor: grab;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.objectButton:hover,
+.objectSelected {
+  transform: translateY(-3px) scale(1.04);
+  border-color: var(--pm-accent);
+  background: #fff7ec;
+}
+
+.objectSelected {
+  box-shadow: 0 0 0 4px rgb(255 100 21 / 20%), var(--pm-shadow-sm);
+}
+
+.objectButton img,
+.objectSelected img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.placeButton,
+.resetButton {
+  position: relative;
+  z-index: 2;
+  min-height: 46px;
+  padding: 8px 13px;
+  border: 2px solid var(--pm-brand);
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-brand);
+  color: white;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.placeButton:disabled {
+  border-color: var(--pm-line);
+  background: rgb(255 255 255 / 72%);
+  color: var(--pm-ink-soft);
+  cursor: not-allowed;
+}
+
+.resetButton {
+  flex: 0 0 auto;
+  border-color: var(--pm-accent);
+  background: #fff7ec;
+  color: var(--pm-accent-dark);
+}
+
+.sceneSummary {
+  padding: 10px 14px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-success-soft);
+  color: var(--pm-brand-dark);
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .sceneStage {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    background-position: 50% 50%;
+  }
+
+  .zoneFeatured {
+    min-height: 290px;
+  }
+}
+
+@media (max-width: 440px) {
+  .sceneShell {
+    padding: 12px;
+    border-radius: var(--pm-radius-md);
+  }
+
+  .sceneHeading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resetButton {
+    width: 100%;
+  }
+
+  .sceneStage {
+    padding: 10px;
+  }
+
+  .basketGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .zone,
+  .zoneFeatured {
+    min-height: 220px;
+  }
+
+  .objectButton,
+  .objectSelected {
+    width: 46px;
+    height: 46px;
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "prototype": {
+    "eyebrow": "Démonstration technique réutilisable",
+    "title": "Les mangues de Yamba",
+    "intro": "Aide Yamba à organiser les 24 mangues. Cette démonstration vérifie la sélection, le déplacement, le comptage et la correction sans imposer une nouvelle leçon.",
+    "yamba": "Choisis une mangue, puis le panier où tu veux la déposer. Tu peux aussi la reprendre pour corriger ton choix.",
+    "catalogTitle": "Premier lot d'objets visuels",
+    "catalogIntro": "Les objets sont indépendants des décors et pourront être réutilisés dans le marché, la boutique scolaire et les futures aventures.",
+    "environmentTitle": "Décors modulaires"
+  },
+  "scene": {
+    "eyebrow": "Je manipule",
+    "title": "Répartis les mangues",
+    "instruction": "Sélectionne une mangue, puis choisis un panier. À la souris, tu peux aussi la faire glisser.",
+    "stock": "Panier de départ",
+    "basket": "Panier {{number}}",
+    "mangoCount_one": "{{count}} mangue",
+    "mangoCount_other": "{{count}} mangues",
+    "selectMango": "Sélectionner la mangue {{number}}",
+    "deselectMango": "Désélectionner la mangue {{number}}",
+    "placeIn": "Déposer dans {{zone}}",
+    "summaryPart": "{{zone}} : {{count}}",
+    "reset": "Recommencer"
+  },
+  "objects": {
+    "mango": "Mangue",
+    "basket": "Panier",
+    "notebook": "Cahier",
+    "pencil": "Crayon",
+    "eraser": "Gomme",
+    "book": "Livre",
+    "banknote": "Billet en francs congolais",
+    "wallet": "Porte-monnaie",
+    "cashRegister": "Caisse",
+    "marketStall": "Étal de marché"
+  },
+  "environments": {
+    "market": "Marché de quartier",
+    "schoolShop": "Boutique scolaire"
+  }
+}
