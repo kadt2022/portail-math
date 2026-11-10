@@ -1009,9 +1009,9 @@
       "situation": "24 fruits sont partagés entre 4 paniers. Combien de fruits dans chaque panier ?",
       "discover": "Partager cherche la quantité dans chaque part ; grouper cherche le nombre de groupes. Un reste est ce qui ne forme pas une part complète.",
       "manipulate": {
-        "hint": "Distribue un jeton à chaque bol, encore et encore, tant que tu peux en donner à tous.",
-        "strongHint": "26 jetons dans 4 bols : 6 dans chaque bol (24 jetons) et il reste 2 jetons.",
-        "instruction": "Distribue 26 jetons dans 4 bols, puis note ce qu'il y a dans chaque bol et ce qui reste."
+        "hint": "Dépose une mangue dans chaque panier, encore et encore, tant que tu peux en donner à tous.",
+        "strongHint": "26 mangues dans 4 paniers : 6 dans chaque panier (24 mangues) et il reste 2 mangues.",
+        "instruction": "Répartis 26 mangues dans 4 paniers en parts égales. Laisse dans le panier de départ ce qui ne peut plus être partagé."
       },
       "example": {
         "easy": "Facile. 32 partagés entre 4 donnent combien chacun ?",

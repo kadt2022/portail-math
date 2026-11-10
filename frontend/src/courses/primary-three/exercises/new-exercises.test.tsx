@@ -86,21 +86,22 @@ describe("Nouveaux exercices interactifs de la 3e primaire", () => {
     expect(onValidated).toHaveBeenCalledOnce();
   });
 
-  it("partage 26 jetons entre 4 bols avec le reste", async () => {
+  it("partage 26 mangues entre 4 paniers avec le reste", async () => {
     const user = userEvent.setup();
     const onValidated = renderStep(lessonStep("MATH-3P-U04-L04", "manipulate"));
 
-    for (let index = 0; index < 6; index += 1) await user.click(screen.getByRole("button", { name: "Ajouter un jeton dans chaque bol" }));
+    for (let mango = 1; mango <= 23; mango += 1) {
+      await user.click(screen.getByRole("button", { name: `Sélectionner la mangue ${mango}` }));
+      await user.click(screen.getByRole("button", { name: `Déposer dans Panier ${((mango - 1) % 4) + 1}` }));
+    }
     await validate(user);
     expect(onValidated).not.toHaveBeenCalled();
 
-    for (let index = 0; index < 3; index += 1) await user.click(screen.getByRole("button", { name: "Ajouter un jeton au reste" }));
-    await validate(user);
-    expect(onValidated).not.toHaveBeenCalled();
-    await user.click(screen.getByRole("button", { name: "Enlever un jeton du reste" }));
+    await user.click(screen.getByRole("button", { name: "Sélectionner la mangue 24" }));
+    await user.click(screen.getByRole("button", { name: "Déposer dans Panier 4" }));
     await validate(user);
     expect(onValidated).toHaveBeenCalledOnce();
-  });
+  }, 30000);
 
   it("forme 2 000 FC avec des cartes et refuse trop de cartes", async () => {
     const user = userEvent.setup();

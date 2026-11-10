@@ -1009,9 +1009,9 @@
       "situation": "24 fruits are shared between 4 baskets. How many fruits in each basket?",
       "discover": "Sharing looks for the amount in each share; grouping looks for the number of groups. A remainder is what does not make a full share.",
       "manipulate": {
-        "hint": "Give one token to each bowl, again and again, as long as every bowl can get one.",
-        "strongHint": "26 tokens in 4 bowls: 6 in each bowl (24 tokens) and 2 tokens are left.",
-        "instruction": "Share 26 tokens between 4 bowls, then note what is in each bowl and what is left."
+        "hint": "Put one mango in each basket, again and again, as long as every basket can get one.",
+        "strongHint": "26 mangoes in 4 baskets: 6 in each basket (24 mangoes) and 2 mangoes are left.",
+        "instruction": "Share 26 mangoes equally between 4 baskets. Leave in the starting basket what can no longer be shared."
       },
       "example": {
         "easy": "Easy. 32 shared between 4 gives how many each?",

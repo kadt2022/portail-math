@@ -115,6 +115,7 @@ export interface ShareTokensExercise {
   id: string;
   total: number;
   bowls: number;
+  manipulative?: "mango-baskets";
 }
 
 // Monnaie factice : composer `target` FC avec des cartes, éventuellement avec

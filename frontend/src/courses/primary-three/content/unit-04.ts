@@ -237,6 +237,7 @@ export const UNIT_04_LESSON_CONTENT: Record<string, LessonContent> = {
         id: "u04l04-manipulate",
         total: 26,
         bowls: 4,
+        manipulative: "mango-baskets",
       },
     },
     exampleMethodKey: "content.method",
