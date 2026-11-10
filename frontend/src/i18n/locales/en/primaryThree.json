@@ -1011,7 +1011,7 @@
       "manipulate": {
         "hint": "Put one mango in each basket, again and again, as long as every basket can get one.",
         "strongHint": "26 mangoes in 4 baskets: 6 in each basket (24 mangoes) and 2 mangoes are left.",
-        "instruction": "Share 26 mangoes equally between 4 baskets. Leave in the starting basket what can no longer be shared."
+        "instruction": "Make 4 baskets with the same number of mangoes. Keep in the starting basket any mangoes that cannot be shared equally."
       },
       "example": {
         "easy": "Easy. 32 shared between 4 gives how many each?",

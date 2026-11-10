@@ -1011,7 +1011,7 @@
       "manipulate": {
         "hint": "Dépose une mangue dans chaque panier, encore et encore, tant que tu peux en donner à tous.",
         "strongHint": "26 mangues dans 4 paniers : 6 dans chaque panier (24 mangues) et il reste 2 mangues.",
-        "instruction": "Répartis 26 mangues dans 4 paniers en parts égales. Laisse dans le panier de départ ce qui ne peut plus être partagé."
+        "instruction": "Forme 4 paniers contenant le même nombre de mangues. Garde dans le panier de départ les mangues impossibles à partager également."
       },
       "example": {
         "easy": "Facile. 32 partagés entre 4 donnent combien chacun ?",
