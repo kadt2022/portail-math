@@ -260,14 +260,15 @@ export const UNIT_04_LESSON_CONTENT: Record<string, LessonContent> = {
     },
     reflect: {
       titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.numeric",
+      instructionKey: "content.common.instruction.choice",
       hintKey: "content.u04l04.reflect.hint",
       strongHintKey: "content.u04l04.reflect.strongHint",
       exercise: {
-        kind: "numeric-question",
+        kind: "text-choice",
         id: "u04l04-reflect",
         promptKey: "content.u04l04.reflect.prompt",
-        answer: 4,
+        choiceKeys: ["content.u04l04.reflect.c0","content.u04l04.reflect.c1","content.u04l04.reflect.c2"],
+        answerIndex: 0,
       },
     },
     play: {

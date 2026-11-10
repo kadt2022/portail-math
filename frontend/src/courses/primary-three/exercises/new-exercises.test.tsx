@@ -103,6 +103,22 @@ describe("Nouveaux exercices interactifs de la 3e primaire", () => {
     expect(onValidated).toHaveBeenCalledOnce();
   }, 30000);
 
+  it("explique pourquoi les deux mangues restantes ne peuvent pas être distribuées", async () => {
+    const user = userEvent.setup();
+    const step = lessonStep("MATH-3P-U04-L04", "reflect");
+    const exercise = step.exercise;
+    if (exercise.kind !== "text-choice") throw new Error("text-choice attendu");
+    const onValidated = renderStep(step);
+
+    await user.click(screen.getByRole("button", { name: t(exercise.choiceKeys[1]) }));
+    await validate(user);
+    expect(onValidated).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: t(exercise.choiceKeys[0]) }));
+    await validate(user);
+    expect(onValidated).toHaveBeenCalledOnce();
+  });
+
   it("forme 2 000 FC avec des cartes et refuse trop de cartes", async () => {
     const user = userEvent.setup();
     const onValidated = renderStep(lessonStep("MATH-3P-U06-L01", "manipulate"));

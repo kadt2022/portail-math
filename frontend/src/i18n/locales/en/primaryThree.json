@@ -1006,39 +1006,42 @@
     },
     "u04l04": {
       "objective": "I can read a division with or without a remainder.",
-      "situation": "24 fruits are shared between 4 baskets. How many fruits in each basket?",
-      "discover": "Sharing looks for the amount in each share; grouping looks for the number of groups. A remainder is what does not make a full share.",
+      "situation": "For the school celebration, Yamba and his classmates prepare 4 mango baskets for 4 tables. They have 26 mangoes, and every table must receive the same number.",
+      "discover": "Yamba suggests giving one mango to every table, round after round. When there are not enough mangoes to serve all 4 tables, the undistributed mangoes form the remainder.",
       "manipulate": {
-        "hint": "Put one mango in each basket, again and again, as long as every basket can get one.",
-        "strongHint": "26 mangoes in 4 baskets: 6 in each basket (24 mangoes) and 2 mangoes are left.",
-        "instruction": "Make 4 baskets with the same number of mangoes. Keep in the starting basket any mangoes that cannot be shared equally."
+        "hint": "Make a round of the 4 tables: put one mango in each basket, then start again while all 4 tables can be served.",
+        "strongHint": "Every table receives 6 mangoes: 4 × 6 = 24. The 2 remaining mangoes are not enough for another round of all 4 tables.",
+        "instruction": "Help Yamba prepare the 4 tables. Make 4 baskets with the same number of mangoes and keep in the starting basket those that cannot be shared equally."
       },
       "example": {
-        "easy": "Easy. 32 shared between 4 gives how many each?",
-        "medium": "Medium. How many groups of 5 in 23?",
-        "reflection": "Think. Check 27 ÷ 3 = 9."
+        "easy": "Easy. For 4 tables, how many mangoes per table do 32 mangoes make?",
+        "medium": "Medium. With 23 mangoes, how many full baskets of 5 can be prepared?",
+        "reflection": "Think. Check that 27 mangoes shared between 3 tables give 9 mangoes per table."
       },
       "practice": {
-        "hint": "Find the number that makes 32 when multiplied by 4.",
-        "strongHint": "4 × 8 = 32, so each child gets 8 items.",
-        "prompt": "32 items are shared between 4 children. How many items does each child get?"
+        "hint": "The 26 mangoes and the 6 new ones make 32 mangoes. Find the number that makes 32 when multiplied by 4.",
+        "strongHint": "26 + 6 = 32, then 4 × 8 = 32. Every table now receives 8 mangoes.",
+        "prompt": "Next challenge: a classmate brings 6 more mangoes. How many mangoes will each of the 4 tables receive now?"
       },
       "reflect": {
-        "hint": "Count in fives without going past 23.",
-        "strongHint": "4 × 5 = 20; 3 items are left, which do not make a full group. You make 4 groups.",
-        "prompt": "How many groups of 5 can you make with 23 items?"
+        "hint": "Imagine giving one of the 2 remaining mangoes to a table. Would all baskets still contain the same number?",
+        "strongHint": "To add one mango to every table, 4 mangoes would be needed. With only 2, two tables would receive more than the others.",
+        "prompt": "Why does Yamba keep 2 mangoes in the starting basket?",
+        "c0": "Because there are not enough to give one more mango to each of the 4 tables",
+        "c1": "Because all four baskets are already full",
+        "c2": "Because two mangoes can never be eaten"
       },
       "play": {
-        "hint": "Each bowl gets the same number of tokens; what is left cannot be shared out.",
-        "strongHint": "17 tokens in 5 bowls: 3 in each bowl (15 tokens), 2 tokens are left.",
-        "title": "Share out as the mission says",
-        "instruction": "Share 17 tokens between 5 bowls, then note each bowl's share and the remainder."
+        "hint": "Every game stand receives the same number of tokens; what is left cannot make a complete round.",
+        "strongHint": "17 tokens for 5 stands: 3 for each stand (15 tokens), and 2 tokens are left.",
+        "title": "Prepare the celebration stands",
+        "instruction": "Yamba shares 17 tokens between 5 game stands. Find each stand's share and the remainder."
       },
-      "remember": "Sharing looks for the amount in each share; grouping looks for the number of groups.",
+      "remember": "Sharing fairly means giving the same amount to every group. The remainder is what is not enough to make another complete round.",
       "check": {
-        "hint": "A division is checked with a multiplication.",
-        "strongHint": "9 groups of 3 make 27: 9 × 3 = 27.",
-        "prompt": "Which multiplication confirms 27 ÷ 3 = 9?",
+        "hint": "To check the mango sharing, multiply one table's share by the number of tables.",
+        "strongHint": "3 tables of 9 mangoes make 27 mangoes: 9 × 3 = 27.",
+        "prompt": "Yamba shares 27 mangoes between 3 tables. Which multiplication confirms that every table receives 9 mangoes?",
         "c0": "3 × 3 = 27",
         "c1": "9 × 3 = 27",
         "c2": "9 + 3 = 27"

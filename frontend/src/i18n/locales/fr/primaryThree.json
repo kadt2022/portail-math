@@ -1006,39 +1006,42 @@
     },
     "u04l04": {
       "objective": "Je peux interpréter une division avec ou sans reste.",
-      "situation": "24 fruits sont partagés entre 4 paniers. Combien de fruits dans chaque panier ?",
-      "discover": "Partager cherche la quantité dans chaque part ; grouper cherche le nombre de groupes. Un reste est ce qui ne forme pas une part complète.",
+      "situation": "Pour la fête de l'école, Yamba et ses camarades préparent 4 paniers de mangues pour 4 tables. Ils ont 26 mangues et chaque table doit en recevoir le même nombre.",
+      "discover": "Yamba propose de donner une mangue à chaque table, tour après tour. Quand il n'y en a plus assez pour servir les 4 tables, les mangues non distribuées forment le reste.",
       "manipulate": {
-        "hint": "Dépose une mangue dans chaque panier, encore et encore, tant que tu peux en donner à tous.",
-        "strongHint": "26 mangues dans 4 paniers : 6 dans chaque panier (24 mangues) et il reste 2 mangues.",
-        "instruction": "Forme 4 paniers contenant le même nombre de mangues. Garde dans le panier de départ les mangues impossibles à partager également."
+        "hint": "Fais un tour des 4 tables : dépose une mangue dans chaque panier, puis recommence tant que les 4 tables peuvent être servies.",
+        "strongHint": "Chaque table reçoit 6 mangues : 4 × 6 = 24. Les 2 mangues restantes ne suffisent pas pour faire un nouveau tour des 4 tables.",
+        "instruction": "Aide Yamba à préparer les 4 tables. Forme 4 paniers contenant le même nombre de mangues et garde dans le panier de départ celles qui ne peuvent pas être partagées également."
       },
       "example": {
-        "easy": "Facile. 32 partagés entre 4 donnent combien chacun ?",
-        "medium": "Intermédiaire. Combien de groupes de 5 dans 23 ?",
-        "reflection": "Réflexion. Vérifie 27 ÷ 3 = 9."
+        "easy": "Facile. Pour 4 tables, 32 mangues donnent combien de mangues par table ?",
+        "medium": "Intermédiaire. Avec 23 mangues, combien de paniers complets de 5 peut-on préparer ?",
+        "reflection": "Réflexion. Vérifie que 27 mangues partagées entre 3 tables donnent 9 mangues par table."
       },
       "practice": {
-        "hint": "Cherche le nombre qui, multiplié par 4, donne 32.",
-        "strongHint": "4 × 8 = 32, donc chaque enfant reçoit 8 objets.",
-        "prompt": "32 objets sont partagés entre 4 enfants. Combien d'objets reçoit chaque enfant ?"
+        "hint": "Les 26 mangues et les 6 nouvelles font 32 mangues. Cherche le nombre qui, multiplié par 4, donne 32.",
+        "strongHint": "26 + 6 = 32, puis 4 × 8 = 32. Chaque table reçoit maintenant 8 mangues.",
+        "prompt": "Défi suivant : un camarade apporte 6 mangues supplémentaires. Combien de mangues chacune des 4 tables recevra-t-elle maintenant ?"
       },
       "reflect": {
-        "hint": "Compte de 5 en 5 sans dépasser 23.",
-        "strongHint": "4 × 5 = 20 ; il reste 3 objets, qui ne forment pas un groupe complet. On fait 4 groupes.",
-        "prompt": "Combien de groupes de 5 peut-on faire avec 23 objets ?"
+        "hint": "Imagine que tu donnes une des 2 mangues restantes à une table. Les paniers contiendraient-ils encore tous le même nombre ?",
+        "strongHint": "Pour ajouter une mangue à chaque table, il en faudrait 4. Avec seulement 2 mangues, deux tables recevraient davantage que les autres.",
+        "prompt": "Pourquoi Yamba garde-t-il 2 mangues dans le panier de départ ?",
+        "c0": "Parce qu'il n'y en a pas assez pour donner une mangue de plus à chacune des 4 tables",
+        "c1": "Parce que les quatre paniers sont déjà pleins",
+        "c2": "Parce que deux mangues ne peuvent jamais être mangées"
       },
       "play": {
-        "hint": "Chaque bol reçoit le même nombre de jetons ; ce qui reste ne se distribue pas.",
-        "strongHint": "17 jetons dans 5 bols : 3 dans chaque bol (15 jetons), il reste 2 jetons.",
-        "title": "Distribue selon la mission",
-        "instruction": "Distribue 17 jetons dans 5 bols, puis note la part de chaque bol et le reste."
+        "hint": "Chaque stand de jeu reçoit le même nombre de jetons ; ce qui reste ne peut pas faire un tour complet.",
+        "strongHint": "17 jetons pour 5 stands : 3 pour chaque stand (15 jetons) et il reste 2 jetons.",
+        "title": "Prépare les stands de la fête",
+        "instruction": "Yamba distribue 17 jetons entre 5 stands de jeu. Trouve la part de chaque stand et le reste."
       },
-      "remember": "Partager cherche la quantité dans chaque part ; grouper cherche le nombre de groupes.",
+      "remember": "Partager équitablement, c'est donner la même quantité à chaque groupe. Le reste est ce qui ne suffit pas pour faire un nouveau tour complet.",
       "check": {
-        "hint": "La division se vérifie avec une multiplication.",
-        "strongHint": "9 groupes de 3 font 27 : 9 × 3 = 27.",
-        "prompt": "Quelle multiplication confirme 27 ÷ 3 = 9 ?",
+        "hint": "Pour vérifier le partage des mangues, multiplie la part d'une table par le nombre de tables.",
+        "strongHint": "3 tables de 9 mangues font 27 mangues : 9 × 3 = 27.",
+        "prompt": "Yamba partage 27 mangues entre 3 tables. Quelle multiplication confirme que chaque table reçoit 9 mangues ?",
         "c0": "3 × 3 = 27",
         "c1": "9 × 3 = 27",
         "c2": "9 + 3 = 27"
