@@ -8,6 +8,7 @@ interface NumericStepperProps {
   decreaseLabel: string;
   increaseLabel: string;
   onChange: (value: number) => void;
+  step?: number;
 }
 
 export function NumericStepper({
@@ -18,6 +19,7 @@ export function NumericStepper({
   decreaseLabel,
   increaseLabel,
   onChange,
+  step = 1,
 }: NumericStepperProps) {
   return (
     <div className={styles.numericControl}>
@@ -27,7 +29,7 @@ export function NumericStepper({
           type="button"
           aria-label={decreaseLabel}
           disabled={value <= min}
-          onClick={() => onChange(value - 1)}
+          onClick={() => onChange(value - step)}
         >
           −
         </button>
@@ -36,7 +38,7 @@ export function NumericStepper({
           type="button"
           aria-label={increaseLabel}
           disabled={value >= max}
-          onClick={() => onChange(value + 1)}
+          onClick={() => onChange(value + step)}
         >
           +
         </button>

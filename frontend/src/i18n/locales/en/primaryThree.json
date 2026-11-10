@@ -70,11 +70,56 @@
     "l1": { "title": "Hundreds, tens and units" },
     "l2": { "title": "Reading and writing numbers" },
     "l3": { "title": "Comparing and ordering" },
-    "l4": { "title": "Number patterns and rounding" }
+    "l4": { "title": "Number patterns and rounding" },
+    "u02l01": { "title": "Mental calculation" },
+    "u02l02": { "title": "Column addition without carrying" },
+    "u02l03": { "title": "Addition with carrying" },
+    "u02l04": { "title": "Addition problems" },
+    "u03l01": { "title": "Mental subtraction" },
+    "u03l02": { "title": "Column subtraction" },
+    "u03l03": { "title": "Subtraction with trading" },
+    "u03l04": { "title": "Difference and missing number" },
+    "u04l01": { "title": "Tables of 2, 5 and 10" },
+    "u04l02": { "title": "Tables of 3 and 4" },
+    "u04l03": { "title": "Column multiplication by one digit" },
+    "u04l04": { "title": "Sharing and grouping" },
+    "u05l01": { "title": "Equal parts" },
+    "u05l02": { "title": "Reading 1/2, 1/3 and 1/4" },
+    "u05l03": { "title": "Comparing simple fractions" },
+    "u05l04": { "title": "Fraction of a collection" },
+    "u06l01": { "title": "Making an amount" },
+    "u06l02": { "title": "Total price" },
+    "u06l03": { "title": "Change given back" },
+    "u06l04": { "title": "Sticking to a budget" },
+    "u07l01": { "title": "Lengths" },
+    "u07l02": { "title": "Masses" },
+    "u07l03": { "title": "Capacities" },
+    "u07l04": { "title": "Perimeter in practice" },
+    "u08l01": { "title": "Lines and segments" },
+    "u08l02": { "title": "Right angles" },
+    "u08l03": { "title": "Solids and simple nets" },
+    "u08l04": { "title": "Maps and moves" },
+    "u09l01": { "title": "Hours and minutes" },
+    "u09l02": { "title": "Working out a duration" },
+    "u09l03": { "title": "Calendar" },
+    "u09l04": { "title": "Planning a day" },
+    "u10l01": { "title": "Tables and pictograms" },
+    "u10l02": { "title": "Two-step problems" },
+    "u10l03": { "title": "Choosing the operation" },
+    "u10l04": { "title": "Create, solve and check" }
   },
   "evaluation": {
     "label": "Module evaluation",
-    "title": "Evaluation - Unit 1"
+    "title": "Evaluation - Unit 1",
+    "u02": { "title": "Assessment - Unit 2" },
+    "u03": { "title": "Assessment - Unit 3" },
+    "u04": { "title": "Assessment - Unit 4" },
+    "u05": { "title": "Assessment - Unit 5" },
+    "u06": { "title": "Assessment - Unit 6" },
+    "u07": { "title": "Assessment - Unit 7" },
+    "u08": { "title": "Assessment - Unit 8" },
+    "u09": { "title": "Assessment - Unit 9" },
+    "u10": { "title": "Assessment - Unit 10" }
   },
   "steps": {
     "situation": "Starting situation",
@@ -157,6 +202,91 @@
     },
     "numberInRange": {
       "prompt": "Find a number between {{min}} and {{max}}."
+    },
+    "visual": {
+      "pictogram": "Pictogram",
+      "symbolCount": "{{count}} symbols",
+      "fractionBar": "Strip of {{parts}} equal parts with {{shaded}} coloured",
+      "clock": "Clock: {{hours}} hours {{minutes}} minutes",
+      "rectangle": "Rectangle with its two dimensions",
+      "ruler": "Ruler: a line goes from {{from}} to {{to}}",
+      "shapes": {
+        "square": "Square",
+        "rectangle": "Rectangle",
+        "triangle": "Triangle",
+        "right-triangle": "Triangle with a right angle",
+        "cube": "Cube",
+        "cylinder": "Cylinder",
+        "sphere": "Sphere",
+        "parallel-lines": "Two lines that stay the same distance apart",
+        "crossing-lines": "Two lines that cross",
+        "segment": "Segment with its two end points",
+        "line": "Line that goes on in both directions"
+      }
+    },
+    "groups": {
+      "target": "Make {{groups}} groups of {{perGroup}}",
+      "groups": "Groups",
+      "perGroup": "In one group",
+      "removeGroup": "Remove a group",
+      "addGroup": "Add a group",
+      "removeItem": "Remove an item from each group",
+      "addItem": "Add an item to each group",
+      "total": "{{groups}} groups of {{perGroup}} make {{total}}"
+    },
+    "share": {
+      "target": "Share {{total}} tokens between {{bowls}} bowls",
+      "perBowl": "In each bowl",
+      "left": "Left over",
+      "removePerBowl": "Remove a token from each bowl",
+      "addPerBowl": "Add a token to each bowl",
+      "removeLeft": "Remove a token from the rest",
+      "addLeft": "Add a token to the rest"
+    },
+    "money": {
+      "target": "Make {{amount}} FC",
+      "maxCards": "using {{count}} cards at most",
+      "card": "{{amount}} FC cards",
+      "remove": "Remove a {{amount}} FC card",
+      "add": "Place a {{amount}} FC card",
+      "total": "Total placed: {{amount}} FC with {{count}} cards"
+    },
+    "fraction": {
+      "target": "Parts to colour: {{shaded}} out of {{parts}}",
+      "bar": "Strip of {{parts}} equal parts",
+      "part": "Part {{number}}",
+      "count": "Parts coloured: {{shaded}} out of {{parts}}"
+    },
+    "clock": {
+      "target": "Show {{hours}}:{{minutes}}",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "removeHour": "Remove an hour",
+      "addHour": "Add an hour",
+      "removeMinutes": "Remove 5 minutes",
+      "addMinutes": "Add 5 minutes"
+    },
+    "grid": {
+      "target": "Go to the square {{column}} across and {{row}} up",
+      "position": "The counter is {{column}} across and {{row}} up",
+      "up": "Up",
+      "down": "Down",
+      "left": "Left",
+      "right": "Right",
+      "restart": "Back to start",
+      "moves": "Moves: {{count}}"
+    },
+    "steps": {
+      "available": "Steps to put in order",
+      "placed": "Steps already in order",
+      "remove": "Remove the step: {{step}}"
+    },
+    "column": {
+      "label": "Operation {{left}} {{operator}} {{right}}",
+      "units": "Ones digit",
+      "tens": "Tens digit",
+      "hundreds": "Hundreds digit",
+      "thousands": "Thousands digit"
     }
   },
   "content": {
@@ -331,7 +461,8 @@
         "title": "Discover the rule",
         "instruction": "Choose the step that explains this number pattern.",
         "hint": "Work out the gap between two neighbouring numbers in the pattern.",
-        "strongHint": "105, 205, 305, 405: each number moves forward by 100."
+        "strongHint": "105, 205, 305, 405: each number moves forward by 100.",
+        "prompt": "In the sequence 105, 205, 305, 405, by how much does each number go up?"
       }
     },
     "u01eval": {
@@ -360,6 +491,1831 @@
         "instruction": "Choose the ten closest to the given number.",
         "hint": "Look at the units digit: is it closer to 0 or to 10?",
         "strongHint": "63 is closer to 60 than to 70."
+      }
+    },
+    "common": {
+      "title": {
+        "manipulate": "I try it",
+        "practice": "Your turn",
+        "reflect": "I think about it",
+        "play": "Mini-game",
+        "check": "I check",
+        "question": "Question"
+      },
+      "instruction": {
+        "numeric": "Work it out, then write your answer.",
+        "numericChoice": "Work it out, then pick the right answer.",
+        "choice": "Read carefully, then pick the right answer.",
+        "placeValue": "Build the number with hundreds, tens and ones.",
+        "column": "Set out the operation and write the result digit by digit.",
+        "groups": "Build the equal groups you are asked for.",
+        "share": "Share the tokens between the bowls, then note what is left.",
+        "money": "Place cards to make exactly the amount you are asked for.",
+        "fraction": "Colour the right number of parts.",
+        "clock": "Turn the hands to show the time you are asked for.",
+        "grid": "Guide the counter with the arrows to the target square.",
+        "steps": "Tap the steps in the right order.",
+        "compare": "Choose the right symbol for each pair.",
+        "order": "Put the numbers in the order asked for."
+      },
+      "unit": {
+        "fc": "FC",
+        "cm": "cm",
+        "m": "m",
+        "km": "km",
+        "g": "g",
+        "kg": "kg",
+        "l": "L",
+        "min": "min",
+        "days": "days"
+      }
+    },
+    "u02l01": {
+      "objective": "I can break numbers apart to add quickly.",
+      "situation": "A team collects 120 bottle tops, then 35 more. How can you find the total without counting everything again?",
+      "discover": "You can split hundreds, tens and ones, then put the results back together. 120 + 35: 100 + 20 + 30 + 5 = 155.",
+      "manipulate": {
+        "hint": "Start with the hundreds: how many are in 230?",
+        "strongHint": "230 + 40 + 6: 2 hundreds, 7 tens (3 + 4) and 6 ones, so 276.",
+        "instruction": "Build 230 + 40 + 6 with hundreds, tens and ones."
+      },
+      "example": {
+        "easy": "Easy. 300 + 70 = __.",
+        "medium": "Medium. 145 + 20 = __.",
+        "reflection": "Think. Work out 198 + 6 by going through 200."
+      },
+      "practice": {
+        "hint": "Only the tens change: 4 tens + 2 tens.",
+        "strongHint": "145 + 20: hundreds and ones stay the same, 4 tens + 2 tens = 6 tens. The answer is 165.",
+        "prompt": "Work out 145 + 20."
+      },
+      "reflect": {
+        "hint": "From 198 to 200 you add 2. How much of the 6 is left to add?",
+        "strongHint": "198 + 2 = 200, then 200 + 4 = 204.",
+        "prompt": "Work out 198 + 6 by going through 200. What is the result?"
+      },
+      "play": {
+        "hint": "35 splits into 30 and 5.",
+        "strongHint": "120 + 30 = 150, then 150 + 5 = 155: jumps of 30 and 5.",
+        "prompt": "To work out 120 + 35 on the number line, which jumps do you choose?",
+        "c0": "A jump of 300, then a jump of 5",
+        "c1": "A jump of 30, then a jump of 5",
+        "c2": "A jump of 3, then a jump of 5"
+      },
+      "remember": "You can split hundreds, tens and ones, then put the results back together.",
+      "check": {
+        "hint": "Split 35 into 30 and 5.",
+        "strongHint": "120 + 30 = 150; 150 + 5 = 155.",
+        "prompt": "Work out 120 + 35."
+      }
+    },
+    "u02l02": {
+      "objective": "I can line up the place values.",
+      "situation": "Two schools put together 243 and 516 pictured notebooks. How many notebooks in all?",
+      "discover": "Line up ones under ones, tens under tens, hundreds under hundreds; then add each column.",
+      "manipulate": {
+        "hint": "Start with the ones column, on the right.",
+        "strongHint": "2 + 5 = 7; 3 + 4 = 7; 1 + 2 = 3. The result is 377.",
+        "instruction": "Set out 132 + 245 on the chart and write the result column by column."
+      },
+      "example": {
+        "easy": "Easy. 231 + 347 = __.",
+        "medium": "Medium. 405 + 172 = __.",
+        "reflection": "Think. Why do 23 and 415 not line up on the left?"
+      },
+      "practice": {
+        "hint": "Add the ones, then the tens, then the hundreds.",
+        "strongHint": "1 + 7 = 8; 3 + 4 = 7; 2 + 3 = 5. The result is 578."
+      },
+      "reflect": {
+        "hint": "Look at the column on the far right: what does it hold?",
+        "strongHint": "Ones go under ones: 23 sits under the last two digits of 415.",
+        "prompt": "Why do 23 and 415 not line up on the left when you set out the addition?",
+        "c0": "Because the ones must be in the same column",
+        "c1": "Because 23 is a small number",
+        "c2": "Because there is no carrying"
+      },
+      "play": {
+        "hint": "Put each digit in its column before adding.",
+        "strongHint": "3 + 6 = 9; 4 + 1 = 5; 2 + 5 = 7. The result is 759.",
+        "title": "Put the digits back"
+      },
+      "remember": "Line up ones under ones, tens under tens, hundreds under hundreds; then add each column.",
+      "check": {
+        "hint": "The tens column holds 0 + 7.",
+        "strongHint": "5 + 2 = 7; 0 + 7 = 7; 4 + 1 = 5. The result is 577.",
+        "prompt": "Work out 405 + 172."
+      }
+    },
+    "u02l03": {
+      "objective": "I can trade ten ones or ten tens.",
+      "situation": "A store receives 278 then 156 sacks. How many sacks does it have in all?",
+      "discover": "When a column reaches 10, write the ones of the result and carry one to the next place.",
+      "manipulate": {
+        "hint": "8 + 7 is more than 10: trade ten ones for one ten.",
+        "strongHint": "8 + 7 = 15: write 5 and carry 1 ten. 6 + 5 + 1 = 12: write 2 and carry 1 hundred. 1 + 1 = 2. The result is 225.",
+        "instruction": "Set out 168 + 57 and make the trades: write the result column by column."
+      },
+      "example": {
+        "easy": "Easy. 47 + 38 = __.",
+        "medium": "Medium. 286 + 149 = __.",
+        "reflection": "Think. Check 375 + 248 = 623 with an estimate."
+      },
+      "practice": {
+        "hint": "7 + 8 = 15: write 5 and carry one ten.",
+        "strongHint": "7 + 8 = 15, I write 5 and carry 1. 4 + 3 + 1 = 8. The result is 85."
+      },
+      "reflect": {
+        "hint": "Round each number to the nearest easy landmark.",
+        "strongHint": "375 is close to 400 and 248 to 250: about 650, so 623 is believable.",
+        "prompt": "To check 375 + 248 = 623, which estimate is closest?",
+        "c0": "400 + 250 = 650",
+        "c1": "300 + 200 = 500",
+        "c2": "400 + 300 = 700"
+      },
+      "play": {
+        "hint": "Trade ten tokens before filling in the next column.",
+        "strongHint": "6 + 9 = 15: 5, carry 1. 8 + 4 + 1 = 13: 3, carry 1. 2 + 1 + 1 = 4. The result is 435.",
+        "title": "Trade before you go on"
+      },
+      "remember": "When a column reaches 10, write the ones of the result and carry one to the next place.",
+      "check": {
+        "hint": "Start with 8 + 6 in the ones column.",
+        "strongHint": "8 + 6 = 14: 4, carry 1. 7 + 5 + 1 = 13: 3, carry 1. 2 + 1 + 1 = 4. The result is 434.",
+        "prompt": "How many sacks in all: 278 sacks and 156 sacks?"
+      }
+    },
+    "u02l04": {
+      "objective": "I can recognise putting together or an increase.",
+      "situation": "A class library has 356 pictured books and receives 128 more. How many books does it have now?",
+      "discover": "Find what is put together or added, work it out, then answer with the unit.",
+      "manipulate": {
+        "hint": "Two bars placed end to end: the amounts are put together.",
+        "strongHint": "Putting two amounts together means adding: 356 + 128.",
+        "title": "I draw it with bars",
+        "prompt": "A bar diagram shows a bar of 356 books and a bar of 128 books placed end to end. Which calculation does it show?",
+        "c0": "356 + 128",
+        "c1": "356 − 128",
+        "c2": "356 × 128"
+      },
+      "example": {
+        "easy": "Easy. 245 mangoes and 176 mangoes: total?",
+        "medium": "Medium. A bus has 38 passengers; 17 get on. How many now?",
+        "reflection": "Think. Make up a problem whose calculation is 325 + 75."
+      },
+      "practice": {
+        "hint": "Two amounts are put together: which operation?",
+        "strongHint": "245 + 176: 5 + 6 = 11, 4 + 7 + 1 = 12, 2 + 1 + 1 = 4. The answer is 421 mangoes.",
+        "prompt": "245 mangoes and 176 mangoes: how many mangoes in all?"
+      },
+      "reflect": {
+        "hint": "Passengers get on: the amount goes up.",
+        "strongHint": "38 + 17 = 55 passengers.",
+        "prompt": "A bus has 38 passengers; 17 get on. How many passengers are there now?"
+      },
+      "play": {
+        "hint": "The question is only about mangoes.",
+        "strongHint": "Keep the mangoes: 120 and 30. The 45 bananas are not needed.",
+        "title": "Pick the useful information",
+        "prompt": "\"A trader has 120 mangoes and 45 bananas. He receives 30 mangoes. How many mangoes does he have now?\" Which pieces of information are useful?",
+        "c0": "120 and 30",
+        "c1": "120 and 45",
+        "c2": "45 and 30"
+      },
+      "remember": "Find what is put together or added, work it out, then answer with the unit.",
+      "check": {
+        "hint": "Add the ones first: 5 + 5.",
+        "strongHint": "325 + 75: 5 + 5 = 10, 2 + 7 + 1 = 10, 3 + 1 = 4. The result is 400.",
+        "prompt": "A problem has the calculation 325 + 75. What is the result?"
+      }
+    },
+    "u02eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Only the tens change.",
+        "strongHint": "145 + 20 = 165.",
+        "prompt": "145 + 20 = ?"
+      },
+      "q2": {
+        "hint": "Line up the places: ones under ones.",
+        "strongHint": "5 + 2 = 7; 0 + 7 = 7; 4 + 1 = 5. The result is 577.",
+        "prompt": "405 + 172 = ?"
+      },
+      "q3": {
+        "hint": "Think about carrying: 6 + 9 is more than 10.",
+        "strongHint": "6 + 9 = 15, 8 + 4 + 1 = 13, 2 + 1 + 1 = 4. The result is 435.",
+        "prompt": "286 + 149 = ?"
+      },
+      "q4": {
+        "hint": "Passengers get on: add.",
+        "strongHint": "38 + 17 = 55 passengers.",
+        "prompt": "A bus has 38 passengers; 17 get on. How many passengers now?"
+      }
+    },
+    "u03l01": {
+      "objective": "I can break numbers apart to subtract.",
+      "situation": "A basket holds 460 seeds; 30 are used. How many seeds are left?",
+      "discover": "You can take away hundreds, tens or ones first, depending on the numbers. 460 − 30: 6 tens minus 3 tens.",
+      "manipulate": {
+        "hint": "Start from 380: 8 tens. How many are left when you take 4 away?",
+        "strongHint": "380 − 40: 8 tens − 4 tens = 4 tens. The result is 340.",
+        "instruction": "Work out 380 − 40 with bundles of ten, then build the result."
+      },
+      "example": {
+        "easy": "Easy. 700 − 200 = __.",
+        "medium": "Medium. 286 − 20 = __.",
+        "reflection": "Think. Work out 402 − 5 by going through 400."
+      },
+      "practice": {
+        "hint": "Only the tens change: 8 tens − 2 tens.",
+        "strongHint": "286 − 20: 8 tens − 2 tens = 6 tens, so 266.",
+        "prompt": "Work out 286 − 20."
+      },
+      "reflect": {
+        "hint": "From 402 to 400 you go back 2. How much is left to go back?",
+        "strongHint": "402 − 2 = 400, then 400 − 3 = 397.",
+        "prompt": "Work out 402 − 5 by going through 400. What is the result?"
+      },
+      "play": {
+        "hint": "Compare the tens: 6 and 3.",
+        "strongHint": "460 − 430 = 30: you go back 30.",
+        "title": "Jump back efficiently",
+        "prompt": "To go back from 460 to 430 on the number line, which jump do you make?",
+        "c0": "A jump of −300",
+        "c1": "A jump of −30",
+        "c2": "A jump of −3"
+      },
+      "remember": "You can take away hundreds, tens or ones first, depending on the numbers.",
+      "check": {
+        "hint": "7 hundreds − 2 hundreds.",
+        "strongHint": "7 hundreds − 2 hundreds = 5 hundreds, so 500.",
+        "prompt": "Work out 700 − 200."
+      }
+    },
+    "u03l02": {
+      "objective": "I can line up and subtract place by place.",
+      "situation": "A store has 758 pictured notebooks and gives out 326. How many notebooks are left?",
+      "discover": "Line up the places and subtract from right to left: ones, then tens, then hundreds.",
+      "manipulate": {
+        "hint": "Start with the ones column, on the right.",
+        "strongHint": "4 − 1 = 3; 7 − 3 = 4; 6 − 2 = 4. The result is 443.",
+        "instruction": "Set out 674 − 231 on the chart and write the result column by column."
+      },
+      "example": {
+        "easy": "Easy. 865 − 342 = __.",
+        "medium": "Medium. 590 − 170 = __.",
+        "reflection": "Think. Check 742 − 321 = 421."
+      },
+      "practice": {
+        "hint": "Subtract the ones, then the tens, then the hundreds.",
+        "strongHint": "5 − 2 = 3; 6 − 4 = 2; 8 − 3 = 5. The result is 523."
+      },
+      "reflect": {
+        "hint": "If you take a number away and put it back, you are back where you started.",
+        "strongHint": "Check by adding back what you took away: 421 + 321 = 742.",
+        "prompt": "How can you check that 742 − 321 = 421?",
+        "c0": "With addition: 421 + 321 = 742",
+        "c1": "With subtraction: 421 − 321 = 742",
+        "c2": "With addition: 421 + 742 = 321"
+      },
+      "play": {
+        "hint": "Unload each column of the lorry one at a time, starting with the ones.",
+        "strongHint": "8 − 6 = 2; 5 − 2 = 3; 7 − 3 = 4. The result is 432.",
+        "title": "Unload each column"
+      },
+      "remember": "Line up the places and subtract from right to left.",
+      "check": {
+        "hint": "The ones are 0 and 0. Move to the tens: 9 − 7.",
+        "strongHint": "0 − 0 = 0; 9 − 7 = 2; 5 − 1 = 4. The result is 420.",
+        "prompt": "Work out 590 − 170."
+      }
+    },
+    "u03l03": {
+      "objective": "I can trade a ten or a hundred.",
+      "situation": "We want to take 47 away from 132, but 2 ones are not enough to take away 7. What can we do?",
+      "discover": "Trade one ten for 10 ones. If there is no ten left, trade a hundred first.",
+      "manipulate": {
+        "hint": "2 − 7 is impossible: trade one ten for 10 ones.",
+        "strongHint": "12 − 7 = 5; 2 tens are left, 2 − 4 is impossible: trade 1 hundred, 12 − 4 = 8; 0 hundreds are left. The result is 85.",
+        "instruction": "Show 132 − 47, make the trades and write the result column by column."
+      },
+      "example": {
+        "easy": "Easy. 72 − 38 = __.",
+        "medium": "Medium. 300 − 126 = __.",
+        "reflection": "Think. Explain the trade in 502 − 178."
+      },
+      "practice": {
+        "hint": "2 − 8 is impossible: trade a ten.",
+        "strongHint": "12 − 8 = 4; 6 tens are left, 6 − 3 = 3. The result is 34."
+      },
+      "reflect": {
+        "hint": "There are no tens in 502: where will the ones come from?",
+        "strongHint": "Trade 1 hundred for 10 tens, then 1 ten for 10 ones; the result is 324.",
+        "prompt": "In 502 − 178, what do you do first?",
+        "c0": "I trade a hundred for 10 tens, then a ten for 10 ones",
+        "c1": "I take the smaller digit from the larger one in each column",
+        "c2": "I take away 5 hundreds straight away"
+      },
+      "play": {
+        "hint": "Trade without changing the total: a hundred is worth 10 tens.",
+        "strongHint": "300 = 2 hundreds, 9 tens and 10 ones. 10 − 6 = 4; 9 − 2 = 7; 2 − 1 = 1. The result is 174.",
+        "title": "Make the trades"
+      },
+      "remember": "Trade one ten for 10 ones. If there is no ten left, trade a hundred first.",
+      "check": {
+        "hint": "1 − 8 is impossible: trade a ten.",
+        "strongHint": "11 − 8 = 3; 3 − 6 is impossible, trade a hundred: 13 − 6 = 7; 1 − 0 = 1. The result is 173.",
+        "prompt": "Work out 241 − 68."
+      }
+    },
+    "u03l04": {
+      "objective": "I can choose between difference and complement.",
+      "situation": "Two teams have 615 and 487 points. What is the gap between them?",
+      "discover": "For a gap, subtract the smaller from the larger. To complete, find what must be added.",
+      "manipulate": {
+        "hint": "Move in steps: 480 → 500, then 500 → 600, then 600 → 615.",
+        "strongHint": "20 + 100 + 15 = 135.",
+        "title": "I measure the gap on the line",
+        "prompt": "On the number line, what is the distance from 480 to 615?"
+      },
+      "example": {
+        "easy": "Easy. Difference between 900 and 675?",
+        "medium": "Medium. __ + 185 = 500.",
+        "reflection": "Think. An amount drops from 742 to 598. By how much?"
+      },
+      "practice": {
+        "hint": "Subtract the smaller from the larger.",
+        "strongHint": "900 − 675 = 225.",
+        "prompt": "What is the difference between 900 and 675?"
+      },
+      "reflect": {
+        "hint": "Find the gap between 742 and 598.",
+        "strongHint": "742 − 598 = 144.",
+        "prompt": "An amount drops from 742 to 598. By how much did it drop?"
+      },
+      "play": {
+        "hint": "Gap = larger number − smaller number.",
+        "strongHint": "340 − 290 = 50.",
+        "title": "Even out two stores",
+        "prompt": "Two stores hold 340 and 290. By how much does the larger exceed the smaller?"
+      },
+      "remember": "For a gap, subtract the smaller from the larger. To complete, find what must be added.",
+      "check": {
+        "hint": "Find what must be added to 185 to reach 500.",
+        "strongHint": "500 − 185 = 315, and 315 + 185 = 500.",
+        "prompt": "Find the missing number: __ + 185 = 500."
+      }
+    },
+    "u03eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Only the tens change.",
+        "strongHint": "8 tens − 2 tens = 6 tens: 266.",
+        "prompt": "286 − 20 = ?"
+      },
+      "q2": {
+        "hint": "Line up the places, then subtract from right to left.",
+        "strongHint": "0 − 0 = 0; 9 − 7 = 2; 5 − 1 = 4. The result is 420.",
+        "prompt": "590 − 170 = ?"
+      },
+      "q3": {
+        "hint": "There are no tens: trade a hundred first.",
+        "strongHint": "300 = 2 hundreds, 9 tens, 10 ones. The result is 174.",
+        "prompt": "300 − 126 = ?"
+      },
+      "q4": {
+        "hint": "Find what to add to 185 to get 500.",
+        "strongHint": "500 − 185 = 315.",
+        "prompt": "Find the missing number: __ + 185 = 500."
+      }
+    },
+    "u04l01": {
+      "objective": "I can find known products.",
+      "situation": "Benches each have 2 seats; packs hold 5 or 10 items. How can you count the total quickly?",
+      "discover": "To multiply is to count equal groups. You can check with repeated addition: 6 × 5 = 5 + 5 + 5 + 5 + 5 + 5.",
+      "manipulate": {
+        "hint": "You need 6 groups, with 5 seeds in each group.",
+        "strongHint": "6 groups of 5: set \"Groups\" to 6 and \"In one group\" to 5. Total 30.",
+        "instruction": "Build 6 groups of 5 seeds: set the number of groups and what is in one group."
+      },
+      "example": {
+        "easy": "Easy. 7 × 2 = __.",
+        "medium": "Medium. 8 × 5 = __.",
+        "reflection": "Think. How many groups of 10 make 90?"
+      },
+      "practice": {
+        "hint": "7 groups of 2: count in twos.",
+        "strongHint": "2 + 2 + 2 + 2 + 2 + 2 + 2 = 14.",
+        "prompt": "Work out 7 × 2."
+      },
+      "reflect": {
+        "hint": "Count in tens up to 90.",
+        "strongHint": "10, 20, 30, 40, 50, 60, 70, 80, 90: 9 groups of 10, because 9 × 10 = 90.",
+        "prompt": "How many groups of 10 make 90?"
+      },
+      "play": {
+        "hint": "Each row holds 10 items.",
+        "strongHint": "4 rows of 10: set \"Groups\" to 4 and \"In one group\" to 10. Total 40.",
+        "title": "Fill the rows",
+        "instruction": "Fill 4 rows of 10 items."
+      },
+      "remember": "To multiply is to count equal groups. You can check with repeated addition.",
+      "check": {
+        "hint": "Count in fives eight times.",
+        "strongHint": "5, 10, 15, 20, 25, 30, 35, 40: 8 × 5 = 40.",
+        "prompt": "Work out 8 × 5."
+      }
+    },
+    "u04l02": {
+      "objective": "I can build new products.",
+      "situation": "Four flower beds each have 3 pictured plants. How many plants in all?",
+      "discover": "You can build the table of 4 by doubling twice: 6 × 4 is double 6 × 2.",
+      "manipulate": {
+        "hint": "Make 7 groups, with 3 items in each group.",
+        "strongHint": "7 groups of 3: 3 + 3 + 3 + 3 + 3 + 3 + 3 = 21.",
+        "instruction": "Make 7 groups of 3, then read the total."
+      },
+      "example": {
+        "easy": "Easy. 6 × 3 = __.",
+        "medium": "Medium. 7 × 4 = __.",
+        "reflection": "Think. Compare 5 × 4 and 4 × 5."
+      },
+      "practice": {
+        "hint": "Count in threes six times.",
+        "strongHint": "3, 6, 9, 12, 15, 18: 6 × 3 = 18.",
+        "prompt": "Work out 6 × 3."
+      },
+      "reflect": {
+        "hint": "Work out each of the two products.",
+        "strongHint": "5 groups of 4 and 4 groups of 5 both make 20: the groups are just described differently.",
+        "prompt": "Compare 5 × 4 and 4 × 5.",
+        "c0": "Both are worth 20",
+        "c1": "5 × 4 is larger",
+        "c2": "4 × 5 is larger"
+      },
+      "play": {
+        "hint": "You need 4 regular rows of 6 plants.",
+        "strongHint": "4 rows of 6 plants: 6 + 6 + 6 + 6 = 24.",
+        "title": "Arrange the plants in rows",
+        "instruction": "Arrange 24 plants in 4 regular rows of 6."
+      },
+      "remember": "You can build the table of 4 by doubling twice: 6 × 4 is double 6 × 2.",
+      "check": {
+        "hint": "Double 7 × 2, then double again.",
+        "strongHint": "7 × 2 = 14; double 14 is 28.",
+        "prompt": "Work out 7 × 4."
+      }
+    },
+    "u04l03": {
+      "objective": "I can multiply a number by a small number.",
+      "situation": "Three classes each receive 124 sheets. How many sheets in all?",
+      "discover": "Multiply each place by the small number and carry when needed.",
+      "manipulate": {
+        "hint": "Multiply the ones first: 3 × 2.",
+        "strongHint": "3 × 2 = 6 ones; 3 × 4 tens = 12 tens, which is 1 hundred and 2 tens. The result is 126.",
+        "instruction": "Show 3 × 42 with tens and ones, then set out 42 × 3."
+      },
+      "example": {
+        "easy": "Easy. 4 × 21 = __.",
+        "medium": "Medium. 3 × 128 = __.",
+        "reflection": "Think. Estimate 5 × 198 before working it out."
+      },
+      "practice": {
+        "hint": "Multiply the ones, then the tens.",
+        "strongHint": "4 × 1 = 4; 4 × 2 tens = 8 tens. The result is 84."
+      },
+      "reflect": {
+        "hint": "198 is close to 200.",
+        "strongHint": "5 × 200 = 1,000: the result of 5 × 198 is a little less than 1,000.",
+        "prompt": "Estimate 5 × 198 before working it out: which result is closest?",
+        "c0": "1,000",
+        "c1": "500",
+        "c2": "2,000"
+      },
+      "play": {
+        "hint": "Copy the load: 124 sheets, three times.",
+        "strongHint": "3 × 4 = 12: 2, carry 1. 3 × 2 + 1 = 7. 3 × 1 = 3. The result is 372.",
+        "title": "Copy the load"
+      },
+      "remember": "Multiply each place by the small number and carry when needed.",
+      "check": {
+        "hint": "Start with the ones: 3 × 8 = 24.",
+        "strongHint": "3 × 8 = 24: 4, carry 2. 3 × 2 + 2 = 8. 3 × 1 = 3. The result is 384.",
+        "prompt": "Work out 3 × 128."
+      }
+    },
+    "u04l04": {
+      "objective": "I can read a division with or without a remainder.",
+      "situation": "24 fruits are shared between 4 baskets. How many fruits in each basket?",
+      "discover": "Sharing looks for the amount in each share; grouping looks for the number of groups. A remainder is what does not make a full share.",
+      "manipulate": {
+        "hint": "Give one token to each bowl, again and again, as long as every bowl can get one.",
+        "strongHint": "26 tokens in 4 bowls: 6 in each bowl (24 tokens) and 2 tokens are left.",
+        "instruction": "Share 26 tokens between 4 bowls, then note what is in each bowl and what is left."
+      },
+      "example": {
+        "easy": "Easy. 32 shared between 4 gives how many each?",
+        "medium": "Medium. How many groups of 5 in 23?",
+        "reflection": "Think. Check 27 ÷ 3 = 9."
+      },
+      "practice": {
+        "hint": "Find the number that makes 32 when multiplied by 4.",
+        "strongHint": "4 × 8 = 32, so each child gets 8 items.",
+        "prompt": "32 items are shared between 4 children. How many items does each child get?"
+      },
+      "reflect": {
+        "hint": "Count in fives without going past 23.",
+        "strongHint": "4 × 5 = 20; 3 items are left, which do not make a full group. You make 4 groups.",
+        "prompt": "How many groups of 5 can you make with 23 items?"
+      },
+      "play": {
+        "hint": "Each bowl gets the same number of tokens; what is left cannot be shared out.",
+        "strongHint": "17 tokens in 5 bowls: 3 in each bowl (15 tokens), 2 tokens are left.",
+        "title": "Share out as the mission says",
+        "instruction": "Share 17 tokens between 5 bowls, then note each bowl's share and the remainder."
+      },
+      "remember": "Sharing looks for the amount in each share; grouping looks for the number of groups.",
+      "check": {
+        "hint": "A division is checked with a multiplication.",
+        "strongHint": "9 groups of 3 make 27: 9 × 3 = 27.",
+        "prompt": "Which multiplication confirms 27 ÷ 3 = 9?",
+        "c0": "3 × 3 = 27",
+        "c1": "9 × 3 = 27",
+        "c2": "9 + 3 = 27"
+      }
+    },
+    "u04eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Count in fives.",
+        "strongHint": "5, 10, 15, 20, 25, 30, 35, 40: 40.",
+        "prompt": "8 × 5 = ?"
+      },
+      "q2": {
+        "hint": "Double twice: 7 × 2, then again.",
+        "strongHint": "7 × 2 = 14; 14 × 2 = 28.",
+        "prompt": "7 × 4 = ?"
+      },
+      "q3": {
+        "hint": "Multiply each place by 3, starting with the ones.",
+        "strongHint": "3 × 8 = 24: 4, carry 2. 3 × 2 + 2 = 8. 3 × 1 = 3. The result is 384.",
+        "prompt": "3 × 128 = ?"
+      },
+      "q4": {
+        "hint": "Count in fives without going past 23.",
+        "strongHint": "4 × 5 = 20, with 3 left over: 4 full groups.",
+        "prompt": "How many groups of 5 can you make from 23?"
+      }
+    },
+    "u05l01": {
+      "objective": "I can recognise a correct fraction.",
+      "situation": "A pictured flatbread is shared between four children. What is needed for the sharing to be fair?",
+      "discover": "A fraction describes equal parts of a whole. If the parts are not equal, they are not quarters.",
+      "manipulate": {
+        "hint": "Half of 4 parts is how many parts?",
+        "strongHint": "A strip of 4 equal parts: colouring half means colouring 2 parts.",
+        "instruction": "A strip is shared into 4 equal parts: colour half of the strip."
+      },
+      "example": {
+        "easy": "Easy. How many halves make a whole?",
+        "medium": "Medium. How many quarters make a whole?",
+        "reflection": "Think. Are two unequal parts two halves?"
+      },
+      "practice": {
+        "hint": "One half and another half...",
+        "strongHint": "Two halves make a whole.",
+        "prompt": "How many halves make a whole?"
+      },
+      "reflect": {
+        "hint": "Think of sharing a flatbread between two friends: is it fair if one gets more?",
+        "strongHint": "A half is one of two equal parts.",
+        "prompt": "Are two unequal parts two halves?",
+        "c0": "No: the two halves must be equal",
+        "c1": "Yes: having two parts is enough",
+        "c2": "Yes, if one of the two is bigger"
+      },
+      "play": {
+        "hint": "A quarter is one of 4 equal parts.",
+        "strongHint": "You need 4 parts, and they must be equal.",
+        "title": "Cut into equal parts",
+        "prompt": "Which way of sharing a flatbread gives quarters?",
+        "c0": "4 equal parts",
+        "c1": "4 parts of different sizes",
+        "c2": "3 equal parts"
+      },
+      "remember": "A fraction describes equal parts of a whole.",
+      "check": {
+        "hint": "A quarter is one part out of 4.",
+        "strongHint": "Four quarters make a whole.",
+        "prompt": "How many quarters make a whole?"
+      }
+    },
+    "u05l02": {
+      "objective": "I can link the writing to the drawing.",
+      "situation": "A basket of 12 fruits is shared into 3 equal groups. What part of the basket is one group?",
+      "discover": "In 1/3, the 3 shows three equal parts and the 1 shows one part chosen.",
+      "manipulate": {
+        "hint": "Only one of the 4 parts must be coloured.",
+        "strongHint": "1 part out of 4 equal parts is written 1/4: colour just one square.",
+        "instruction": "Colour one part of the four equal parts of the strip."
+      },
+      "example": {
+        "easy": "Easy. One third of 12 items?",
+        "medium": "Medium. One quarter of 20 items?",
+        "reflection": "Think. Which fraction shows one part out of two?"
+      },
+      "practice": {
+        "hint": "Share 12 items into 3 equal groups.",
+        "strongHint": "12 ÷ 3 = 4: one third of 12 is 4.",
+        "prompt": "How many items is one third of 12 items?"
+      },
+      "reflect": {
+        "hint": "The bottom number says how many equal parts there are.",
+        "strongHint": "One part out of 2 equal parts is written 1/2.",
+        "prompt": "Which fraction shows one part out of two equal parts?",
+        "c0": "1/2",
+        "c1": "2/1",
+        "c2": "1/3"
+      },
+      "play": {
+        "hint": "Count all the parts, then the coloured parts.",
+        "strongHint": "3 equal parts with 1 coloured: 1/3.",
+        "title": "Match fraction and portion",
+        "prompt": "Match the coloured strip to the right fraction.",
+        "c0": "1/3",
+        "c1": "1/4",
+        "c2": "1/2"
+      },
+      "remember": "In 1/3, the 3 shows three equal parts and the 1 shows one part chosen.",
+      "check": {
+        "hint": "Share 20 items into 4 equal groups.",
+        "strongHint": "20 ÷ 4 = 5: one quarter of 20 is 5.",
+        "prompt": "How many items is one quarter of 20 items?"
+      }
+    },
+    "u05l03": {
+      "objective": "I can compare parts of the same whole.",
+      "situation": "Two identical flatbreads show 1/2 and 1/4. Which part is bigger?",
+      "discover": "For the same whole, a half is bigger than a quarter. You must compare wholes of the same size.",
+      "manipulate": {
+        "hint": "Picture the two coloured parts laid on top of each other.",
+        "strongHint": "The more parts there are, the smaller each part: 1/2 is bigger than 1/4.",
+        "prompt": "Two strips of the same length are folded in 2 and in 4. Which coloured part is bigger?",
+        "c0": "1/2",
+        "c1": "1/4",
+        "c2": "They are equal"
+      },
+      "example": {
+        "easy": "Easy. Complete: 1/2 __ 1/4.",
+        "medium": "Medium. Complete: 1/3 __ 1/3.",
+        "reflection": "Think. Can you fairly compare half of a small orange and a quarter of a very big one using only the fractions?"
+      },
+      "practice": {
+        "hint": "Compare the size of a half and a quarter of the same whole.",
+        "strongHint": "A half is bigger than a quarter.",
+        "prompt": "Complete: 1/2 __ 1/4.",
+        "c0": "1/2 > 1/4",
+        "c1": "1/2 < 1/4",
+        "c2": "1/2 = 1/4"
+      },
+      "reflect": {
+        "hint": "A fraction depends on the size of the whole.",
+        "strongHint": "To compare with fractions, the wholes must be the same size.",
+        "prompt": "Can you compare half of a small orange and a quarter of a very big orange using only the fractions?",
+        "c0": "No: the wholes must be the same size",
+        "c1": "Yes: 1/2 is always bigger than 1/4",
+        "c2": "Yes: 1/4 is always bigger than 1/2"
+      },
+      "play": {
+        "hint": "The fewer the parts, the bigger each part.",
+        "strongHint": "1/3 is bigger than 1/4.",
+        "title": "Pick the biggest piece",
+        "prompt": "Which strip has the bigger coloured part? Do not trust the picture only: count the parts.",
+        "c0": "They are equal",
+        "c1": "The strip in 3 parts (1/3)",
+        "c2": "The strip in 4 parts (1/4)"
+      },
+      "remember": "For the same whole, a half is bigger than a quarter.",
+      "check": {
+        "hint": "These are the same fraction of the same whole twice.",
+        "strongHint": "Two identical fractions of the same whole are equal.",
+        "prompt": "Complete: 1/3 __ 1/3.",
+        "c0": "1/3 < 1/3",
+        "c1": "1/3 > 1/3",
+        "c2": "1/3 = 1/3"
+      }
+    },
+    "u05l04": {
+      "objective": "I can find a part of a group.",
+      "situation": "Half of the 18 pictured pupils wear a blue card. How many pupils wear a blue card?",
+      "discover": "First share the collection into equal groups, then take the number of groups shown. 1/3 of 15: 3 groups of 5, take 1 group.",
+      "manipulate": {
+        "hint": "One third: share the tokens into 3 equal groups.",
+        "strongHint": "15 tokens in 3 bowls: 5 in each bowl, so 1/3 of 15 is 5.",
+        "instruction": "Find 1/3 of 15: share 15 tokens between 3 bowls, then note what is in one bowl."
+      },
+      "example": {
+        "easy": "Easy. 1/2 of 16?",
+        "medium": "Medium. 1/4 of 24?",
+        "reflection": "Think. How much are 2/3 of 12?"
+      },
+      "practice": {
+        "hint": "Share 16 into 2 equal groups.",
+        "strongHint": "16 ÷ 2 = 8.",
+        "prompt": "How much is 1/2 of 16?"
+      },
+      "reflect": {
+        "hint": "First find 1/3 of 12.",
+        "strongHint": "1/3 of 12 is 4, so 2/3 of 12 is 4 + 4 = 8.",
+        "prompt": "How much are 2/3 of 12?"
+      },
+      "play": {
+        "hint": "One quarter: share the harvest into 4 equal groups.",
+        "strongHint": "20 tokens in 4 bowls: 5 in each bowl, so 1/4 of 20 is 5.",
+        "title": "Share out the harvest",
+        "instruction": "Find 1/4 of 20: share 20 tokens between 4 bowls, then note what is in one bowl."
+      },
+      "remember": "First share the collection into equal groups, then take the number of groups shown.",
+      "check": {
+        "hint": "Share 24 into 4 equal groups.",
+        "strongHint": "24 ÷ 4 = 6.",
+        "prompt": "How much is 1/4 of 24?"
+      }
+    },
+    "u05eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "A quarter is one part out of 4.",
+        "strongHint": "Four quarters make a whole.",
+        "prompt": "How many quarters make a whole?"
+      },
+      "q2": {
+        "hint": "Share 20 into 4 equal groups.",
+        "strongHint": "20 ÷ 4 = 5.",
+        "prompt": "How many is a quarter of 20 items?"
+      },
+      "q3": {
+        "hint": "Same fraction, same whole.",
+        "strongHint": "Two identical fractions of the same whole are equal.",
+        "prompt": "Complete: 1/3 __ 1/3.",
+        "c0": "1/3 < 1/3",
+        "c1": "1/3 > 1/3",
+        "c2": "1/3 = 1/3"
+      },
+      "q4": {
+        "hint": "Share 24 into 4 equal groups.",
+        "strongHint": "24 ÷ 4 = 6.",
+        "prompt": "How much is 1/4 of 24?"
+      }
+    },
+    "u06l01": {
+      "objective": "I can make a value in several ways.",
+      "situation": "At the pretend market you must make 2,000 FC with cards. How can you do it?",
+      "discover": "Add the values. Several combinations can make the same amount: 1,000 + 500 + 500 = 2,000, but also 1,000 + 1,000.",
+      "manipulate": {
+        "hint": "Start with the big cards, then top up with the small ones.",
+        "strongHint": "For example 2 cards of 1,000 FC, or 1 card of 1,000 FC and 2 cards of 500 FC.",
+        "instruction": "Combine pretend cards of 100, 500 and 1,000 FC to make 2,000 FC."
+      },
+      "example": {
+        "easy": "Easy. 500 FC + 500 FC = __.",
+        "medium": "Medium. How much are three 200 FC cards worth?",
+        "reflection": "Think. Give two ways to make 1,500 FC."
+      },
+      "practice": {
+        "hint": "Two 500 FC cards.",
+        "strongHint": "500 + 500 = 1,000.",
+        "prompt": "Work out 500 FC + 500 FC."
+      },
+      "reflect": {
+        "hint": "Add up the cards in each combination.",
+        "strongHint": "1,000 + 100 + 100 = 1,200 FC, not 1,500 FC.",
+        "prompt": "Which combination does not make 1,500 FC?",
+        "c0": "1,000 + 100 + 100",
+        "c1": "1,000 + 500",
+        "c2": "500 + 500 + 500"
+      },
+      "play": {
+        "hint": "Start with the biggest card you can.",
+        "strongHint": "1,000 + 500 + 100 + 100 = 1,700 with 4 cards.",
+        "title": "Make the exact price",
+        "instruction": "Make exactly 1,700 FC with as few cards as possible (4 at most)."
+      },
+      "remember": "Add the values. Several combinations can make the same amount.",
+      "check": {
+        "hint": "Add 200 + 200 + 200.",
+        "strongHint": "3 × 200 = 600 FC.",
+        "prompt": "How much are three 200 FC cards worth?"
+      }
+    },
+    "u06l02": {
+      "objective": "I can work out several purchases.",
+      "situation": "A pretend notebook costs 750 FC and a pencil 250 FC. How much do the two cost together?",
+      "discover": "Add the prices and write FC in the answer.",
+      "manipulate": {
+        "hint": "Add the two prices.",
+        "strongHint": "750 + 250 = 1,000 FC.",
+        "title": "I play at the market",
+        "prompt": "A notebook costs 750 FC and a pencil 250 FC. How much do the two cost?"
+      },
+      "example": {
+        "easy": "Easy. 850 FC + 650 FC = __.",
+        "medium": "Medium. How much do 3 pretend items at 400 FC cost?",
+        "reflection": "Think. Two purchases total 2,300 FC; one costs 900 FC. What is the price of the other?"
+      },
+      "practice": {
+        "hint": "Add the hundreds first: 800 + 600.",
+        "strongHint": "850 + 650 = 1,500.",
+        "prompt": "Work out 850 FC + 650 FC."
+      },
+      "reflect": {
+        "hint": "Find what must be added to 900 to reach 2,300.",
+        "strongHint": "2,300 − 900 = 1,400 FC, and 900 + 1,400 = 2,300.",
+        "prompt": "Two purchases total 2,300 FC. One costs 900 FC. What is the price of the other?"
+      },
+      "play": {
+        "hint": "First work out the price of the 3 items at 400 FC.",
+        "strongHint": "3 × 400 = 1,200; 1,200 + 250 = 1,450 FC.",
+        "title": "Fill your basket",
+        "prompt": "Your basket holds 3 items at 400 FC and 1 item at 250 FC. What is the total?"
+      },
+      "remember": "Add the prices and write FC in the answer.",
+      "check": {
+        "hint": "Three times 400.",
+        "strongHint": "3 × 400 = 1,200 FC.",
+        "prompt": "How much do 3 pretend items cost at 400 FC each?"
+      }
+    },
+    "u06l03": {
+      "objective": "I can work out and check change.",
+      "situation": "A pretend purchase costs 2,650 FC and you hand over 3,000 FC. How much change must be given back?",
+      "discover": "Change is the amount handed over minus the price. Check: price + change = amount handed over.",
+      "manipulate": {
+        "hint": "The change is 3,000 − 2,650.",
+        "strongHint": "3,000 − 2,650 = 350 FC: for example 3 cards of 100 FC and 1 card of 50 FC.",
+        "instruction": "Act out a payment with cards: make the change for a 2,650 FC purchase paid with 3,000 FC."
+      },
+      "example": {
+        "easy": "Easy. 1,000 FC handed over for 725 FC: change?",
+        "medium": "Medium. 5,000 FC handed over for 3,450 FC: change?",
+        "reflection": "Think. Check a change of 800 FC on 4,200 FC paid with 5,000 FC."
+      },
+      "practice": {
+        "hint": "Change = amount handed over − price.",
+        "strongHint": "1,000 − 725 = 275 FC.",
+        "prompt": "You hand over 1,000 FC for a 725 FC purchase. What is the change?"
+      },
+      "reflect": {
+        "hint": "Price + change must give back the amount handed over.",
+        "strongHint": "4,200 + 800 = 5,000: the change is right.",
+        "prompt": "Check a change of 800 FC on a 4,200 FC purchase paid with 5,000 FC: how much is 4,200 + 800?"
+      },
+      "play": {
+        "hint": "The change is 5,000 − 3,750.",
+        "strongHint": "5,000 − 3,750 = 1,250 FC: 1,000 + 200 + 50 with 3 cards.",
+        "title": "Run the till",
+        "instruction": "A customer pays 5,000 FC for a 3,750 FC purchase. Give exactly the right change with 3 cards at most."
+      },
+      "remember": "Change is the amount handed over minus the price. Check: price + change = amount handed over.",
+      "check": {
+        "hint": "Change = 5,000 − 3,450.",
+        "strongHint": "5,000 − 3,450 = 1,550 FC, and 3,450 + 1,550 = 5,000.",
+        "prompt": "You hand over 5,000 FC for a 3,450 FC purchase. What is the change?"
+      }
+    },
+    "u06l04": {
+      "objective": "I can make choices and explain them.",
+      "situation": "A pretend family picks school supplies without going over 5,000 FC. How should they decide?",
+      "discover": "Work out the total before deciding. A cheaper solution can be better if it meets the need.",
+      "manipulate": {
+        "hint": "Work out the total of each basket.",
+        "strongHint": "A costs 5,300 FC (too much), B costs 3,900 FC (within budget).",
+        "title": "I compare baskets",
+        "prompt": "Basket A: 2,000 + 1,800 + 1,500 FC. Basket B: 1,200 + 1,800 + 900 FC. Budget: 5,000 FC. Which basket stays within the budget?",
+        "c0": "Basket A",
+        "c1": "Basket B",
+        "c2": "Both baskets"
+      },
+      "example": {
+        "easy": "Easy. Budget 3,000 FC; purchases 1,250 and 1,500 FC. Left over?",
+        "medium": "Medium. Can you buy 1,800, 900 and 700 FC items with 3,500 FC?",
+        "reflection": "Think. Find two combinations that total 2,000 FC using 500, 750, 1,250 and 1,500 FC."
+      },
+      "practice": {
+        "hint": "Add the purchases first, then take the total from the budget.",
+        "strongHint": "1,250 + 1,500 = 2,750; 3,000 − 2,750 = 250 FC.",
+        "prompt": "Budget: 3,000 FC. Purchases: 1,250 FC and 1,500 FC. How much is left?"
+      },
+      "reflect": {
+        "hint": "Add the three prices.",
+        "strongHint": "1,800 + 900 + 700 = 3,400 FC, which is less than 3,500 FC.",
+        "prompt": "Can you buy items at 1,800, 900 and 700 FC with 3,500 FC?",
+        "c0": "Yes: the total is 3,400 FC",
+        "c1": "No: the total is over 3,500 FC",
+        "c2": "Yes: the total is 3,600 FC"
+      },
+      "play": {
+        "hint": "Try one big card with one small card.",
+        "strongHint": "500 + 1,500 = 2,000 or 750 + 1,250 = 2,000.",
+        "title": "Equip the class without going over",
+        "instruction": "Pick two items whose total is exactly 2,000 FC."
+      },
+      "remember": "Work out the total before deciding.",
+      "check": {
+        "hint": "Think of the budget you must not go over.",
+        "strongHint": "You need the total to know whether it stays within budget.",
+        "prompt": "What do you do before deciding on a purchase?",
+        "c0": "Buy everything without counting",
+        "c1": "Work out the total",
+        "c2": "Pick the biggest price"
+      }
+    },
+    "u06eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "3 times 200.",
+        "strongHint": "3 × 200 = 600 FC.",
+        "prompt": "How much are three 200 FC cards worth?"
+      },
+      "q2": {
+        "hint": "3 times 400.",
+        "strongHint": "3 × 400 = 1,200 FC.",
+        "prompt": "How much do 3 pretend items at 400 FC cost?"
+      },
+      "q3": {
+        "hint": "Change = amount handed over − price.",
+        "strongHint": "5,000 − 3,450 = 1,550 FC.",
+        "prompt": "You hand over 5,000 FC for a 3,450 FC purchase. What is the change?"
+      },
+      "q4": {
+        "hint": "Add the three prices.",
+        "strongHint": "1,800 + 900 + 700 = 3,400 FC, which does not go over 3,500 FC.",
+        "prompt": "Can you buy items at 1,800, 900 and 700 FC with 3,500 FC?",
+        "c0": "Yes: the total is 3,400 FC",
+        "c1": "No: the total is over 3,500 FC"
+      }
+    },
+    "u07l01": {
+      "objective": "I can choose cm, m or km.",
+      "situation": "We measure a notebook, the yard and the distance between two pictured villages. Which unit should we use for each?",
+      "discover": "The cm suits small objects, the m nearby places and the km long distances. 100 cm = 1 m.",
+      "manipulate": {
+        "hint": "A notebook is a small object.",
+        "strongHint": "For a small object we measure in centimetres.",
+        "title": "I measure with a ruler",
+        "prompt": "You measure a notebook with a ruler. Which unit do you choose?",
+        "c0": "m",
+        "c1": "km",
+        "c2": "cm"
+      },
+      "example": {
+        "easy": "Easy. 3 m = how many cm?",
+        "medium": "Medium. A line goes from 2 to 11 cm. Length?",
+        "reflection": "Think. Which unit for a road between two towns?"
+      },
+      "practice": {
+        "hint": "1 m = 100 cm.",
+        "strongHint": "3 × 100 = 300 cm.",
+        "prompt": "3 m = how many centimetres?"
+      },
+      "reflect": {
+        "hint": "It is a very long distance.",
+        "strongHint": "For long distances we use the kilometre.",
+        "prompt": "Which unit do you use for a road between two towns?",
+        "c0": "km",
+        "c1": "cm",
+        "c2": "m"
+      },
+      "play": {
+        "hint": "The yard is bigger than a notebook but smaller than a road.",
+        "strongHint": "For a nearby place we measure in metres with a tape or marked string.",
+        "title": "Choose the right tool",
+        "prompt": "Which tool suits measuring the length of the yard?",
+        "c0": "A 30 cm ruler",
+        "c1": "A long string or tape marked in metres",
+        "c2": "A car counter in kilometres"
+      },
+      "remember": "The cm suits small objects, the m nearby places and the km long distances.",
+      "check": {
+        "hint": "Count the gaps between 2 and 11.",
+        "strongHint": "11 − 2 = 9 cm.",
+        "prompt": "A line goes from 2 to 11 on the ruler. What is its length?"
+      }
+    },
+    "u07l02": {
+      "objective": "I can compare in g and kg.",
+      "situation": "A scale compares a 500 g bag and a 1 kg packet. Which is heavier?",
+      "discover": "The gram measures small masses; the kilogram measures bigger ones. 1 kg = 1,000 g.",
+      "manipulate": {
+        "hint": "Remember: 1 kg = 1,000 g.",
+        "strongHint": "1 kg = 1,000 g, which is more than 500 g.",
+        "title": "I look at packages",
+        "prompt": "With an adult you look at two clean packages: a 1 kg box and a 500 g bag. Which is heavier?",
+        "c0": "The 1 kg box",
+        "c1": "The 500 g bag",
+        "c2": "They weigh the same"
+      },
+      "example": {
+        "easy": "Easy. 2 kg = how many g?",
+        "medium": "Medium. The heavier: 750 g or 1 kg?",
+        "reflection": "Think. A 3 kg bag loses 1 kg. Mass left?"
+      },
+      "practice": {
+        "hint": "1 kg = 1,000 g.",
+        "strongHint": "2 × 1,000 = 2,000 g.",
+        "prompt": "2 kg = how many grams?"
+      },
+      "reflect": {
+        "hint": "It loses mass: take away.",
+        "strongHint": "3 − 1 = 2 kg.",
+        "prompt": "A 3 kg bag loses 1 kg. What mass is left?"
+      },
+      "play": {
+        "hint": "Convert 1 kg into grams.",
+        "strongHint": "1 kg = 1,000 g: the scale balances with 1,000 g.",
+        "title": "Balance the scale",
+        "prompt": "To balance a 1 kg packet, which mass do you put on the other pan of the scale?",
+        "c0": "2 kg",
+        "c1": "500 g",
+        "c2": "1,000 g"
+      },
+      "remember": "The gram measures small masses; the kilogram measures bigger ones.",
+      "check": {
+        "hint": "Compare in grams: how many grams is 1 kg?",
+        "strongHint": "1 kg = 1,000 g and 1,000 is bigger than 750.",
+        "prompt": "The heavier: 750 g or 1 kg?",
+        "c0": "1 kg",
+        "c1": "They weigh the same",
+        "c2": "750 g"
+      }
+    },
+    "u07l03": {
+      "objective": "I can reason with litres.",
+      "situation": "Clean containers are used to give out water. How can you work out the water given out?",
+      "discover": "The litre measures capacity. Add or subtract litres depending on the action.",
+      "manipulate": {
+        "hint": "3 groups of 2 litres.",
+        "strongHint": "3 × 2 = 6 L.",
+        "title": "I pour clean water",
+        "prompt": "With an adult you pour 3 bottles of 2 L into a bucket. How many litres are in the bucket?"
+      },
+      "example": {
+        "easy": "Easy. 3 bottles of 2 L make how much?",
+        "medium": "Medium. A 10 L can still holds 6 L. How much was used?",
+        "reflection": "Think. Two buckets total 15 L; one holds 7 L. The other?"
+      },
+      "practice": {
+        "hint": "It lost water: take away.",
+        "strongHint": "10 − 6 = 4 L, and 6 + 4 = 10.",
+        "prompt": "A 10 L can still holds 6 L. How many litres were used?"
+      },
+      "reflect": {
+        "hint": "Find what must be added to 7 to reach 15.",
+        "strongHint": "15 − 7 = 8 L.",
+        "prompt": "Two buckets hold 15 L in all. One holds 7 L. How many litres in the other?"
+      },
+      "play": {
+        "hint": "Find the gap between 12 L and 20 L.",
+        "strongHint": "20 − 12 = 8 L.",
+        "title": "Fill the tank",
+        "prompt": "A tank must be filled up to the 20 L mark. It already holds 12 L. How many litres must be added?"
+      },
+      "remember": "The litre measures capacity.",
+      "check": {
+        "hint": "Think of what a bottle can hold.",
+        "strongHint": "What a container can hold is measured in litres.",
+        "prompt": "Which unit measures the capacity of a water bottle?",
+        "c0": "The litre",
+        "c1": "The gram",
+        "c2": "The metre"
+      }
+    },
+    "u07l04": {
+      "objective": "I can measure around a shape.",
+      "situation": "A small fence goes around a pictured rectangular garden. How long a fence is needed?",
+      "discover": "The perimeter is the length around the edge. Add up the lengths of all the sides.",
+      "manipulate": {
+        "hint": "A square has 4 equal sides.",
+        "strongHint": "4 + 4 + 4 + 4 = 16 cm.",
+        "title": "I go around a shape",
+        "prompt": "You put a string around a square with 4 cm sides. How long a string do you need?",
+        "v1": "cm"
+      },
+      "example": {
+        "easy": "Easy. Square with a 4 cm side: perimeter?",
+        "medium": "Medium. Rectangle 6 cm by 3 cm: perimeter?",
+        "reflection": "Think. Can two different rectangles have the same perimeter?"
+      },
+      "practice": {
+        "hint": "A rectangle has 2 lengths and 2 widths.",
+        "strongHint": "6 + 3 + 6 + 3 = 18 cm.",
+        "prompt": "What is the perimeter of a rectangle 6 cm by 3 cm?",
+        "v1": "cm"
+      },
+      "reflect": {
+        "hint": "Work out the perimeter of several rectangles.",
+        "strongHint": "6 + 2 + 6 + 2 = 16 and 5 + 3 + 5 + 3 = 16: two different shapes, same length around.",
+        "prompt": "Can two different rectangles have the same perimeter?",
+        "c0": "Yes: for example 6 by 2 and 5 by 3 both make 16",
+        "c1": "No, never",
+        "c2": "Only if they are squares"
+      },
+      "play": {
+        "hint": "Add the 4 sides.",
+        "strongHint": "7 + 3 + 7 + 3 = 20 m.",
+        "title": "Build a fence",
+        "prompt": "You build a fence around a rectangular garden 7 m by 3 m. How long a fence is needed?"
+      },
+      "remember": "The perimeter is the length around the edge.",
+      "check": {
+        "hint": "4 equal sides of 5 cm.",
+        "strongHint": "5 + 5 + 5 + 5 = 20 cm.",
+        "prompt": "What is the perimeter of a square with 5 cm sides?"
+      }
+    },
+    "u07eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Count the gaps between 2 and 11.",
+        "strongHint": "11 − 2 = 9 cm.",
+        "prompt": "A line goes from 2 to 11 on the ruler. What is its length?"
+      },
+      "q2": {
+        "hint": "Compare in grams.",
+        "strongHint": "1 kg = 1,000 g, which is more than 750 g.",
+        "prompt": "The heavier: 750 g or 1 kg?",
+        "c0": "750 g",
+        "c1": "1 kg",
+        "c2": "They weigh the same"
+      },
+      "q3": {
+        "hint": "It lost water: take away.",
+        "strongHint": "10 − 6 = 4 L.",
+        "prompt": "A 10 L can still holds 6 L. How many litres were used?"
+      },
+      "q4": {
+        "hint": "Add the 4 sides.",
+        "strongHint": "6 + 3 + 6 + 3 = 18 cm.",
+        "prompt": "What is the perimeter of a rectangle 6 cm by 3 cm?",
+        "v1": "cm"
+      }
+    },
+    "u08l01": {
+      "objective": "I can recognise and draw.",
+      "situation": "A neighbourhood map uses lines and limited routes. What is the difference between a line and a segment?",
+      "discover": "A line goes on and on; a segment has two end points. Two lines can be parallel or cross.",
+      "manipulate": {
+        "hint": "The line stops at the two points.",
+        "strongHint": "A line that stops at two end points is a segment.",
+        "title": "I draw segments",
+        "prompt": "You draw with a ruler between two points without going past them. What is this line called?",
+        "c0": "A line",
+        "c1": "An angle",
+        "c2": "A segment"
+      },
+      "example": {
+        "easy": "Easy. Is a side of a triangle a segment?",
+        "medium": "Medium. Two straight rails that stay the same distance apart are what?",
+        "reflection": "Think. How many end points does a segment have?"
+      },
+      "practice": {
+        "hint": "A side starts and ends at a corner.",
+        "strongHint": "Each side goes from one corner to another: it is a segment.",
+        "prompt": "Is a side of a triangle a segment?",
+        "c0": "No: it is an angle",
+        "c1": "Yes: it has two end points",
+        "c2": "No: it is a line"
+      },
+      "reflect": {
+        "hint": "It starts in one place and ends in another.",
+        "strongHint": "A segment has two end points.",
+        "prompt": "How many end points does a segment have?"
+      },
+      "play": {
+        "hint": "They never meet.",
+        "strongHint": "Lines that stay the same distance apart are parallel.",
+        "title": "Join without going over",
+        "prompt": "Two straight rails always stay the same distance apart. What are they?",
+        "c0": "Parallel",
+        "c1": "Crossing",
+        "c2": "Curved"
+      },
+      "remember": "A line goes on and on; a segment has two end points.",
+      "check": {
+        "hint": "It has no end points.",
+        "strongHint": "A line goes on in both directions, with no end points.",
+        "prompt": "Which of these goes on in both directions?",
+        "c0": "A line",
+        "c1": "A segment",
+        "c2": "A square"
+      }
+    },
+    "u08l02": {
+      "objective": "I can spot a square corner.",
+      "situation": "The corners of a notebook make right angles. How can you recognise them?",
+      "discover": "Check a right angle with the corner of a sheet or a set square. Not every four-sided shape has four right angles.",
+      "manipulate": {
+        "hint": "Count the corners of the cover.",
+        "strongHint": "A rectangle has 4 corners, all right angles.",
+        "title": "I look for right angles",
+        "prompt": "You look for right angles in a closed rectangular notebook. How many do you find?"
+      },
+      "example": {
+        "easy": "Easy. How many right angles does a square have?",
+        "medium": "Medium. Does a triangle always have a right angle?",
+        "reflection": "Think. How can you check an angle without trusting your eyes?"
+      },
+      "practice": {
+        "hint": "Count the corners of the square.",
+        "strongHint": "A square has 4 right angles.",
+        "prompt": "How many right angles does a square have?"
+      },
+      "reflect": {
+        "hint": "Compare any triangle with a triangle that has a square corner.",
+        "strongHint": "Some triangles have a right angle, others do not.",
+        "prompt": "Does a triangle always have a right angle?",
+        "c0": "No: only some triangles",
+        "c1": "Yes, always",
+        "c2": "No, never"
+      },
+      "play": {
+        "hint": "The square corner of the set square fits into one corner of the shape.",
+        "strongHint": "The triangle has one square corner: one right angle.",
+        "title": "Place the set square",
+        "prompt": "You place the set square on the corner of this shape. What can you say?",
+        "c0": "It has four right angles",
+        "c1": "It has a right angle",
+        "c2": "It has no right angle"
+      },
+      "remember": "Check a right angle with the corner of a sheet or a set square.",
+      "check": {
+        "hint": "You need a tool with a square corner.",
+        "strongHint": "Place the corner of a sheet or the set square into the angle.",
+        "prompt": "How can you check a right angle without trusting your eyes?",
+        "c0": "By looking from far away",
+        "c1": "With the corner of a sheet or a set square",
+        "c2": "By counting the sides"
+      }
+    },
+    "u08l03": {
+      "objective": "I can link objects and solids.",
+      "situation": "We look at pictured boxes, balls and tins. How can we describe them?",
+      "discover": "The faces of a solid are surfaces. A net is a flat shape that can be folded to make a solid.",
+      "manipulate": {
+        "hint": "Count the faces of a box: top, bottom and sides.",
+        "strongHint": "A cube has 6 square faces: the net shows 6 squares.",
+        "title": "I unfold a box",
+        "prompt": "With an adult you carefully unfold a cube-shaped box. What do you see laid flat?",
+        "c0": "4 squares",
+        "c1": "6 circles",
+        "c2": "6 squares"
+      },
+      "example": {
+        "easy": "Easy. How many square faces does a cube have?",
+        "medium": "Medium. Which solid has two round bases?",
+        "reflection": "Think. Does a sphere have flat faces?"
+      },
+      "practice": {
+        "hint": "Top, bottom and four sides.",
+        "strongHint": "1 top + 1 bottom + 4 sides = 6 faces.",
+        "prompt": "How many square faces does a cube have?"
+      },
+      "reflect": {
+        "hint": "Can you rest a ball flat on the table?",
+        "strongHint": "A sphere has no flat face: its whole surface is curved.",
+        "prompt": "Does a sphere have flat faces?",
+        "c0": "No: its surface is curved",
+        "c1": "Yes: just one",
+        "c2": "Yes: six"
+      },
+      "play": {
+        "hint": "Which solid has faces that are all squares?",
+        "strongHint": "6 equal squares folded make a cube.",
+        "title": "Fold the net",
+        "prompt": "You fold a net of 6 equal squares joined together. Which solid do you get?",
+        "c0": "A cube",
+        "c1": "A cylinder",
+        "c2": "A sphere"
+      },
+      "remember": "The faces of a solid are surfaces.",
+      "check": {
+        "hint": "Think of a tin can.",
+        "strongHint": "The top and bottom of a cylinder are discs.",
+        "prompt": "Which solid has two round bases?",
+        "c0": "The sphere",
+        "c1": "The cylinder",
+        "c2": "The cube"
+      }
+    },
+    "u08l04": {
+      "objective": "I can follow and describe a route.",
+      "situation": "A grid map shows the school, the market and the water point. How can you describe a route?",
+      "discover": "Describe a route with directions and numbers of squares, starting from a chosen point.",
+      "manipulate": {
+        "hint": "Each arrow moves the counter one square.",
+        "strongHint": "Press \"Right\" 3 times then \"Up\" 2 times: the counter reaches the target square.",
+        "instruction": "Start at square A, bottom left: move 3 squares right, then 2 squares up."
+      },
+      "example": {
+        "easy": "Easy. From A, move 3 squares right then 2 up. How many moves?",
+        "medium": "Medium. Why must you say where you start?",
+        "reflection": "Think. Give another route to the same point on a grid."
+      },
+      "practice": {
+        "hint": "Add the squares to the right and the squares up.",
+        "strongHint": "3 + 2 = 5 moves.",
+        "prompt": "From A you move 3 squares right then 2 squares up. How many one-square moves do you make?"
+      },
+      "reflect": {
+        "hint": "\"3 squares right\": to the right of where?",
+        "strongHint": "The same route ends in different places if you start somewhere else.",
+        "prompt": "Why must you say where you start?",
+        "c0": "So that the route leads to the same place for everyone",
+        "c1": "To make the route longer",
+        "c2": "It is not needed"
+      },
+      "play": {
+        "hint": "Go down 3 squares and move 5 squares right, in any order.",
+        "strongHint": "From the top-left square: \"Right\" 5 times and \"Down\" 3 times.",
+        "title": "Guide the character",
+        "instruction": "Guide the character from the water point (top left) to the school, without leaving the map."
+      },
+      "remember": "Describe a route with directions and numbers of squares, starting from a chosen point.",
+      "check": {
+        "hint": "Look first at the number of squares to the right.",
+        "strongHint": "2 squares right then 1 square up reaches the right square.",
+        "prompt": "Which route leads from A to the square 2 squares right and 1 square up?",
+        "c0": "1 square right then 2 squares up",
+        "c1": "2 squares up then 1 square left",
+        "c2": "2 squares right then 1 square up"
+      }
+    },
+    "u08eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "They never meet.",
+        "strongHint": "Lines that stay the same distance apart are parallel.",
+        "prompt": "Two straight rails that stay the same distance apart are what?",
+        "c0": "Parallel",
+        "c1": "Crossing",
+        "c2": "Curved"
+      },
+      "q2": {
+        "hint": "Think of two different triangles.",
+        "strongHint": "Some triangles have a right angle, others do not.",
+        "prompt": "Does a triangle always have a right angle?",
+        "c0": "Yes, always",
+        "c1": "No, never",
+        "c2": "No: only some triangles"
+      },
+      "q3": {
+        "hint": "Think of a tin can.",
+        "strongHint": "The cylinder has a disc on top and a disc underneath.",
+        "prompt": "Which solid has two round bases?",
+        "c0": "The sphere",
+        "c1": "The cylinder",
+        "c2": "The cube"
+      },
+      "q4": {
+        "hint": "\"3 squares right\": to the right of where?",
+        "strongHint": "The same route ends in different places if you start somewhere else.",
+        "prompt": "Why must you say where you start?",
+        "c0": "So that the route leads to the same place for everyone",
+        "c1": "To make the route longer",
+        "c2": "It is not needed"
+      }
+    },
+    "u09l01": {
+      "objective": "I can read a clock to the nearest 5 minutes.",
+      "situation": "An activity starts at 8:15. Where do the clock hands go?",
+      "discover": "An hour has 60 minutes. The long hand moves 5 minutes from one number to the next.",
+      "manipulate": {
+        "hint": "The long hand is on the 3 for 15 minutes.",
+        "strongHint": "8:15: short hand just past the 8, long hand on the 3 (3 × 5 = 15 minutes).",
+        "title": "I make my clock",
+        "instruction": "Set the hours and minutes to show the activity's start time: 8:15."
+      },
+      "example": {
+        "easy": "Easy. Long hand on 6: how many minutes?",
+        "medium": "Medium. 8:15 + 30 min = __.",
+        "reflection": "Think. How many minutes between 9:20 and 10:00?"
+      },
+      "practice": {
+        "hint": "From the 12 to the 6, count in fives.",
+        "strongHint": "6 × 5 = 30 minutes.",
+        "prompt": "The long hand is on the 6. How many minutes past the hour?"
+      },
+      "reflect": {
+        "hint": "Move on to the next full hour.",
+        "strongHint": "From 9:20 to 10:00: 60 − 20 = 40 minutes.",
+        "prompt": "How many minutes are there between 9:20 and 10:00?"
+      },
+      "play": {
+        "hint": "For 40 minutes, the long hand is on the 8.",
+        "strongHint": "3:40: short hand between the 3 and the 4, long hand on the 8 (8 × 5 = 40).",
+        "title": "Turn the hands",
+        "instruction": "Turn the hands until the time asked for: 3:40."
+      },
+      "remember": "An hour has 60 minutes.",
+      "check": {
+        "hint": "Add 30 minutes to 15 minutes.",
+        "strongHint": "15 + 30 = 45: it is 8:45.",
+        "prompt": "The activity starts at 8:15 and lasts 30 minutes. What time does the clock show at the end?",
+        "c0": "8:30",
+        "c1": "9:15",
+        "c2": "8:45"
+      }
+    },
+    "u09l02": {
+      "objective": "I can find the time that has passed.",
+      "situation": "A journey starts at 7:30 and ends at 8:15. How long does it last?",
+      "discover": "Move on to a landmark time, then to the arrival, and add the durations. 7:30 → 8:00: 30 min; 8:00 → 8:15: 15 min; total 45 min.",
+      "manipulate": {
+        "hint": "Go through 8:00: from 7:30 to 8:00, then from 8:00 to 8:15.",
+        "strongHint": "30 + 15 = 45 minutes.",
+        "title": "I draw a timeline",
+        "prompt": "On a timeline, from 7:30 to 8:15, how many minutes pass?"
+      },
+      "example": {
+        "easy": "Easy. From 10:00 to 11:25: duration?",
+        "medium": "Medium. A 40-minute activity starts at 14:00. End?",
+        "reflection": "Think. From 8:50 to 9:10: duration?"
+      },
+      "practice": {
+        "hint": "One hour is 60 minutes: add the 25 minutes.",
+        "strongHint": "60 + 25 = 85 minutes.",
+        "prompt": "From 10:00 to 11:25, what is the duration in minutes?"
+      },
+      "reflect": {
+        "hint": "Go through 9:00.",
+        "strongHint": "From 8:50 to 9:00: 10 min; from 9:00 to 9:10: 10 min; total 20 min.",
+        "prompt": "From 8:50 to 9:10, how many minutes pass?"
+      },
+      "play": {
+        "hint": "Work out when the first activity ends.",
+        "strongHint": "9:00 + 30 min = 9:30: the next one starts at 9:30 or later.",
+        "title": "Complete the timetable",
+        "prompt": "A 30-minute activity starts at 9:00. The next one must not overlap it. When can it start?",
+        "c0": "At 8:45",
+        "c1": "At 9:30 or later",
+        "c2": "At 9:15"
+      },
+      "remember": "Move on to a landmark time, then to the arrival, and add the durations.",
+      "check": {
+        "hint": "From 10 to 55 minutes: find the gap.",
+        "strongHint": "55 − 10 = 45 minutes.",
+        "prompt": "A film starts at 15:10 and ends at 15:55. How long is it in minutes?"
+      }
+    },
+    "u09l03": {
+      "objective": "I can find dates and intervals.",
+      "situation": "A class is preparing an activity for the 18th of the month. Today is the 4th: how many days must we wait?",
+      "discover": "Seven days make a week. Two dates 7 days apart fall on the same day of the week.",
+      "manipulate": {
+        "hint": "Count in weeks of 7 days.",
+        "strongHint": "18 − 4 = 14 days, which is 2 weeks.",
+        "title": "I look at a calendar",
+        "prompt": "With an adult you look at a calendar. From the 4th to the 18th, how many days pass?"
+      },
+      "example": {
+        "easy": "Easy. How many days in 3 weeks?",
+        "medium": "Medium. If the 4th is a Monday, which day is the 11th?",
+        "reflection": "Think. From the 12th to the 17th, how many days pass?"
+      },
+      "practice": {
+        "hint": "One week = 7 days.",
+        "strongHint": "3 × 7 = 21 days.",
+        "prompt": "How many days are there in 3 weeks?"
+      },
+      "reflect": {
+        "hint": "Find the gap between 12 and 17.",
+        "strongHint": "17 − 12 = 5 days.",
+        "prompt": "From the 12th to the 17th, how many days pass?"
+      },
+      "play": {
+        "hint": "From the 4th to the 11th, how many days pass?",
+        "strongHint": "11 − 4 = 7 days: one week later it is a Monday again.",
+        "title": "Put the event on the calendar",
+        "prompt": "If the 4th is a Monday, which day is the 11th?",
+        "c0": "Monday",
+        "c1": "Tuesday",
+        "c2": "Sunday"
+      },
+      "remember": "Seven days make a week.",
+      "check": {
+        "hint": "Monday, Tuesday... up to Sunday.",
+        "strongHint": "A week has 7 days.",
+        "prompt": "How many days are there in a week?"
+      }
+    },
+    "u09l04": {
+      "objective": "I can put actions and durations in order.",
+      "situation": "A school day has lessons, a break and activities. How can you plan it well?",
+      "discover": "A timetable must respect the order, the start and end times and the durations.",
+      "manipulate": {
+        "hint": "Look at the times: they never go backwards.",
+        "strongHint": "8:00, then 8:30, then 10:00, then 10:15: put them in order of time.",
+        "title": "I make a timetable",
+        "instruction": "Put the four moments of this pretend timetable in the order of the day.",
+        "s0": "8:00: I arrive at school",
+        "s1": "8:30: maths lesson",
+        "s2": "10:00: break",
+        "s3": "10:15: reading activity"
+      },
+      "example": {
+        "easy": "Easy. Activity from 9:00 to 9:45: duration?",
+        "medium": "Medium. A 15-minute break after 10:30: restart time?",
+        "reflection": "Think. Two 30-minute activities and a 15-minute break last how long?"
+      },
+      "practice": {
+        "hint": "It lasts until 45 minutes past 9:00.",
+        "strongHint": "From 9:00 to 9:45: 45 minutes.",
+        "prompt": "An activity runs from 9:00 to 9:45. How long is it in minutes?"
+      },
+      "reflect": {
+        "hint": "Add the three durations.",
+        "strongHint": "30 + 30 + 15 = 75 minutes.",
+        "prompt": "Two 30-minute activities and a 15-minute break: how many minutes in all?"
+      },
+      "play": {
+        "hint": "Think of your day from morning to evening.",
+        "strongHint": "7:30, 8:00, 12:00 then 16:00: from earliest to latest.",
+        "title": "Build a sensible timetable",
+        "instruction": "Put the moments of a day in order so that the timetable makes sense.",
+        "s0": "7:30: I get up",
+        "s1": "8:00: I go to school",
+        "s2": "12:00: I eat",
+        "s3": "16:00: I go home"
+      },
+      "remember": "A timetable must respect the order, the start and end times and the durations.",
+      "check": {
+        "hint": "Add 15 minutes to 10:30.",
+        "strongHint": "10:30 + 15 min = 10:45.",
+        "prompt": "A 15-minute break starts at 10:30. At what time do we start again?",
+        "c0": "11:30",
+        "c1": "10:45",
+        "c2": "10:15"
+      }
+    },
+    "u09eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Add 30 minutes to 15 minutes.",
+        "strongHint": "15 + 30 = 45: it will be 8:45.",
+        "prompt": "It is 8:15. What time will it be in 30 minutes?",
+        "c0": "8:30",
+        "c1": "9:15",
+        "c2": "8:45"
+      },
+      "q2": {
+        "hint": "40 minutes is less than an hour.",
+        "strongHint": "14:00 + 40 min = 14:40.",
+        "prompt": "A 40-minute activity starts at 14:00. When does it end?",
+        "c0": "14:04",
+        "c1": "14:40",
+        "c2": "15:40"
+      },
+      "q3": {
+        "hint": "From the 4th to the 11th, how many days?",
+        "strongHint": "11 − 4 = 7 days: a Monday again.",
+        "prompt": "If the 4th is a Monday, which day is the 11th?",
+        "c0": "Monday",
+        "c1": "Tuesday",
+        "c2": "Sunday"
+      },
+      "q4": {
+        "hint": "Add 15 minutes to 10:30.",
+        "strongHint": "10:30 + 15 min = 10:45.",
+        "prompt": "A 15-minute break starts at 10:30. When do we start again?",
+        "c0": "10:15",
+        "c1": "11:30",
+        "c2": "10:45"
+      }
+    },
+    "u10l01": {
+      "objective": "I can read simple data.",
+      "situation": "The class counts favourite fruits and puts them in a table. How do you read this table?",
+      "discover": "A table organises data. In a pictogram, read the key before counting.",
+      "manipulate": {
+        "hint": "Add the votes from each row.",
+        "strongHint": "4 + 3 + 2 = 9 votes.",
+        "title": "I run a small survey",
+        "prompt": "In this small survey, how many people voted in all?",
+        "v1": "Fruit",
+        "v2": "Votes",
+        "v3": "Mango",
+        "v4": "Banana",
+        "v5": "Orange"
+      },
+      "example": {
+        "easy": "Easy. If 1 picture is worth 2 votes, how much are 4 pictures worth?",
+        "medium": "Medium. In a table, 7 pick A and 5 pick B. Difference?",
+        "reflection": "Think. Why is the key needed?"
+      },
+      "practice": {
+        "hint": "Read the key: what is one picture worth?",
+        "strongHint": "3 pictures × 2 votes = 6 votes.",
+        "prompt": "How many votes for the mango?",
+        "v1": "1 picture is worth {{value}} votes",
+        "v2": "Mango",
+        "v3": "Banana"
+      },
+      "reflect": {
+        "hint": "A picture can be worth 1 vote, 2 votes or 5 votes.",
+        "strongHint": "Without a key you do not know what a picture is worth: you might count wrongly.",
+        "prompt": "Why is the key needed in a pictogram?",
+        "c0": "It decorates the table",
+        "c1": "It gives the title",
+        "c2": "It says what each picture is worth"
+      },
+      "play": {
+        "hint": "Subtract the smaller from the larger.",
+        "strongHint": "7 − 5 = 2.",
+        "title": "Answer the harvest table",
+        "prompt": "In this harvest table, what is the difference between baskets A and B?",
+        "v1": "Basket",
+        "v2": "Fruits",
+        "v3": "Basket A",
+        "v4": "Basket B"
+      },
+      "remember": "A table organises data.",
+      "check": {
+        "hint": "Count in twos.",
+        "strongHint": "4 × 2 = 8 votes.",
+        "prompt": "If 1 picture is worth 2 votes, how many votes are 4 pictures worth?"
+      }
+    },
+    "u10l02": {
+      "objective": "I can chain two calculations.",
+      "situation": "We pick 235 fruits in the morning and 187 in the afternoon, then give out 96. How many fruits are left?",
+      "discover": "Deal with the actions in order and keep the in-between result. 235 + 187 = 422, then 422 − 96 = 326.",
+      "manipulate": {
+        "hint": "First step: put the two harvests together.",
+        "strongHint": "235 + 187 = 422.",
+        "title": "I show it with two bars",
+        "prompt": "Two bars one after the other: 235 fruits in the morning, 187 in the afternoon. How many fruits in all before the giving out?"
+      },
+      "example": {
+        "easy": "Easy. 120 + 85 then − 40 = __.",
+        "medium": "Medium. 6 baskets of 8 fruits; 15 are used. Left?",
+        "reflection": "Think. 72 items are shared between 8 groups, then 3 are added to each group. How many in each group?"
+      },
+      "practice": {
+        "hint": "Keep the result of the first step.",
+        "strongHint": "120 + 85 = 205; 205 − 40 = 165.",
+        "prompt": "Work out 120 + 85, then take away 40."
+      },
+      "reflect": {
+        "hint": "First find the share of one group.",
+        "strongHint": "72 ÷ 8 = 9; 9 + 3 = 12 items per group.",
+        "prompt": "72 items are shared between 8 groups, then 3 items are added to each group. How many items in each group?"
+      },
+      "play": {
+        "hint": "First action: how many fruits at the start?",
+        "strongHint": "6 × 8 = 48; 48 − 15 = 33 fruits.",
+        "title": "Solve a mission",
+        "prompt": "Mission: 6 baskets of 8 fruits, of which 15 fruits are used. How many fruits are left?"
+      },
+      "remember": "Deal with the actions in order and keep the in-between result.",
+      "check": {
+        "hint": "Work out 235 + 187, then take away 96.",
+        "strongHint": "235 + 187 = 422; 422 − 96 = 326.",
+        "prompt": "We pick 235 + 187 fruits then give out 96. How many fruits are left?"
+      }
+    },
+    "u10l03": {
+      "objective": "I can explain a choice of addition, subtraction, multiplication or sharing.",
+      "situation": "Several stories are about fruit, but they do not all need the same calculation. How do you choose?",
+      "discover": "Words alone are not enough: understand the action and the question before choosing.",
+      "manipulate": {
+        "hint": "What do you do with the two piles?",
+        "strongHint": "Putting two amounts together: an addition.",
+        "title": "I act out the action",
+        "prompt": "You act out putting two piles of fruit together. Which operation shows this action?",
+        "c0": "An addition",
+        "c1": "A subtraction",
+        "c2": "A multiplication",
+        "c3": "A sharing (division)"
+      },
+      "example": {
+        "easy": "Easy. 4 baskets of 7: which operation?",
+        "medium": "Medium. There were 35, 19 are left: which operation?",
+        "reflection": "Think. 54 items spread between 6: which operation?"
+      },
+      "practice": {
+        "hint": "The baskets hold the same number of fruits.",
+        "strongHint": "Equal groups: a multiplication, 4 × 7.",
+        "prompt": "4 baskets each hold 7 fruits. Which operation gives the total?",
+        "c0": "A subtraction",
+        "c1": "A multiplication",
+        "c2": "A sharing (division)",
+        "c3": "An addition"
+      },
+      "reflect": {
+        "hint": "The number of fruits went down.",
+        "strongHint": "We look for what was taken away: a subtraction, 35 − 19.",
+        "prompt": "There were 35 fruits, 19 are left. Which operation gives the number of fruits taken away?",
+        "c0": "A sharing (division)",
+        "c1": "An addition",
+        "c2": "A subtraction",
+        "c3": "A multiplication"
+      },
+      "play": {
+        "hint": "We spread into equal shares.",
+        "strongHint": "Spreading 54 items between 6 groups: a sharing, 54 ÷ 6.",
+        "title": "Open the right door",
+        "prompt": "54 items are spread between 6 groups. Which door do you choose?",
+        "c0": "A sharing (division)",
+        "c1": "An addition",
+        "c2": "A subtraction",
+        "c3": "A multiplication"
+      },
+      "remember": "Words alone are not enough: understand the action and the question before choosing.",
+      "check": {
+        "hint": "Think of what happens to the number: does it go up or down?",
+        "strongHint": "Taking off, removing, losing: that is a subtraction.",
+        "prompt": "Which action matches a subtraction?",
+        "c0": "Putting two amounts together",
+        "c1": "Making equal groups",
+        "c2": "Taking away an amount"
+      }
+    },
+    "u10l04": {
+      "objective": "I can make up a sensible problem.",
+      "situation": "The class is preparing challenges for other pupils. What makes a good problem?",
+      "discover": "A good problem gives the useful data, asks a clear question and has an answer you can check.",
+      "manipulate": {
+        "hint": "A story starts with the data and ends with the question.",
+        "strongHint": "Start (240), add (175), take away (90), then the question: this is the calculation 240 + 175 − 90.",
+        "title": "I write a story",
+        "instruction": "Put the story that matches the calculation 240 + 175 − 90 in order.",
+        "s0": "At the market, a seller has 240 mangoes.",
+        "s1": "He receives 175 more.",
+        "s2": "He sells 90.",
+        "s3": "How many mangoes does he have left?"
+      },
+      "example": {
+        "easy": "Easy. Make up a problem with the answer 36 using a multiplication.",
+        "medium": "Medium. Correct: \"He has some mangoes. He gives away 5. How many are left?\"",
+        "reflection": "Think. How can you check 504 − 268 = 236?"
+      },
+      "practice": {
+        "hint": "Do the addition, then the subtraction.",
+        "strongHint": "240 + 175 = 415; 415 − 90 = 325 mangoes.",
+        "prompt": "In the story 240 + 175 − 90, how many mangoes are left?"
+      },
+      "reflect": {
+        "hint": "Can you answer without knowing how many he had?",
+        "strongHint": "Without the starting amount you cannot work out what is left.",
+        "prompt": "In \"He has some mangoes. He gives away 5. How many are left?\", what is missing?",
+        "c0": "The question",
+        "c1": "The number of mangoes given away",
+        "c2": "The number of mangoes at the start"
+      },
+      "play": {
+        "hint": "If you put back what you took away, you get back to the start.",
+        "strongHint": "236 + 268 = 504: the subtraction is right.",
+        "title": "I swap and explain the correction",
+        "prompt": "How can you check that 504 − 268 = 236?",
+        "c0": "236 − 268 = 504",
+        "c1": "504 + 268 = 236",
+        "c2": "236 + 268 = 504"
+      },
+      "remember": "A good problem gives the useful data, asks a clear question and has an answer you can check.",
+      "check": {
+        "hint": "Add the result and the number taken away.",
+        "strongHint": "236 + 268 = 504: we get back the starting number.",
+        "prompt": "Check: how much is 236 + 268?"
+      }
+    },
+    "u10eval": {
+      "intro": "Work alone first. Use a diagram if you need one and explain at least one answer.",
+      "q1": {
+        "hint": "Subtract the smaller from the larger.",
+        "strongHint": "7 − 5 = 2.",
+        "prompt": "In a table, 7 children pick A and 5 pick B. What is the difference?"
+      },
+      "q2": {
+        "hint": "First work out the total number of fruits.",
+        "strongHint": "6 × 8 = 48; 48 − 15 = 33.",
+        "prompt": "6 baskets of 8 fruits; 15 fruits are used. How many fruits are left?"
+      },
+      "q3": {
+        "hint": "The number went down.",
+        "strongHint": "We look for what was taken away: a subtraction.",
+        "prompt": "There were 35, 19 are left. Which operation should you choose?",
+        "c0": "A sharing (division)",
+        "c1": "An addition",
+        "c2": "A subtraction",
+        "c3": "A multiplication"
+      },
+      "q4": {
+        "hint": "Can you answer without knowing the start?",
+        "strongHint": "The starting amount is missing, so you cannot work out what is left.",
+        "prompt": "Correct: \"He has some mangoes. He gives away 5. How many are left?\" What is missing?",
+        "c0": "The number of mangoes at the start",
+        "c1": "The question",
+        "c2": "The number of mangoes given away"
       }
     }
   },

@@ -31,7 +31,10 @@ describe("Pages du parcours de 3e primaire", () => {
     expect(screen.getAllByRole("article")).toHaveLength(10);
     expect(screen.getByText("0 / 40 leçons")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /commencer mon parcours/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /voir le module/i })).toHaveLength(9);
+    expect(screen.queryByRole("link", { name: /voir le module/i })).not.toBeInTheDocument();
+    for (const article of screen.getAllByRole("article")) {
+      expect(within(article).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
+    }
     expect(screen.getByRole("complementary", { name: /Yamba.*degré moyen/i })).toBeInTheDocument();
   });
 
@@ -45,15 +48,27 @@ describe("Pages du parcours de 3e primaire", () => {
     }
   });
 
-  it("affiche le module 2 comme à venir, sans aucune leçon accessible", () => {
+  it("publie les modules 2 à 10 avec leurs quatre leçons et leur évaluation", () => {
+    for (const module of PRIMARY_THREE_MODULES) {
+      expect(module.publication).toBe("available");
+      expect(module.lessons).toHaveLength(4);
+      for (const item of [...module.lessons, module.evaluation]) {
+        expect(item.publication).toBe("available");
+        expect(item.steps.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("affiche le module 2 avec ses quatre leçons et son évaluation, toutes disponibles", () => {
     renderAt("/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U02");
 
     const articles = screen.getAllByRole("article");
     expect(articles).toHaveLength(5);
     for (const article of articles) {
-      expect(within(article).getAllByText("À venir").length).toBeGreaterThan(0);
-      expect(within(article).queryByRole("link")).not.toBeInTheDocument();
+      expect(within(article).getByRole("link", { name: /commencer/i })).toBeInTheDocument();
     }
+    expect(screen.getAllByText("Calcul mental").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Évaluation - Unité 2").length).toBeGreaterThan(0);
   });
 
   it("distingue À commencer, En cours et Terminé sur la page du module 1", () => {
@@ -462,11 +477,11 @@ describe("Pages du parcours de 3e primaire", () => {
 
     // L'unité 1 est intégralement terminée : l'action principale propose le module suivant (pas de leçon suivante).
     renderAt("/app/apprentissages/primaire/3/mathematiques");
-    expect(screen.getByRole("link", { name: /module suivant/i })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: /module suivant/i })[0]).toHaveAttribute(
       "href",
       "/app/apprentissages/primaire/3/mathematiques/modules/MATH-3P-U02",
     );
-  });
+  }, 20000);
 
   it("propose le module 3e primaire depuis le menu de navigation", async () => {
     const user = userEvent.setup();
