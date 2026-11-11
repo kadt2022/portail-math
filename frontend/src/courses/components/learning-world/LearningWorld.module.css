@@ -209,7 +209,13 @@
   .sceneStage {
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+    gap: 20px;
     background-position: 50% 50%;
+  }
+
+  .sourceZone,
+  .basketGrid {
+    align-content: start;
   }
 
   .zoneFeatured {
@@ -234,15 +240,20 @@
 
   .sceneStage {
     padding: 10px;
+    gap: 18px;
   }
 
   .basketGrid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .zone,
+  .zone {
+    grid-template-rows: auto auto auto;
+    min-height: 0;
+  }
+
   .zoneFeatured {
-    min-height: 220px;
+    min-height: 0;
   }
 
   .objectButton,
