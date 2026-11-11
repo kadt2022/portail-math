@@ -10,7 +10,7 @@ import type { MoveLearningObjectAction } from "./learning-world.types";
 import { LearningObject } from "./LearningObject";
 import styles from "./LearningWorld.module.css";
 import { ObjectZone, setLearningObjectDragData } from "./ObjectZone";
-import type { MangoBasketState, MangoZoneId } from "./mango-basket-engine";
+import type { BasketFruit, MangoBasketState, MangoZoneId } from "./mango-basket-engine";
 import { MANGO_BASKET_IDS, MANGO_SOURCE_ID } from "./mango-basket-engine";
 
 interface Selection {
@@ -22,9 +22,17 @@ export interface MangoBasketSceneProps {
   state: MangoBasketState;
   onAction: (action: MoveLearningObjectAction) => void;
   onReset?: () => void;
+  fruit?: BasketFruit;
+  showCounts?: boolean;
 }
 
-export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneProps) {
+export function MangoBasketScene({
+  state,
+  onAction,
+  onReset,
+  fruit = "mango",
+  showCounts = true,
+}: MangoBasketSceneProps) {
   const { t } = useTranslation("learningWorld");
   const [selection, setSelection] = useState<Selection | null>(null);
   const basketUrl = getLearningObjectDefinition("container.basket").assetUrl;
@@ -63,7 +71,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
 
   const renderObjects = (zoneId: MangoZoneId) =>
     state.zones[zoneId].map((object) => {
-      const number = Number(object.instanceId.replace("mango-", ""));
+      const number = Number(object.instanceId.match(/(\d+)$/)?.[1] ?? 0);
       const selected = activeSelection?.objectInstanceId === object.instanceId;
       const dragStart = (event: DragEvent<HTMLButtonElement>) => {
         const nextSelection = { objectInstanceId: object.instanceId, fromZoneId: zoneId };
@@ -74,7 +82,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
         <LearningObject
           key={object.instanceId}
           instance={object}
-          label={t(selected ? "scene.deselectMango" : "scene.selectMango", { number })}
+          label={t(selected ? `scene.${fruit}.deselect` : `scene.${fruit}.select`, { number })}
           selected={selected}
           onSelect={() => select(object.instanceId, zoneId)}
           onDragStart={dragStart}
@@ -89,7 +97,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
       <ObjectZone
         key={zoneId}
         label={label}
-        countLabel={t("scene.mangoCount", { count })}
+        countLabel={showCounts ? t(`scene.${fruit}.count`, { count }) : undefined}
         decorationUrl={basketUrl}
         placeLabel={t("scene.placeIn", { zone: label })}
         canPlace={Boolean(activeSelection && activeSelection.fromZoneId !== zoneId)}
@@ -116,7 +124,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
       <div className={styles.sceneHeading}>
         <div>
           <p>{t("scene.eyebrow")}</p>
-          <h2 id="mango-scene-title">{t("scene.title")}</h2>
+          <h2 id="mango-scene-title">{t(`scene.${fruit}.title`)}</h2>
         </div>
         {onReset ? (
           <button
@@ -131,7 +139,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
           </button>
         ) : null}
       </div>
-      <p className={styles.sceneInstruction}>{t("scene.instruction")}</p>
+      <p className={styles.sceneInstruction}>{t(`scene.${fruit}.instruction`)}</p>
       <div
         className={styles.sceneStage}
         style={{ backgroundImage: `linear-gradient(rgb(15 51 43 / 10%), rgb(15 51 43 / 28%)), url(${backgroundUrl})` }}
@@ -141,7 +149,7 @@ export function MangoBasketScene({ state, onAction, onReset }: MangoBasketSceneP
           {MANGO_BASKET_IDS.map((basketId, index) => zone(basketId, index + 1))}
         </div>
       </div>
-      <p className={styles.sceneSummary} aria-live="polite">{summary}</p>
+      {showCounts ? <p className={styles.sceneSummary} aria-live="polite">{summary}</p> : null}
     </section>
   );
 }

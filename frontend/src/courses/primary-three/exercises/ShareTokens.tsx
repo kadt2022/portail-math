@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MangoBasketScene } from "../../components/learning-world/MangoBasketScene";
 import {
   applyMangoBasketAction,
-  createMangoBasketState,
+  createFruitBasketState,
   MANGO_BASKET_IDS,
 } from "../../components/learning-world/mango-basket-engine";
 import type { MangoBasketState } from "../../components/learning-world/mango-basket-engine";
@@ -84,20 +84,20 @@ function TokenShareSteppers({ exercise, titleKey, instructionKey, hintKey, stron
   );
 }
 
-function completedMangoState(total: number, bowls: number): MangoBasketState {
+function completedOrangeState(total: number, bowls: number): MangoBasketState {
   const share = Math.floor(total / bowls);
-  let state = createMangoBasketState(total);
-  let mangoNumber = 1;
+  let state = createFruitBasketState(total, "orange");
+  let fruitNumber = 1;
 
   for (const basketId of MANGO_BASKET_IDS.slice(0, bowls)) {
     for (let index = 0; index < share; index += 1) {
       state = applyMangoBasketAction(state, {
         type: "move-object",
-        objectInstanceId: `mango-${mangoNumber}`,
+        objectInstanceId: `orange-${fruitNumber}`,
         fromZoneId: "stock",
         toZoneId: basketId,
       });
-      mangoNumber += 1;
+      fruitNumber += 1;
     }
   }
 
@@ -109,8 +109,10 @@ function MangoShareTokens({ exercise, titleKey, instructionKey, hintKey, strongH
   const share = Math.floor(exercise.total / exercise.bowls);
   const rest = exercise.total % exercise.bowls;
   const [state, setState] = useState<MangoBasketState>(() => completed
-    ? completedMangoState(exercise.total, exercise.bowls)
-    : createMangoBasketState(exercise.total));
+    ? completedOrangeState(exercise.total, exercise.bowls)
+    : createFruitBasketState(exercise.total, "orange"));
+  const [perBasketAnswer, setPerBasketAnswer] = useState(completed ? String(share) : "");
+  const [remainderAnswer, setRemainderAnswer] = useState(completed ? String(rest) : "");
   const { attempts, registerWrong, reset } = useAttempts();
   const feedback = hintForAttempts(attempts, t, hintKey, strongHintKey);
 
@@ -118,7 +120,11 @@ function MangoShareTokens({ exercise, titleKey, instructionKey, hintKey, strongH
     const basketsAreEqual = MANGO_BASKET_IDS
       .slice(0, exercise.bowls)
       .every((basketId) => state.zones[basketId].length === share);
-    if (basketsAreEqual && state.zones.stock.length === rest) {
+    const answersAreCorrect = perBasketAnswer.trim() !== ""
+      && remainderAnswer.trim() !== ""
+      && Number(perBasketAnswer) === share
+      && Number(remainderAnswer) === rest;
+    if (basketsAreEqual && state.zones.stock.length === rest && answersAreCorrect) {
       onValidated();
       return;
     }
@@ -129,15 +135,61 @@ function MangoShareTokens({ exercise, titleKey, instructionKey, hintKey, strongH
     <ActivityShell titleKey={titleKey} instructionKey={instructionKey} completed={completed} feedback={feedback} onValidate={validate}>
       <MangoBasketScene
         state={state}
+        fruit="orange"
+        showCounts={false}
         onAction={(action) => {
           setState((current) => applyMangoBasketAction(current, action));
           reset();
         }}
         onReset={() => {
-          setState(createMangoBasketState(exercise.total));
+          setState(createFruitBasketState(exercise.total, "orange"));
+          setPerBasketAnswer("");
+          setRemainderAnswer("");
           reset();
         }}
       />
+      <section className={styles.observationAnswers} aria-labelledby="sharing-observation-title">
+        <h3 id="sharing-observation-title">{t("exercise.share.observationTitle")}</h3>
+        <p>{t("exercise.share.observationInstruction")}</p>
+        <div className={styles.sharingAnswerGrid}>
+          <label>
+            <span>{t("exercise.share.orangePerBasket")}</span>
+            <span className={styles.sharingAnswerLine}>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                placeholder="?"
+                value={perBasketAnswer}
+                aria-label={t("exercise.share.orangePerBasketLabel")}
+                onChange={(event) => {
+                  setPerBasketAnswer(event.target.value);
+                  reset();
+                }}
+              />
+              {t("exercise.share.oranges")}
+            </span>
+          </label>
+          <label>
+            <span>{t("exercise.share.orangeRemainder")}</span>
+            <span className={styles.sharingAnswerLine}>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                placeholder="?"
+                value={remainderAnswer}
+                aria-label={t("exercise.share.orangeRemainderLabel")}
+                onChange={(event) => {
+                  setRemainderAnswer(event.target.value);
+                  reset();
+                }}
+              />
+              {t("exercise.share.orangesInStart")}
+            </span>
+          </label>
+        </div>
+      </section>
     </ActivityShell>
   );
 }

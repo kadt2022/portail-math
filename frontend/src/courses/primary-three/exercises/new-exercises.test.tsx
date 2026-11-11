@@ -86,24 +86,33 @@ describe("Nouveaux exercices interactifs de la 3e primaire", () => {
     expect(onValidated).toHaveBeenCalledOnce();
   });
 
-  it("partage 26 mangues entre 4 paniers avec le reste", async () => {
+  it("partage 26 oranges, masque les compteurs et vérifie les réponses écrites", async () => {
     const user = userEvent.setup();
     const onValidated = renderStep(lessonStep("MATH-3P-U04-L04", "manipulate"));
 
     for (let mango = 1; mango <= 23; mango += 1) {
-      await user.click(screen.getByRole("button", { name: `Sélectionner la mangue ${mango}` }));
+      await user.click(screen.getByRole("button", { name: `Sélectionner l'orange ${mango}` }));
       await user.click(screen.getByRole("button", { name: `Déposer dans Panier ${((mango - 1) % 4) + 1}` }));
     }
+    expect(screen.queryByText(/Panier 1 :/)).not.toBeInTheDocument();
     await validate(user);
     expect(onValidated).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole("button", { name: "Sélectionner la mangue 24" }));
+    await user.click(screen.getByRole("button", { name: "Sélectionner l'orange 24" }));
     await user.click(screen.getByRole("button", { name: "Déposer dans Panier 4" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Nombre d'oranges dans chaque panier" }), "5");
+    await user.type(screen.getByRole("spinbutton", { name: "Nombre d'oranges dans le panier de départ" }), "2");
+    await validate(user);
+    expect(onValidated).not.toHaveBeenCalled();
+
+    const perBasket = screen.getByRole("spinbutton", { name: "Nombre d'oranges dans chaque panier" });
+    await user.clear(perBasket);
+    await user.type(perBasket, "6");
     await validate(user);
     expect(onValidated).toHaveBeenCalledOnce();
   }, 30000);
 
-  it("explique pourquoi les deux mangues restantes ne peuvent pas être distribuées", async () => {
+  it("explique pourquoi les deux oranges restantes ne peuvent pas être distribuées", async () => {
     const user = userEvent.setup();
     const step = lessonStep("MATH-3P-U04-L04", "reflect");
     const exercise = step.exercise;

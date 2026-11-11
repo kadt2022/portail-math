@@ -1,5 +1,6 @@
 export type LearningObjectId =
   | "fruit.mango"
+  | "fruit.orange"
   | "container.basket"
   | "school.notebook"
   | "school.pencil"

@@ -10,20 +10,31 @@
   },
   "scene": {
     "eyebrow": "Je manipule",
-    "title": "Répartis les mangues",
-    "instruction": "Sélectionne une mangue, puis choisis un panier. À la souris, tu peux aussi la faire glisser.",
     "stock": "Panier de départ",
     "basket": "Panier {{number}}",
-    "mangoCount_one": "{{count}} mangue",
-    "mangoCount_other": "{{count}} mangues",
-    "selectMango": "Sélectionner la mangue {{number}}",
-    "deselectMango": "Désélectionner la mangue {{number}}",
+    "mango": {
+      "title": "Répartis les mangues",
+      "instruction": "Sélectionne une mangue, puis choisis un panier. À la souris, tu peux aussi la faire glisser.",
+      "count_one": "{{count}} mangue",
+      "count_other": "{{count}} mangues",
+      "select": "Sélectionner la mangue {{number}}",
+      "deselect": "Désélectionner la mangue {{number}}"
+    },
+    "orange": {
+      "title": "Le partage des oranges",
+      "instruction": "Sélectionne une orange, puis choisis le panier d'une table. Tu peux la reprendre pour corriger.",
+      "count_one": "{{count}} orange",
+      "count_other": "{{count}} oranges",
+      "select": "Sélectionner l'orange {{number}}",
+      "deselect": "Désélectionner l'orange {{number}}"
+    },
     "placeIn": "Déposer dans {{zone}}",
     "summaryPart": "{{zone}} : {{count}}",
     "reset": "Recommencer"
   },
   "objects": {
     "mango": "Mangue",
+    "orange": "Orange",
     "basket": "Panier",
     "notebook": "Cahier",
     "pencil": "Crayon",

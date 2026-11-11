@@ -4,7 +4,7 @@ import styles from "./LearningWorld.module.css";
 
 interface ObjectZoneProps {
   label: string;
-  countLabel: string;
+  countLabel?: string;
   decorationUrl?: string;
   placeLabel: string;
   canPlace: boolean;
@@ -48,13 +48,13 @@ export function ObjectZone({
   return (
     <section
       className={`${styles.zone} ${featured ? styles.zoneFeatured : ""}`}
-      aria-label={`${label}, ${countLabel}`}
+      aria-label={countLabel ? `${label}, ${countLabel}` : label}
       onDragOver={acceptDrop}
       onDrop={drop}
     >
       <header className={styles.zoneHeader}>
         <h3>{label}</h3>
-        <strong>{countLabel}</strong>
+        {countLabel ? <strong>{countLabel}</strong> : null}
       </header>
       {decorationUrl ? <img className={styles.zoneDecoration} src={decorationUrl} alt="" /> : null}
       <div className={styles.zoneObjects}>{children}</div>

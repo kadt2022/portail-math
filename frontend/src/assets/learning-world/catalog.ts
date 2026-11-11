@@ -6,6 +6,7 @@ import eraserUrl from "./objects/eraser.svg";
 import mangoUrl from "./objects/mango.svg";
 import marketStallObjectUrl from "./objects/market-stall.svg";
 import notebookUrl from "./objects/notebook.svg";
+import orangeUrl from "./objects/orange.svg";
 import pencilUrl from "./objects/pencil.svg";
 import walletUrl from "./objects/wallet.svg";
 import marketEnvironmentUrl from "./environments/market-stall.webp";
@@ -24,6 +25,17 @@ export const LEARNING_OBJECT_CATALOG: Record<LearningObjectId, LearningObjectDef
     category: "fruit",
     assetUrl: mangoUrl,
     altKey: "objects.mango",
+    aspectRatio: 1,
+    format: "svg",
+    roles: ["countable", "movable"],
+    provenance: "original",
+    license: "project",
+  },
+  "fruit.orange": {
+    id: "fruit.orange",
+    category: "fruit",
+    assetUrl: orangeUrl,
+    altKey: "objects.orange",
     aspectRatio: 1,
     format: "svg",
     roles: ["countable", "movable"],

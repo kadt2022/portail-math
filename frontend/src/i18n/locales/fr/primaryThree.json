@@ -241,7 +241,15 @@
       "removePerBowl": "Enlever un jeton dans chaque bol",
       "addPerBowl": "Ajouter un jeton dans chaque bol",
       "removeLeft": "Enlever un jeton du reste",
-      "addLeft": "Ajouter un jeton au reste"
+      "addLeft": "Ajouter un jeton au reste",
+      "observationTitle": "J'observe, je compte et j'écris",
+      "observationInstruction": "Compte les oranges sans utiliser de compteur, puis complète les deux phrases.",
+      "orangePerBasket": "Chaque panier a reçu…",
+      "orangePerBasketLabel": "Nombre d'oranges dans chaque panier",
+      "orangeRemainder": "Et il reste…",
+      "orangeRemainderLabel": "Nombre d'oranges dans le panier de départ",
+      "oranges": "oranges.",
+      "orangesInStart": "oranges dans le panier de départ."
     },
     "money": {
       "target": "Forme {{amount}} FC",
@@ -1006,30 +1014,30 @@
     },
     "u04l04": {
       "objective": "Je peux interpréter une division avec ou sans reste.",
-      "situation": "Pour la fête de l'école, Yamba et ses camarades préparent 4 paniers de mangues pour 4 tables. Ils ont 26 mangues et chaque table doit en recevoir le même nombre.",
-      "discover": "Yamba propose de donner une mangue à chaque table, tour après tour. Quand il n'y en a plus assez pour servir les 4 tables, les mangues non distribuées forment le reste.",
+      "situation": "Pour la fête de l'école, Yamba et ses camarades préparent 4 paniers d'oranges pour 4 tables. Ils ont 26 oranges et chaque table doit en recevoir le même nombre.",
+      "discover": "Yamba propose de donner une orange à chaque table, tour après tour. Quand il n'y en a plus assez pour servir les 4 tables, les oranges non distribuées forment le reste.",
       "manipulate": {
-        "hint": "Fais un tour des 4 tables : dépose une mangue dans chaque panier, puis recommence tant que les 4 tables peuvent être servies.",
-        "strongHint": "Chaque table reçoit 6 mangues : 4 × 6 = 24. Les 2 mangues restantes ne suffisent pas pour faire un nouveau tour des 4 tables.",
-        "instruction": "Aide Yamba à préparer les 4 tables. Forme 4 paniers contenant le même nombre de mangues et garde dans le panier de départ celles qui ne peuvent pas être partagées également."
+        "hint": "Fais un tour des 4 tables : dépose une orange dans chaque panier, puis recommence tant que les 4 tables peuvent être servies.",
+        "strongHint": "Chaque table reçoit 6 oranges : 4 × 6 = 24. Les 2 oranges restantes ne suffisent pas pour faire un nouveau tour des 4 tables.",
+        "instruction": "Aide Yamba à préparer les 4 tables. Forme 4 paniers contenant le même nombre d'oranges et garde dans le panier de départ celles qui ne peuvent pas être partagées également."
       },
       "example": {
-        "easy": "Facile. Pour 4 tables, 32 mangues donnent combien de mangues par table ?",
-        "medium": "Intermédiaire. Avec 23 mangues, combien de paniers complets de 5 peut-on préparer ?",
-        "reflection": "Réflexion. Vérifie que 27 mangues partagées entre 3 tables donnent 9 mangues par table."
+        "easy": "Facile. Pour 4 tables, 32 oranges donnent combien d'oranges par table ?",
+        "medium": "Intermédiaire. Avec 23 oranges, combien de paniers complets de 5 peut-on préparer ?",
+        "reflection": "Réflexion. Vérifie que 27 oranges partagées entre 3 tables donnent 9 oranges par table."
       },
       "practice": {
-        "hint": "Les 26 mangues et les 6 nouvelles font 32 mangues. Cherche le nombre qui, multiplié par 4, donne 32.",
-        "strongHint": "26 + 6 = 32, puis 4 × 8 = 32. Chaque table reçoit maintenant 8 mangues.",
-        "prompt": "Défi suivant : un camarade apporte 6 mangues supplémentaires. Combien de mangues chacune des 4 tables recevra-t-elle maintenant ?"
+        "hint": "Les 26 oranges et les 6 nouvelles font 32 oranges. Cherche le nombre qui, multiplié par 4, donne 32.",
+        "strongHint": "26 + 6 = 32, puis 4 × 8 = 32. Chaque table reçoit maintenant 8 oranges.",
+        "prompt": "Défi suivant : un camarade apporte 6 oranges supplémentaires. Combien d'oranges chacune des 4 tables recevra-t-elle maintenant ?"
       },
       "reflect": {
-        "hint": "Imagine que tu donnes une des 2 mangues restantes à une table. Les paniers contiendraient-ils encore tous le même nombre ?",
-        "strongHint": "Pour ajouter une mangue à chaque table, il en faudrait 4. Avec seulement 2 mangues, deux tables recevraient davantage que les autres.",
-        "prompt": "Pourquoi Yamba garde-t-il 2 mangues dans le panier de départ ?",
-        "c0": "Parce qu'il n'y en a pas assez pour donner une mangue de plus à chacune des 4 tables",
+        "hint": "Imagine que tu donnes une des 2 oranges restantes à une table. Les paniers contiendraient-ils encore tous le même nombre ?",
+        "strongHint": "Pour ajouter une orange à chaque table, il en faudrait 4. Avec seulement 2 oranges, deux tables recevraient davantage que les autres.",
+        "prompt": "Pourquoi Yamba garde-t-il 2 oranges dans le panier de départ ?",
+        "c0": "Parce qu'il n'y en a pas assez pour donner une orange de plus à chacune des 4 tables",
         "c1": "Parce que les quatre paniers sont déjà pleins",
-        "c2": "Parce que deux mangues ne peuvent jamais être mangées"
+        "c2": "Parce que deux oranges ne peuvent jamais être mangées"
       },
       "play": {
         "hint": "Chaque stand de jeu reçoit le même nombre de jetons ; ce qui reste ne peut pas faire un tour complet.",
@@ -1039,9 +1047,9 @@
       },
       "remember": "Partager équitablement, c'est donner la même quantité à chaque groupe. Le reste est ce qui ne suffit pas pour faire un nouveau tour complet.",
       "check": {
-        "hint": "Pour vérifier le partage des mangues, multiplie la part d'une table par le nombre de tables.",
-        "strongHint": "3 tables de 9 mangues font 27 mangues : 9 × 3 = 27.",
-        "prompt": "Yamba partage 27 mangues entre 3 tables. Quelle multiplication confirme que chaque table reçoit 9 mangues ?",
+        "hint": "Pour vérifier le partage des oranges, multiplie la part d'une table par le nombre de tables.",
+        "strongHint": "3 tables de 9 oranges font 27 oranges : 9 × 3 = 27.",
+        "prompt": "Yamba partage 27 oranges entre 3 tables. Quelle multiplication confirme que chaque table reçoit 9 oranges ?",
         "c0": "3 × 3 = 27",
         "c1": "9 × 3 = 27",
         "c2": "9 + 3 = 27"

@@ -8,20 +8,26 @@ export interface MangoBasketState {
   zones: Record<MangoZoneId, readonly LearningObjectInstance[]>;
 }
 
-export function createMangoBasketState(total = 24): MangoBasketState {
-  const mangoes = Array.from({ length: total }, (_, index): LearningObjectInstance => ({
-    instanceId: `mango-${index + 1}`,
-    objectId: "fruit.mango",
+export type BasketFruit = "mango" | "orange";
+
+export function createFruitBasketState(total = 24, fruit: BasketFruit = "mango"): MangoBasketState {
+  const fruits = Array.from({ length: total }, (_, index): LearningObjectInstance => ({
+    instanceId: `${fruit}-${index + 1}`,
+    objectId: `fruit.${fruit}`,
   }));
   return {
     zones: {
-      stock: mangoes,
+      stock: fruits,
       "basket-1": [],
       "basket-2": [],
       "basket-3": [],
       "basket-4": [],
     },
   };
+}
+
+export function createMangoBasketState(total = 24): MangoBasketState {
+  return createFruitBasketState(total, "mango");
 }
 
 export function applyMangoBasketAction(

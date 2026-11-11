@@ -686,6 +686,61 @@
   gap: 12px;
 }
 
+.observationAnswers {
+  margin-top: 20px;
+  padding: clamp(16px, 3vw, 24px);
+  border: 2px solid #bcd6ea;
+  border-radius: var(--pm-radius-md);
+  background: linear-gradient(145deg, #f2f8fd, #fffaf1);
+}
+
+.observationAnswers h3 {
+  margin: 0;
+  color: var(--pm-brand-dark);
+  font-size: clamp(20px, 4vw, 27px);
+}
+
+.observationAnswers > p {
+  margin: 6px 0 16px;
+  color: var(--pm-ink-soft);
+}
+
+.sharingAnswerGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sharingAnswerGrid label {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius-sm);
+  background: #fff;
+  color: var(--pm-brand-dark);
+  font-weight: 800;
+}
+
+.sharingAnswerLine {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sharingAnswerLine input {
+  width: 76px;
+  min-height: 54px;
+  padding: 8px;
+  border: 2px solid var(--pm-accent);
+  border-radius: var(--pm-radius-sm);
+  color: var(--pm-brand-dark);
+  font: inherit;
+  font-size: 24px;
+  font-weight: 900;
+  text-align: center;
+}
+
 .moneyControls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -1048,6 +1103,7 @@
 
 @media (max-width: 600px) {
   .twoControls,
+  .sharingAnswerGrid,
   .clockLayout {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -241,7 +241,15 @@
       "removePerBowl": "Remove a token from each bowl",
       "addPerBowl": "Add a token to each bowl",
       "removeLeft": "Remove a token from the rest",
-      "addLeft": "Add a token to the rest"
+      "addLeft": "Add a token to the rest",
+      "observationTitle": "I observe, count and write",
+      "observationInstruction": "Count the oranges without using a counter, then complete both sentences.",
+      "orangePerBasket": "Each basket received…",
+      "orangePerBasketLabel": "Number of oranges in each basket",
+      "orangeRemainder": "And there are…",
+      "orangeRemainderLabel": "Number of oranges in the starting basket",
+      "oranges": "oranges.",
+      "orangesInStart": "oranges left in the starting basket."
     },
     "money": {
       "target": "Make {{amount}} FC",
@@ -1006,30 +1014,30 @@
     },
     "u04l04": {
       "objective": "I can read a division with or without a remainder.",
-      "situation": "For the school celebration, Yamba and his classmates prepare 4 mango baskets for 4 tables. They have 26 mangoes, and every table must receive the same number.",
-      "discover": "Yamba suggests giving one mango to every table, round after round. When there are not enough mangoes to serve all 4 tables, the undistributed mangoes form the remainder.",
+      "situation": "For the school celebration, Yamba and his classmates prepare 4 orange baskets for 4 tables. They have 26 oranges, and every table must receive the same number.",
+      "discover": "Yamba suggests giving one orange to every table, round after round. When there are not enough oranges to serve all 4 tables, the undistributed oranges form the remainder.",
       "manipulate": {
-        "hint": "Make a round of the 4 tables: put one mango in each basket, then start again while all 4 tables can be served.",
-        "strongHint": "Every table receives 6 mangoes: 4 × 6 = 24. The 2 remaining mangoes are not enough for another round of all 4 tables.",
-        "instruction": "Help Yamba prepare the 4 tables. Make 4 baskets with the same number of mangoes and keep in the starting basket those that cannot be shared equally."
+        "hint": "Make a round of the 4 tables: put one orange in each basket, then start again while all 4 tables can be served.",
+        "strongHint": "Every table receives 6 oranges: 4 × 6 = 24. The 2 remaining oranges are not enough for another round of all 4 tables.",
+        "instruction": "Help Yamba prepare the 4 tables. Make 4 baskets with the same number of oranges and keep in the starting basket those that cannot be shared equally."
       },
       "example": {
-        "easy": "Easy. For 4 tables, how many mangoes per table do 32 mangoes make?",
-        "medium": "Medium. With 23 mangoes, how many full baskets of 5 can be prepared?",
-        "reflection": "Think. Check that 27 mangoes shared between 3 tables give 9 mangoes per table."
+        "easy": "Easy. For 4 tables, how many oranges per table do 32 oranges make?",
+        "medium": "Medium. With 23 oranges, how many full baskets of 5 can be prepared?",
+        "reflection": "Think. Check that 27 oranges shared between 3 tables give 9 oranges per table."
       },
       "practice": {
-        "hint": "The 26 mangoes and the 6 new ones make 32 mangoes. Find the number that makes 32 when multiplied by 4.",
-        "strongHint": "26 + 6 = 32, then 4 × 8 = 32. Every table now receives 8 mangoes.",
-        "prompt": "Next challenge: a classmate brings 6 more mangoes. How many mangoes will each of the 4 tables receive now?"
+        "hint": "The 26 oranges and the 6 new ones make 32 oranges. Find the number that makes 32 when multiplied by 4.",
+        "strongHint": "26 + 6 = 32, then 4 × 8 = 32. Every table now receives 8 oranges.",
+        "prompt": "Next challenge: a classmate brings 6 more oranges. How many oranges will each of the 4 tables receive now?"
       },
       "reflect": {
-        "hint": "Imagine giving one of the 2 remaining mangoes to a table. Would all baskets still contain the same number?",
-        "strongHint": "To add one mango to every table, 4 mangoes would be needed. With only 2, two tables would receive more than the others.",
-        "prompt": "Why does Yamba keep 2 mangoes in the starting basket?",
-        "c0": "Because there are not enough to give one more mango to each of the 4 tables",
+        "hint": "Imagine giving one of the 2 remaining oranges to a table. Would all baskets still contain the same number?",
+        "strongHint": "To add one orange to every table, 4 oranges would be needed. With only 2, two tables would receive more than the others.",
+        "prompt": "Why does Yamba keep 2 oranges in the starting basket?",
+        "c0": "Because there are not enough to give one more orange to each of the 4 tables",
         "c1": "Because all four baskets are already full",
-        "c2": "Because two mangoes can never be eaten"
+        "c2": "Because two oranges can never be eaten"
       },
       "play": {
         "hint": "Every game stand receives the same number of tokens; what is left cannot make a complete round.",
@@ -1039,9 +1047,9 @@
       },
       "remember": "Sharing fairly means giving the same amount to every group. The remainder is what is not enough to make another complete round.",
       "check": {
-        "hint": "To check the mango sharing, multiply one table's share by the number of tables.",
-        "strongHint": "3 tables of 9 mangoes make 27 mangoes: 9 × 3 = 27.",
-        "prompt": "Yamba shares 27 mangoes between 3 tables. Which multiplication confirms that every table receives 9 mangoes?",
+        "hint": "To check the orange sharing, multiply one table's share by the number of tables.",
+        "strongHint": "3 tables of 9 oranges make 27 oranges: 9 × 3 = 27.",
+        "prompt": "Yamba shares 27 oranges between 3 tables. Which multiplication confirms that every table receives 9 oranges?",
         "c0": "3 × 3 = 27",
         "c1": "9 × 3 = 27",
         "c2": "9 + 3 = 27"
