@@ -11,6 +11,10 @@ out/
 frontend/node_modules/
 frontend/dist/
 
+# Captures et journaux de vérification locale du prototype visuel.
+/output/
+frontend/vite-dev*.log
+
 # Dépendances de test des jeux statiques (racine du dépôt, voir package.json).
 /node_modules/
 
