@@ -1,355 +1,211 @@
-import type { EvaluationContent, LessonContent } from "./lesson-content";
+import { step, type EvaluationContent, type LessonContent } from "./lesson-content";
 
 export const UNIT_04_LESSON_CONTENT: Record<string, LessonContent> = {
   "MATH-3P-U04-L01": {
     objectiveKey: "content.u04l01.objective",
     situationKey: "content.u04l01.situation",
     discoverKey: "content.u04l01.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u04l01.manipulate.instruction",
-      hintKey: "content.u04l01.manipulate.hint",
-      strongHintKey: "content.u04l01.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u04l01.manipulate", "content.u04l01.manipulate.instruction", {
         kind: "equal-groups",
         id: "u04l01-manipulate",
         groups: 6,
         perGroup: 5,
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u04l01.example.easy",
       "content.u04l01.example.medium",
       "content.u04l01.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l01.practice.hint",
-      strongHintKey: "content.u04l01.practice.strongHint",
-      exercise: {
+    practice: step("content.u04l01.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l01-practice",
         promptKey: "content.u04l01.practice.prompt",
         answer: 14,
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l01.reflect.hint",
-      strongHintKey: "content.u04l01.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u04l01.reflect", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l01-reflect",
         promptKey: "content.u04l01.reflect.prompt",
         answer: 9,
-      },
-    },
-    play: {
-      titleKey: "content.u04l01.play.title",
-      instructionKey: "content.u04l01.play.instruction",
-      hintKey: "content.u04l01.play.hint",
-      strongHintKey: "content.u04l01.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u04l01.play", "content.u04l01.play.instruction", {
         kind: "equal-groups",
         id: "u04l01-play",
         groups: 4,
         perGroup: 10,
-      },
-    },
+      }, "content.u04l01.play.title"),
     rememberKey: "content.u04l01.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numericChoice",
-      hintKey: "content.u04l01.check.hint",
-      strongHintKey: "content.u04l01.check.strongHint",
-      exercise: {
+    check: step("content.u04l01.check", "content.common.instruction.numericChoice", {
         kind: "numeric-question",
         id: "u04l01-check",
         promptKey: "content.u04l01.check.prompt",
         answer: 40,
         choices: [35,40,45],
-      },
-    },
+      }),
   },
   "MATH-3P-U04-L02": {
     objectiveKey: "content.u04l02.objective",
     situationKey: "content.u04l02.situation",
     discoverKey: "content.u04l02.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u04l02.manipulate.instruction",
-      hintKey: "content.u04l02.manipulate.hint",
-      strongHintKey: "content.u04l02.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u04l02.manipulate", "content.u04l02.manipulate.instruction", {
         kind: "equal-groups",
         id: "u04l02-manipulate",
         groups: 7,
         perGroup: 3,
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u04l02.example.easy",
       "content.u04l02.example.medium",
       "content.u04l02.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l02.practice.hint",
-      strongHintKey: "content.u04l02.practice.strongHint",
-      exercise: {
+    practice: step("content.u04l02.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l02-practice",
         promptKey: "content.u04l02.practice.prompt",
         answer: 18,
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u04l02.reflect.hint",
-      strongHintKey: "content.u04l02.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u04l02.reflect", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u04l02-reflect",
         promptKey: "content.u04l02.reflect.prompt",
         choiceKeys: ["content.u04l02.reflect.c0","content.u04l02.reflect.c1","content.u04l02.reflect.c2"],
         answerIndex: 0,
-      },
-    },
-    play: {
-      titleKey: "content.u04l02.play.title",
-      instructionKey: "content.u04l02.play.instruction",
-      hintKey: "content.u04l02.play.hint",
-      strongHintKey: "content.u04l02.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u04l02.play", "content.u04l02.play.instruction", {
         kind: "equal-groups",
         id: "u04l02-play",
         groups: 4,
         perGroup: 6,
-      },
-    },
+      }, "content.u04l02.play.title"),
     rememberKey: "content.u04l02.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l02.check.hint",
-      strongHintKey: "content.u04l02.check.strongHint",
-      exercise: {
+    check: step("content.u04l02.check", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l02-check",
         promptKey: "content.u04l02.check.prompt",
         answer: 28,
-      },
-    },
+      }),
   },
   "MATH-3P-U04-L03": {
     objectiveKey: "content.u04l03.objective",
     situationKey: "content.u04l03.situation",
     discoverKey: "content.u04l03.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u04l03.manipulate.instruction",
-      hintKey: "content.u04l03.manipulate.hint",
-      strongHintKey: "content.u04l03.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u04l03.manipulate", "content.u04l03.manipulate.instruction", {
         kind: "column-calc",
         id: "u04l03-manipulate",
         operation: "x",
         left: 42,
         right: 3,
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u04l03.example.easy",
       "content.u04l03.example.medium",
       "content.u04l03.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.column",
-      hintKey: "content.u04l03.practice.hint",
-      strongHintKey: "content.u04l03.practice.strongHint",
-      exercise: {
+    practice: step("content.u04l03.practice", "content.common.instruction.column", {
         kind: "column-calc",
         id: "u04l03-practice",
         operation: "x",
         left: 21,
         right: 4,
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u04l03.reflect.hint",
-      strongHintKey: "content.u04l03.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u04l03.reflect", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u04l03-reflect",
         promptKey: "content.u04l03.reflect.prompt",
         choiceKeys: ["content.u04l03.reflect.c0","content.u04l03.reflect.c1","content.u04l03.reflect.c2"],
         answerIndex: 0,
-      },
-    },
-    play: {
-      titleKey: "content.u04l03.play.title",
-      instructionKey: "content.common.instruction.column",
-      hintKey: "content.u04l03.play.hint",
-      strongHintKey: "content.u04l03.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u04l03.play", "content.common.instruction.column", {
         kind: "column-calc",
         id: "u04l03-play",
         operation: "x",
         left: 124,
         right: 3,
-      },
-    },
+      }, "content.u04l03.play.title"),
     rememberKey: "content.u04l03.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l03.check.hint",
-      strongHintKey: "content.u04l03.check.strongHint",
-      exercise: {
+    check: step("content.u04l03.check", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l03-check",
         promptKey: "content.u04l03.check.prompt",
         answer: 384,
-      },
-    },
+      }),
   },
   "MATH-3P-U04-L04": {
     objectiveKey: "content.u04l04.objective",
     situationKey: "content.u04l04.situation",
     discoverKey: "content.u04l04.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u04l04.manipulate.instruction",
-      hintKey: "content.u04l04.manipulate.hint",
-      strongHintKey: "content.u04l04.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u04l04.manipulate", "content.u04l04.manipulate.instruction", {
         kind: "share-tokens",
         id: "u04l04-manipulate",
         total: 26,
         bowls: 4,
         manipulative: "mango-baskets",
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u04l04.example.easy",
       "content.u04l04.example.medium",
       "content.u04l04.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04l04.practice.hint",
-      strongHintKey: "content.u04l04.practice.strongHint",
-      exercise: {
+    practice: step("content.u04l04.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04l04-practice",
         promptKey: "content.u04l04.practice.prompt",
         answer: 8,
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u04l04.reflect.hint",
-      strongHintKey: "content.u04l04.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u04l04.reflect", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u04l04-reflect",
         promptKey: "content.u04l04.reflect.prompt",
         choiceKeys: ["content.u04l04.reflect.c0","content.u04l04.reflect.c1","content.u04l04.reflect.c2"],
         answerIndex: 0,
-      },
-    },
-    play: {
-      titleKey: "content.u04l04.play.title",
-      instructionKey: "content.u04l04.play.instruction",
-      hintKey: "content.u04l04.play.hint",
-      strongHintKey: "content.u04l04.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u04l04.play", "content.u04l04.play.instruction", {
         kind: "share-tokens",
         id: "u04l04-play",
         total: 17,
         bowls: 5,
-      },
-    },
+      }, "content.u04l04.play.title"),
     rememberKey: "content.u04l04.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u04l04.check.hint",
-      strongHintKey: "content.u04l04.check.strongHint",
-      exercise: {
+    check: step("content.u04l04.check", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u04l04-check",
         promptKey: "content.u04l04.check.prompt",
         choiceKeys: ["content.u04l04.check.c0","content.u04l04.check.c1","content.u04l04.check.c2"],
         answerIndex: 1,
-      },
-    },
+      }),
   },
 };
 
 export const UNIT_04_EVALUATION: EvaluationContent = {
   introKey: "content.u04eval.intro",
   items: [
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04eval.q1.hint",
-      strongHintKey: "content.u04eval.q1.strongHint",
-      exercise: {
+    step("content.u04eval.q1", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04eval-q1",
         promptKey: "content.u04eval.q1.prompt",
         answer: 40,
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04eval.q2.hint",
-      strongHintKey: "content.u04eval.q2.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u04eval.q2", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04eval-q2",
         promptKey: "content.u04eval.q2.prompt",
         answer: 28,
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04eval.q3.hint",
-      strongHintKey: "content.u04eval.q3.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u04eval.q3", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04eval-q3",
         promptKey: "content.u04eval.q3.prompt",
         answer: 384,
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u04eval.q4.hint",
-      strongHintKey: "content.u04eval.q4.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u04eval.q4", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u04eval-q4",
         promptKey: "content.u04eval.q4.prompt",
         answer: 4,
-      },
-    },
+      }, "content.common.title.question"),
   ],
 };

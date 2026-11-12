@@ -1,245 +1,150 @@
-import type { EvaluationContent, LessonContent } from "./lesson-content";
+import { step, type EvaluationContent, type LessonContent } from "./lesson-content";
 
 export const UNIT_06_LESSON_CONTENT: Record<string, LessonContent> = {
   "MATH-3P-U06-L01": {
     objectiveKey: "content.u06l01.objective",
     situationKey: "content.u06l01.situation",
     discoverKey: "content.u06l01.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u06l01.manipulate.instruction",
-      hintKey: "content.u06l01.manipulate.hint",
-      strongHintKey: "content.u06l01.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u06l01.manipulate", "content.u06l01.manipulate.instruction", {
         kind: "money-build",
         id: "u06l01-manipulate",
         target: 2000,
         cards: [100,500,1000],
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u06l01.example.easy",
       "content.u06l01.example.medium",
       "content.u06l01.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l01.practice.hint",
-      strongHintKey: "content.u06l01.practice.strongHint",
-      exercise: {
+    practice: step("content.u06l01.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l01-practice",
         promptKey: "content.u06l01.practice.prompt",
         answer: 1000,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u06l01.reflect.hint",
-      strongHintKey: "content.u06l01.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u06l01.reflect", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u06l01-reflect",
         promptKey: "content.u06l01.reflect.prompt",
         choiceKeys: ["content.u06l01.reflect.c0","content.u06l01.reflect.c1","content.u06l01.reflect.c2"],
         answerIndex: 0,
-      },
-    },
-    play: {
-      titleKey: "content.u06l01.play.title",
-      instructionKey: "content.u06l01.play.instruction",
-      hintKey: "content.u06l01.play.hint",
-      strongHintKey: "content.u06l01.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u06l01.play", "content.u06l01.play.instruction", {
         kind: "money-build",
         id: "u06l01-play",
         target: 1700,
         cards: [100,500,1000],
         maxCards: 4,
-      },
-    },
+      }, "content.u06l01.play.title"),
     rememberKey: "content.u06l01.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l01.check.hint",
-      strongHintKey: "content.u06l01.check.strongHint",
-      exercise: {
+    check: step("content.u06l01.check", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l01-check",
         promptKey: "content.u06l01.check.prompt",
         answer: 600,
         unitKey: "content.common.unit.fc",
-      },
-    },
+      }),
   },
   "MATH-3P-U06-L02": {
     objectiveKey: "content.u06l02.objective",
     situationKey: "content.u06l02.situation",
     discoverKey: "content.u06l02.discover",
-    manipulate: {
-      titleKey: "content.u06l02.manipulate.title",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l02.manipulate.hint",
-      strongHintKey: "content.u06l02.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u06l02.manipulate", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l02-manipulate",
         promptKey: "content.u06l02.manipulate.prompt",
         answer: 1000,
         unitKey: "content.common.unit.fc",
-      },
-    },
+      }, "content.u06l02.manipulate.title"),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u06l02.example.easy",
       "content.u06l02.example.medium",
       "content.u06l02.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l02.practice.hint",
-      strongHintKey: "content.u06l02.practice.strongHint",
-      exercise: {
+    practice: step("content.u06l02.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l02-practice",
         promptKey: "content.u06l02.practice.prompt",
         answer: 1500,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l02.reflect.hint",
-      strongHintKey: "content.u06l02.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u06l02.reflect", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l02-reflect",
         promptKey: "content.u06l02.reflect.prompt",
         answer: 1400,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    play: {
-      titleKey: "content.u06l02.play.title",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l02.play.hint",
-      strongHintKey: "content.u06l02.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u06l02.play", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l02-play",
         promptKey: "content.u06l02.play.prompt",
         answer: 1450,
         unitKey: "content.common.unit.fc",
-      },
-    },
+      }, "content.u06l02.play.title"),
     rememberKey: "content.u06l02.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l02.check.hint",
-      strongHintKey: "content.u06l02.check.strongHint",
-      exercise: {
+    check: step("content.u06l02.check", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l02-check",
         promptKey: "content.u06l02.check.prompt",
         answer: 1200,
         unitKey: "content.common.unit.fc",
-      },
-    },
+      }),
   },
   "MATH-3P-U06-L03": {
     objectiveKey: "content.u06l03.objective",
     situationKey: "content.u06l03.situation",
     discoverKey: "content.u06l03.discover",
-    manipulate: {
-      titleKey: "content.common.title.manipulate",
-      instructionKey: "content.u06l03.manipulate.instruction",
-      hintKey: "content.u06l03.manipulate.hint",
-      strongHintKey: "content.u06l03.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u06l03.manipulate", "content.u06l03.manipulate.instruction", {
         kind: "money-build",
         id: "u06l03-manipulate",
         target: 350,
         cards: [100,50,500],
-      },
-    },
+      }),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u06l03.example.easy",
       "content.u06l03.example.medium",
       "content.u06l03.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l03.practice.hint",
-      strongHintKey: "content.u06l03.practice.strongHint",
-      exercise: {
+    practice: step("content.u06l03.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l03-practice",
         promptKey: "content.u06l03.practice.prompt",
         answer: 275,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l03.reflect.hint",
-      strongHintKey: "content.u06l03.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u06l03.reflect", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l03-reflect",
         promptKey: "content.u06l03.reflect.prompt",
         answer: 5000,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    play: {
-      titleKey: "content.u06l03.play.title",
-      instructionKey: "content.u06l03.play.instruction",
-      hintKey: "content.u06l03.play.hint",
-      strongHintKey: "content.u06l03.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u06l03.play", "content.u06l03.play.instruction", {
         kind: "money-build",
         id: "u06l03-play",
         target: 1250,
         cards: [1000,500,200,50],
         maxCards: 3,
-      },
-    },
+      }, "content.u06l03.play.title"),
     rememberKey: "content.u06l03.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l03.check.hint",
-      strongHintKey: "content.u06l03.check.strongHint",
-      exercise: {
+    check: step("content.u06l03.check", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l03-check",
         promptKey: "content.u06l03.check.prompt",
         answer: 1550,
         unitKey: "content.common.unit.fc",
-      },
-    },
+      }),
   },
   "MATH-3P-U06-L04": {
     objectiveKey: "content.u06l04.objective",
     situationKey: "content.u06l04.situation",
     discoverKey: "content.u06l04.discover",
-    manipulate: {
-      titleKey: "content.u06l04.manipulate.title",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u06l04.manipulate.hint",
-      strongHintKey: "content.u06l04.manipulate.strongHint",
-      exercise: {
+    manipulate: step("content.u06l04.manipulate", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u06l04-manipulate",
         promptKey: "content.u06l04.manipulate.prompt",
@@ -249,124 +154,75 @@ export const UNIT_06_LESSON_CONTENT: Record<string, LessonContent> = {
           "content.u06l04.manipulate.c2",
         ],
         answerIndex: 1,
-      },
-    },
+      }, "content.u06l04.manipulate.title"),
     exampleMethodKey: "content.method",
     examplePromptKeys: [
       "content.u06l04.example.easy",
       "content.u06l04.example.medium",
       "content.u06l04.example.reflection",
     ],
-    practice: {
-      titleKey: "content.common.title.practice",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06l04.practice.hint",
-      strongHintKey: "content.u06l04.practice.strongHint",
-      exercise: {
+    practice: step("content.u06l04.practice", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06l04-practice",
         promptKey: "content.u06l04.practice.prompt",
         answer: 250,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    reflect: {
-      titleKey: "content.common.title.reflect",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u06l04.reflect.hint",
-      strongHintKey: "content.u06l04.reflect.strongHint",
-      exercise: {
+      }),
+    reflect: step("content.u06l04.reflect", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u06l04-reflect",
         promptKey: "content.u06l04.reflect.prompt",
         choiceKeys: ["content.u06l04.reflect.c0","content.u06l04.reflect.c1","content.u06l04.reflect.c2"],
         answerIndex: 0,
-      },
-    },
-    play: {
-      titleKey: "content.u06l04.play.title",
-      instructionKey: "content.u06l04.play.instruction",
-      hintKey: "content.u06l04.play.hint",
-      strongHintKey: "content.u06l04.play.strongHint",
-      exercise: {
+      }),
+    play: step("content.u06l04.play", "content.u06l04.play.instruction", {
         kind: "money-build",
         id: "u06l04-play",
         target: 2000,
         cards: [500,750,1250,1500],
         maxCards: 2,
-      },
-    },
+      }, "content.u06l04.play.title"),
     rememberKey: "content.u06l04.remember",
-    check: {
-      titleKey: "content.common.title.check",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u06l04.check.hint",
-      strongHintKey: "content.u06l04.check.strongHint",
-      exercise: {
+    check: step("content.u06l04.check", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u06l04-check",
         promptKey: "content.u06l04.check.prompt",
         choiceKeys: ["content.u06l04.check.c0","content.u06l04.check.c1","content.u06l04.check.c2"],
         answerIndex: 1,
-      },
-    },
+      }),
   },
 };
 
 export const UNIT_06_EVALUATION: EvaluationContent = {
   introKey: "content.u06eval.intro",
   items: [
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06eval.q1.hint",
-      strongHintKey: "content.u06eval.q1.strongHint",
-      exercise: {
+    step("content.u06eval.q1", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06eval-q1",
         promptKey: "content.u06eval.q1.prompt",
         answer: 600,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06eval.q2.hint",
-      strongHintKey: "content.u06eval.q2.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u06eval.q2", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06eval-q2",
         promptKey: "content.u06eval.q2.prompt",
         answer: 1200,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.numeric",
-      hintKey: "content.u06eval.q3.hint",
-      strongHintKey: "content.u06eval.q3.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u06eval.q3", "content.common.instruction.numeric", {
         kind: "numeric-question",
         id: "u06eval-q3",
         promptKey: "content.u06eval.q3.prompt",
         answer: 1550,
         unitKey: "content.common.unit.fc",
-      },
-    },
-    {
-      titleKey: "content.common.title.question",
-      instructionKey: "content.common.instruction.choice",
-      hintKey: "content.u06eval.q4.hint",
-      strongHintKey: "content.u06eval.q4.strongHint",
-      exercise: {
+      }, "content.common.title.question"),
+    step("content.u06eval.q4", "content.common.instruction.choice", {
         kind: "text-choice",
         id: "u06eval-q4",
         promptKey: "content.u06eval.q4.prompt",
         choiceKeys: ["content.u06eval.q4.c0","content.u06eval.q4.c1"],
         answerIndex: 0,
-      },
-    },
+      }, "content.common.title.question"),
   ],
 };
