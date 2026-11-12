@@ -7,12 +7,15 @@ import {
   INTERSECTION_X,
   isInCorrectLane,
   isLeoRoadPoint,
+  isTrafficVehicleOnRoad,
   isVehicleOnRoad,
   laneAt,
   MAIN_LANE_Y,
   normalizeAngle,
+  ONCOMING_LANE_Y,
   ROAD_Y,
   ROUTE_LENGTH_METERS,
+  TRAFFIC_VEHICLES,
   START_POSITION,
   VEHICLE_WIDTH,
   vehicleCorners,
@@ -234,6 +237,30 @@ describe("livraison", () => {
     expect(DESTINATIONS.length).toBeGreaterThanOrEqual(10);
     expect(DESTINATIONS.at(-1)?.stop.x).toBeGreaterThan(10_000);
     expect(isLeoRoadPoint(11_600, MAIN_LANE_Y)).toBe(true);
+  });
+});
+
+describe("géométrie du trafic opposé", () => {
+  it("calcule deux centres de voie séparés de la ligne centrale", () => {
+    expect(MAIN_LANE_Y).toBeGreaterThan(ROAD_Y);
+    expect(ONCOMING_LANE_Y).toBeLessThan(ROAD_Y);
+    expect(Math.abs(MAIN_LANE_Y - ROAD_Y)).toBeGreaterThan(20);
+    expect(Math.abs(ONCOMING_LANE_Y - ROAD_Y)).toBeGreaterThan(20);
+  });
+
+  it("contient chaque profil, y compris les bus, dans sa voie", () => {
+    for (const vehicle of TRAFFIC_VEHICLES) {
+      expect(isTrafficVehicleOnRoad(1200, ONCOMING_LANE_Y, vehicle.width, vehicle.height)).toBe(true);
+      expect(ONCOMING_LANE_Y + vehicle.height / 2).toBeLessThan(ROAD_Y);
+      expect(MAIN_LANE_Y - vehicle.height / 2).toBeGreaterThan(ROAD_Y);
+    }
+  });
+
+  it("ne place aucun véhicule sur la ligne centrale", () => {
+    for (const vehicle of TRAFFIC_VEHICLES) {
+      expect(ONCOMING_LANE_Y + vehicle.height / 2).toBeLessThan(ROAD_Y);
+      expect(MAIN_LANE_Y - vehicle.height / 2).toBeGreaterThan(ROAD_Y);
+    }
   });
 });
 

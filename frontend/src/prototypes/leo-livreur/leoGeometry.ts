@@ -12,8 +12,18 @@ export const WORLD_HEIGHT = 900;
 export const ROAD_Y = 600;
 export const ROAD_WIDTH = 140;
 export const ROAD_HALF_WIDTH = ROAD_WIDTH / 2;
-export const LANE_OFFSET = 35;
+export const ROAD_EDGE_MARGIN = 8;
+/** Marge issue de l'empreinte visuelle des roues, commune à tous les profils. */
+export const WHEEL_CONTACT_OFFSET = 34;
+/** Hauteur visuelle maximale des véhicules de trafic (famille : 58 px). */
+export const TRAFFIC_VISUAL_HALF_HEIGHT = 29;
+export const LANE_CENTER_OFFSET = Math.max(
+  ROAD_HALF_WIDTH - WHEEL_CONTACT_OFFSET - ROAD_EDGE_MARGIN,
+  TRAFFIC_VISUAL_HALF_HEIGHT + 1,
+);
+export const LANE_OFFSET = LANE_CENTER_OFFSET;
 export const MAIN_LANE_Y = ROAD_Y + LANE_OFFSET;
+export const ONCOMING_LANE_Y = ROAD_Y - LANE_OFFSET;
 export const INTERSECTION_X = 930;
 export const BRANCH_LANE_X = INTERSECTION_X + LANE_OFFSET;
 export const BRANCH_TOP_Y = 220;
@@ -24,6 +34,27 @@ export const ROUTE_LENGTH_METERS = MAIN_ROAD_X_MAX - MAIN_ROAD_X_MIN;
 // Empreinte logique du véhicule (rectangle orienté), indépendante de l'illustration.
 export const VEHICLE_LENGTH = 84;
 export const VEHICLE_WIDTH = 40;
+
+export type TrafficVehicleKind = "family" | "compact" | "sedan" | "city-bus" | "school-bus" | "taxi" | "minibus";
+
+export interface TrafficVehicleSpec {
+  kind: TrafficVehicleKind;
+  assetKey: string;
+  width: number;
+  height: number;
+  speed: number;
+}
+
+/** Catalogue léger : les dimensions visuelles sont séparées de l'empreinte de Léo. */
+export const TRAFFIC_VEHICLES: readonly TrafficVehicleSpec[] = [
+  { kind: "family", assetKey: "leo-traffic-family-blue", width: 128, height: 58, speed: 110 },
+  { kind: "compact", assetKey: "leo-traffic-compact-green", width: 112, height: 56, speed: 128 },
+  { kind: "sedan", assetKey: "leo-traffic-sedan-gray", width: 126, height: 56, speed: 118 },
+  { kind: "city-bus", assetKey: "leo-traffic-city-bus", width: 190, height: 52, speed: 84 },
+  { kind: "school-bus", assetKey: "leo-traffic-school-bus", width: 180, height: 54, speed: 92 },
+  { kind: "taxi", assetKey: "leo-traffic-taxi", width: 116, height: 56, speed: 142 },
+  { kind: "minibus", assetKey: "leo-traffic-minibus", width: 156, height: 52, speed: 102 },
+];
 
 export const START_POSITION = { x: 300, y: MAIN_LANE_Y } as const;
 
@@ -86,6 +117,19 @@ export function isLeoRoadPoint(x: number, y: number) {
   const onMainRoad = x >= MAIN_ROAD_X_MIN && x <= MAIN_ROAD_X_MAX && Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH;
   const onBranch = y >= BRANCH_TOP_Y && y <= ROAD_Y + ROAD_HALF_WIDTH && Math.abs(x - INTERSECTION_X) <= ROAD_HALF_WIDTH;
   return onMainRoad || onBranch;
+}
+
+/** Empreinte rectangulaire d'un véhicule de trafic, calculée dans le même
+ * repère que la chaussée et indépendante des marges transparentes du PNG. */
+export function isTrafficVehicleOnRoad(x: number, y: number, width: number, height: number) {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  return [
+    [x - halfWidth, y - halfHeight],
+    [x + halfWidth, y - halfHeight],
+    [x + halfWidth, y + halfHeight],
+    [x - halfWidth, y + halfHeight],
+  ].every(([pointX, pointY]) => isLeoRoadPoint(pointX, pointY));
 }
 
 /** Les quatre coins du rectangle représentant le véhicule. */

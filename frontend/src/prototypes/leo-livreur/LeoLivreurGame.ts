@@ -2,13 +2,20 @@ import Phaser from "phaser";
 
 import backCarUrl from "./assets/leo-car-back.webp";
 import countrysideUrl from "./assets/leo-countryside-v1.webp";
+import familyTrafficUrl from "./assets/leo-traffic-family-blue-v1.webp";
+import compactTrafficUrl from "./assets/leo-traffic-compact-green-v1.webp";
+import sedanTrafficUrl from "./assets/leo-traffic-sedan-gray-v1.webp";
+import cityBusTrafficUrl from "./assets/leo-traffic-city-bus-v1.webp";
+import schoolBusTrafficUrl from "./assets/leo-traffic-school-bus-v1.webp";
+import taxiTrafficUrl from "./assets/leo-traffic-taxi-v1.webp";
+import minibusTrafficUrl from "./assets/leo-traffic-minibus-v1.webp";
 import frontCarUrl from "./assets/leo-car-front.webp";
 import leftCarUrl from "./assets/leo-car-left.webp";
 import roadUrl from "./assets/leo-road-straight-v1.png";
 import rightCarUrl from "./assets/leo-car-right.webp";
 import houseUrl from "./assets/leo-house-turquoise.webp";
 import restaurantUrl from "./assets/leo-pizza-restaurant.webp";
-import trafficLightsUrl from "./assets/leo-traffic-lights-v1.png";
+import trafficLightsUrl from "./assets/leo-traffic-lights-v1.webp";
 import treeUrl from "./assets/leo-tree-v1.png";
 import { updateLeoMotion, type LeoMotionInput, type LeoMotionState } from "./leoDriving";
 import {
@@ -18,7 +25,6 @@ import {
   DESTINATIONS,
   destinationAt,
   INTERSECTION_X,
-  LANE_OFFSET,
   laneAt,
   MAIN_LANE_Y,
   MAIN_ROAD_X_MAX,
@@ -33,6 +39,8 @@ import {
   vehicleCorners,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  TRAFFIC_VEHICLES,
+  ONCOMING_LANE_Y,
   distanceTo,
 } from "./leoGeometry";
 import { vehicleViewForHeading, type LeoVehicleSprite } from "./leoVehicleView";
@@ -128,6 +136,13 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.load.image("leo-road-straight", roadUrl);
     this.load.image("leo-tree", treeUrl);
     this.load.image("leo-traffic-lights", trafficLightsUrl);
+    this.load.image("leo-traffic-family-blue", familyTrafficUrl);
+    this.load.image("leo-traffic-compact-green", compactTrafficUrl);
+    this.load.image("leo-traffic-sedan-gray", sedanTrafficUrl);
+    this.load.image("leo-traffic-city-bus", cityBusTrafficUrl);
+    this.load.image("leo-traffic-school-bus", schoolBusTrafficUrl);
+    this.load.image("leo-traffic-taxi", taxiTrafficUrl);
+    this.load.image("leo-traffic-minibus", minibusTrafficUrl);
     this.load.image("leo-car-right", rightCarUrl);
     this.load.image("leo-car-left", leftCarUrl);
     this.load.image("leo-car-front", frontCarUrl);
@@ -221,7 +236,7 @@ export class LeoLivreurScene extends Phaser.Scene {
       const traffic = this.trafficCars[index];
       if (!traffic) return;
       traffic.x = x;
-      traffic.sprite.setPosition(x, ROAD_Y - LANE_OFFSET).setVisible(true);
+      traffic.sprite.setPosition(x, ONCOMING_LANE_Y).setVisible(true);
     });
     this.controls = { left: false, right: false, forward: false, brake: false };
     this.drawTargets();
@@ -358,13 +373,16 @@ export class LeoLivreurScene extends Phaser.Scene {
   /** Circulation opposée : les véhicules roulent seuls sur la voie haute et
    * sortent définitivement du monde visible quand Léo les a dépassés. */
   private createTrafficCars() {
-    this.trafficCars = TRAFFIC_START_POSITIONS.map((x, index) => ({
-      x,
-      speed: 105 + (index % 3) * 18,
-      sprite: this.add.image(x, ROAD_Y - LANE_OFFSET, "leo-car-left")
-        .setDisplaySize(108, 78)
-        .setDepth(6),
-    }));
+    this.trafficCars = TRAFFIC_START_POSITIONS.map((x, index) => {
+      const spec = TRAFFIC_VEHICLES[index % TRAFFIC_VEHICLES.length];
+      return {
+        x,
+        speed: spec.speed,
+        sprite: this.add.image(x, ONCOMING_LANE_Y, spec.assetKey)
+          .setDisplaySize(spec.width, spec.height)
+          .setDepth(6),
+      };
+    });
   }
 
   private updateTrafficCars(seconds: number) {
