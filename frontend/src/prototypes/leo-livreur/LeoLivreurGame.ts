@@ -1,11 +1,15 @@
 import Phaser from "phaser";
 
 import backCarUrl from "./assets/leo-car-back.webp";
+import countrysideUrl from "./assets/leo-countryside-v1.webp";
 import frontCarUrl from "./assets/leo-car-front.webp";
 import leftCarUrl from "./assets/leo-car-left.webp";
+import roadUrl from "./assets/leo-road-straight-v1.png";
 import rightCarUrl from "./assets/leo-car-right.webp";
 import houseUrl from "./assets/leo-house-turquoise.webp";
 import restaurantUrl from "./assets/leo-pizza-restaurant.webp";
+import trafficLightsUrl from "./assets/leo-traffic-lights-v1.png";
+import treeUrl from "./assets/leo-tree-v1.png";
 import { updateLeoMotion, type LeoMotionInput, type LeoMotionState } from "./leoDriving";
 import {
   BRANCH_LANE_X,
@@ -107,6 +111,10 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("leo-countryside", countrysideUrl);
+    this.load.image("leo-road-straight", roadUrl);
+    this.load.image("leo-tree", treeUrl);
+    this.load.image("leo-traffic-lights", trafficLightsUrl);
     this.load.image("leo-car-right", rightCarUrl);
     this.load.image("leo-car-left", leftCarUrl);
     this.load.image("leo-car-front", frontCarUrl);
@@ -263,6 +271,9 @@ export class LeoLivreurScene extends Phaser.Scene {
 
   private drawWorld() {
     this.add.rectangle(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_WIDTH, WORLD_HEIGHT, 0x9bdc79).setDepth(-5);
+    this.add.image(WORLD_WIDTH / 2, 260, "leo-countryside")
+      .setDisplaySize(WORLD_WIDTH, 600)
+      .setDepth(-4);
     const road = this.add.graphics().setDepth(0);
     road.fillStyle(0xd7bd8c, 1);
     road.fillRect(28, ROAD_Y - ROAD_HALF_WIDTH - 13, WORLD_WIDTH - 56, ROAD_WIDTH + 26);
@@ -278,7 +289,19 @@ export class LeoLivreurScene extends Phaser.Scene {
     for (let x = 90; x < WORLD_WIDTH - 80; x += 90) road.lineBetween(x, ROAD_Y, x + 42, ROAD_Y);
     for (let y = 270; y < ROAD_Y - 55; y += 82) road.lineBetween(INTERSECTION_X, y, INTERSECTION_X, y + 38);
 
+    // Habillage graphique de la chaussée horizontale. Les rectangles et les
+    // axes ci-dessus restent la référence physique de la route et de l'intersection.
+    this.add.image(WORLD_WIDTH / 2, ROAD_Y, "leo-road-straight")
+      .setDisplaySize(WORLD_WIDTH, 300)
+      .setDepth(1);
+
     this.add.image(170, 445, "leo-restaurant").setDisplaySize(250, 167).setDepth(2);
+    this.add.image(430, 462, "leo-tree").setDisplaySize(170, 160).setDepth(2);
+    this.add.image(1520, 450, "leo-tree").setDisplaySize(170, 160).setDepth(2);
+    this.add.image(INTERSECTION_X + 125, ROAD_Y - 120, "leo-traffic-lights")
+      .setCrop(0, 0, 256, 256)
+      .setDisplaySize(78, 110)
+      .setDepth(3);
     for (const destination of DESTINATIONS) {
       this.add.image(destination.house.x, destination.house.y, "leo-house").setDisplaySize(230, 153).setDepth(2);
     }
