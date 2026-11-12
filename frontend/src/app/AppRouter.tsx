@@ -50,6 +50,10 @@ const MangoBasketPrototypePage = lazy(() =>
   import("../prototypes/mango-basket/MangoBasketPrototypePage").then((module) => ({ default: module.MangoBasketPrototypePage })),
 );
 
+const LeoLivreurPrototypePage = lazy(() =>
+  import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((module) => ({ default: module.LeoLivreurPrototypePage })),
+);
+
 // Le basename est fixé à /app : react-router-dom compose alors des chemins
 // absolus (/app/jeux, ...) sans qu'aucune route ne répète le préfixe.
 // Spring Boot sert déjà index.html pour toute URL sous /app/** qui ne
@@ -142,6 +146,14 @@ export function AppRouter() {
             element={
               <Suspense fallback={null}>
                 <MangoBasketPrototypePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="prototypes/leo-livreur"
+            element={
+              <Suspense fallback={null}>
+                <LeoLivreurPrototypePage />
               </Suspense>
             }
           />

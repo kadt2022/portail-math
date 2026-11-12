@@ -1,0 +1,158 @@
+.page {
+  display: grid;
+  gap: 18px;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: clamp(14px, 3vw, 32px);
+  color: #3b241c;
+}
+
+.hero,
+.gameCard,
+.panel {
+  border: 3px solid #3b241c;
+  border-radius: 28px;
+  box-shadow: 0 12px 30px rgb(63 35 19 / 15%);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 42px);
+  background: linear-gradient(120deg, #6f2b1d, #a64222 60%, #db7d28);
+  color: #fff9e8;
+}
+
+.hero h1,
+.hero p,
+.panel p {
+  margin: 0;
+}
+
+.hero h1 {
+  margin-top: 6px;
+  font-size: clamp(32px, 6vw, 64px);
+  line-height: .98;
+}
+
+.eyebrow {
+  color: #ffd26b;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 760px;
+  margin-top: 14px !important;
+  font-size: clamp(17px, 2.3vw, 23px);
+  line-height: 1.4;
+}
+
+.missionCard {
+  display: grid;
+  min-width: 210px;
+  gap: 3px;
+  padding: 16px 20px;
+  border: 3px solid #3b241c;
+  border-radius: 22px;
+  background: #ffe53d;
+  color: #3b241c;
+  text-align: center;
+}
+
+.missionCard strong { font-size: 30px; }
+.missionCard small { font-weight: 800; }
+
+.gameCard {
+  overflow: hidden;
+  background: #8bd879;
+}
+
+.gameHost {
+  min-height: min(62vw, 620px);
+  height: 620px;
+  touch-action: none;
+}
+
+.gameHost canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 10px;
+  padding: 14px 18px;
+  background: #fff9e8;
+  font-size: 18px;
+}
+
+.panel {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 3vw, 26px);
+  background: #fff9e8;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.success { color: #0b7a6b; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.primaryAction,
+.secondaryAction,
+.control {
+  min-height: 58px;
+  padding: 10px 22px;
+  border: 3px solid #3b241c;
+  border-radius: 17px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.primaryAction { background: #0b7a6b; color: white; }
+.secondaryAction { background: #ffe0a3; color: #3b241c; }
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-height: 100px;
+  font-size: clamp(17px, 2.5vw, 24px);
+}
+
+.control span { font-size: 42px; line-height: .9; }
+.left,
+.right { background: #ffbd45; }
+.forward { background: #32c834; color: white; }
+.brake { background: #ed4334; color: white; }
+
+@media (max-width: 720px) {
+  .hero { align-items: stretch; flex-direction: column; }
+  .missionCard { min-width: 0; }
+  .gameHost { height: 480px; min-height: 480px; }
+  .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .page { padding: 10px; }
+  .gameHost { height: 400px; min-height: 400px; }
+  .hud { justify-content: flex-start; font-size: 15px; }
+}
