@@ -18,6 +18,7 @@ import {
   DESTINATIONS,
   destinationAt,
   INTERSECTION_X,
+  LANE_OFFSET,
   laneAt,
   MAIN_LANE_Y,
   MAIN_ROAD_X_MAX,
@@ -25,6 +26,7 @@ import {
   ROAD_HALF_WIDTH,
   ROAD_WIDTH,
   ROAD_Y,
+  ROUTE_LENGTH_METERS,
   START_POSITION,
   VEHICLE_LENGTH,
   VEHICLE_WIDTH,
@@ -47,6 +49,8 @@ export interface LeoLivreurSnapshot {
   targetCargo: number;
   distanceToHouse: number;
   targetLabel: string;
+  travelledMeters: number;
+  routeLengthMeters: number;
 }
 
 export interface LeoLivreurController {
@@ -68,6 +72,13 @@ export const CAR_RIGHT_WHEEL_HUBS = [[-37, 34], [34, 34]] as const;
 export const CAR_LEFT_WHEEL_HUBS = [[-34, 34], [37, 34]] as const;
 const SIDE_SPRITE_SIZE = { width: 132, height: 96 };
 const END_SPRITE_SIZE = { width: 80, height: 90 };
+const TRAFFIC_START_POSITIONS = [900, 1850, 3000, 4300, 5600, 6900, 8200, 9500, 10800];
+
+interface TrafficCar {
+  sprite: Phaser.GameObjects.Image;
+  x: number;
+  speed: number;
+}
 
 export class LeoLivreurScene extends Phaser.Scene {
   private readonly onSnapshot: SnapshotListener;
@@ -80,6 +91,8 @@ export class LeoLivreurScene extends Phaser.Scene {
   private debugGuides?: Phaser.GameObjects.Graphics;
   private debugVehicle?: Phaser.GameObjects.Graphics;
   private debugText?: Phaser.GameObjects.Text;
+  private trafficCars: TrafficCar[] = [];
+  private travelledMeters = 0;
   // Mode diagnostic : développement uniquement, activé par ?debug (pas de route ni d'API).
   private readonly debugMode = import.meta.env.DEV
     && typeof window !== "undefined"
@@ -140,6 +153,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.body.add([...Object.values(this.sprites), this.wheelGraphics]);
     this.car.add(this.body);
     this.updateVehicleVisual();
+    this.createTrafficCars();
     if (this.debugMode) this.createDebugOverlay();
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.startFollow(this.car, true, 0.08, 0.08);
@@ -149,6 +163,8 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number) {
+    const seconds = Math.min(delta / 1000, 0.05);
+    this.updateTrafficCars(seconds);
     if (!this.car || this.phase !== "DRIVING") return;
     const previousSpeed = this.motion.speed;
     const pulseActive = this.time.now < this.steeringPulseUntil;
@@ -157,8 +173,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       left: this.controls.left || (pulseActive && this.steeringPulseDirection === "left"),
       right: this.controls.right || (pulseActive && this.steeringPulseDirection === "right"),
     };
-    const seconds = Math.min(delta / 1000, 0.05);
+    const previousX = this.motion.x;
+    const previousY = this.motion.y;
     this.motion = updateLeoMotion(this.motion, input, delta / 1000);
+    this.travelledMeters += Math.hypot(this.motion.x - previousX, this.motion.y - previousY);
     this.wheelSpin += (this.motion.speed * seconds) / WHEEL_RADIUS;
     this.syncCar();
 
@@ -198,6 +216,13 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.steeringPulseDirection = null;
     this.steeringPulseUntil = 0;
     this.deliveredCount = 0;
+    this.travelledMeters = 0;
+    TRAFFIC_START_POSITIONS.forEach((x, index) => {
+      const traffic = this.trafficCars[index];
+      if (!traffic) return;
+      traffic.x = x;
+      traffic.sprite.setPosition(x, ROAD_Y - LANE_OFFSET).setVisible(true);
+    });
     this.controls = { left: false, right: false, forward: false, brake: false };
     this.drawTargets();
     this.syncCar();
@@ -266,14 +291,18 @@ export class LeoLivreurScene extends Phaser.Scene {
       targetCargo: DESTINATIONS.length,
       distanceToHouse: Math.round(distanceTo(this.motion.x, this.motion.y, destination.stop)),
       targetLabel: destination.label,
+      travelledMeters: Math.round(this.travelledMeters),
+      routeLengthMeters: ROUTE_LENGTH_METERS,
     });
   }
 
   private drawWorld() {
     this.add.rectangle(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_WIDTH, WORLD_HEIGHT, 0x9bdc79).setDepth(-5);
-    this.add.image(WORLD_WIDTH / 2, 260, "leo-countryside")
-      .setDisplaySize(WORLD_WIDTH, 600)
-      .setDepth(-4);
+    for (let x = 1086; x < WORLD_WIDTH; x += 2172) {
+      this.add.image(x, 260, "leo-countryside")
+        .setDisplaySize(2172, 600)
+        .setDepth(-4);
+    }
     const road = this.add.graphics().setDepth(0);
     road.fillStyle(0xd7bd8c, 1);
     road.fillRect(28, ROAD_Y - ROAD_HALF_WIDTH - 13, WORLD_WIDTH - 56, ROAD_WIDTH + 26);
@@ -291,13 +320,16 @@ export class LeoLivreurScene extends Phaser.Scene {
 
     // Habillage graphique de la chaussée horizontale. Les rectangles et les
     // axes ci-dessus restent la référence physique de la route et de l'intersection.
-    this.add.image(WORLD_WIDTH / 2, ROAD_Y, "leo-road-straight")
-      .setDisplaySize(WORLD_WIDTH, 300)
-      .setDepth(1);
+    for (let x = 768; x < WORLD_WIDTH; x += 1536) {
+      this.add.image(x, ROAD_Y, "leo-road-straight")
+        .setDisplaySize(1536, 300)
+        .setDepth(1);
+    }
 
     this.add.image(170, 445, "leo-restaurant").setDisplaySize(250, 167).setDepth(2);
-    this.add.image(430, 462, "leo-tree").setDisplaySize(170, 160).setDepth(2);
-    this.add.image(1520, 450, "leo-tree").setDisplaySize(170, 160).setDepth(2);
+    for (let x = 430; x < WORLD_WIDTH; x += 760) {
+      this.add.image(x, 462, "leo-tree").setDisplaySize(170, 160).setDepth(2);
+    }
     this.add.image(INTERSECTION_X + 125, ROAD_Y - 120, "leo-traffic-lights")
       .setCrop(0, 0, 256, 256)
       .setDisplaySize(78, 110)
@@ -321,6 +353,26 @@ export class LeoLivreurScene extends Phaser.Scene {
       fontSize: "28px",
       fontStyle: "bold",
     }).setDepth(3);
+  }
+
+  /** Circulation opposée : les véhicules roulent seuls sur la voie haute et
+   * sortent définitivement du monde visible quand Léo les a dépassés. */
+  private createTrafficCars() {
+    this.trafficCars = TRAFFIC_START_POSITIONS.map((x, index) => ({
+      x,
+      speed: 105 + (index % 3) * 18,
+      sprite: this.add.image(x, ROAD_Y - LANE_OFFSET, "leo-car-left")
+        .setDisplaySize(108, 78)
+        .setDepth(6),
+    }));
+  }
+
+  private updateTrafficCars(seconds: number) {
+    for (const traffic of this.trafficCars) {
+      traffic.x -= traffic.speed * seconds;
+      traffic.sprite.setX(traffic.x);
+      traffic.sprite.setVisible(traffic.x >= this.cameras.main.scrollX - 260);
+    }
   }
 
   /** Zones d'arrêt : la destination en cours est en relief, les autres sont estompées. */

@@ -4,7 +4,9 @@
 // Repère : x vers la droite, y vers le bas (comme Phaser). Cap 0 = vers la droite,
 // cap négatif = virage à gauche (sens antihoraire à l'écran).
 
-export const WORLD_WIDTH = 1800;
+// Le prototype représente maintenant un long parcours : 1 unité Phaser = 1 mètre.
+// La caméra suit Léo, les destinations sont espacées comme de vraies étapes.
+export const WORLD_WIDTH = 12000;
 export const WORLD_HEIGHT = 900;
 
 export const ROAD_Y = 600;
@@ -17,6 +19,7 @@ export const BRANCH_LANE_X = INTERSECTION_X + LANE_OFFSET;
 export const BRANCH_TOP_Y = 220;
 export const MAIN_ROAD_X_MIN = 40;
 export const MAIN_ROAD_X_MAX = WORLD_WIDTH - 40;
+export const ROUTE_LENGTH_METERS = MAIN_ROAD_X_MAX - MAIN_ROAD_X_MIN;
 
 // Empreinte logique du véhicule (rectangle orienté), indépendante de l'illustration.
 export const VEHICLE_LENGTH = 84;
@@ -56,6 +59,13 @@ export const DESTINATIONS: readonly LeoDestination[] = [
     radius: 70,
     house: { x: 1560, y: 805 },
   },
+  ...[2600, 3800, 5100, 6400, 7700, 9000, 10300, 11600].map((x, index) => ({
+    id: `house-${index + 4}`,
+    label: `Maison ${index + 4}`,
+    stop: { x, y: MAIN_LANE_Y },
+    radius: 70,
+    house: { x, y: 805 },
+  })),
 ];
 
 export interface VehiclePose {

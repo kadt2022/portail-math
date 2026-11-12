@@ -12,6 +12,7 @@ import {
   MAIN_LANE_Y,
   normalizeAngle,
   ROAD_Y,
+  ROUTE_LENGTH_METERS,
   START_POSITION,
   VEHICLE_WIDTH,
   vehicleCorners,
@@ -227,6 +228,13 @@ describe("livraison", () => {
     expect(laneAt(house2.stop.x, house2.stop.y)).toBe("main-right");
     expect(laneAt(house3.stop.x, house3.stop.y)).toBe("main-right");
   });
+
+  it("déploie un parcours de plusieurs kilomètres avec des étapes espacées", () => {
+    expect(ROUTE_LENGTH_METERS).toBeGreaterThan(10_000);
+    expect(DESTINATIONS.length).toBeGreaterThanOrEqual(10);
+    expect(DESTINATIONS.at(-1)?.stop.x).toBeGreaterThan(10_000);
+    expect(isLeoRoadPoint(11_600, MAIN_LANE_Y)).toBe(true);
+  });
 });
 
 describe("parcours complet piloté uniquement avec Gauche, Avancer, Freiner, Droite", () => {
@@ -276,7 +284,9 @@ describe("parcours complet piloté uniquement avec Gauche, Avancer, Freiner, Dro
     advance({ brake: true }, (s) => s.speed === 0, 120);
     deliver();
 
-    expect(delivered).toBe(DESTINATIONS.length);
+    // Cette non-régression couvre les trois premières étapes historiques. Les
+    // étapes suivantes prolongent maintenant le parcours jusqu'à plusieurs km.
+    expect(delivered).toBe(3);
     expect(checkpoints).toEqual(["maison 1", "maison 2", "maison 3"]);
     expect(house1.stop.y).toBeLessThan(ROAD_Y);
   });
