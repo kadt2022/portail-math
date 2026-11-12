@@ -28,6 +28,7 @@ import {
   type LeoMotionState,
 } from "./leoDriving";
 import { vehicleViewForHeading } from "./leoVehicleView";
+import { advanceTrafficMotion, keepTrafficGap, trafficWheelIsMoving } from "./leoTraffic";
 
 const NONE: LeoMotionInput = { left: false, right: false, forward: false, brake: false };
 const stopped: LeoMotionState = { ...START_POSITION, speed: 0, heading: 0, steeringAngle: 0 };
@@ -261,6 +262,19 @@ describe("géométrie du trafic opposé", () => {
       expect(ONCOMING_LANE_Y + vehicle.height / 2).toBeLessThan(ROAD_Y);
       expect(MAIN_LANE_Y - vehicle.height / 2).toBeGreaterThan(ROAD_Y);
     }
+  });
+
+  it("fait rouler les roues selon le déplacement et les immobilise à l'arrêt", () => {
+    const moving = advanceTrafficMotion({ x: 900, speed: 120, wheelSpin: 0 }, 0.5);
+    expect(moving.x).toBe(840);
+    expect(moving.wheelSpin).toBeLessThan(0);
+    expect(trafficWheelIsMoving(120)).toBe(true);
+    expect(trafficWheelIsMoving(0)).toBe(false);
+  });
+
+  it("recycle un véhicule sans autoriser une superposition", () => {
+    expect(keepTrafficGap(1000, 1100, 220)).toBe(1220);
+    expect(keepTrafficGap(1000, 1300, 220)).toBe(1300);
   });
 });
 

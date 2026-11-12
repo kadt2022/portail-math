@@ -44,6 +44,7 @@ import {
   distanceTo,
 } from "./leoGeometry";
 import { vehicleViewForHeading, type LeoVehicleSprite } from "./leoVehicleView";
+import { advanceTrafficMotion, keepTrafficGap, trafficWheelIsMoving } from "./leoTraffic";
 
 export type LeoLivreurPhase = "INTRO" | "DRIVING" | "ARRIVED" | "DELIVERED";
 export type LeoLivreurControl = "left" | "right" | "forward" | "brake";
@@ -84,8 +85,12 @@ const TRAFFIC_START_POSITIONS = [900, 1850, 3000, 4300, 5600, 6900, 8200, 9500, 
 
 interface TrafficCar {
   sprite: Phaser.GameObjects.Image;
+  wheelGraphics: Phaser.GameObjects.Graphics;
   x: number;
   speed: number;
+  wheelSpin: number;
+  width: number;
+  height: number;
 }
 
 export class LeoLivreurScene extends Phaser.Scene {
@@ -236,7 +241,9 @@ export class LeoLivreurScene extends Phaser.Scene {
       const traffic = this.trafficCars[index];
       if (!traffic) return;
       traffic.x = x;
+      traffic.wheelSpin = 0;
       traffic.sprite.setPosition(x, ONCOMING_LANE_Y).setVisible(true);
+      traffic.wheelGraphics.setVisible(true);
     });
     this.controls = { left: false, right: false, forward: false, brake: false };
     this.drawTargets();
@@ -378,18 +385,62 @@ export class LeoLivreurScene extends Phaser.Scene {
       return {
         x,
         speed: spec.speed,
+        wheelSpin: 0,
+        width: spec.width,
+        height: spec.height,
         sprite: this.add.image(x, ONCOMING_LANE_Y, spec.assetKey)
           .setDisplaySize(spec.width, spec.height)
           .setDepth(6),
+        wheelGraphics: this.add.graphics().setDepth(7),
       };
     });
   }
 
   private updateTrafficCars(seconds: number) {
     for (const traffic of this.trafficCars) {
-      traffic.x -= traffic.speed * seconds;
+      const motion = advanceTrafficMotion(traffic, seconds);
+      traffic.x = motion.x;
+      traffic.wheelSpin = motion.wheelSpin;
       traffic.sprite.setX(traffic.x);
-      traffic.sprite.setVisible(traffic.x >= this.cameras.main.scrollX - 260);
+      const cameraRight = this.cameras.main.scrollX + this.scale.width / this.cameras.main.zoom;
+      if (traffic.x < this.cameras.main.scrollX - 260) {
+        traffic.x = Math.max(cameraRight + 520, this.motion.x + 1100);
+        traffic.wheelSpin = 0;
+      }
+      traffic.sprite.setX(traffic.x).setVisible(true);
+      traffic.wheelGraphics.setVisible(true);
+    }
+    const ordered = [...this.trafficCars].sort((left, right) => left.x - right.x);
+    for (let index = 1; index < ordered.length; index += 1) {
+      const previous = ordered[index - 1];
+      const current = ordered[index];
+      current.x = keepTrafficGap(previous.x, current.x);
+      current.sprite.setX(current.x);
+    }
+    for (const traffic of this.trafficCars) this.drawTrafficWheels(traffic);
+  }
+
+  private drawTrafficWheels(traffic: TrafficCar) {
+    const graphics = traffic.wheelGraphics;
+    graphics.clear();
+    // Les pneus sont déjà peints dans chaque illustration. On anime uniquement
+    // deux petits moyeux/spokes à l'intérieur de ces pneus, jamais de nouveaux pneus.
+    const hubs = [
+      [-traffic.width * 0.31, traffic.height * 0.22],
+      [traffic.width * 0.31, traffic.height * 0.22],
+    ];
+    for (const [offsetX, offsetY] of hubs) {
+      const x = traffic.x + offsetX;
+      const y = ONCOMING_LANE_Y + offsetY;
+      graphics.fillStyle(0xe3ddd2, 0.9);
+      graphics.fillCircle(x, y, 3.5);
+      graphics.lineStyle(1.2, 0x5b5660, 0.85);
+      if (trafficWheelIsMoving(traffic.speed)) {
+        for (let spoke = 0; spoke < 4; spoke += 1) {
+          const angle = traffic.wheelSpin + spoke * Math.PI / 2;
+          graphics.lineBetween(x, y, x + Math.cos(angle) * 3, y + Math.sin(angle) * 3);
+        }
+      }
     }
   }
 
