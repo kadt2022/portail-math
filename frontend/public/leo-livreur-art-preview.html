@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LEO-ART-01 — Maquette graphique</title>
+    <style>
+      :root { color-scheme: light; font-family: Nunito, system-ui, sans-serif; }
+      body { margin: 0; background: #f7efd9; color: #3b241c; }
+      main { width: min(1180px, 100%); margin: auto; padding: 24px; }
+      h1 { margin: 0 0 6px; font-size: clamp(28px, 5vw, 52px); }
+      p { margin: 0 0 18px; font-weight: 700; }
+      .scene { position: relative; overflow: hidden; aspect-ratio: 3 / 1.55; border: 4px solid #3b241c; border-radius: 24px; background: #8bd879; box-shadow: 0 14px 28px #3b241c2b; }
+      .scene > img { position: absolute; display: block; }
+      .landscape { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .road { left: 0; right: 0; top: 48%; width: 100%; height: auto; }
+      .restaurant { left: 4%; bottom: 31%; width: 19%; }
+      .house { right: 10%; top: 7%; width: 20%; }
+      .tree { left: 29%; bottom: 32%; width: 13%; }
+      .traffic { right: 3%; top: 32%; width: 8%; height: auto; object-fit: cover; object-position: left; }
+      .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+      .card { padding: 14px; border: 3px solid #3b241c; border-radius: 16px; background: #fff9e8; }
+      .card img { display: block; width: 100%; max-height: 140px; object-fit: contain; }
+      .card strong { display: block; margin-top: 8px; }
+      @media (max-width: 680px) { main { padding: 12px; } .legend { grid-template-columns: 1fr; } .scene { aspect-ratio: 1 / 1; } .road { top: 50%; } .restaurant { width: 30%; } .house { width: 30%; } .tree { width: 22%; } .traffic { width: 13%; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>LEO-ART-01 — Première maquette</h1>
+      <p>Assemblage visuel indépendant : campagne, route, restaurant, maison, arbre et feu tricolore.</p>
+      <section class="scene" aria-label="Maquette du monde de Léo">
+        <img class="landscape" src="assets/leo-livreur/backgrounds/countryside-v1.webp" alt="Campagne verdoyante avec collines">
+        <img class="road" src="assets/leo-livreur/roads/road-straight-v1.png" alt="Route droite avec accotements">
+        <img class="restaurant" src="assets/leo-livreur/restaurant/leo-pizza-restaurant.webp" alt="Restaurant Léo Pizza">
+        <img class="house" src="assets/leo-livreur/houses/house-turquoise.webp" alt="Maison de livraison turquoise">
+        <img class="tree" src="assets/leo-livreur/scenery/tree-v1.png" alt="Arbre de campagne">
+        <img class="traffic" src="assets/leo-livreur/traffic-lights/traffic-lights-v1.png" alt="Feu tricolore, état rouge montré">
+      </section>
+      <section class="legend" aria-label="Ressources présentées">
+        <article class="card"><img src="assets/leo-livreur/vehicles/leo-car-right.webp" alt="Léo, profil droit"><strong>Voiture — profil existant</strong></article>
+        <article class="card"><img src="assets/leo-livreur/traffic-lights/traffic-lights-v1.png" alt="Les trois états du feu"><strong>Feu — rouge / orange / vert</strong></article>
+        <article class="card"><img src="assets/leo-livreur/scenery/tree-v1.png" alt="Arbre détouré"><strong>Décor proche — arbre réutilisable</strong></article>
+      </section>
+    </main>
+  </body>
+</html>
