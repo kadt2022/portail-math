@@ -1,0 +1,125 @@
+.page {
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: clamp(14px, 3vw, 32px);
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.hero {
+  padding: clamp(20px, 4vw, 42px);
+  border-radius: var(--pm-radius-lg);
+  background: linear-gradient(125deg, var(--pm-brand-dark), var(--pm-brand));
+  color: white;
+  box-shadow: var(--pm-shadow-md);
+}
+
+.hero p,
+.hero h1,
+.hero span,
+.catalogSection h2,
+.catalogSection p,
+.objectGallery figure,
+.environmentGallery figure {
+  margin: 0;
+}
+
+.hero p {
+  color: #ffd8be;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 8px 0;
+  font-size: clamp(32px, 7vw, 58px);
+}
+
+.hero span {
+  display: block;
+  max-width: 760px;
+  font-size: clamp(17px, 2.4vw, 21px);
+  line-height: 1.55;
+}
+
+.catalogSection {
+  display: grid;
+  gap: 16px;
+  padding: clamp(16px, 3vw, 26px);
+  border: 1px solid var(--pm-line);
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-surface);
+  box-shadow: var(--pm-shadow-sm);
+}
+
+.catalogSection h2 {
+  color: var(--pm-brand-dark);
+  font-size: clamp(23px, 4vw, 32px);
+}
+
+.catalogSection p {
+  margin-top: 6px;
+  color: var(--pm-ink-soft);
+}
+
+.objectGallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.objectGallery figure {
+  display: grid;
+  min-height: 150px;
+  padding: 12px;
+  place-items: center;
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-surface-warm);
+  color: var(--pm-brand-dark);
+  font-weight: 800;
+  text-align: center;
+}
+
+.objectGallery img {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+}
+
+.environmentGallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.environmentGallery figure {
+  overflow: hidden;
+  border-radius: var(--pm-radius-md);
+  background: var(--pm-surface-warm);
+}
+
+.environmentGallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.environmentGallery figcaption {
+  padding: 10px 14px;
+  color: var(--pm-brand-dark);
+  font-weight: 800;
+}
+
+@media (max-width: 680px) {
+  .environmentGallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

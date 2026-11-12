@@ -46,6 +46,10 @@ const TurboPulsePage = lazy(() =>
   import("../games/turbo-pulse/TurboPulsePage").then((module) => ({ default: module.TurboPulsePage })),
 );
 
+const MangoBasketPrototypePage = lazy(() =>
+  import("../prototypes/mango-basket/MangoBasketPrototypePage").then((module) => ({ default: module.MangoBasketPrototypePage })),
+);
+
 // Le basename est fixé à /app : react-router-dom compose alors des chemins
 // absolus (/app/jeux, ...) sans qu'aucune route ne répète le préfixe.
 // Spring Boot sert déjà index.html pour toute URL sous /app/** qui ne
@@ -133,6 +137,14 @@ export function AppRouter() {
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />
+          <Route
+            path="prototypes/mangues-yamba"
+            element={
+              <Suspense fallback={null}>
+                <MangoBasketPrototypePage />
+              </Suspense>
+            }
+          />
           {PRIMARY_COURSES.filter((course) => course.availability === "coming-soon").map((course) => (
             <Route
               key={course.id}

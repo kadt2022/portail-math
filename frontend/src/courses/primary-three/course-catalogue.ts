@@ -50,51 +50,34 @@ function lesson(moduleId: string, lessonNumber: number, titleKey: string): Cours
   };
 }
 
-function evaluation(moduleId: string): CourseItem {
+function evaluation(moduleId: string, titleKey = "evaluation.title"): CourseItem {
   const id = `${moduleId}-EVAL`;
   return {
     id,
     moduleId,
     kind: "evaluation",
-    titleKey: "evaluation.title",
+    titleKey,
     publication: "available",
     steps: EVALUATION_STEP_KINDS.map((kind, index) => step(id, kind, index)),
   };
 }
 
-function comingLesson(moduleId: string, lessonNumber: number, titleKey = "lessons.plannedTitle"): CourseItem {
-  return {
-    id: `${moduleId}-L${String(lessonNumber).padStart(2, "0")}`,
-    moduleId,
-    kind: "lesson",
-    titleKey,
-    publication: "coming-soon",
-    steps: [],
-  };
-}
-
-function comingEvaluation(moduleId: string): CourseItem {
-  return {
-    id: `${moduleId}-EVAL`,
-    moduleId,
-    kind: "evaluation",
-    titleKey: "evaluation.title",
-    publication: "coming-soon",
-    steps: [],
-  };
-}
-
-function plannedModule(number: number, titleKey: string, illustration: string): CourseModule {
-  const moduleId = `MATH-3P-U${String(number).padStart(2, "0")}`;
+// Unités 2 à 10 : quatre leçons et une évaluation, toutes publiées. Les titres
+// viennent de `lessons.uXXlYY.title` et `evaluation.uXX.title` (i18n).
+function unitModule(number: number, illustration: string): CourseModule {
+  const unit = String(number).padStart(2, "0");
+  const moduleId = `MATH-3P-U${unit}`;
   return {
     id: moduleId,
     number,
-    titleKey,
+    titleKey: `modules.m${number}.title`,
     illustration,
-    publication: "coming-soon",
+    publication: "available",
     plannedLessonCount: 4,
-    lessons: [1, 2, 3, 4].map((lessonNumber) => comingLesson(moduleId, lessonNumber)),
-    evaluation: comingEvaluation(moduleId),
+    lessons: [1, 2, 3, 4].map((lessonNumber) =>
+      lesson(moduleId, lessonNumber, `lessons.u${unit}l${String(lessonNumber).padStart(2, "0")}.title`),
+    ),
+    evaluation: evaluation(moduleId, `evaluation.u${unit}.title`),
   };
 }
 
@@ -116,15 +99,15 @@ export const PRIMARY_THREE_MODULES: readonly CourseModule[] = [
     ],
     evaluation: evaluation(MODULE_ONE_ID),
   },
-  plannedModule(2, "modules.m2.title", "+"),
-  plannedModule(3, "modules.m3.title", "−"),
-  plannedModule(4, "modules.m4.title", "× ÷"),
-  plannedModule(5, "modules.m5.title", "½"),
-  plannedModule(6, "modules.m6.title", "FC"),
-  plannedModule(7, "modules.m7.title", "cm · kg · L"),
-  plannedModule(8, "modules.m8.title", "△ □ ○"),
-  plannedModule(9, "modules.m9.title", "◷"),
-  plannedModule(10, "modules.m10.title", "▤"),
+  unitModule(2, "+"),
+  unitModule(3, "−"),
+  unitModule(4, "× ÷"),
+  unitModule(5, "½"),
+  unitModule(6, "FC"),
+  unitModule(7, "cm · kg · L"),
+  unitModule(8, "△ □ ○"),
+  unitModule(9, "◷"),
+  unitModule(10, "▤"),
 ] as const;
 
 export const PRIMARY_THREE_COURSE: CourseDefinition = {

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import styles from "../PrimaryThreeLesson.module.css";
 import { ActivityShell } from "./ActivityShell";
 import { ChoiceGroup } from "./ChoiceGroup";
+import { ExerciseVisual } from "./ExerciseVisual";
 import { hintForAttempts, useAttempts } from "./use-attempts";
 import type { ExerciseWidgetProps, NumericQuestionExercise } from "./exercise-types";
 
@@ -36,28 +37,33 @@ export function NumericQuestion({
   return (
     <ActivityShell titleKey={titleKey} instructionKey={instructionKey} completed={completed} feedback={feedback} onValidate={validate}>
       <p className={styles.questionPrompt}>{t(exercise.promptKey, exercise.promptValues)}</p>
+      {exercise.visual ? <ExerciseVisual visual={exercise.visual} /> : null}
       {exercise.choices ? (
         <ChoiceGroup
           choices={exercise.choices}
           selected={selected}
           ariaLabel={t(instructionKey)}
+          labelFor={exercise.unitKey ? (choice) => `${choice} ${t(exercise.unitKey ?? "")}` : undefined}
           onSelect={(choice) => {
             setSelected(choice);
             reset();
           }}
         />
       ) : (
-        <input
-          type="number"
-          inputMode="numeric"
-          className={styles.sequenceInput}
-          value={value}
-          aria-label={t(instructionKey)}
-          onChange={(event) => {
-            setValue(event.target.value);
-            reset();
-          }}
-        />
+        <div className={styles.answerLine}>
+          <input
+            type="number"
+            inputMode="numeric"
+            className={styles.sequenceInput}
+            value={value}
+            aria-label={t(instructionKey)}
+            onChange={(event) => {
+              setValue(event.target.value);
+              reset();
+            }}
+          />
+          {exercise.unitKey ? <span>{t(exercise.unitKey)}</span> : null}
+        </div>
       )}
     </ActivityShell>
   );

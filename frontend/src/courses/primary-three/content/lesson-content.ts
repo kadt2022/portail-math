@@ -26,3 +26,18 @@ export interface EvaluationContent {
   introKey: string;
   items: readonly ExerciseStepContent[];
 }
+
+export function step(
+  prefix: string,
+  instructionKey: string,
+  exercise: Exercise,
+  titleKey = `content.common.title.${prefix.split(".").at(-1)}`,
+): ExerciseStepContent {
+  return {
+    titleKey,
+    instructionKey,
+    hintKey: `${prefix}.hint`,
+    strongHintKey: `${prefix}.strongHint`,
+    exercise,
+  };
+}

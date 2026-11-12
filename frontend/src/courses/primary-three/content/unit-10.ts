@@ -1,0 +1,267 @@
+import { step, type EvaluationContent, type LessonContent } from "./lesson-content";
+
+export const UNIT_10_LESSON_CONTENT: Record<string, LessonContent> = {
+  "MATH-3P-U10-L01": {
+    objectiveKey: "content.u10l01.objective",
+    situationKey: "content.u10l01.situation",
+    discoverKey: "content.u10l01.discover",
+    manipulate: step("content.u10l01.manipulate", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l01-manipulate",
+        promptKey: "content.u10l01.manipulate.prompt",
+        answer: 9,
+        visual: {
+          kind: "table",
+          headerKeys: ["content.u10l01.manipulate.v1","content.u10l01.manipulate.v2"],
+          rows: [
+            ["content.u10l01.manipulate.v3",4],
+            ["content.u10l01.manipulate.v4",3],
+            ["content.u10l01.manipulate.v5",2],
+          ],
+        },
+      }, "content.u10l01.manipulate.title"),
+    exampleMethodKey: "content.method",
+    examplePromptKeys: [
+      "content.u10l01.example.easy",
+      "content.u10l01.example.medium",
+      "content.u10l01.example.reflection",
+    ],
+    practice: step("content.u10l01.practice", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l01-practice",
+        promptKey: "content.u10l01.practice.prompt",
+        answer: 6,
+        visual: {
+          kind: "pictogram",
+          legendKey: "content.u10l01.practice.v1",
+          unitValue: 2,
+          rows: [
+            ["content.u10l01.practice.v2",3],
+            ["content.u10l01.practice.v3",2],
+          ],
+        },
+      }),
+    reflect: step("content.u10l01.reflect", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l01-reflect",
+        promptKey: "content.u10l01.reflect.prompt",
+        choiceKeys: ["content.u10l01.reflect.c0","content.u10l01.reflect.c1","content.u10l01.reflect.c2"],
+        answerIndex: 2,
+      }),
+    play: step("content.u10l01.play", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l01-play",
+        promptKey: "content.u10l01.play.prompt",
+        answer: 2,
+        visual: {
+          kind: "table",
+          headerKeys: ["content.u10l01.play.v1","content.u10l01.play.v2"],
+          rows: [
+            ["content.u10l01.play.v3",7],
+            ["content.u10l01.play.v4",5],
+          ],
+        },
+      }, "content.u10l01.play.title"),
+    rememberKey: "content.u10l01.remember",
+    check: step("content.u10l01.check", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l01-check",
+        promptKey: "content.u10l01.check.prompt",
+        answer: 8,
+      }),
+  },
+  "MATH-3P-U10-L02": {
+    objectiveKey: "content.u10l02.objective",
+    situationKey: "content.u10l02.situation",
+    discoverKey: "content.u10l02.discover",
+    manipulate: step("content.u10l02.manipulate", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l02-manipulate",
+        promptKey: "content.u10l02.manipulate.prompt",
+        answer: 422,
+      }, "content.u10l02.manipulate.title"),
+    exampleMethodKey: "content.method",
+    examplePromptKeys: [
+      "content.u10l02.example.easy",
+      "content.u10l02.example.medium",
+      "content.u10l02.example.reflection",
+    ],
+    practice: step("content.u10l02.practice", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l02-practice",
+        promptKey: "content.u10l02.practice.prompt",
+        answer: 165,
+      }),
+    reflect: step("content.u10l02.reflect", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l02-reflect",
+        promptKey: "content.u10l02.reflect.prompt",
+        answer: 12,
+      }),
+    play: step("content.u10l02.play", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l02-play",
+        promptKey: "content.u10l02.play.prompt",
+        answer: 33,
+      }, "content.u10l02.play.title"),
+    rememberKey: "content.u10l02.remember",
+    check: step("content.u10l02.check", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l02-check",
+        promptKey: "content.u10l02.check.prompt",
+        answer: 326,
+      }),
+  },
+  "MATH-3P-U10-L03": {
+    objectiveKey: "content.u10l03.objective",
+    situationKey: "content.u10l03.situation",
+    discoverKey: "content.u10l03.discover",
+    manipulate: step("content.u10l03.manipulate", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l03-manipulate",
+        promptKey: "content.u10l03.manipulate.prompt",
+        choiceKeys: [
+          "content.u10l03.manipulate.c0",
+          "content.u10l03.manipulate.c1",
+          "content.u10l03.manipulate.c2",
+          "content.u10l03.manipulate.c3",
+        ],
+        answerIndex: 0,
+      }, "content.u10l03.manipulate.title"),
+    exampleMethodKey: "content.method",
+    examplePromptKeys: [
+      "content.u10l03.example.easy",
+      "content.u10l03.example.medium",
+      "content.u10l03.example.reflection",
+    ],
+    practice: step("content.u10l03.practice", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l03-practice",
+        promptKey: "content.u10l03.practice.prompt",
+        choiceKeys: [
+          "content.u10l03.practice.c0",
+          "content.u10l03.practice.c1",
+          "content.u10l03.practice.c2",
+          "content.u10l03.practice.c3",
+        ],
+        answerIndex: 1,
+      }),
+    reflect: step("content.u10l03.reflect", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l03-reflect",
+        promptKey: "content.u10l03.reflect.prompt",
+        choiceKeys: [
+          "content.u10l03.reflect.c0",
+          "content.u10l03.reflect.c1",
+          "content.u10l03.reflect.c2",
+          "content.u10l03.reflect.c3",
+        ],
+        answerIndex: 2,
+      }),
+    play: step("content.u10l03.play", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l03-play",
+        promptKey: "content.u10l03.play.prompt",
+        choiceKeys: [
+          "content.u10l03.play.c0",
+          "content.u10l03.play.c1",
+          "content.u10l03.play.c2",
+          "content.u10l03.play.c3",
+        ],
+        answerIndex: 0,
+      }, "content.u10l03.play.title"),
+    rememberKey: "content.u10l03.remember",
+    check: step("content.u10l03.check", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l03-check",
+        promptKey: "content.u10l03.check.prompt",
+        choiceKeys: ["content.u10l03.check.c0","content.u10l03.check.c1","content.u10l03.check.c2"],
+        answerIndex: 2,
+      }),
+  },
+  "MATH-3P-U10-L04": {
+    objectiveKey: "content.u10l04.objective",
+    situationKey: "content.u10l04.situation",
+    discoverKey: "content.u10l04.discover",
+    manipulate: step("content.u10l04.manipulate", "content.u10l04.manipulate.instruction", {
+        kind: "step-order",
+        id: "u10l04-manipulate",
+        stepKeys: [
+          "content.u10l04.manipulate.s0",
+          "content.u10l04.manipulate.s1",
+          "content.u10l04.manipulate.s2",
+          "content.u10l04.manipulate.s3",
+        ],
+      }, "content.u10l04.manipulate.title"),
+    exampleMethodKey: "content.method",
+    examplePromptKeys: [
+      "content.u10l04.example.easy",
+      "content.u10l04.example.medium",
+      "content.u10l04.example.reflection",
+    ],
+    practice: step("content.u10l04.practice", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l04-practice",
+        promptKey: "content.u10l04.practice.prompt",
+        answer: 325,
+      }),
+    reflect: step("content.u10l04.reflect", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l04-reflect",
+        promptKey: "content.u10l04.reflect.prompt",
+        choiceKeys: ["content.u10l04.reflect.c0","content.u10l04.reflect.c1","content.u10l04.reflect.c2"],
+        answerIndex: 2,
+      }),
+    play: step("content.u10l04.play", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10l04-play",
+        promptKey: "content.u10l04.play.prompt",
+        choiceKeys: ["content.u10l04.play.c0","content.u10l04.play.c1","content.u10l04.play.c2"],
+        answerIndex: 2,
+      }, "content.u10l04.play.title"),
+    rememberKey: "content.u10l04.remember",
+    check: step("content.u10l04.check", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10l04-check",
+        promptKey: "content.u10l04.check.prompt",
+        answer: 504,
+      }),
+  },
+};
+
+export const UNIT_10_EVALUATION: EvaluationContent = {
+  introKey: "content.u10eval.intro",
+  items: [
+    step("content.u10eval.q1", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10eval-q1",
+        promptKey: "content.u10eval.q1.prompt",
+        answer: 2,
+      }, "content.common.title.question"),
+    step("content.u10eval.q2", "content.common.instruction.numeric", {
+        kind: "numeric-question",
+        id: "u10eval-q2",
+        promptKey: "content.u10eval.q2.prompt",
+        answer: 33,
+      }, "content.common.title.question"),
+    step("content.u10eval.q3", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10eval-q3",
+        promptKey: "content.u10eval.q3.prompt",
+        choiceKeys: [
+          "content.u10eval.q3.c0",
+          "content.u10eval.q3.c1",
+          "content.u10eval.q3.c2",
+          "content.u10eval.q3.c3",
+        ],
+        answerIndex: 2,
+      }, "content.common.title.question"),
+    step("content.u10eval.q4", "content.common.instruction.choice", {
+        kind: "text-choice",
+        id: "u10eval-q4",
+        promptKey: "content.u10eval.q4.prompt",
+        choiceKeys: ["content.u10eval.q4.c0","content.u10eval.q4.c1","content.u10eval.q4.c2"],
+        answerIndex: 0,
+      }, "content.common.title.question"),
+  ],
+};

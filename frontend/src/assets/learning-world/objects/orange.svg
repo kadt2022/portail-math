@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">Orange</title>
+  <defs>
+    <radialGradient id="peel" cx="36%" cy="28%" r="72%">
+      <stop offset="0" stop-color="#ffd261"/>
+      <stop offset=".58" stop-color="#f7941d"/>
+      <stop offset="1" stop-color="#dc6514"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#74390f" flood-opacity=".24"/>
+    </filter>
+  </defs>
+  <ellipse cx="61" cy="101" rx="34" ry="8" fill="#7a4a22" opacity=".16"/>
+  <g filter="url(#shadow)">
+    <path d="M62 28c-4-11 2-20 13-24" fill="none" stroke="#61752a" stroke-width="7" stroke-linecap="round"/>
+    <path d="M69 18c10-9 23-7 29 1-10 8-21 9-29-1Z" fill="#78a83c" stroke="#4e7627" stroke-width="3"/>
+    <circle cx="59" cy="65" r="38" fill="url(#peel)" stroke="#c95a10" stroke-width="3"/>
+    <path d="M36 43c7-9 18-14 28-14" fill="none" stroke="#ffe293" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+    <g fill="#c85d14" opacity=".42">
+      <circle cx="39" cy="62" r="1.8"/><circle cx="49" cy="50" r="1.5"/><circle cx="71" cy="46" r="1.6"/>
+      <circle cx="80" cy="61" r="1.8"/><circle cx="45" cy="78" r="1.6"/><circle cx="68" cy="84" r="1.8"/>
+      <circle cx="83" cy="76" r="1.4"/><circle cx="57" cy="67" r="1.4"/>
+    </g>
+  </g>
+</svg>

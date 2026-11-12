@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 90">
+  <defs><filter id="eraser-shadow"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0f332b" flood-opacity=".22"/></filter></defs>
+  <g filter="url(#eraser-shadow)" stroke="#704255" stroke-width="4" stroke-linejoin="round">
+    <path d="m18 49 27-31h55l14 23-28 32H32Z" fill="#f3a4bb"/>
+    <path d="m76 18 14 23-28 32H32L18 49l27-31Z" fill="#e7789e"/>
+    <path d="M90 41h24L86 73H62Z" fill="#8fb7df" stroke="#365d8c"/>
+    <path d="M33 48h37" stroke="#ffd5e2" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
