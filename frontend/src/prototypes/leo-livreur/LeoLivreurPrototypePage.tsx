@@ -13,9 +13,10 @@ const INITIAL_SNAPSHOT: LeoLivreurSnapshot = {
   speed: 0,
   heading: 0,
   steering: 0,
-  cargo: 2,
-  targetCargo: 2,
+  cargo: 3,
+  targetCargo: 3,
   distanceToHouse: 740,
+  targetLabel: "Maison 1",
 };
 
 const PHASE_LABELS: Record<LeoLivreurSnapshot["phase"], string> = {
@@ -97,11 +98,11 @@ export function LeoLivreurPrototypePage() {
         <div>
           <p className={styles.eyebrow}>Prototype LEO-DRIVE-01</p>
           <h1>Léo le livreur de pizzas</h1>
-          <p className={styles.lead}>Conduis vraiment jusqu’à la maison : avance, tourne à l’intersection, puis freine dans la zone jaune.</p>
+          <p className={styles.lead}>Conduis vraiment jusqu’aux maisons : avance, tourne à l’intersection, puis freine dans la zone jaune.</p>
         </div>
         <div className={styles.missionCard}>
           <span>Commande du jour</span>
-          <strong>{snapshot.targetCargo} pizzas</strong>
+          <strong>{snapshot.targetCargo} pizzas, une par maison</strong>
           <small>{PHASE_LABELS[snapshot.phase]}</small>
         </div>
       </header>
@@ -112,18 +113,18 @@ export function LeoLivreurPrototypePage() {
           <span>Dans la voiture : <strong>{snapshot.cargo} pizzas</strong></span>
           <span>Vitesse : <strong>{snapshot.speed}</strong></span>
           <span>Braquage : <strong>{snapshot.steering}°</strong></span>
-          <span>Distance : <strong>{snapshot.distanceToHouse}</strong></span>
+          <span>{snapshot.targetLabel} : <strong>{snapshot.distanceToHouse}</strong></span>
         </div>
       </section>
 
       <section className={styles.panel}>
-        {canStart ? <p>Les pizzas sont chargées. Pars du restaurant et rejoins la maison turquoise.</p> : null}
-        {snapshot.phase === "DRIVING" ? <p>Regarde l’intersection : tourne vers le haut pour prendre la route de la maison.</p> : null}
-        {canDeliver ? <p>Tu es arrêté au bon endroit. La conduite est bloquée pendant la livraison.</p> : null}
-        {snapshot.phase === "DELIVERED" ? <p className={styles.success}>Bravo ! Première livraison réussie. La prochaine étape ajoutera les questions mathématiques.</p> : null}
+        {canStart ? <p>Les pizzas sont chargées. Pars du restaurant et livre d’abord la Maison 1, au bout de la route du haut.</p> : null}
+        {snapshot.phase === "DRIVING" ? <p>Prochaine livraison : {snapshot.targetLabel}. Tu choisis toi-même où tourner. Besoin de reculer ? Maintiens Freiner à l’arrêt.</p> : null}
+        {canDeliver ? <p>Tu es arrêté au bon endroit. La conduite est bloquée pendant la livraison : {snapshot.targetLabel}.</p> : null}
+        {snapshot.phase === "DELIVERED" ? <p className={styles.success}>Bravo ! Les trois maisons sont livrées. La prochaine étape ajoutera les questions mathématiques.</p> : null}
         <div className={styles.actions}>
           {canStart ? <button type="button" className={styles.primaryAction} onClick={() => controller?.startMission()}>Commencer la mission</button> : null}
-          {canDeliver ? <button type="button" className={styles.primaryAction} onClick={() => controller?.deliver()}>Livrer les 2 pizzas</button> : null}
+          {canDeliver ? <button type="button" className={styles.primaryAction} onClick={() => controller?.deliver()}>Livrer la pizza</button> : null}
           {snapshot.phase === "DELIVERED" ? <button type="button" className={styles.secondaryAction} onClick={() => controller?.reset()}>Rejouer</button> : null}
         </div>
       </section>

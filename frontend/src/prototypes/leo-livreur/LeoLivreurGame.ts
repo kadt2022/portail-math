@@ -1,9 +1,35 @@
 import Phaser from "phaser";
 
-import carUrl from "./assets/leo-car.webp";
+import backCarUrl from "./assets/leo-car-back.webp";
 import frontCarUrl from "./assets/leo-car-front.webp";
+import leftCarUrl from "./assets/leo-car-left.webp";
+import rightCarUrl from "./assets/leo-car-right.webp";
 import houseUrl from "./assets/leo-house-turquoise.webp";
 import restaurantUrl from "./assets/leo-pizza-restaurant.webp";
+import { updateLeoMotion, type LeoMotionInput, type LeoMotionState } from "./leoDriving";
+import {
+  BRANCH_LANE_X,
+  BRANCH_TOP_Y,
+  canDeliver,
+  DESTINATIONS,
+  destinationAt,
+  INTERSECTION_X,
+  laneAt,
+  MAIN_LANE_Y,
+  MAIN_ROAD_X_MAX,
+  MAIN_ROAD_X_MIN,
+  ROAD_HALF_WIDTH,
+  ROAD_WIDTH,
+  ROAD_Y,
+  START_POSITION,
+  VEHICLE_LENGTH,
+  VEHICLE_WIDTH,
+  vehicleCorners,
+  WORLD_HEIGHT,
+  WORLD_WIDTH,
+  distanceTo,
+} from "./leoGeometry";
+import { vehicleViewForHeading, type LeoVehicleSprite } from "./leoVehicleView";
 
 export type LeoLivreurPhase = "INTRO" | "DRIVING" | "ARRIVED" | "DELIVERED";
 export type LeoLivreurControl = "left" | "right" | "forward" | "brake";
@@ -16,6 +42,7 @@ export interface LeoLivreurSnapshot {
   cargo: number;
   targetCargo: number;
   distanceToHouse: number;
+  targetLabel: string;
 }
 
 export interface LeoLivreurController {
@@ -30,99 +57,43 @@ export interface LeoLivreurController {
 
 type SnapshotListener = (snapshot: LeoLivreurSnapshot) => void;
 
-const WORLD_WIDTH = 1800;
-const WORLD_HEIGHT = 900;
-export const ROAD_Y = 600;
-export const ROAD_WIDTH = 140;
-export const ROAD_HALF_WIDTH = ROAD_WIDTH / 2;
-export const LANE_OFFSET = 35;
-export const MAIN_LANE_Y = ROAD_Y + LANE_OFFSET;
-export const INTERSECTION_X = 930;
-export const BRANCH_LANE_X = INTERSECTION_X + LANE_OFFSET;
-export const HOUSE_X = BRANCH_LANE_X;
-export const HOUSE_Y = 290;
-const MAX_SPEED = 260;
-const ARRIVAL_RADIUS = 105;
-export const MAX_STEERING_ANGLE = Math.PI / 6;
-export const WHEEL_BASE = 96;
-export const STEERING_RETURN_RATE = 3.8;
 export const WHEEL_RADIUS = 11;
-// Le nez peint dans l'illustration pointe légèrement vers le bas à droite.
-// Phaser considère 0° comme l'axe horizontal vers la droite : cet offset
-// aligne donc la voiture avec la route sans modifier la direction physique.
-export const CAR_SPRITE_HEADING_OFFSET = -18;
-// Positions des deux moyeux déjà présents dans l'illustration de la voiture.
-// On anime uniquement ces détails : aucun pneu supplémentaire n'est dessiné.
-export const CAR_WHEEL_HUBS = [[-43, 17], [-10, 21]] as const;
-export const CAR_FRONT_WHEEL_HUBS = [[-21, 36], [21, 36]] as const;
-
-export interface LeoMotionState {
-  x: number;
-  y: number;
-  speed: number;
-  heading: number;
-  steeringAngle: number;
-}
-
-export interface LeoMotionInput {
-  left: boolean;
-  right: boolean;
-  forward: boolean;
-  brake: boolean;
-}
-
-export function approach(current: number, target: number, amount: number) {
-  if (current < target) return Math.min(current + amount, target);
-  return Math.max(current - amount, target);
-}
-
-export function isLeoRoadPoint(x: number, y: number) {
-  const onMainRoad = x >= 40 && x <= WORLD_WIDTH - 40 && Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH;
-  const onBranch = y >= 220 && y <= ROAD_Y + ROAD_HALF_WIDTH && Math.abs(x - INTERSECTION_X) <= ROAD_HALF_WIDTH;
-  return onMainRoad || onBranch;
-}
-
-export function updateLeoMotion(state: LeoMotionState, input: LeoMotionInput, deltaSeconds: number): LeoMotionState {
-  const seconds = Math.min(deltaSeconds, 0.05);
-  const steeringTarget = input.left === input.right
-    ? 0
-    : input.left
-      ? -MAX_STEERING_ANGLE
-      : MAX_STEERING_ANGLE;
-  const steeringAngle = approach(state.steeringAngle, steeringTarget, STEERING_RETURN_RATE * seconds);
-  let speed = input.forward ? Math.min(MAX_SPEED, state.speed + 280 * seconds) : Math.max(0, state.speed - 90 * seconds);
-  if (input.brake) speed = Math.max(0, speed - 520 * seconds);
-  if (speed < 2) speed = 0;
-
-  const heading = state.heading + (speed / WHEEL_BASE) * Math.tan(steeringAngle) * seconds;
-  const x = state.x + Math.cos(heading) * speed * seconds;
-  const y = state.y + Math.sin(heading) * speed * seconds;
-  if (!isLeoRoadPoint(x, y)) return { ...state, speed: 0, steeringAngle };
-  return { x, y, speed, heading, steeringAngle };
-}
+// Les pneus et jantes sont peints dans les illustrations. On n'anime que les
+// moyeux des deux profils (positions relatives au centre du sprite affiché).
+export const CAR_RIGHT_WHEEL_HUBS = [[-37, 34], [34, 34]] as const;
+export const CAR_LEFT_WHEEL_HUBS = [[-34, 34], [37, 34]] as const;
+const SIDE_SPRITE_SIZE = { width: 132, height: 96 };
+const END_SPRITE_SIZE = { width: 80, height: 90 };
 
 export class LeoLivreurScene extends Phaser.Scene {
   private readonly onSnapshot: SnapshotListener;
   private car?: Phaser.GameObjects.Container;
-  private sideCar?: Phaser.GameObjects.Image;
-  private frontCar?: Phaser.GameObjects.Image;
+  private body?: Phaser.GameObjects.Container;
+  private sprites: Partial<Record<LeoVehicleSprite, Phaser.GameObjects.Image>> = {};
   private carShadow?: Phaser.GameObjects.Ellipse;
   private wheelGraphics?: Phaser.GameObjects.Graphics;
+  private targetGraphics?: Phaser.GameObjects.Graphics;
   private debugGuides?: Phaser.GameObjects.Graphics;
-  private debugMarker?: Phaser.GameObjects.Graphics;
-  private readonly debugMode = typeof window !== "undefined"
+  private debugVehicle?: Phaser.GameObjects.Graphics;
+  private debugText?: Phaser.GameObjects.Text;
+  // Mode diagnostic : développement uniquement, activé par ?debug (pas de route ni d'API).
+  private readonly debugMode = import.meta.env.DEV
+    && typeof window !== "undefined"
     && new URLSearchParams(window.location.search).has("debug");
+  private debugRectangle = typeof window !== "undefined"
+    && new URLSearchParams(window.location.search).get("debug") === "rect";
   private phase: LeoLivreurPhase = "INTRO";
-  private speed = 0;
-  private heading = 0;
-  private steeringAngle = 0;
+  private motion: LeoMotionState = {
+    x: START_POSITION.x,
+    y: START_POSITION.y,
+    speed: 0,
+    heading: 0,
+    steeringAngle: 0,
+  };
   private wheelSpin = 0;
   private steeringPulseDirection: "left" | "right" | null = null;
   private steeringPulseUntil = 0;
-  private cargo = 2;
-  private readonly targetCargo = 2;
-  private xPosition = 300;
-  private yPosition = MAIN_LANE_Y;
+  private deliveredCount = 0;
   private controls: Record<LeoLivreurControl, boolean> = {
     left: false,
     right: false,
@@ -136,24 +107,32 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("leo-car", carUrl);
+    this.load.image("leo-car-right", rightCarUrl);
+    this.load.image("leo-car-left", leftCarUrl);
     this.load.image("leo-car-front", frontCarUrl);
+    this.load.image("leo-car-back", backCarUrl);
     this.load.image("leo-house", houseUrl);
     this.load.image("leo-restaurant", restaurantUrl);
   }
 
   create() {
     this.drawWorld();
-    this.carShadow = this.add.ellipse(this.xPosition, this.yPosition + 27, 120, 34, 0x3b241c, 0.3).setDepth(8);
-    this.car = this.add.container(this.xPosition, this.yPosition).setDepth(10);
-    this.sideCar = this.add.image(0, 0, "leo-car").setDisplaySize(132, 88).setAngle(CAR_SPRITE_HEADING_OFFSET);
-    this.frontCar = this.add.image(0, 0, "leo-car-front").setDisplaySize(86, 88).setVisible(false).setFlipY(true);
-    this.car.add([this.sideCar, this.frontCar]);
+    this.carShadow = this.add.ellipse(this.motion.x, this.motion.y + 27, 120, 34, 0x3b241c, 0.3).setDepth(8);
+    this.car = this.add.container(this.motion.x, this.motion.y).setDepth(10);
+    this.body = this.add.container(0, 0);
+    const make = (sprite: LeoVehicleSprite, size: { width: number; height: number }) =>
+      this.add.image(0, 0, `leo-car-${sprite}`).setDisplaySize(size.width, size.height).setVisible(false);
+    this.sprites = {
+      right: make("right", SIDE_SPRITE_SIZE),
+      left: make("left", SIDE_SPRITE_SIZE),
+      front: make("front", END_SPRITE_SIZE),
+      back: make("back", END_SPRITE_SIZE),
+    };
     this.wheelGraphics = this.add.graphics();
-    this.car.add(this.wheelGraphics);
+    this.body.add([...Object.values(this.sprites), this.wheelGraphics]);
+    this.car.add(this.body);
     this.updateVehicleVisual();
-    if (this.debugMode) this.createDebugGuides();
-    this.car.setDepth(10);
+    if (this.debugMode) this.createDebugOverlay();
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.startFollow(this.car, true, 0.08, 0.08);
     this.cameras.main.setZoom(Math.min(this.scale.width / 900, this.scale.height / 520, 1));
@@ -163,35 +142,22 @@ export class LeoLivreurScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     if (!this.car || this.phase !== "DRIVING") return;
-    const previousSpeed = this.speed;
-    const previousX = this.xPosition;
-    const previousY = this.yPosition;
+    const previousSpeed = this.motion.speed;
     const pulseActive = this.time.now < this.steeringPulseUntil;
-    const motion = updateLeoMotion(
-      { x: this.xPosition, y: this.yPosition, speed: this.speed, heading: this.heading, steeringAngle: this.steeringAngle },
-      {
-        ...this.controls,
-        left: this.controls.left || (pulseActive && this.steeringPulseDirection === "left"),
-        right: this.controls.right || (pulseActive && this.steeringPulseDirection === "right"),
-      },
-      delta / 1000,
-    );
-    this.xPosition = Phaser.Math.Clamp(motion.x, 80, WORLD_WIDTH - 80);
-    this.yPosition = Phaser.Math.Clamp(motion.y, 100, WORLD_HEIGHT - 80);
-    this.speed = motion.speed;
-    this.heading = motion.heading;
-    this.steeringAngle = motion.steeringAngle;
-    const movedDistance = Phaser.Math.Distance.Between(previousX, previousY, this.xPosition, this.yPosition);
-    this.wheelSpin += movedDistance / WHEEL_RADIUS;
-    this.car.setPosition(this.xPosition, this.yPosition);
-    this.carShadow?.setPosition(this.xPosition, this.yPosition + 27);
-    this.updateVehicleVisual();
-    this.updateDebugMarker();
+    const input: LeoMotionInput = {
+      ...this.controls,
+      left: this.controls.left || (pulseActive && this.steeringPulseDirection === "left"),
+      right: this.controls.right || (pulseActive && this.steeringPulseDirection === "right"),
+    };
+    const seconds = Math.min(delta / 1000, 0.05);
+    this.motion = updateLeoMotion(this.motion, input, delta / 1000);
+    this.wheelSpin += (this.motion.speed * seconds) / WHEEL_RADIUS;
+    this.syncCar();
 
-    if (this.distanceToHouse() <= ARRIVAL_RADIUS && this.speed === 0) {
+    if (this.canDeliverNow()) {
       this.phase = "ARRIVED";
       this.publish();
-    } else if (Math.floor(this.speed) % 8 === 0 || previousSpeed !== this.speed) {
+    } else if (previousSpeed !== this.motion.speed) {
       this.publish();
     }
   }
@@ -203,28 +169,30 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   deliver() {
-    if (this.phase !== "ARRIVED") return;
-    this.cargo = 0;
-    this.phase = "DELIVERED";
+    // Livraison possible uniquement arrêté dans la zone de la destination en cours.
+    if (this.phase !== "ARRIVED" || !this.canDeliverNow()) return;
+    this.deliveredCount += 1;
+    this.phase = this.deliveredCount >= DESTINATIONS.length ? "DELIVERED" : "DRIVING";
+    this.drawTargets();
     this.publish();
   }
 
   reset() {
     this.phase = "INTRO";
-    this.speed = 0;
-    this.heading = 0;
-    this.steeringAngle = 0;
+    this.motion = {
+      x: START_POSITION.x,
+      y: START_POSITION.y,
+      speed: 0,
+      heading: 0,
+      steeringAngle: 0,
+    };
     this.wheelSpin = 0;
     this.steeringPulseDirection = null;
     this.steeringPulseUntil = 0;
-    this.cargo = this.targetCargo;
-    this.xPosition = 300;
-    this.yPosition = MAIN_LANE_Y;
+    this.deliveredCount = 0;
     this.controls = { left: false, right: false, forward: false, brake: false };
-    this.car?.setPosition(this.xPosition, this.yPosition);
-    this.carShadow?.setPosition(this.xPosition, this.yPosition + 27);
-    this.updateVehicleVisual();
-    this.updateDebugMarker();
+    this.drawTargets();
+    this.syncCar();
     this.publish();
   }
 
@@ -263,21 +231,33 @@ export class LeoLivreurScene extends Phaser.Scene {
     bind("keyup-DOWN", "brake", false);
     bind("keydown-S", "brake", true);
     bind("keyup-S", "brake", false);
+    if (this.debugMode) {
+      keyboard.on("keydown-G", () => {
+        this.debugRectangle = !this.debugRectangle;
+        this.syncCar();
+      });
+    }
   }
 
-  private distanceToHouse() {
-    return Phaser.Math.Distance.Between(this.xPosition, this.yPosition, HOUSE_X, HOUSE_Y);
+  private currentDestination() {
+    return destinationAt(this.deliveredCount);
+  }
+
+  private canDeliverNow() {
+    return canDeliver(this.motion.x, this.motion.y, this.motion.speed, this.deliveredCount);
   }
 
   private publish() {
+    const destination = this.currentDestination();
     this.onSnapshot({
       phase: this.phase,
-      speed: Math.round(this.speed),
-      heading: this.heading,
-      steering: Math.round(Phaser.Math.RadToDeg(this.steeringAngle)),
-      cargo: this.cargo,
-      targetCargo: this.targetCargo,
-      distanceToHouse: Math.round(this.distanceToHouse()),
+      speed: Math.round(Math.abs(this.motion.speed)),
+      heading: this.motion.heading,
+      steering: Math.round(Phaser.Math.RadToDeg(this.motion.steeringAngle)),
+      cargo: DESTINATIONS.length - this.deliveredCount,
+      targetCargo: DESTINATIONS.length,
+      distanceToHouse: Math.round(distanceTo(this.motion.x, this.motion.y, destination.stop)),
+      targetLabel: destination.label,
     });
   }
 
@@ -286,10 +266,10 @@ export class LeoLivreurScene extends Phaser.Scene {
     const road = this.add.graphics().setDepth(0);
     road.fillStyle(0xd7bd8c, 1);
     road.fillRect(28, ROAD_Y - ROAD_HALF_WIDTH - 13, WORLD_WIDTH - 56, ROAD_WIDTH + 26);
-    road.fillRect(INTERSECTION_X - ROAD_HALF_WIDTH - 13, 207, ROAD_WIDTH + 26, ROAD_Y - 124);
+    road.fillRect(INTERSECTION_X - ROAD_HALF_WIDTH - 13, BRANCH_TOP_Y - 13, ROAD_WIDTH + 26, ROAD_Y - BRANCH_TOP_Y + 63);
     road.fillStyle(0x4b4b55, 1);
-    road.fillRect(40, ROAD_Y - ROAD_HALF_WIDTH, WORLD_WIDTH - 80, ROAD_WIDTH);
-    road.fillRect(INTERSECTION_X - ROAD_HALF_WIDTH, 220, ROAD_WIDTH, ROAD_Y - 150);
+    road.fillRect(MAIN_ROAD_X_MIN, ROAD_Y - ROAD_HALF_WIDTH, MAIN_ROAD_X_MAX - MAIN_ROAD_X_MIN, ROAD_WIDTH);
+    road.fillRect(INTERSECTION_X - ROAD_HALF_WIDTH, BRANCH_TOP_Y, ROAD_WIDTH, ROAD_Y + ROAD_HALF_WIDTH - BRANCH_TOP_Y);
     road.lineStyle(8, 0xffd83d, 1);
     road.lineBetween(80, ROAD_Y, INTERSECTION_X - 75, ROAD_Y);
     road.lineBetween(INTERSECTION_X + 75, ROAD_Y, WORLD_WIDTH - 80, ROAD_Y);
@@ -299,16 +279,11 @@ export class LeoLivreurScene extends Phaser.Scene {
     for (let y = 270; y < ROAD_Y - 55; y += 82) road.lineBetween(INTERSECTION_X, y, INTERSECTION_X, y + 38);
 
     this.add.image(170, 445, "leo-restaurant").setDisplaySize(250, 167).setDepth(2);
-    this.add.image(HOUSE_X, HOUSE_Y - 25, "leo-house").setDisplaySize(230, 153).setDepth(2);
-    this.add.circle(HOUSE_X, HOUSE_Y + 95, ARRIVAL_RADIUS, 0xfff1a8, 0.22).setStrokeStyle(4, 0xffd83d, 0.9).setDepth(1);
-    this.add.text(HOUSE_X, HOUSE_Y + 175, "ZONE D’ARRÊT", {
-      color: "#3b241c",
-      fontFamily: "Nunito, sans-serif",
-      fontSize: "22px",
-      fontStyle: "bold",
-      stroke: "#fff4d6",
-      strokeThickness: 6,
-    }).setOrigin(0.5).setDepth(3);
+    for (const destination of DESTINATIONS) {
+      this.add.image(destination.house.x, destination.house.y, "leo-house").setDisplaySize(230, 153).setDepth(2);
+    }
+    this.targetGraphics = this.add.graphics().setDepth(1);
+    this.drawTargets();
     this.add.text(INTERSECTION_X + 115, ROAD_Y - 110, "Intersection", {
       color: "#3b241c",
       fontFamily: "Nunito, sans-serif",
@@ -325,64 +300,115 @@ export class LeoLivreurScene extends Phaser.Scene {
     }).setDepth(3);
   }
 
-  private updateVehicleVisual() {
-    if (!this.car || !this.sideCar || !this.frontCar) return;
-    const verticalProgress = Phaser.Math.Clamp(
-      (Math.abs(this.heading) - Phaser.Math.DegToRad(42)) / Phaser.Math.DegToRad(48),
-      0,
-      1,
-    );
-    this.sideCar.setAlpha(1 - verticalProgress);
-    this.frontCar.setAlpha(verticalProgress).setFlipY(this.heading < 0);
-    this.car.setAngle(Phaser.Math.RadToDeg(this.heading) * (1 - verticalProgress));
-    this.drawWheels(verticalProgress);
+  /** Zones d'arrêt : la destination en cours est en relief, les autres sont estompées. */
+  private drawTargets() {
+    if (!this.targetGraphics) return;
+    this.targetGraphics.clear();
+    DESTINATIONS.forEach((destination, index) => {
+      if (index < this.deliveredCount) return;
+      const current = index === this.deliveredCount;
+      this.targetGraphics?.fillStyle(0xfff1a8, current ? 0.3 : 0.1);
+      this.targetGraphics?.fillCircle(destination.stop.x, destination.stop.y, destination.radius);
+      this.targetGraphics?.lineStyle(4, 0xffd83d, current ? 0.95 : 0.35);
+      this.targetGraphics?.strokeCircle(destination.stop.x, destination.stop.y, destination.radius);
+    });
   }
 
-  private drawWheels(verticalProgress = 0) {
+  private syncCar() {
+    if (!this.car) return;
+    this.car.setPosition(this.motion.x, this.motion.y);
+    this.carShadow?.setPosition(this.motion.x, this.motion.y + 27);
+    this.updateVehicleVisual();
+    this.updateDebugOverlay();
+  }
+
+  private updateVehicleVisual() {
+    if (!this.body) return;
+    const view = vehicleViewForHeading(this.motion.heading);
+    const showSprite = !this.debugRectangle;
+    for (const [name, image] of Object.entries(this.sprites)) image?.setVisible(showSprite && name === view.sprite);
+    this.body.setAngle(view.angleDeg);
+    this.carShadow?.setVisible(showSprite);
+    this.drawWheels(view.sprite);
+  }
+
+  private drawWheels(sprite: LeoVehicleSprite) {
     if (!this.wheelGraphics) return;
     this.wheelGraphics.clear();
-    for (const [x, y] of CAR_WHEEL_HUBS) this.drawWheelHub(x, y, 1 - verticalProgress);
-    for (const [x, y] of CAR_FRONT_WHEEL_HUBS) this.drawWheelHub(x, y, verticalProgress);
+    if (this.debugRectangle) return;
+    // De face ou de dos, les roues ne montrent pas leur jante : rien à animer.
+    if (sprite === "front" || sprite === "back") return;
+    const hubs = sprite === "right" ? CAR_RIGHT_WHEEL_HUBS : CAR_LEFT_WHEEL_HUBS;
+    for (const [x, y] of hubs) this.drawWheelHub(x, y);
   }
 
-  private drawWheelHub(x: number, y: number, alpha: number) {
-    if (!this.wheelGraphics || alpha <= 0) return;
+  private drawWheelHub(x: number, y: number) {
+    if (!this.wheelGraphics) return;
     // Les pneus et jantes sont déjà peints dans les sprites directionnels.
     // On n'anime que leurs moyeux, sans superposer un pneu supplémentaire.
-    this.wheelGraphics.fillStyle(0xe3ddd2, 0.95 * alpha);
+    this.wheelGraphics.fillStyle(0xe3ddd2, 0.95);
     this.wheelGraphics.fillCircle(x, y, 4.5);
-    this.wheelGraphics.lineStyle(1.5, 0x5b5660, 0.9 * alpha);
+    this.wheelGraphics.lineStyle(1.5, 0x5b5660, 0.9);
     for (let spoke = 0; spoke < 4; spoke += 1) {
       const angle = this.wheelSpin + spoke * Math.PI / 2;
       this.wheelGraphics.lineBetween(x, y, x + Math.cos(angle) * 4, y + Math.sin(angle) * 4);
     }
   }
 
-  private createDebugGuides() {
+  // --- Mode diagnostic (développement uniquement) -------------------------------
+
+  private createDebugOverlay() {
     this.debugGuides = this.add.graphics().setDepth(4);
-    this.debugGuides.lineStyle(3, 0xff4fd8, 0.9);
-    this.debugGuides.lineBetween(40, MAIN_LANE_Y, WORLD_WIDTH - 40, MAIN_LANE_Y);
-    this.debugGuides.lineBetween(BRANCH_LANE_X, 220, BRANCH_LANE_X, ROAD_Y + ROAD_HALF_WIDTH);
+    // Limites des chaussées (blanc), axes (cyan), centres de voie (magenta).
+    this.debugGuides.lineStyle(2, 0xffffff, 0.9);
+    this.debugGuides.strokeRect(MAIN_ROAD_X_MIN, ROAD_Y - ROAD_HALF_WIDTH, MAIN_ROAD_X_MAX - MAIN_ROAD_X_MIN, ROAD_WIDTH);
+    this.debugGuides.strokeRect(INTERSECTION_X - ROAD_HALF_WIDTH, BRANCH_TOP_Y, ROAD_WIDTH, ROAD_Y - BRANCH_TOP_Y);
     this.debugGuides.lineStyle(2, 0x2ee6ff, 0.85);
-    this.debugGuides.lineBetween(40, ROAD_Y, WORLD_WIDTH - 40, ROAD_Y);
-    this.debugGuides.lineBetween(INTERSECTION_X, 220, INTERSECTION_X, ROAD_Y + ROAD_HALF_WIDTH);
-    this.add.text(55, MAIN_LANE_Y + 14, "voie droite →", {
-      color: "#ff4fd8",
-      fontFamily: "Nunito, sans-serif",
-      fontSize: "18px",
-      fontStyle: "bold",
-    }).setDepth(4);
-    this.debugMarker = this.add.graphics().setDepth(12);
-    this.updateDebugMarker();
+    this.debugGuides.lineBetween(MAIN_ROAD_X_MIN, ROAD_Y, MAIN_ROAD_X_MAX, ROAD_Y);
+    this.debugGuides.lineBetween(INTERSECTION_X, BRANCH_TOP_Y, INTERSECTION_X, ROAD_Y + ROAD_HALF_WIDTH);
+    this.debugGuides.lineStyle(3, 0xff4fd8, 0.9);
+    this.debugGuides.lineBetween(MAIN_ROAD_X_MIN, MAIN_LANE_Y, MAIN_ROAD_X_MAX, MAIN_LANE_Y);
+    this.debugGuides.lineBetween(BRANCH_LANE_X, BRANCH_TOP_Y, BRANCH_LANE_X, ROAD_Y + ROAD_HALF_WIDTH);
+    this.debugVehicle = this.add.graphics().setDepth(12);
+    this.debugText = this.add.text(0, 0, "", {
+      color: "#ffffff",
+      backgroundColor: "#000000aa",
+      fontFamily: "monospace",
+      fontSize: "16px",
+    }).setDepth(13);
+    this.updateDebugOverlay();
   }
 
-  private updateDebugMarker() {
-    if (!this.debugMarker) return;
-    this.debugMarker.clear();
-    this.debugMarker.lineStyle(2, 0xffffff, 0.95);
-    this.debugMarker.strokeCircle(this.xPosition, this.yPosition, 12);
-    this.debugMarker.lineBetween(this.xPosition - 18, this.yPosition, this.xPosition + 18, this.yPosition);
-    this.debugMarker.lineBetween(this.xPosition, this.yPosition - 18, this.xPosition, this.yPosition + 18);
+  private updateDebugOverlay() {
+    if (!this.debugVehicle || !this.debugText) return;
+    const { x, y, heading, steeringAngle, speed } = this.motion;
+    const g = this.debugVehicle;
+    g.clear();
+    // Rectangle d'empreinte : c'est lui que le moteur teste contre la chaussée.
+    g.lineStyle(3, this.debugRectangle ? 0xffd83d : 0xffffff, 1);
+    const corners = vehicleCorners({ x, y, heading });
+    g.beginPath();
+    g.moveTo(corners[0][0], corners[0][1]);
+    for (const [cx, cy] of corners.slice(1)) g.lineTo(cx, cy);
+    g.closePath();
+    g.strokePath();
+    // Flèche : l'avant du véhicule.
+    const tipX = x + Math.cos(heading) * (VEHICLE_LENGTH / 2 + 24);
+    const tipY = y + Math.sin(heading) * (VEHICLE_LENGTH / 2 + 24);
+    g.lineStyle(4, 0xff3b30, 1);
+    g.lineBetween(x, y, tipX, tipY);
+    g.fillStyle(0xff3b30, 1);
+    g.fillTriangle(
+      tipX, tipY,
+      tipX - Math.cos(heading - 0.5) * 14, tipY - Math.sin(heading - 0.5) * 14,
+      tipX - Math.cos(heading + 0.5) * 14, tipY - Math.sin(heading + 0.5) * 14,
+    );
+    // Point logique (centre de l'empreinte).
+    g.fillStyle(0x00e676, 1);
+    g.fillCircle(x, y, 6);
+    this.debugText
+      .setPosition(x + VEHICLE_LENGTH / 2 + 8, y - VEHICLE_WIDTH / 2 - 44)
+      .setText(`cap ${Math.round(Phaser.Math.RadToDeg(heading))}°  braq ${Math.round(Phaser.Math.RadToDeg(steeringAngle))}°\nv ${Math.round(speed)}  ${laneAt(x, y)}`);
   }
 }
 
