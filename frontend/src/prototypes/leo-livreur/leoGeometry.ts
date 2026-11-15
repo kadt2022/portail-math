@@ -6,55 +6,35 @@
 
 // Le prototype représente maintenant un long parcours : 1 unité Phaser = 1 mètre.
 // La caméra suit Léo, les destinations sont espacées comme de vraies étapes.
-export const WORLD_WIDTH = 12000;
-export const WORLD_HEIGHT = 900;
+export const WORLD_WIDTH = 1_000_000_000;
+export const WORLD_HEIGHT = 960;
 
 export const ROAD_Y = 600;
-export const ROAD_WIDTH = 140;
+/**
+ * Largeur de la chaussée principale, identique pour toute sa longueur.
+ */
+export const ROAD_WIDTH = 200;
 export const ROAD_HALF_WIDTH = ROAD_WIDTH / 2;
-export const ROAD_EDGE_MARGIN = 8;
-/** Marge issue de l'empreinte visuelle des roues, commune à tous les profils. */
-export const WHEEL_CONTACT_OFFSET = 34;
-/** Hauteur visuelle maximale des véhicules de trafic (famille : 58 px). */
-export const TRAFFIC_VISUAL_HALF_HEIGHT = 29;
-export const LANE_CENTER_OFFSET = Math.max(
-  ROAD_HALF_WIDTH - WHEEL_CONTACT_OFFSET - ROAD_EDGE_MARGIN,
-  TRAFFIC_VISUAL_HALF_HEIGHT + 1,
-);
-export const LANE_OFFSET = LANE_CENTER_OFFSET;
+export const LANE_WIDTH = ROAD_HALF_WIDTH;
+/** Centre d'une voie : à mi-chemin entre la ligne centrale et la bordure. */
+export const LANE_OFFSET = LANE_WIDTH / 2;
 export const MAIN_LANE_Y = ROAD_Y + LANE_OFFSET;
 export const ONCOMING_LANE_Y = ROAD_Y - LANE_OFFSET;
-export const INTERSECTION_X = 930;
-export const BRANCH_LANE_X = INTERSECTION_X + LANE_OFFSET;
-export const BRANCH_TOP_Y = 220;
 export const MAIN_ROAD_X_MIN = 40;
-export const MAIN_ROAD_X_MAX = WORLD_WIDTH - 40;
-export const ROUTE_LENGTH_METERS = MAIN_ROAD_X_MAX - MAIN_ROAD_X_MIN;
+export const MAIN_ROAD_X_MAX = WORLD_WIDTH;
+/** Le parcours n'a pas de destination finale; valeur infinie réservée à l'affichage HUD. */
+export const ROUTE_LENGTH_METERS = Number.POSITIVE_INFINITY;
 
-// Empreinte logique du véhicule (rectangle orienté), indépendante de l'illustration.
-export const VEHICLE_LENGTH = 84;
-export const VEHICLE_WIDTH = 40;
+/**
+ * Empreinte au sol de Léo (rectangle orienté), indépendante de l'illustration.
+ * Le point logique est le centre de cette empreinte, donc le centre de la voie ;
+ * les pneus du sprite touchent le bord inférieur de l'empreinte (voir leoVehicleCatalog).
+ */
+export const VEHICLE_LENGTH = 124;
+export const VEHICLE_WIDTH = 36;
 
-export type TrafficVehicleKind = "family" | "compact" | "sedan" | "city-bus" | "school-bus" | "taxi" | "minibus";
-
-export interface TrafficVehicleSpec {
-  kind: TrafficVehicleKind;
-  assetKey: string;
-  width: number;
-  height: number;
-  speed: number;
-}
-
-/** Catalogue léger : les dimensions visuelles sont séparées de l'empreinte de Léo. */
-export const TRAFFIC_VEHICLES: readonly TrafficVehicleSpec[] = [
-  { kind: "family", assetKey: "leo-traffic-family-blue", width: 128, height: 58, speed: 110 },
-  { kind: "compact", assetKey: "leo-traffic-compact-green", width: 112, height: 56, speed: 128 },
-  { kind: "sedan", assetKey: "leo-traffic-sedan-gray", width: 126, height: 56, speed: 118 },
-  { kind: "city-bus", assetKey: "leo-traffic-city-bus", width: 190, height: 52, speed: 84 },
-  { kind: "school-bus", assetKey: "leo-traffic-school-bus", width: 180, height: 54, speed: 92 },
-  { kind: "taxi", assetKey: "leo-traffic-taxi", width: 116, height: 56, speed: 142 },
-  { kind: "minibus", assetKey: "leo-traffic-minibus", width: 156, height: 52, speed: 102 },
-];
+/** Maisons rapprochées du bord, en conservant une marge hors chaussée. */
+export const HOUSE_ROW_Y = 880;
 
 export const START_POSITION = { x: 300, y: MAIN_LANE_Y } as const;
 
@@ -68,36 +48,59 @@ export interface LeoDestination {
   house: { x: number; y: number };
 }
 
-export const DESTINATIONS: readonly LeoDestination[] = [
+const INITIAL_DESTINATIONS: readonly LeoDestination[] = [
   {
     id: "house-1",
     label: "Maison 1",
-    stop: { x: BRANCH_LANE_X, y: 340 },
-    radius: 70,
-    house: { x: BRANCH_LANE_X, y: 265 },
+    stop: { x: 750, y: MAIN_LANE_Y },
+    radius: 90,
+    house: { x: 750, y: HOUSE_ROW_Y },
   },
   {
     id: "house-2",
     label: "Maison 2",
-    stop: { x: 1250, y: MAIN_LANE_Y },
-    radius: 70,
-    house: { x: 1250, y: 805 },
+    stop: { x: 1050, y: MAIN_LANE_Y },
+    radius: 90,
+    house: { x: 1050, y: HOUSE_ROW_Y },
   },
   {
     id: "house-3",
     label: "Maison 3",
-    stop: { x: 1560, y: MAIN_LANE_Y },
-    radius: 70,
-    house: { x: 1560, y: 805 },
+    stop: { x: 1350, y: MAIN_LANE_Y },
+    radius: 90,
+    house: { x: 1350, y: HOUSE_ROW_Y },
+  },
+  {
+    id: "house-4",
+    label: "Maison 4",
+    stop: { x: 1650, y: MAIN_LANE_Y },
+    radius: 90,
+    house: { x: 1650, y: HOUSE_ROW_Y },
   },
   ...[2600, 3800, 5100, 6400, 7700, 9000, 10300, 11600].map((x, index) => ({
-    id: `house-${index + 4}`,
-    label: `Maison ${index + 4}`,
+    id: `house-${index + 5}`,
+    label: `Maison ${index + 5}`,
     stop: { x, y: MAIN_LANE_Y },
-    radius: 70,
-    house: { x, y: 805 },
+    radius: 90,
+    house: { x, y: HOUSE_ROW_Y },
   })),
 ];
+
+export const DESTINATIONS: readonly LeoDestination[] = INITIAL_DESTINATIONS;
+
+const REPEAT_DELIVERY_SPACING = 1050;
+export function destinationForDelivery(deliveryIndex: number): LeoDestination {
+  if (deliveryIndex < INITIAL_DESTINATIONS.length) return INITIAL_DESTINATIONS[deliveryIndex];
+  const repeatIndex = deliveryIndex - INITIAL_DESTINATIONS.length;
+  const x = 12800 + repeatIndex * REPEAT_DELIVERY_SPACING;
+  return {
+    id: `delivery-${deliveryIndex + 1}`,
+    label: `Maison ${deliveryIndex + 1}`,
+    stop: { x, y: MAIN_LANE_Y },
+    radius: 90,
+    house: { x, y: HOUSE_ROW_Y },
+  };
+}
 
 export interface VehiclePose {
   x: number;
@@ -112,24 +115,15 @@ export function normalizeAngle(angle: number) {
   return value - Math.PI;
 }
 
-/** Point situé sur une chaussée (route principale ou branche). */
+/** Point situé sur la chaussée principale, sans route secondaire. */
 export function isLeoRoadPoint(x: number, y: number) {
-  const onMainRoad = x >= MAIN_ROAD_X_MIN && x <= MAIN_ROAD_X_MAX && Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH;
-  const onBranch = y >= BRANCH_TOP_Y && y <= ROAD_Y + ROAD_HALF_WIDTH && Math.abs(x - INTERSECTION_X) <= ROAD_HALF_WIDTH;
-  return onMainRoad || onBranch;
+  const onMainRoad = x >= MAIN_ROAD_X_MIN && Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH;
+  return onMainRoad;
 }
 
-/** Empreinte rectangulaire d'un véhicule de trafic, calculée dans le même
- * repère que la chaussée et indépendante des marges transparentes du PNG. */
-export function isTrafficVehicleOnRoad(x: number, y: number, width: number, height: number) {
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
-  return [
-    [x - halfWidth, y - halfHeight],
-    [x + halfWidth, y - halfHeight],
-    [x + halfWidth, y + halfHeight],
-    [x - halfWidth, y + halfHeight],
-  ].every(([pointX, pointY]) => isLeoRoadPoint(pointX, pointY));
+/** Un rectangle au sol (centre, longueur, profondeur) tient-il dans une voie horizontale ? */
+export function isFootprintInLane(centerY: number, depth: number, laneY: number, margin = 0) {
+  return Math.abs(centerY - laneY) + depth / 2 + margin <= LANE_WIDTH / 2;
 }
 
 /** Les quatre coins du rectangle représentant le véhicule. */
@@ -156,31 +150,24 @@ export function isVehicleOnRoad(pose: VehiclePose) {
   return points.every(([x, y]) => isLeoRoadPoint(x, y));
 }
 
-export type LeoLane = "main-right" | "main-left" | "branch-right" | "branch-left" | "intersection" | "off-road";
+export type LeoLane = "main-right" | "main-left" | "off-road";
 
 /**
  * Voie occupée par le centre du véhicule. Circulation à droite : voie droite de la
- * route principale = moitié basse quand on roule vers la droite ; voie droite de la
- * branche = moitié droite quand on monte. Information seulement : aucune assistance
- * ne s'en sert pour décider à la place de l'enfant.
+ * route principale = moitié basse quand on roule vers la droite. Information seulement.
  */
 export function laneAt(x: number, y: number): LeoLane {
   if (!isLeoRoadPoint(x, y)) return "off-road";
-  const inJunction = Math.abs(x - INTERSECTION_X) <= ROAD_HALF_WIDTH && Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH;
-  if (inJunction) return "intersection";
   if (Math.abs(y - ROAD_Y) <= ROAD_HALF_WIDTH) return y >= ROAD_Y ? "main-right" : "main-left";
-  return x >= INTERSECTION_X ? "branch-right" : "branch-left";
+  return "off-road";
 }
 
 /** La voiture roule-t-elle dans le bon sens pour la voie qu'elle occupe ? */
 export function isInCorrectLane(pose: VehiclePose) {
   const lane = laneAt(pose.x, pose.y);
   const east = Math.cos(pose.heading);
-  const north = -Math.sin(pose.heading);
   if (lane === "main-right") return east >= 0;
   if (lane === "main-left") return east <= 0;
-  if (lane === "branch-right") return north >= 0;
-  if (lane === "branch-left") return north <= 0;
   return true;
 }
 
@@ -194,7 +181,7 @@ export function isInsideDestination(x: number, y: number, destination: LeoDestin
 
 /** Destination à livrer quand `deliveredCount` maisons sont déjà servies. */
 export function destinationAt(deliveredCount: number) {
-  return DESTINATIONS[Math.min(deliveredCount, DESTINATIONS.length - 1)];
+  return destinationForDelivery(deliveredCount);
 }
 
 /**
@@ -202,6 +189,5 @@ export function destinationAt(deliveredCount: number) {
  * en cours : arrêté devant une autre maison, elle ne compte pas.
  */
 export function canDeliver(x: number, y: number, speed: number, deliveredCount: number) {
-  if (deliveredCount >= DESTINATIONS.length) return false;
   return speed === 0 && isInsideDestination(x, y, destinationAt(deliveredCount));
 }

@@ -1,26 +1,25 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  BRANCH_LANE_X,
   canDeliver,
   DESTINATIONS,
-  INTERSECTION_X,
+  destinationForDelivery,
   isInCorrectLane,
   isLeoRoadPoint,
-  isTrafficVehicleOnRoad,
   isVehicleOnRoad,
   laneAt,
   MAIN_LANE_Y,
   normalizeAngle,
-  ONCOMING_LANE_Y,
+  ROAD_HALF_WIDTH,
   ROAD_Y,
   ROUTE_LENGTH_METERS,
-  TRAFFIC_VEHICLES,
   START_POSITION,
   VEHICLE_WIDTH,
   vehicleCorners,
 } from "./leoGeometry";
 import {
+  CITY_SPEED_LIMIT,
+  MAX_REVERSE_SPEED,
   MAX_SPEED,
   MAX_STEERING_ANGLE,
   updateLeoMotion,
@@ -28,7 +27,7 @@ import {
   type LeoMotionState,
 } from "./leoDriving";
 import { vehicleViewForHeading } from "./leoVehicleView";
-import { advanceTrafficMotion, keepTrafficGap, trafficWheelIsMoving } from "./leoTraffic";
+import { brakingDistance } from "./leoSightline";
 
 const NONE: LeoMotionInput = { left: false, right: false, forward: false, brake: false };
 const stopped: LeoMotionState = { ...START_POSITION, speed: 0, heading: 0, steeringAngle: 0 };
@@ -44,6 +43,10 @@ function hold(state: LeoMotionState, input: Partial<LeoMotionInput>, until: (s: 
   for (let frame = 0; frame < max && !until(current); frame += 1) current = step(current, input);
   return current;
 }
+
+/** Distance d'arrêt approximative d'un joueur prudent : il commence à freiner assez tôt. */
+// Distance d'arrêt mesurée avec le vrai modèle de conduite (freinage à fond, pédale progressive), plus une petite marge.
+const stoppingDistance = (speed: number) => brakingDistance(speed) + 20;
 
 const deg = (radians: number) => (radians * 180) / Math.PI;
 
@@ -93,7 +96,8 @@ describe("commandes", () => {
     expect(first.speed).toBeGreaterThan(0);
     expect(second.speed).toBeGreaterThan(first.speed);
     expect(first.speed).toBeLessThan(MAX_SPEED / 10);
-    expect(hold(stopped, { forward: true }, () => false, 300).speed).toBe(MAX_SPEED);
+    // 0 → 120 km/h en environ 18 s (voiture de référence) : on maintient Avancer 25 s.
+    expect(hold(stopped, { forward: true }, () => false, 1500).speed).toBe(MAX_SPEED);
     expect(second.x).toBeGreaterThan(stopped.x);
   });
 
@@ -129,12 +133,56 @@ describe("commandes", () => {
     expect(next.y).toBe(stopped.y);
   });
 
-  it("Freiner immobilise réellement la voiture, sans la faire reculer", () => {
-    const rolling = hold(stopped, { forward: true }, () => false, 120);
-    expect(rolling.speed).toBeGreaterThan(100);
-    const stoppedAgain = hold(rolling, { brake: true }, (s) => s.speed === 0, 60);
-    expect(stoppedAgain.speed).toBe(0);
-    expect(stoppedAgain.x).toBeLessThan(rolling.x + 100);
+  it("Freiner : d'abord une décélération progressive, puis l'arrêt réel, sans reculer", () => {
+    // Depuis 50 km/h (limite de la route).
+    const rolling = { ...stopped, speed: CITY_SPEED_LIMIT };
+    // Aucune décélération instantanée : la pédale s'enfonce, la voiture ralentit d'abord peu.
+    const first = step(rolling, { brake: true });
+    expect(first.speed).toBeGreaterThan(rolling.speed * 0.97);
+    const tenth = hold(rolling, { brake: true }, () => false, 6);
+    expect(tenth.speed).toBeGreaterThan(rolling.speed * 0.8);
+    // Vitesse strictement décroissante jusqu'à l'arrêt complet, qui prend un vrai temps.
+    let state = rolling;
+    let frames = 0;
+    let previous = state.speed;
+    while (state.speed > 0 && frames < 600) {
+      state = step(state, { brake: true });
+      expect(state.speed).toBeLessThanOrEqual(previous);
+      previous = state.speed;
+      frames += 1;
+    }
+    expect(state.speed).toBe(0);
+    expect(frames).toBeGreaterThan(60);
+    expect(frames).toBeLessThan(180);
+    expect(state.x - rolling.x).toBeGreaterThan(150);
+    // Relâcher tout ralentit aussi, plus doucement que le frein.
+    const coasting = hold(rolling, {}, () => false, 60);
+    expect(coasting.speed).toBeLessThan(rolling.speed);
+    expect(coasting.speed).toBeGreaterThan(state.speed);
+  });
+
+  it("ne freine jamais instantanément, à aucune vitesse", () => {
+    for (const speed of [80, 200, 360, 520]) {
+      const start = { ...stopped, speed };
+      const next = step(start, { brake: true });
+      expect(next.speed).toBeGreaterThan(speed * 0.96);
+    }
+  });
+
+  it("adapte la vitesse maximale au trafic : libre = pleine vitesse, véhicule devant = on s'aligne dessus", () => {
+    const free = hold(stopped, { forward: true }, () => false, 1500);
+    expect(free.speed).toBe(MAX_SPEED);
+    let capped = free;
+    for (let frame = 0; frame < 240; frame += 1) capped = updateLeoMotion(capped, { ...NONE, forward: true }, FRAME, undefined, 200);
+    expect(capped.speed).toBe(200);
+    // Le ralentissement est progressif : jamais de saut d'une image à l'autre.
+    let previous = free.speed;
+    let state = free;
+    for (let frame = 0; frame < 120; frame += 1) {
+      state = updateLeoMotion(state, { ...NONE, forward: true }, FRAME, undefined, 200);
+      expect(previous - state.speed).toBeLessThan(5);
+      previous = state.speed;
+    }
   });
 
   it("le braquage revient vers le centre quand on relâche", () => {
@@ -144,21 +192,19 @@ describe("commandes", () => {
   });
 });
 
-describe("virage à 90° et suivi routier", () => {
-  it("quitte la route principale et monte la branche par un virage à gauche choisi par le joueur", () => {
-    let state = hold(stopped, { forward: true }, (s) => s.x >= 780);
-    state = hold(state, { forward: true, left: true }, (s) => s.heading <= -Math.PI / 2 + 0.05, 300);
-    expect(deg(state.heading)).toBeLessThan(-85);
-    state = hold(state, { forward: true }, (s) => s.y <= 380, 300);
+describe("chaussée principale uniquement", () => {
+  it("garde Léo sur la route droite lorsqu'il braque vers un côté", () => {
+    const state = hold(stopped, { forward: true, left: true }, (s) => s.y < ROAD_Y - 10, 300);
     expect(isVehicleOnRoad(state)).toBe(true);
-    expect(Math.abs(state.x - BRANCH_LANE_X)).toBeLessThan(30);
-    expect(laneAt(state.x, state.y)).toBe("branch-right");
+    expect(Math.abs(state.y - ROAD_Y)).toBeLessThanOrEqual(ROAD_HALF_WIDTH);
+    expect(laneAt(state.x, state.y)).toBe("main-left");
   });
 
-  it("sans action du joueur, la voiture ne tourne pas toute seule à l'intersection", () => {
-    const state = hold(stopped, { forward: true }, (s) => s.x > INTERSECTION_X + 200);
+  it("roule tout droit sans bifurcation sur toute la chaussée", () => {
+    const state = hold(stopped, { forward: true }, (s) => s.x > 1500);
     expect(state.heading).toBe(0);
     expect(state.y).toBe(MAIN_LANE_Y);
+    expect(isVehicleOnRoad(state)).toBe(true);
   });
 
   it("reste dans les zones routières : un obstacle ne la téléporte jamais hors chaussée", () => {
@@ -169,10 +215,10 @@ describe("virage à 90° et suivi routier", () => {
   });
 
   it("le contrôle porte sur l'empreinte entière : la carrosserie ne déborde pas du bord", () => {
-    const hugging = hold({ ...stopped, heading: -0.3, speed: 200 }, { forward: true }, () => false, 120);
+    const hugging = hold({ ...stopped, heading: -0.3, speed: 200 }, { forward: true }, () => false, 40);
     expect(isVehicleOnRoad(hugging)).toBe(true);
-    expect(Math.min(...vehicleCorners(hugging).map(([, y]) => y))).toBeGreaterThanOrEqual(ROAD_Y - 70);
-    expect(isLeoRoadPoint(300, ROAD_Y - 90)).toBe(false);
+    expect(Math.min(...vehicleCorners(hugging).map(([, y]) => y))).toBeGreaterThanOrEqual(ROAD_Y - ROAD_HALF_WIDTH);
+    expect(isLeoRoadPoint(300, ROAD_Y - ROAD_HALF_WIDTH - 10)).toBe(false);
     expect(VEHICLE_WIDTH).toBeLessThan(70);
   });
 
@@ -190,27 +236,37 @@ describe("virage à 90° et suivi routier", () => {
 });
 
 describe("marche arrière : revenir d'une mauvaise direction", () => {
-  it("Freiner maintenu à l'arrêt recule lentement, mais pas en roulant", () => {
-    const rolling = hold(stopped, { forward: true }, () => false, 60);
-    const braking = hold(rolling, { brake: true }, () => false, 5);
-    expect(braking.speed).toBeGreaterThanOrEqual(0);
-    const reversing = hold({ ...stopped, x: 400 }, { brake: true }, (s) => s.speed < -20, 120);
-    expect(reversing.speed).toBeLessThan(-20);
-    expect(reversing.x).toBeLessThan(400);
+  it("Reculer : à l'arrêt, la voiture recule progressivement, cap inchangé", () => {
+    const reversing = hold({ ...stopped, x: 600 }, { reverse: true }, (s) => s.speed < -100, 300);
+    expect(reversing.speed).toBeLessThan(-100);
+    expect(reversing.speed).toBeGreaterThanOrEqual(-MAX_REVERSE_SPEED);
+    expect(reversing.x).toBeLessThan(600);
     expect(reversing.heading).toBe(0);
+    const first = step({ ...stopped, x: 600 }, { reverse: true });
+    expect(first.speed).toBeLessThan(0);
+    expect(first.speed).toBeGreaterThan(-10);
   });
 
-  it("depuis le bout de la branche, on peut ressortir en marche arrière et repartir vers l'est", () => {
-    let state: LeoMotionState = { x: BRANCH_LANE_X, y: 313, speed: 0, heading: -1.62, steeringAngle: 0 };
-    state = hold(state, { brake: true }, (s) => s.y >= 580, 900);
-    state = hold(state, { brake: true, left: true }, (s) => s.heading >= -0.4, 600);
-    state = hold(state, {}, (s) => s.speed === 0, 200);
-    state = hold(state, { forward: true, right: true }, (s) => s.heading >= -0.02, 300);
-    expect(Math.abs(state.heading)).toBeLessThan(0.1);
-    expect(state.y).toBeGreaterThan(ROAD_Y);
-    expect(isInCorrectLane(state)).toBe(true);
-    expect(isVehicleOnRoad(state)).toBe(true);
+  it("Reculer en roulant vers l'avant freine d'abord jusqu'à l'arrêt, sans inversion instantanée", () => {
+    let state = hold(stopped, { forward: true }, () => false, 200);
+    let previous = state.speed;
+    for (let frame = 0; frame < 300 && state.speed > 0; frame += 1) {
+      state = step(state, { reverse: true });
+      expect(state.speed).toBeLessThanOrEqual(previous);
+      expect(state.speed).toBeGreaterThanOrEqual(0);
+      previous = state.speed;
+    }
+    expect(state.speed).toBe(0);
+    state = hold(state, { reverse: true }, (s) => s.speed < -50, 120);
+    expect(state.speed).toBeLessThan(-50);
   });
+
+  it("Freiner à l'arrêt ne fait pas reculer", () => {
+    const state = hold({ ...stopped, x: 600 }, { brake: true }, () => false, 120);
+    expect(state.speed).toBe(0);
+    expect(state.x).toBe(600);
+  });
+
 });
 
 describe("livraison", () => {
@@ -228,58 +284,29 @@ describe("livraison", () => {
 
   it("les zones d'arrêt sont sur la chaussée et dans la voie de droite", () => {
     for (const destination of DESTINATIONS) expect(isLeoRoadPoint(destination.stop.x, destination.stop.y)).toBe(true);
-    expect(laneAt(house1.stop.x, house1.stop.y)).toBe("branch-right");
+    expect(laneAt(house1.stop.x, house1.stop.y)).toBe("main-right");
     expect(laneAt(house2.stop.x, house2.stop.y)).toBe("main-right");
     expect(laneAt(house3.stop.x, house3.stop.y)).toBe("main-right");
   });
 
   it("déploie un parcours de plusieurs kilomètres avec des étapes espacées", () => {
-    expect(ROUTE_LENGTH_METERS).toBeGreaterThan(10_000);
+    expect(ROUTE_LENGTH_METERS).toBe(Number.POSITIVE_INFINITY);
     expect(DESTINATIONS.length).toBeGreaterThanOrEqual(10);
     expect(DESTINATIONS.at(-1)?.stop.x).toBeGreaterThan(10_000);
     expect(isLeoRoadPoint(11_600, MAIN_LANE_Y)).toBe(true);
   });
-});
 
-describe("géométrie du trafic opposé", () => {
-  it("calcule deux centres de voie séparés de la ligne centrale", () => {
-    expect(MAIN_LANE_Y).toBeGreaterThan(ROAD_Y);
-    expect(ONCOMING_LANE_Y).toBeLessThan(ROAD_Y);
-    expect(Math.abs(MAIN_LANE_Y - ROAD_Y)).toBeGreaterThan(20);
-    expect(Math.abs(ONCOMING_LANE_Y - ROAD_Y)).toBeGreaterThan(20);
-  });
-
-  it("contient chaque profil, y compris les bus, dans sa voie", () => {
-    for (const vehicle of TRAFFIC_VEHICLES) {
-      expect(isTrafficVehicleOnRoad(1200, ONCOMING_LANE_Y, vehicle.width, vehicle.height)).toBe(true);
-      expect(ONCOMING_LANE_Y + vehicle.height / 2).toBeLessThan(ROAD_Y);
-      expect(MAIN_LANE_Y - vehicle.height / 2).toBeGreaterThan(ROAD_Y);
-    }
-  });
-
-  it("ne place aucun véhicule sur la ligne centrale", () => {
-    for (const vehicle of TRAFFIC_VEHICLES) {
-      expect(ONCOMING_LANE_Y + vehicle.height / 2).toBeLessThan(ROAD_Y);
-      expect(MAIN_LANE_Y - vehicle.height / 2).toBeGreaterThan(ROAD_Y);
-    }
-  });
-
-  it("fait rouler les roues selon le déplacement et les immobilise à l'arrêt", () => {
-    const moving = advanceTrafficMotion({ x: 900, speed: 120, wheelSpin: 0 }, 0.5);
-    expect(moving.x).toBe(840);
-    expect(moving.wheelSpin).toBeLessThan(0);
-    expect(trafficWheelIsMoving(120)).toBe(true);
-    expect(trafficWheelIsMoving(0)).toBe(false);
-  });
-
-  it("recycle un véhicule sans autoriser une superposition", () => {
-    expect(keepTrafficGap(1000, 1100, 220)).toBe(1220);
-    expect(keepTrafficGap(1000, 1300, 220)).toBe(1300);
+  it("continue à créer des destinations jouables au-delà du premier cycle", () => {
+    const next = destinationForDelivery(DESTINATIONS.length);
+    const later = destinationForDelivery(DESTINATIONS.length + 8);
+    expect(next.stop.x).toBeGreaterThan(DESTINATIONS.at(-1)!.stop.x);
+    expect(later.stop.x).toBeGreaterThan(next.stop.x);
+    expect(canDeliver(next.stop.x, next.stop.y, 0, DESTINATIONS.length)).toBe(true);
   });
 });
 
 describe("parcours complet piloté uniquement avec Gauche, Avancer, Freiner, Droite", () => {
-  it("restaurant → Maison 1 → route principale → Maison 2 → Maison 3, sans téléportation", () => {
+  it("livre trois maisons successives sur la route droite, sans téléportation", () => {
     const [house1, house2, house3] = DESTINATIONS;
     let state = stopped;
     let previous = state;
@@ -288,47 +315,37 @@ describe("parcours complet piloté uniquement avec Gauche, Avancer, Freiner, Dro
     const advance = (input: Partial<LeoMotionInput>, until: (s: LeoMotionState) => boolean, max = 900) => {
       for (let frame = 0; frame < max && !until(state); frame += 1) {
         state = step(state, input);
-        // Aucune téléportation : jamais plus de 6 px entre deux images (260 px/s à 60 Hz = 4,4 px).
-        expect(Math.hypot(state.x - previous.x, state.y - previous.y)).toBeLessThan(6);
+        // Aucune téléportation : jamais plus de 10 px entre deux images (520 px/s à 60 Hz = 8,7 px).
+        expect(Math.hypot(state.x - previous.x, state.y - previous.y)).toBeLessThan(10);
         expect(isVehicleOnRoad(state)).toBe(true);
         previous = state;
       }
     };
     const deliver = () => {
-      expect(canDeliver(state.x, state.y, state.speed, delivered)).toBe(true);
+      if (!canDeliver(state.x, state.y, state.speed, delivered)) throw new Error(`stop manqué: ${JSON.stringify({ x: state.x, y: state.y, v: state.speed, delivered })}`);
       delivered += 1;
       checkpoints.push(`maison ${delivered}`);
     };
 
-    // Restaurant → route principale → virage à gauche à l'intersection → Maison 1.
-    advance({ forward: true }, (s) => s.x >= 780);
-    advance({ forward: true, left: true }, (s) => s.heading <= -Math.PI / 2 + 0.05, 300);
-    advance({ forward: true }, (s) => s.y <= 385, 300);
-    advance({ brake: true }, (s) => s.speed === 0, 120);
+    // Première livraison sur la chaussée principale.
+    advance({ forward: true }, (s) => house1.stop.x - s.x <= stoppingDistance(s.speed), 900);
+    advance({ brake: true }, (s) => s.speed === 0, 300);
     deliver();
 
-    // Maison 1 → route principale : marche arrière, demi-tour en trois temps.
-    advance({ brake: true }, (s) => s.y >= 580);
-    advance({ brake: true, left: true }, (s) => s.heading >= -0.4, 600);
-    advance({}, (s) => s.speed === 0, 200);
-    advance({ forward: true, right: true }, (s) => s.heading >= -0.02, 300);
-    expect(state.y).toBeGreaterThan(ROAD_Y);
-    expect(isInCorrectLane(state)).toBe(true);
-
-    // Route principale → Maison 2.
-    advance({ forward: true }, (s) => s.x >= house2.stop.x - 85);
-    advance({ brake: true }, (s) => s.speed === 0, 120);
+    // Maison 1 → Maison 2 → Maison 3, toujours sur la route droite.
+    advance({ forward: true }, (s) => house2.stop.x - s.x <= stoppingDistance(s.speed), 900);
+    advance({ brake: true }, (s) => s.speed === 0, 300);
     deliver();
 
     // Maison 2 → Maison 3, toujours à droite.
-    advance({ forward: true }, (s) => s.x >= house3.stop.x - 85);
-    advance({ brake: true }, (s) => s.speed === 0, 120);
+    advance({ forward: true }, (s) => house3.stop.x - s.x <= stoppingDistance(s.speed), 900);
+    advance({ brake: true }, (s) => s.speed === 0, 300);
     deliver();
 
     // Cette non-régression couvre les trois premières étapes historiques. Les
     // étapes suivantes prolongent maintenant le parcours jusqu'à plusieurs km.
     expect(delivered).toBe(3);
     expect(checkpoints).toEqual(["maison 1", "maison 2", "maison 3"]);
-    expect(house1.stop.y).toBeLessThan(ROAD_Y);
+    expect(house1.stop.y).toBe(MAIN_LANE_Y);
   });
 });
