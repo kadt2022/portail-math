@@ -7,6 +7,8 @@
 // affiché figé ici, pour que le Dashboard reste bilingue sans dupliquer
 // cette liste.
 
+import leoCarUrl from "../prototypes/leo-livreur/assets/leo-car-right.webp";
+
 export type GameAvailability = "standalone" | "react" | "coming-soon";
 
 export type GameSceneId = "train" | "new-game" | "grille-magique" | "turbo-pulse" | "flux-forge";
@@ -21,6 +23,8 @@ export interface GameCatalogueEntry {
   // Une vraie photo (jeux déjà illustrés) OU une scène SVG dessinée pour ce
   // jeu (aucun visuel n'existe encore pour lui) — jamais les deux.
   imageSrc?: string;
+  /** Illustration détourée (fond transparent) : affichée entière sur un fond de scène, jamais rognée. */
+  imageFit?: "cover" | "contain";
   sceneId?: GameSceneId;
 }
 
@@ -63,6 +67,19 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/turbo-pulse",
     availability: "react",
     sceneId: "turbo-pulse",
+  },
+  {
+    id: "conduire-avec-leo",
+    nameKey: "leoDriving.name",
+    descriptionKey: "leoDriving.description",
+    ctaLabelKey: "leoDriving.cta",
+    // Ouvre directement l'écran de conduite plein écran.
+    href: "/jeux/conduire-avec-leo",
+    availability: "react",
+    // Illustration déjà utilisée par le jeu : la voiture rouge de Léo (24 Ko).
+    // Importée par le build du front : aucune copie à servir par le backend.
+    imageSrc: leoCarUrl,
+    imageFit: "contain",
   },
   {
     id: "flux-forge",

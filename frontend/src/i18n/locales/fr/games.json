@@ -66,6 +66,11 @@
       }
     }
   },
+  "leoDriving": {
+    "name": "Conduire avec Léo",
+    "description": "Prends le volant de Léo, respecte les feux et livre les pizzas dans toute la ville.",
+    "cta": "Prendre le volant"
+  },
   "turboPulse": {
     "name": "Turbo Pulse",
     "description": "Résous les calculs, vise les bons fruits et déclenche des combos de couleur.",
