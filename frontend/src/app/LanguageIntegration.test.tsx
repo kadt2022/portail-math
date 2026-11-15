@@ -1,9 +1,13 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, beforeAll } from "vitest";
 import i18next from "i18next";
 
 import { AppRouter } from "./AppRouter";
+import { preloadRoutes } from "./LazyRoute";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 function renderAt(path: string) {
   window.history.pushState({}, "", path);

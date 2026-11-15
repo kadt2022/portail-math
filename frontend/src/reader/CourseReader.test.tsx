@@ -1,9 +1,10 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from "vitest";
 
 import { AppRouter } from "../app/AppRouter";
+import { preloadRoutes } from "../app/LazyRoute";
 import type { CourseDefinition } from "../courses/course-engine/course-model";
 import { evaluation, lesson, plannedModule } from "../courses/course-engine/course-scaffold";
 import { completeLearningStep, createEmptyCourseProgress } from "../courses/course-engine/course-progress";
@@ -13,6 +14,9 @@ import { i18next } from "../i18n/i18n";
 import { READER_COURSES } from "./reader-courses";
 import { readerCourseFromDefinition, type ReaderCourse } from "./reader-model";
 import { ReaderShell } from "./ReaderShell";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 const PREFIX = "TEST-R-U";
 const FIRST = `${PREFIX}01`;

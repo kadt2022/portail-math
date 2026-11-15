@@ -1,8 +1,9 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, beforeAll } from "vitest";
 
 import { AppRouter } from "../../app/AppRouter";
+import { preloadRoutes } from "../../app/LazyRoute";
 import { i18next } from "../../i18n/i18n";
 import type { CourseItem } from "../course-engine/course-model";
 import { completeLearningStep, createEmptyCourseProgress, startLearningItem, type CourseProgress } from "../course-engine/course-progress";
@@ -12,6 +13,9 @@ import { lessonPath, modulePath, PRIMARY_TWO_COURSE, PRIMARY_TWO_MODULES } from 
 import { moduleContinue, nextStop, PRIMARY_TWO_JOURNEY } from "./journey";
 import { PrimaryTwoCompletion } from "./JourneyNavigation";
 import { solveActivity } from "./test-support/solve-activity";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 // L'enfant suit un seul chemin : leçon après leçon, puis l'évaluation, puis
 // le module suivant, jusqu'au bilan. Ces tests vérifient chaque passage.

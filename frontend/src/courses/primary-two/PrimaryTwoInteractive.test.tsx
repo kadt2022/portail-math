@@ -1,12 +1,16 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, beforeAll } from "vitest";
 
 import { AppRouter } from "../../app/AppRouter";
+import { preloadRoutes } from "../../app/LazyRoute";
 import { i18next } from "../../i18n/i18n";
 import { getSessionCourseProgress, resetSessionCourseProgress } from "../course-engine/useCourseProgress";
 import { INTERACTIVE_CONTENT } from "./content";
 import { lessonPath, PRIMARY_TWO_COURSE } from "./course-catalogue";
 import { solveActivity, validateButton } from "./test-support/solve-activity";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 // Parcours complet de chaque leçon et évaluation pilotée par données :
 // les six phases (ou les questions d'évaluation) sont résolues par

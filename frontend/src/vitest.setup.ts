@@ -4,6 +4,10 @@ import "@testing-library/jest-dom/vitest";
 import "vitest-canvas-mock";
 import "./i18n/test-language-setup";
 import "./i18n/i18n";
+import { loadCourseNamespaces } from "./i18n/course-namespaces";
+
+// En production, les traductions des cours arrivent avec leurs pages ; les tests importent directement les pages.
+await loadCourseNamespaces();
 
 // jsdom n'implémente pas window.matchMedia : ce filet par défaut (aucune
 // media query ne correspond) évite un crash à l'import pour tout composant

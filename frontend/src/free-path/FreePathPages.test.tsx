@@ -1,10 +1,14 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi, beforeAll } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { FreePathExamsPage, FreePathPage, FreePathTestsPage } from "./FreePathPages";
 import { AppRouter } from "../app/AppRouter";
+import { preloadRoutes } from "../app/LazyRoute";
 import { i18next } from "../i18n/i18n";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 afterEach(async () => { vi.unstubAllGlobals(); await i18next.changeLanguage("fr"); });
 describe("Parcours libre", () => {
