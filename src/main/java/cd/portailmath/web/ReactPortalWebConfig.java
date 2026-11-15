@@ -1,6 +1,7 @@
 package cd.portailmath.web;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -32,6 +33,10 @@ public class ReactPortalWebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/app/**")
                 .addResourceLocations(PORTAL_LOCATION)
+                // Doctrine V1 du Capitaine (LEO-PERF-02) : aucun cache persistant côté client. Sans directive, le
+                // navigateur gardait les fichiers par heuristique (Last-Modified) ; no-store l'interdit, pour le
+                // portail seulement (les API et l'actuator ne passent pas par ce gestionnaire).
+                .setCacheControl(CacheControl.noStore())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
                     @Override
