@@ -419,6 +419,7 @@ export class LeoLivreurScene extends Phaser.Scene {
   private prepareBundle(bundle: BundleId) {
     if (bundle === "common") {
       for (const spec of [LEO_SPEC_RIGHT, LEO_SPEC_LEFT, ...TRAFFIC_SPECS, ...ACTIVE_CROSS_SPECS]) this.createWheelTextures(spec);
+      this.restoreCommonVisuals();
       return;
     }
     if (bundle === "bridge") {
@@ -587,6 +588,22 @@ export class LeoLivreurScene extends Phaser.Scene {
       context.globalCompositeOperation = "source-over";
       texture.refresh();
     }
+  }
+
+  /**
+   * Lot commun reçu après la création de la scène (reprise d'une image du démarrage) : les objets déjà créés portent
+   * l'image de remplacement de Phaser et une taille calculée sur elle. Léo est donc recréé, et chaque vue du trafic
+   * sera reconfigurée à sa prochaine mise à jour. Les zones (maison, tablier) sont reconstruites par onAssetsChanged.
+   */
+  private restoreCommonVisuals() {
+    if (this.body) {
+      this.body.removeAll(true);
+      this.sprites = {};
+      this.leoWheels = { right: [], left: [] };
+      this.createLeoSprites();
+      this.updateVehicleVisual();
+    }
+    for (const view of this.trafficViews) view.spec = null;
   }
 
   private createLeoSprites() {

@@ -12,7 +12,8 @@ import { BRIDGE_END_X, BRIDGE_START_X, cityLayout, CITY_FADE } from "./leoCityLa
 import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 
 export type BundleId = "common" | "bridge" | "city";
-export type BundleState = "absent" | "loading" | "ready" | "error";
+/** « retrying » : échec, reprise automatique programmée ; les demandes ordinaires attendent la fin du délai. */
+export type BundleState = "absent" | "loading" | "retrying" | "ready" | "error";
 
 /** Clés de texture téléchargées par lot (les textures dérivées sont gérées par la scène). */
 export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
@@ -128,10 +129,13 @@ export class ZoneAssetManager {
     return (["common", "bridge", "city"] as const).filter((bundle) => this.state(bundle) === "error");
   }
 
-  /** Demande un lot : sans effet s'il est prêt, en cours ou en erreur (l'erreur attend un « Réessayer »). */
+  /**
+   * Demande un lot : sans effet s'il est prêt, en cours, en attente de reprise (le délai n'est jamais court-circuité)
+   * ou en erreur (l'erreur attend un « Réessayer »).
+   */
   request(bundle: BundleId): Promise<void> | null {
     const current = this.status.get(bundle) as BundleStatus;
-    if (current.state === "ready" || current.state === "error") return null;
+    if (current.state === "ready" || current.state === "error" || current.state === "retrying") return null;
     const existing = this.inFlight.get(bundle);
     if (existing) return existing;
     return this.start(bundle);
@@ -174,9 +178,11 @@ export class ZoneAssetManager {
         const attempts = (this.status.get(bundle) as BundleStatus).attempts;
         if (attempts <= MAX_AUTO_RETRIES) {
           // Reprise automatique, après un délai croissant : jamais de boucle serrée.
-          this.status.set(bundle, { state: "absent", attempts });
+          this.status.set(bundle, { state: "retrying", attempts });
           this.schedule(() => {
-            if (this.state(bundle) === "absent") void this.request(bundle);
+            if (this.state(bundle) !== "retrying") return;
+            this.status.set(bundle, { state: "absent", attempts });
+            void this.request(bundle);
           }, RETRY_DELAYS_MS[Math.min(attempts - 1, RETRY_DELAYS_MS.length - 1)]);
         } else {
           this.status.set(bundle, { state: "error", attempts });

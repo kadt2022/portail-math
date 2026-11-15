@@ -115,7 +115,7 @@ describe("gestionnaire de chargement des lots", () => {
       calls[attempt].reject();
       await flush();
       if (attempt < MAX_AUTO_RETRIES) {
-        expect(manager.state("city")).toBe("absent");
+        expect(manager.state("city")).toBe("retrying");
         expect(scheduler.pending[attempt].delay).toBe(RETRY_DELAYS_MS[attempt]);
         scheduler.pending[attempt].callback();
       }
@@ -132,6 +132,24 @@ describe("gestionnaire de chargement des lots", () => {
     calls[calls.length - 1].resolve();
     await flush();
     expect(manager.state("city")).toBe("ready");
+  });
+
+  it("ne court-circuite jamais le délai de reprise, même si la scène redemande le lot à chaque image", async () => {
+    const { calls, fetcher } = fakeFetcher();
+    const scheduler = manualScheduler();
+    const manager = new ZoneAssetManager(fetcher, scheduler.schedule);
+    void manager.request("city");
+    calls[0].reject();
+    await flush();
+    // Pendant le délai, les demandes de manageBundles() (une par image) ne relancent rien.
+    for (let frame = 0; frame < 60; frame += 1) expect(manager.request("city")).toBeNull();
+    expect(calls).toHaveLength(1);
+    expect(manager.state("city")).toBe("retrying");
+    expect(manager.failed()).toEqual([]);
+    // Une fois le délai écoulé, une seule nouvelle tentative.
+    scheduler.pending[0].callback();
+    expect(calls).toHaveLength(2);
+    expect(manager.state("city")).toBe("loading");
   });
 
   it("mesure le débit réel pour les anticipations suivantes", async () => {
@@ -166,6 +184,18 @@ describe("intégration dans la scène", () => {
     expect(preload).not.toContain("leo-world-suspension-bridge-layer");
     expect(preload).not.toContain("leo-world-city-top");
     expect(preload).not.toContain("TURN_SHEET.key");
+  });
+
+  it("rend leurs vraies images à Léo et au trafic quand le lot commun arrive après une reprise", () => {
+    const start = game.indexOf("  private prepareBundle(");
+    const common = game.slice(start, game.indexOf("    if (bundle === \"bridge\")", start));
+    expect(common).toContain("this.restoreCommonVisuals()");
+    const restore = game.slice(game.indexOf("  private restoreCommonVisuals() {"), game.indexOf("  private createLeoSprites() {"));
+    // Léo est recréé (taille recalculée sur la vraie image), le trafic reconfiguré à sa prochaine mise à jour.
+    expect(restore).toContain("this.body.removeAll(true)");
+    expect(restore).toContain("this.createLeoSprites()");
+    expect(restore).toContain("view.spec = null");
+    expect(game).toContain("if (view2.spec !== vehicle.spec");
   });
 
   it("met la conduite en attente tant que les ressources de la vue manquent, au lieu d'afficher une zone vide", () => {
