@@ -31,6 +31,15 @@
   object-fit: cover;
 }
 
+/* Illustration détourée : entière, posée sur un ciel et une chaussée. */
+.photoContain {
+  box-sizing: border-box;
+  padding: 8% 10% 4%;
+  object-fit: contain;
+  object-position: center bottom;
+  background: linear-gradient(180deg, #8fd0ff 0%, #c9ecff 52%, #4b4f5c 52%, #4b4f5c 100%);
+}
+
 .badge {
   position: absolute;
   top: 12px;

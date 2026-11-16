@@ -1,9 +1,13 @@
 import { render, screen, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from "vitest";
 
 import { AppRouter } from "./AppRouter";
+import { preloadRoutes } from "./LazyRoute";
 import { mockLibraryCatalogue } from "../library/library-catalogue.fixture";
 import { PRIMARY_COURSES } from "./course-navigation";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 // Le lecteur PDF réel démarre pdfjs-dist et son worker : inutile pour vérifier
 // le routage. Le stub affiche seulement le titre reçu.

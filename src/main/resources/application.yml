@@ -1,5 +1,13 @@
 server:
   port: ${PORT:8080}
+  # Compression gzip des réponses textuelles du portail (LEO-PERF-02). Le JavaScript du portail passait sans
+  # compression (1,25 Mo pour le fichier principal). Le JSON n'est volontairement pas listé : les réponses d'API
+  # peuvent contenir des données propres à l'élève, et compresser une réponse qui mélange secret et texte choisi par
+  # l'utilisateur expose à des attaques de type BREACH. Les images (WebP, PNG) sont déjà compressées : non listées.
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,text/javascript,application/javascript,image/svg+xml
+    min-response-size: 1KB
   error:
     include-exception: false
     include-message: never

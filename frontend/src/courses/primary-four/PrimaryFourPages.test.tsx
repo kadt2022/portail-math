@@ -1,8 +1,9 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from "vitest";
 
 import { AppRouter } from "../../app/AppRouter";
+import { preloadRoutes } from "../../app/LazyRoute";
 import { i18next } from "../../i18n/i18n";
 import { completeLearningStep, createEmptyCourseProgress } from "../course-engine/course-progress";
 import { getSessionCourseProgress, resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
@@ -10,6 +11,9 @@ import { PRIMARY_FOUR_COURSE, PRIMARY_FOUR_MODULES } from "./course-catalogue";
 import { formatNumber } from "./number-words";
 import { InteractiveExercise } from "./exercises/InteractiveExercise";
 import primaryFourCatalog from "../../../../src/main/resources/content/courses/primary-four.json?raw";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 interface CatalogLesson {
   id: string;

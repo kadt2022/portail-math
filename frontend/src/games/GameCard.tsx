@@ -12,7 +12,8 @@ interface GameCardProps {
 
 function CardVisual({ game }: GameCardProps) {
   if (game.imageSrc) {
-    return <img className={styles.photo} src={game.imageSrc} alt="" loading="lazy" />;
+    const className = game.imageFit === "contain" ? `${styles.photo} ${styles.photoContain}` : styles.photo;
+    return <img className={className} src={game.imageSrc} alt="" loading="lazy" />;
   }
   if (game.sceneId === "train") {
     return <TrainScene />;

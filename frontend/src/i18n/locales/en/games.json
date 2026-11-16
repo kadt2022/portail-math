@@ -66,6 +66,11 @@
       }
     }
   },
+  "leoDriving": {
+    "name": "Driving with Léo",
+    "description": "Take Léo's wheel, obey the traffic lights and deliver pizzas all over town.",
+    "cta": "Take the wheel"
+  },
   "turboPulse": {
     "name": "Turbo Pulse",
     "description": "Solve each equation, aim at the right fruit and trigger colour combos.",

@@ -12,11 +12,6 @@ import gamesEn from "./locales/en/games.json";
 import libraryEn from "./locales/en/library.json";
 import learningWorldEn from "./locales/en/learningWorld.json";
 import progressEn from "./locales/en/progress.json";
-import primaryFourEn from "./locales/en/primaryFour.json";
-import primaryOneEn from "./locales/en/primaryOne.json";
-import primaryThreeEn from "./locales/en/primaryThree.json";
-import primaryTwoEn from "./locales/en/primaryTwo.json";
-import primaryTwoLessonsEn from "./locales/en/primaryTwoLessons.json";
 import commonFr from "./locales/fr/common.json";
 import dashboardFr from "./locales/fr/dashboard.json";
 import exetatFr from "./locales/fr/exetat.json";
@@ -24,17 +19,11 @@ import gamesFr from "./locales/fr/games.json";
 import libraryFr from "./locales/fr/library.json";
 import learningWorldFr from "./locales/fr/learningWorld.json";
 import progressFr from "./locales/fr/progress.json";
-import primaryFourFr from "./locales/fr/primaryFour.json";
-import primaryOneFr from "./locales/fr/primaryOne.json";
-import primaryThreeFr from "./locales/fr/primaryThree.json";
-import primaryTwoFr from "./locales/fr/primaryTwo.json";
-import primaryTwoLessonsFr from "./locales/fr/primaryTwoLessons.json";
 import { resolveInitialLanguage } from "./language-storage";
 import { FALLBACK_LANGUAGE, SUPPORTED_LANGUAGES } from "./supported-languages";
 
-// Toutes les traductions sont importées statiquement (pas de chargement HTTP
-// à l'exécution) : deux petits jeux de fichiers JSON, aucun risque de flash
-// de clés non traduites, et la langue est prête dès le premier rendu.
+// Les traductions communes sont importées statiquement : la langue est prête dès le premier rendu. Celles des cours
+// (texte des leçons, ≈ 750 Ko) sont chargées avec leurs pages : voir course-namespaces.ts (LEO-PERF-02).
 void i18next
   .use(initReactI18next)
   .init({
@@ -72,11 +61,6 @@ void i18next
         library: libraryFr,
         learningWorld: learningWorldFr,
         progress: progressFr,
-        primaryOne: primaryOneFr,
-        primaryTwo: primaryTwoFr,
-        primaryTwoLessons: primaryTwoLessonsFr,
-        primaryThree: primaryThreeFr,
-        primaryFour: primaryFourFr,
       },
       en: {
         freePath: freePathEn,
@@ -88,12 +72,6 @@ void i18next
         library: libraryEn,
         learningWorld: learningWorldEn,
         progress: progressEn,
-        primaryOne: primaryOneEn,
-        primaryTwo: primaryTwoEn,
-        // Les activités interactives sont publiées en français seulement.
-        primaryTwoLessons: primaryTwoLessonsEn,
-        primaryThree: primaryThreeEn,
-        primaryFour: primaryFourEn,
       },
     },
   });

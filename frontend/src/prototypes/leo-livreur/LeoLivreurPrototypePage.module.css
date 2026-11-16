@@ -1,0 +1,522 @@
+.page {
+  display: grid;
+  gap: 18px;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: clamp(14px, 3vw, 32px);
+  color: #3b241c;
+}
+
+.hero,
+.gameCard,
+.panel {
+  border: 3px solid #3b241c;
+  border-radius: 28px;
+  box-shadow: 0 12px 30px rgb(63 35 19 / 15%);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 42px);
+  background: linear-gradient(120deg, #6f2b1d, #a64222 60%, #db7d28);
+  color: #fff9e8;
+}
+
+.hero h1,
+.hero p,
+.panel p {
+  margin: 0;
+}
+
+.hero h1 {
+  margin-top: 6px;
+  font-size: clamp(32px, 6vw, 64px);
+  line-height: .98;
+}
+
+.eyebrow {
+  color: #ffd26b;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 760px;
+  margin-top: 14px !important;
+  font-size: clamp(17px, 2.3vw, 23px);
+  line-height: 1.4;
+}
+
+.missionCard {
+  display: grid;
+  min-width: 210px;
+  gap: 3px;
+  padding: 16px 20px;
+  border: 3px solid #3b241c;
+  border-radius: 22px;
+  background: #ffe53d;
+  color: #3b241c;
+  text-align: center;
+}
+
+.missionCard strong { font-size: 30px; }
+.missionCard small { font-weight: 800; }
+
+.gameCard {
+  overflow: hidden;
+  background: #8bd879;
+}
+
+.gameHost {
+  /* Cadre plus haut : maisons, pont et rivière entrent en entier dans la vue. */
+  min-height: min(62vw, 520px);
+  height: clamp(520px, 74vh, 720px);
+  touch-action: none;
+}
+
+.gameHost canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 10px;
+  padding: 14px 18px;
+  background: #fff9e8;
+  font-size: 18px;
+}
+
+.panel {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 3vw, 26px);
+  background: #fff9e8;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.success { color: #0b7a6b; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.primaryAction,
+.secondaryAction,
+.control {
+  min-height: 58px;
+  padding: 10px 22px;
+  border: 3px solid #3b241c;
+  border-radius: 17px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.primaryAction { background: #0b7a6b; color: white; }
+.secondaryAction { background: #ffe0a3; color: #3b241c; }
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-height: 100px;
+  font-size: clamp(17px, 2.5vw, 24px);
+}
+
+.control span { font-size: 42px; line-height: .9; }
+.left,
+.right { background: #ffbd45; }
+.forward { background: #32c834; color: white; }
+.brake { background: #ed4334; color: white; }
+.reverse { background: #6b5bd2; color: white; }
+
+.gameCard { position: relative; }
+
+.classicOverlay { display: contents; }
+
+/* Indicateur d'approche d'un feu : une petite puce en haut à gauche, jamais un panneau qui masque la route. */
+.signalChip {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 249, 228, 0.92);
+  border: 2px solid #3b241c;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.lamp {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #1d2430;
+  background: #2ee06b;
+}
+
+.signalChip[data-state="YELLOW"] .lamp { background: #ffc21a; }
+.signalChip[data-state="RED"] .lamp { background: #ff3b30; }
+.signalChip[data-state="RED"] { background: rgba(255, 233, 228, 0.95); }
+
+.signal {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff3c4;
+  border: 3px solid #3b241c;
+  font-weight: 900;
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Écran de conduite : trois zones distinctes, sans recouvrement (grille calculée par leoDrivingLayout).
+   A. tableau de bord · B. scène Phaser (seule dans sa zone) · C. panneau de commandes crème.
+   La scène n'est jamais étirée : Phaser (mode RESIZE) adapte la caméra à la taille exacte de la zone B.
+   ------------------------------------------------------------------------------------------------ */
+
+.pageImmersive {
+  padding: 0;
+}
+
+.drivingScreen {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2000;
+  /* Hauteur réellement visible : 100dvh (barres du navigateur mobile exclues), repli 100vh. */
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* Tableau de bord et commandes à leur taille réelle d'abord ; tout le reste pour la scène. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: #fff6e2;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Zone A */
+.dashboard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 6px calc(10px + env(safe-area-inset-right, 0px)) 0 calc(10px + env(safe-area-inset-left, 0px));
+  background: linear-gradient(90deg, #123a7a, #1d5fc4);
+  color: #fff;
+  overflow: hidden;
+}
+
+.brand {
+  flex: none;
+  font-size: 18px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.stat,
+.statSignal {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 2px solid #3b241c;
+  border-radius: 999px;
+  background: #fff6e2;
+  color: #3b241c;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.statSignal[data-state="RED"] .lamp { background: #ff3b30; }
+.statSignal[data-state="YELLOW"] .lamp { background: #ffc21a; }
+
+.dashboardActions {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.dashboardButton {
+  flex: none;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #0f2b5c;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.quitButton {
+  background: #4a2416;
+}
+
+/* Zone B : seul conteneur du canvas Phaser. */
+.gameViewport {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  /* Portrait : hauteur utile du monde seulement (au-delà, la caméra ne montrerait que du vide). */
+  max-height: var(--scene-max, none);
+  overflow: hidden;
+  background: #8bd879;
+}
+
+/* Le canvas garde sa taille exacte en pixels (fixée par Phaser) : aucun étirement, même d'un pixel. */
+.gameViewport canvas {
+  display: block;
+}
+
+/* Zone C : panneau fixe, indépendant de la caméra. */
+.controlsPanel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "left info right";
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 8px calc(12px + env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px));
+  border-top: 3px solid #3b241c;
+  background: #fff6e2;
+  overflow: hidden;
+}
+
+.panelLeft,
+.panelRight {
+  display: flex;
+  gap: 8px;
+}
+
+.panelLeft { grid-area: left; }
+.panelRight { grid-area: right; }
+
+.panelInfo {
+  grid-area: info;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 2px solid #3b241c;
+  border-radius: 14px;
+  background: #fffdf6;
+  color: #3b241c;
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* Chargement en cours : petit indicateur tournant, sans pourcentage inventé. */
+.panelInfo[data-assets="loading"]::before {
+  content: "";
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 4px solid rgba(59, 36, 28, 0.15);
+  border-top-color: #0b7a6b;
+  border-radius: 50%;
+  animation: leo-spin 0.9s linear infinite;
+}
+
+.panelInfo[data-assets="error"] {
+  border-color: #b8251a;
+  background: #fff1ee;
+}
+
+@keyframes leo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.panelText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.panelInfo strong,
+.panelInfo span {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+.panelAction {
+  flex: none;
+  min-height: 36px;
+  padding: 4px 16px;
+  border: 2px solid #3b241c;
+  border-radius: 12px;
+  background: #0b7a6b;
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.keyboardHint {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* Boutons de conduite : grands, nets, appuis prolongés et simultanés, aucun geste laissé au navigateur. */
+/* Boutons ronds, contour blanc, léger reflet : la forme validée par le Capitaine Pi. */
+.touchButton {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  width: var(--control-size, 72px);
+  height: var(--control-size, 72px);
+  padding: 0;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.touchButton span {
+  font-size: calc(var(--control-size, 72px) * 0.34);
+}
+
+.touchButton strong {
+  font-size: clamp(11px, calc(var(--control-size, 72px) * 0.19), 16px);
+}
+
+.touchButton[data-pressed="true"] {
+  transform: scale(0.94);
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 3px 6px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
+}
+
+/* Couleur unie avec un reflet clair en haut, comme sur la maquette. */
+.touch_left,
+.touch_right { background: radial-gradient(circle at 50% 28%, #ffc94d, #f0a01c 70%); }
+.touch_forward { background: radial-gradient(circle at 50% 28%, #3cc35a, #1c8a33 70%); }
+.touch_brake { background: radial-gradient(circle at 50% 28%, #ec4a3c, #b8251a 70%); }
+.touch_reverse { background: radial-gradient(circle at 50% 28%, #7a68e0, #4a39b0 70%); }
+
+/* Téléphone couché : tout tient sur une ligne, consignes resserrées. */
+.drivingScreen[data-format="landscape-compact"] .panelInfo {
+  padding: 2px 8px;
+  font-size: 13px;
+}
+
+.drivingScreen[data-format="landscape-compact"] .touchButton strong {
+  display: none;
+}
+
+.drivingScreen[data-format="landscape-compact"] .stat,
+.drivingScreen[data-format="landscape-compact"] .statSignal {
+  padding: 1px 8px;
+  font-size: 13px;
+}
+
+/* Portrait : consignes sur une ligne, puis direction à gauche et pédales à droite, sans débordement. */
+.drivingScreen[data-format="portrait"] .controlsPanel {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "info info info"
+    "left . right";
+  align-items: start;
+  row-gap: 8px;
+  column-gap: 8px;
+}
+
+.drivingScreen[data-format="portrait"] .panelInfo {
+  font-size: 15px;
+}
+
+.drivingScreen[data-format="portrait"] .stat,
+.drivingScreen[data-format="portrait"] .statSignal {
+  padding: 1px 7px;
+  font-size: 12px;
+}
+
+.drivingScreen[data-format="portrait"] .dashboard {
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 4px;
+}
+
+
+/* Boutons en bas du panneau, à portée de pouce ; la consigne au-dessus. */
+.drivingScreen[data-format="portrait"] .panelLeft,
+.drivingScreen[data-format="portrait"] .panelRight {
+  align-self: end;
+}
+
+.drivingScreen[data-format="portrait"] .dashboardButton {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .hero { align-items: stretch; flex-direction: column; }
+  .missionCard { min-width: 0; }
+  .gameHost { height: 480px; min-height: 480px; }
+  .controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .page { padding: 10px; }
+  .gameHost { height: 400px; min-height: 400px; }
+  .hud { justify-content: flex-start; font-size: 15px; }
+}

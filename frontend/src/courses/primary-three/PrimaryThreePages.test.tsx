@@ -1,12 +1,16 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, beforeAll } from "vitest";
 
 import { AppRouter } from "../../app/AppRouter";
+import { preloadRoutes } from "../../app/LazyRoute";
 import { i18next } from "../../i18n/i18n";
 import { completeLearningStep, createEmptyCourseProgress } from "../course-engine/course-progress";
 import { getSessionCourseProgress, resetSessionCourseProgress, setSessionCourseProgress } from "../course-engine/useCourseProgress";
 import { PRIMARY_THREE_COURSE, PRIMARY_THREE_MODULES } from "./course-catalogue";
+
+// Les pages sont chargées à la demande (LEO-PERF-02) : on les précharge pour garder des tests synchrones.
+beforeAll(() => preloadRoutes());
 
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
