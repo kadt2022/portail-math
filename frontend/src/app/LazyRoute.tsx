@@ -1,4 +1,4 @@
-import { Component, Suspense, lazy, type ComponentType, type ReactNode } from "react";
+import { Component, Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
 
 import styles from "./LazyRoute.module.css";
 
@@ -65,21 +65,21 @@ export function lazyRoute<P extends object>(load: () => Promise<ComponentType<P>
     resolved = component;
     return component;
   });
-  const Page = lazy(() => {
-    if (resolved) {
-      // Thenable déjà résolu : React lit la page sans suspendre (aucun indicateur pour une page déjà présente).
-      const ready = { default: resolved };
-      return { then: (onFulfilled: (value: typeof ready) => unknown) => onFulfilled(ready) } as unknown as Promise<typeof ready>;
-    }
-    return fetchPage().then((component) => ({ default: component }));
-  });
+  const Page = lazy(() => fetchPage().then((component) => ({ default: component })));
   ROUTES.push({ preload: fetchPage, heavy: Boolean(options.heavy) });
   function LazyRouteElement(props: P) {
+    // Page déjà téléchargée : rendue directement, sans suspendre (aucun indicateur pour une page déjà présente).
+    // Le choix est figé au montage : un nouveau rendu du parent ne remplace jamais la page par une autre instance.
+    const [Ready] = useState(() => resolved);
     return (
       <RouteErrorBoundary>
-        <Suspense fallback={<RouteLoading />}>
-          <Page {...props} />
-        </Suspense>
+        {Ready ? (
+          <Ready {...props} />
+        ) : (
+          <Suspense fallback={<RouteLoading />}>
+            <Page {...props} />
+          </Suspense>
+        )}
       </RouteErrorBoundary>
     );
   }
