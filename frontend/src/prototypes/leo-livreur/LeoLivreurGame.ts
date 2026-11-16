@@ -76,7 +76,8 @@ import {
   wheelDiscSourceRadius,
   type VehicleSpec,
 } from "./leoVehicleCatalog";
-import { pxToKmh, pxToMeters } from "./leoUnits";
+import { LeoSound, passerPitch } from "./leoAudio";
+import { kmhToPx, pxToKmh, pxToMeters } from "./leoUnits";
 import {
   BUNDLE_TEXTURES,
   ZoneAssetManager,
@@ -133,6 +134,10 @@ export interface LeoLivreurController {
   setPaused(paused: boolean): void;
   /** Réessaie le téléchargement des ressources en échec (bouton Réessayer). */
   retryAssets(): void;
+  /** Active ou coupe le son (à appeler depuis le clic de l'enfant). Renvoie l'état obtenu. */
+  setSound(on: boolean): boolean;
+  /** Klaxon tenu (vrai) ou relâché (faux). */
+  horn(active: boolean): void;
 }
 
 type SnapshotListener = (snapshot: LeoLivreurSnapshot) => void;
@@ -141,6 +146,12 @@ const END_SPRITE_SIZE = { width: 80, height: 90 };
 const TRAFFIC_POOL_CAPACITY = 12;
 const MAX_LANE_CAP = 6;
 const CROSS_CAPACITY = 6;
+/** Son : vitesse minimale d'un choc audible, délai entre deux chocs. */
+const MIN_COLLISION_KMH = 6;
+const COLLISION_COOLDOWN_MS = 900;
+/** Son : une voiture qui croise Léo s'entend si elle passe à moins de cette distance latérale (px) et assez vite. */
+const PASS_HEARING_DISTANCE = 260;
+const MIN_PASS_KMH = 12;
 
 /** Adresse de chaque texture téléchargée (une seule source de vérité pour le préchargement et les lots). */
 const TEXTURE_URLS: Record<string, string> = {
@@ -295,11 +306,17 @@ export class LeoLivreurScene extends Phaser.Scene {
   private assetsLoaded: number | null = 0;
   private assetsTotal: number | null = BUNDLE_TEXTURES.common.length;
   private assetsWaiting = false;
+  /** Son du jeu (moteur, voitures qui passent, collisions, klaxon) : coupé tant que l'enfant ne l'active pas. */
+  private readonly leoSound: LeoSound;
+  /** Position de chaque voiture du trafic par rapport à Léo à l'image précédente : un changement de côté = un passage. */
+  private readonly passSides = new Map<number, number>();
+  private lastCrashAt = Number.NEGATIVE_INFINITY;
 
-  constructor(onSnapshot: SnapshotListener, pixelRatio = 1) {
+  constructor(onSnapshot: SnapshotListener, pixelRatio = 1, sound: LeoSound = new LeoSound()) {
     super({ key: "leo-livreur" });
     this.onSnapshot = onSnapshot;
     this.pixelRatio = pixelRatio;
+    this.leoSound = sound;
   }
 
   preload() {
@@ -687,6 +704,7 @@ export class LeoLivreurScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     const seconds = Math.min(delta / 1000, 0.05);
+    this.leoSound.update(pxToKmh(Math.abs(this.motion.speed)), this.controls.forward || this.controls.reverse, this.controls.brake, seconds);
     this.updateBridgeCamera(seconds);
     this.manageBundles();
     // Ressources de la vue absentes : tout le monde s'arrête (Léo, trafic, feux) jusqu'à leur arrivée.
@@ -723,7 +741,9 @@ export class LeoLivreurScene extends Phaser.Scene {
       this.traffic.blocksPose(pose, VEHICLE_LENGTH, VEHICLE_WIDTH),
     // La vitesse s'adapte au trafic : libre = pleine vitesse, véhicule devant = on s'aligne dessus.
     this.traffic.leoSpeedCap(this.motion));
-    this.travelledPx += Math.hypot(this.motion.x - previousX, this.motion.y - previousY);
+    const moved = Math.hypot(this.motion.x - previousX, this.motion.y - previousY);
+    this.travelledPx += moved;
+    this.detectCollision(previousSpeed, moved, seconds);
     // Δθ = Δdistance / r, signé : négatif en marche arrière, nul à l'arrêt.
     this.wheelSpin += rollAngle(this.motion.speed * seconds, vehicleDisplay(LEO_SPEC_RIGHT).wheels[0].rollRadius);
     this.syncCar();
@@ -734,6 +754,55 @@ export class LeoLivreurScene extends Phaser.Scene {
     } else if (previousSpeed !== this.motion.speed) {
       this.publish();
     }
+  }
+
+  /**
+   * Choc : Léo roulait mais n'a presque pas avancé (la physique l'a fait rebondir contre une voiture ou le bord de la
+   * route). La physique n'est pas modifiée : on constate seulement le rebond. Un choc toutes les 0,9 s au plus, pour
+   * qu'un frottement prolongé ne répète pas le son.
+   */
+  private detectCollision(previousSpeed: number, moved: number, seconds: number) {
+    const kmh = pxToKmh(Math.abs(previousSpeed));
+    if (kmh < MIN_COLLISION_KMH || moved > Math.abs(previousSpeed) * seconds * 0.35) return;
+    if (this.time.now - this.lastCrashAt < COLLISION_COOLDOWN_MS) return;
+    this.lastCrashAt = this.time.now;
+    this.leoSound.crash(kmh);
+  }
+
+  /** Une voiture du trafic qui croise Léo (elle change de côté par rapport à lui) se fait entendre en passant. */
+  private listenToTraffic(seconds: number) {
+    for (const vehicle of this.traffic.vehicles) {
+      if (!vehicle.active) {
+        this.passSides.delete(vehicle.id);
+        continue;
+      }
+      const relative = vehicle.x - this.motion.x;
+      const before = this.passSides.get(vehicle.id);
+      this.passSides.set(vehicle.id, relative);
+      if (before === undefined || Math.sign(before) === Math.sign(relative)) continue;
+      const lateral = Math.abs(laneY(vehicle.lane) - this.motion.y);
+      const closing = Math.abs(relative - before) / Math.max(seconds, 0.001);
+      if (lateral > PASS_HEARING_DISTANCE || closing < kmhToPx(MIN_PASS_KMH)) continue;
+      this.leoSound.passBy(relative > before ? 1 : -1, passerPitch(vehicle.spec.kind, vehicle.id), 1 - lateral / PASS_HEARING_DISTANCE);
+    }
+  }
+
+  /** Bouton Son : à appeler depuis le clic (le navigateur n'autorise le son qu'après un geste). */
+  setSound(on: boolean) {
+    return this.leoSound.setEnabled(on);
+  }
+
+  horn(active: boolean) {
+    if (active) this.leoSound.hornOn();
+    else this.leoSound.hornOff();
+  }
+
+  setSoundPaused(paused: boolean) {
+    this.leoSound.setPaused(paused);
+  }
+
+  destroySound() {
+    this.leoSound.destroy();
   }
 
   startMission() {
@@ -818,6 +887,8 @@ export class LeoLivreurScene extends Phaser.Scene {
     bind("keyup-SPACE", "brake", false);
     bind("keydown-R", "reverse", true);
     bind("keyup-R", "reverse", false);
+    keyboard.on("keydown-H", () => this.horn(true));
+    keyboard.on("keyup-H", () => this.horn(false));
     if (this.debugMode) {
       keyboard.on("keydown-G", () => {
         this.debugRectangle = !this.debugRectangle;
@@ -1288,6 +1359,7 @@ export class LeoLivreurScene extends Phaser.Scene {
         { lineX: city.stopLineWest, direction: -1, state: phase.main },
       ],
     });
+    this.listenToTraffic(seconds);
     this.traffic.vehicles.forEach((vehicle, index) => {
       const view2 = this.trafficViews[index];
       if (!view2) return;
@@ -1455,6 +1527,8 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
     scene,
     // Réseau lent : un fichier qui ne répond pas en 45 s est considéré en échec (puis repris, voir ZoneAssetManager).
     loader: { timeout: 45_000 },
+    // Le son du jeu est géré par LeoSound, créé seulement quand l'enfant l'active : Phaser n'ouvre aucun audio.
+    audio: { noAudio: true },
     scale: {
       mode: Phaser.Scale.NONE,
       ...backing(),
@@ -1463,7 +1537,10 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
   });
 
   return {
-    destroy: () => game.destroy(true),
+    destroy: () => {
+      scene.destroySound();
+      game.destroy(true);
+    },
     refreshLayout: () => {
       const size = backing();
       game.scale.resize(size.width, size.height);
@@ -1473,7 +1550,13 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
     reset: () => scene.reset(),
     setControl: (control, active) => scene.setControl(control, active),
     turn: (direction) => scene.turn(direction),
-    setPaused: (paused) => (paused ? game.pause() : game.resume()),
+    setPaused: (paused) => {
+      scene.setSoundPaused(paused);
+      if (paused) game.pause();
+      else game.resume();
+    },
     retryAssets: () => scene.retryAssets(),
+    setSound: (on) => scene.setSound(on),
+    horn: (active) => scene.horn(active),
   };
 }

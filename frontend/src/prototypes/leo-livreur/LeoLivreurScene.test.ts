@@ -4,6 +4,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, onTes
 import { LeoLivreurScene, mountLeoLivreurGame, renderPixelRatio, type LeoLivreurSnapshot } from "./LeoLivreurGame";
 import { BRIDGE_END_X, BRIDGE_START_X, cityLayout } from "./leoCityLayout";
 import { DESTINATIONS, MAIN_LANE_Y, START_POSITION } from "./leoGeometry";
+import type { LeoSound } from "./leoAudio";
+import { kmhToPx } from "./leoUnits";
 import { MAX_AUTO_RETRIES } from "./leoZoneAssets";
 
 /**
@@ -27,11 +29,25 @@ const failures = new Map<RegExp, number>();
 const games: Phaser.Game[] = [];
 let clock = 0;
 
-async function mountScene() {
+/** Son espion : la scène lui transmet vitesse, pédales, chocs et passages ; le test lit ce qu'elle a demandé. */
+function spySound() {
+  return {
+    update: vi.fn(),
+    setEnabled: vi.fn((on: boolean) => on),
+    setPaused: vi.fn(),
+    hornOn: vi.fn(),
+    hornOff: vi.fn(),
+    passBy: vi.fn(() => true),
+    crash: vi.fn(() => "accrochage"),
+    destroy: vi.fn(),
+  };
+}
+
+async function mountScene(sound?: ReturnType<typeof spySound>) {
   const parent = document.createElement("div");
   document.body.appendChild(parent);
   const snapshots: LeoLivreurSnapshot[] = [];
-  const scene = new LeoLivreurScene((snapshot) => snapshots.push(snapshot));
+  const scene = new LeoLivreurScene((snapshot) => snapshots.push(snapshot), 1, sound as unknown as LeoSound | undefined);
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
@@ -256,6 +272,73 @@ describe("scène de conduite de Léo", () => {
     expect(internals.trafficViews.some((view) => view.spec !== null)).toBe(true);
   });
 
+  it("transmet au son la vitesse et les pédales à chaque image, le klaxon (touche H), la pause et la fin", async () => {
+    const sound = spySound();
+    const { scene, step, started } = await mountScene(sound);
+    await stepUntil(step, started);
+    expect(sound.update).toHaveBeenLastCalledWith(0, false, false, expect.any(Number));
+    scene.startMission();
+    scene.setControl("forward", true);
+    await step(60);
+    const [kmh, accelerating] = sound.update.mock.calls.at(-1) as [number, boolean];
+    expect(kmh).toBeGreaterThan(0);
+    expect(accelerating).toBe(true);
+    const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+    keyboard.emit("keydown-H");
+    expect(sound.hornOn).toHaveBeenCalledTimes(1);
+    keyboard.emit("keyup-H");
+    expect(sound.hornOff).toHaveBeenCalledTimes(1);
+    expect(scene.setSound(true)).toBe(true);
+    expect(sound.setEnabled).toHaveBeenLastCalledWith(true);
+    scene.setSoundPaused(true);
+    expect(sound.setPaused).toHaveBeenLastCalledWith(true);
+    scene.destroySound();
+    expect(sound.destroy).toHaveBeenCalledTimes(1);
+  });
+
+  it("fait entendre un choc quand Léo bute contre le bord de la route, une seule fois par choc", async () => {
+    const sound = spySound();
+    const { scene, internals, step, started } = await mountScene(sound);
+    await stepUntil(step, started);
+    scene.startMission();
+    // Léo fonce vers le trottoir : la physique l'arrête au bord, sans le laisser avancer.
+    internals.motion = { ...internals.motion, heading: -Math.PI / 2, speed: kmhToPx(40), steeringAngle: 0 };
+    scene.setControl("forward", true);
+    await stepUntil(step, () => sound.crash.mock.calls.length > 0, 200);
+    const [kmh] = sound.crash.mock.calls[0] as unknown as [number];
+    expect(kmh).toBeGreaterThan(6);
+    // Le frottement qui suit ne répète pas le choc immédiatement.
+    const count = sound.crash.mock.calls.length;
+    await step(20);
+    expect(sound.crash.mock.calls.length).toBe(count);
+  });
+
+  it("ne fait aucun bruit de choc en roulant normalement sur la chaussée", async () => {
+    const sound = spySound();
+    const { scene, step, started } = await mountScene(sound);
+    await stepUntil(step, started);
+    scene.startMission();
+    scene.setControl("forward", true);
+    await step(120);
+    scene.setControl("forward", false);
+    scene.setControl("brake", true);
+    await step(120);
+    expect(sound.crash).not.toHaveBeenCalled();
+  });
+
+  it("fait entendre les voitures du trafic qui croisent Léo", async () => {
+    const sound = spySound();
+    const { scene, step, started } = await mountScene(sound);
+    await stepUntil(step, started);
+    scene.startMission();
+    await stepUntil(step, () => sound.passBy.mock.calls.length > 0, 2400);
+    const [direction, pitch, closeness] = sound.passBy.mock.calls[0] as unknown as [number, number, number];
+    expect([1, -1]).toContain(direction);
+    expect(pitch).toBeGreaterThanOrEqual(55);
+    expect(closeness).toBeGreaterThan(0);
+    expect(closeness).toBeLessThanOrEqual(1);
+  });
+
   it("propose un mode diagnostic (départ avancé, empreintes, rectangle de contrôle)", async () => {
     window.history.replaceState(null, "", "/?debug&startx=2000&lanecap=2");
     const { scene, internals, step, started } = await mountScene();
@@ -325,6 +408,10 @@ describe("scène de conduite de Léo", () => {
       controller.setPaused(false);
       controller.deliver();
       controller.retryAssets();
+      // Sans son dans ce navigateur de test : le son reste coupé, le klaxon ne fait rien, sans erreur.
+      expect(controller.setSound(true)).toBe(false);
+      controller.horn(true);
+      controller.horn(false);
       controller.reset();
       expect(snapshots.at(-1)?.phase).toBe("INTRO");
       controller.destroy();

@@ -18,6 +18,8 @@ const { controllerMock, mountMock } = vi.hoisted(() => {
     turn: vi.fn(),
     setPaused: vi.fn(),
     retryAssets: vi.fn(),
+    setSound: vi.fn((on: boolean) => on),
+    horn: vi.fn(),
   };
   const mountMock = vi.fn((_host: HTMLElement, listener: (snapshot: LeoLivreurSnapshot) => void) => {
     controllerMock.listener = listener;
@@ -176,6 +178,58 @@ describe("page : écran de conduite", () => {
     expect(forward).toHaveAttribute("data-pressed", "true");
     fireEvent.pointerCancel(forward, { pointerId: 1 });
     expect(controllerMock.setControl).toHaveBeenLastCalledWith("forward", false);
+  });
+
+  it("coupe le son au départ ; le bouton Son l'active depuis le clic, puis le coupe", () => {
+    setScreen(1366, 768, false);
+    enter();
+    const dashboard = screen.getByLabelText("Tableau de bord");
+    const sound = within(dashboard).getByRole("button", { name: "Son du jeu" });
+    expect(sound).toHaveAttribute("aria-pressed", "false");
+    expect(sound).toHaveTextContent("Son : non");
+    expect(controllerMock.setSound).not.toHaveBeenCalled();
+    fireEvent.click(sound);
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(true);
+    expect(sound).toHaveAttribute("aria-pressed", "true");
+    expect(sound).toHaveTextContent("Son : oui");
+    fireEvent.click(sound);
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(false);
+    expect(sound).toHaveTextContent("Son : non");
+  });
+
+  it("sur téléphone, écrit seulement « Son », barré quand il est coupé, pour laisser la place à Pause et Quitter", () => {
+    enter();
+    const sound = screen.getByRole("button", { name: "Son du jeu" });
+    expect(sound).toHaveTextContent(/^Son$/);
+    expect(sound).toHaveAttribute("data-compact", "true");
+    expect(sound).toHaveAttribute("data-sound", "off");
+    expect(css).toContain('.dashboardButton[data-sound="off"][data-compact="true"] { text-decoration: line-through; }');
+    fireEvent.click(sound);
+    expect(sound).toHaveAttribute("data-sound", "on");
+  });
+
+  it("reste « Son : non » si le navigateur ne peut pas jouer de son", () => {
+    enter();
+    controllerMock.setSound.mockReturnValueOnce(false);
+    const sound = screen.getByRole("button", { name: "Son du jeu" });
+    fireEvent.click(sound);
+    expect(sound).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("klaxonne tant que le bouton du centre est tenu, et le relâche à la pause", () => {
+    enter();
+    const panel = screen.getByRole("region", { name: "Commandes de conduite" });
+    const horn = within(panel).getByRole("button", { name: "Klaxon (maintenir)" });
+    fireEvent.pointerDown(horn, { pointerId: 3 });
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(true);
+    expect(horn).toHaveAttribute("data-pressed", "true");
+    expect(fireEvent.contextMenu(horn)).toBe(false);
+    fireEvent.pointerUp(horn, { pointerId: 3 });
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(false);
+    expect(horn).toHaveAttribute("data-pressed", "false");
+    fireEvent.pointerDown(horn, { pointerId: 4 });
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(false);
   });
 
   it("range la direction à gauche et les pédales à droite, sans menu contextuel au long appui", () => {

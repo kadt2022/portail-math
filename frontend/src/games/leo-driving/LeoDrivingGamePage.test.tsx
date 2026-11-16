@@ -19,6 +19,8 @@ const { controllerMock } = vi.hoisted(() => ({
     turn: vi.fn(),
     setPaused: vi.fn(),
     retryAssets: vi.fn(),
+    setSound: vi.fn(() => false),
+    horn: vi.fn(),
   },
 }));
 

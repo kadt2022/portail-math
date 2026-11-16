@@ -137,6 +137,49 @@ function HoldButton({
   );
 }
 
+/**
+ * Klaxon : sonne tant qu'il est tenu, comme les pédales (capture du pointeur, aucun geste laissé au navigateur).
+ * Au centre du panneau, comme le klaxon au milieu d'un volant.
+ */
+function HornButton({ controller, variant }: { controller: LeoLivreurController | null; variant: "panel" | "touch" }) {
+  const [pressed, setPressed] = useState(false);
+  const press = (event: PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setPressed(true);
+    controller?.horn(true);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Sans capture, le relâchement reste détecté par pointerup / pointercancel sur le bouton.
+    }
+  };
+  const release = (event?: PointerEvent<HTMLButtonElement>) => {
+    if (event && event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setPressed(false);
+    controller?.horn(false);
+  };
+  const className = variant === "touch" ? `${styles.touchButton} ${styles.touch_horn}` : `${styles.control} ${styles.horn}`;
+  return (
+    <button
+      type="button"
+      className={className}
+      data-control="horn"
+      data-pressed={pressed ? "true" : "false"}
+      onPointerDown={press}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onLostPointerCapture={release}
+      onContextMenu={(event) => event.preventDefault()}
+      aria-label="Klaxon (maintenir)"
+    >
+      <span aria-hidden="true">♪</span>
+      <strong>Klaxon</strong>
+    </button>
+  );
+}
+
 function SignalChip({ snapshot }: { snapshot: LeoLivreurSnapshot }) {
   if (snapshot.signalDistance === null || !snapshot.signalState) return null;
   return (
@@ -147,17 +190,49 @@ function SignalChip({ snapshot }: { snapshot: LeoLivreurSnapshot }) {
   );
 }
 
-/** Zone A — tableau de bord compact : pizzas, vitesse, prochaine livraison, feu, Pause, Quitter. */
+/** Son du jeu : coupé au départ, activé par l'enfant (le choix n'est pas mémorisé, doctrine V1). */
+function SoundButton({
+  soundOn,
+  onSound,
+  className,
+  compact = false,
+}: {
+  soundOn: boolean;
+  onSound: () => void;
+  className: string;
+  /** Petit écran : « Son » seul, barré quand il est coupé, pour laisser la place à Pause et Quitter. */
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={className}
+      data-sound={soundOn ? "on" : "off"}
+      data-compact={compact ? "true" : "false"}
+      onClick={onSound}
+      aria-pressed={soundOn}
+      aria-label="Son du jeu"
+    >
+      {compact ? "Son" : soundOn ? "Son : oui" : "Son : non"}
+    </button>
+  );
+}
+
+/** Zone A — tableau de bord compact : pizzas, vitesse, prochaine livraison, feu, Son, Pause, Quitter. */
 function Dashboard({
   snapshot,
   paused,
   compact,
+  soundOn,
+  onSound,
   onPause,
   onQuit,
 }: {
   snapshot: LeoLivreurSnapshot;
   paused: boolean;
   compact: boolean;
+  soundOn: boolean;
+  onSound: () => void;
   onPause: () => void;
   onQuit: () => void;
 }) {
@@ -174,6 +249,7 @@ function Dashboard({
         </span>
       ) : null}
       <span className={styles.dashboardActions}>
+        <SoundButton soundOn={soundOn} onSound={onSound} className={styles.dashboardButton} compact={compact} />
         <button type="button" className={styles.dashboardButton} onClick={onPause} aria-pressed={paused}>
           {paused ? "Reprendre" : "Pause"}
         </button>
@@ -223,6 +299,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
   const [snapshot, setSnapshot] = useState(INITIAL_SNAPSHOT);
   const [immersive, setImmersive] = useState(startInDrivingMode);
   const [paused, setPaused] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const viewport = useViewport();
   const layout = drivingLayout(viewport);
 
@@ -243,6 +320,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
 
   const releaseAll = useCallback(() => {
     for (const control of ALL_CONTROLS) controllerRef.current?.setControl(control, false);
+    controllerRef.current?.horn(false);
   }, []);
 
   /** Sortie de l’écran de conduite : le jeu reprend (jamais de pause cachée), les commandes sont relâchées. */
@@ -295,6 +373,10 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
     controller?.startMission();
     setImmersive(true);
   };
+  // Appelé directement par le clic : c'est ce geste qui autorise le navigateur à jouer du son.
+  const toggleSound = () => {
+    setSoundOn(controller?.setSound(!soundOn) ?? false);
+  };
   const togglePause = () => {
     const next = !paused;
     releaseAll();
@@ -307,6 +389,8 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
   // fixées ici.
   const screenStyle = {
     "--control-size": `${layout.controlSize}px`,
+    // Taille de référence pour le klaxon (80 % des pédales) : une variable ne peut pas se redéfinir à partir d'elle-même.
+    "--control-size-base": `${layout.controlSize}px`,
     "--scene-max": layout.sceneMaxHeight === null ? "none" : `${layout.sceneMaxHeight}px`,
   } as CSSProperties;
 
@@ -343,6 +427,8 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
             snapshot={snapshot}
             paused={paused}
             compact={layout.format !== "desktop"}
+            soundOn={soundOn}
+            onSound={toggleSound}
             onPause={togglePause}
             onQuit={exitDriving}
           />
@@ -359,12 +445,13 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
                 <strong>Prochaine livraison : {snapshot.targetLabel}</strong>
                 <span>{instructionFor(snapshot, paused)}</span>
                 {layout.touchControls || layout.format !== "desktop" || canStart || canDeliver ? null : (
-                  <small className={styles.keyboardHint}>Clavier : flèches ou W A S D · Espace : freiner · R : reculer · Échap : quitter</small>
+                  <small className={styles.keyboardHint}>Clavier : flèches ou W A S D · Espace : freiner · R : reculer · H : klaxon · Échap : quitter</small>
                 )}
               </div>
               {canDeliver ? <button type="button" className={styles.panelAction} onClick={() => controller?.deliver()}>Livrer la pizza</button> : null}
               {canStart && snapshot.assets === "ready" ? <button type="button" className={styles.panelAction} onClick={startMission}>Commencer</button> : null}
               {snapshot.assets === "error" ? <button type="button" className={styles.panelAction} onClick={() => controller?.retryAssets()}>Réessayer</button> : null}
+              <HornButton controller={controller} variant="touch" />
             </div>
             <div className={styles.panelRight} aria-label="Pédales">
               <HoldButton control="forward" label="Avancer" icon="↑" controller={controller} variant="touch" />
@@ -397,6 +484,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
               {canStart ? <button type="button" className={styles.primaryAction} onClick={startMission}>Commencer la mission</button> : null}
               {canDeliver ? <button type="button" className={styles.primaryAction} onClick={() => controller?.deliver()}>Livrer la pizza</button> : null}
               <button type="button" className={styles.secondaryAction} onClick={() => setImmersive(true)}>Mode conduite plein écran</button>
+              <SoundButton soundOn={soundOn} onSound={toggleSound} className={styles.secondaryAction} />
             </div>
           </section>
 
@@ -406,6 +494,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
             <HoldButton control="brake" label="Freiner" icon="■" controller={controller} />
             <HoldButton control="reverse" label="Reculer" icon="↓" controller={controller} />
             <HoldButton control="right" label="Droite" icon="→" controller={controller} />
+            <HornButton controller={controller} variant="panel" />
           </section>
         </>
       )}
