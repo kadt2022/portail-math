@@ -1,7 +1,15 @@
 {
   "cataloguePage": {
-    "eyebrow": "Catalogue",
-    "title": "Games"
+    "title": "Games",
+    "subtitle": "Discover, play and learn with our educational games",
+    "searchLabel": "Search for a game",
+    "searchPlaceholder": "Search for a game",
+    "filterLabel": "Filter by universe",
+    "all": "All games",
+    "galleryTitle": "All games",
+    "noResult": "No game has this name. Try another word!",
+    "resultCount_one": "{{count}} game",
+    "resultCount_other": "{{count}} games"
   },
   "badge": {
     "new": "New"
@@ -9,17 +17,20 @@
   "multiplicationTrain": {
     "name": "The Multiplication Train",
     "description": "Learn the 2 and 5 times tables while driving your train forward.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Ride the times tables"
   },
   "fractionRiver": {
     "name": "The Fraction River",
     "description": "Cross the river by picking the right fractions.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Cross the river"
   },
   "fluxForge": {
     "name": "Flux Forge",
     "description": "Become a little engineer and build the village's cabin.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Build the village"
   },
   "grilleMagique": {
     "name": "The Magic Tiles",
@@ -64,12 +75,14 @@
         "nextLevel": "Next level",
         "backToGames": "Back to games"
       }
-    }
+    },
+    "tagline": "Slide the tiles"
   },
   "leoDriving": {
     "name": "Driving with Léo",
     "description": "Take Léo's wheel, obey the traffic lights and deliver pizzas all over town.",
-    "cta": "Take the wheel"
+    "cta": "Take the wheel",
+    "tagline": "Deliver pizzas across town"
   },
   "turboPulse": {
     "name": "Turbo Pulse",
@@ -126,12 +139,14 @@
         "fullscreenOn": "Fullscreen",
         "fullscreenOff": "Exit fullscreen"
       }
-    }
+    },
+    "tagline": "Aim, calculate, chain combos"
   },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",
-    "cta": "Coming soon"
+    "cta": "Coming soon",
+    "tagline": "Coming soon"
   },
   "comingSoonPage": {
     "eyebrow": "New educational game",
@@ -148,5 +163,21 @@
       "name": "The Shape Builder",
       "description": "Assemble shapes to discover geometry."
     }
+  },
+  "categories": {
+    "driving": "Driving",
+    "calculation": "Math challenges",
+    "logic": "Logic",
+    "discovery": "Discovery"
+  },
+  "featured": {
+    "label": "Featured",
+    "educational": "Educational game",
+    "cta": "Play",
+    "aria": "Play {{name}}"
+  },
+  "card": {
+    "playAria": "Play {{name}}",
+    "soonAria": "{{name}}: coming soon"
   }
 }

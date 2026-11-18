@@ -12,8 +12,18 @@ export function AppLayout() {
   const { t } = useTranslation("common");
   const location = useLocation();
   const isLibraryReader = /^\/bibliotheque\/[^/]+$/.test(location.pathname);
+  // Habillages propres à deux espaces (catalogue des jeux, catalogue de la bibliothèque) : chacun est limité à
+  // sa page et ne touche aucune autre page du portail. Le lecteur de livre a sa propre mise en page.
+  const catalogue = location.pathname.replace(/\/$/, "");
+  const space: "games" | "library" | undefined = catalogue === "/jeux" ? "games" : catalogue === "/bibliotheque" ? "library" : undefined;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Sur les catalogues « Jeux » et « Bibliothèque », le menu latéral est replié par défaut (plus de place pour le contenu).
+  // Le choix de l'utilisateur prime ensuite, mais ne se perpétue pas d'un type de page à l'autre : en revenant sur une
+  // autre page, le menu retrouve son état habituel (déployé).
+  const collapsedByDefault = space !== undefined;
+  const [collapseChoice, setCollapseChoice] = useState<{ forDefault: boolean; collapsed: boolean } | null>(null);
+  const sidebarCollapsed = collapseChoice && collapseChoice.forDefault === collapsedByDefault ? collapseChoice.collapsed : collapsedByDefault;
+  const setSidebarCollapsed = (collapsed: boolean) => setCollapseChoice({ forDefault: collapsedByDefault, collapsed });
   const navId = useId();
   const shellRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -79,7 +89,11 @@ export function AppLayout() {
   }
 
   return (
-    <div ref={shellRef} className={`${styles.shell}${sidebarCollapsed ? ` ${styles.sidebarCollapsed}` : ""}`}>
+    <div
+      ref={shellRef}
+      className={`${styles.shell}${sidebarCollapsed ? ` ${styles.sidebarCollapsed}` : ""}${space === "games" ? ` ${styles.gamesTheme}` : ""}${space === "library" ? ` ${styles.libraryTheme}` : ""}`}
+      data-theme={space}
+    >
       <a className={styles.skipLink} href="#contenu">
         {t("skipToContent")}
       </a>
@@ -92,7 +106,7 @@ export function AppLayout() {
           aria-controls={navId}
           aria-label={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
           title={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
-          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
           <span />
         </button>
@@ -131,6 +145,7 @@ export function AppLayout() {
         onExpand={() => setSidebarCollapsed(false)}
         onNavigate={() => setSidebarOpen(false)}
         navId={navId}
+        theme={space}
       />
 
       <div className={`${styles.scroller}${sidebarOpen ? ` ${styles.scrollerLocked}` : ""}`}>

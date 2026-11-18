@@ -1,109 +1,149 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--pm-line);
-  border-radius: var(--pm-radius-lg);
-  background: var(--pm-surface);
-  box-shadow: var(--pm-shadow-sm);
-  transition: box-shadow 160ms ease, transform 160ms ease;
-}
-
-/* Mouvement volontairement discret : la carte entière se soulève et grandit
-   à peine (1.5 %), presque imperceptible, plutôt que de faire gonfler
-   seulement l'image. */
-.card:hover {
-  box-shadow: var(--pm-shadow-md);
-  transform: translateY(-2px) scale(1.015);
-}
-
-.illustration {
   position: relative;
-  aspect-ratio: 5 / 3;
+  display: block;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
+  border-radius: 14px;
+  background: transparent;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
-.illustration svg,
-.photo {
+.image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 320ms ease;
 }
 
-/* Illustration détourée : entière, posée sur un ciel et une chaussée. */
-.photoContain {
-  box-sizing: border-box;
-  padding: 8% 10% 4%;
-  object-fit: contain;
-  object-position: center bottom;
-  background: linear-gradient(180deg, #8fd0ff 0%, #c9ecff 52%, #4b4f5c 52%, #4b4f5c 100%);
-}
-
-.badge {
+.card::after {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 5px 12px;
-  border-radius: var(--pm-radius-signature);
-  background: var(--pm-accent);
-  color: #fff;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(8 11 40 / 0%) 55%, rgb(8 11 40 / 88%) 100%);
+  content: "";
+  pointer-events: none;
+}
+
+/* Pas de cadre ni de halo : au survol la carte monte à peine et l'image s'anime. */
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-4px);
+}
+
+.card:hover .image,
+.card:focus-visible .image {
+  transform: scale(1.06);
+}
+
+.card:focus-visible {
+  outline: none;
+}
+
+.card:focus-visible .name {
+  text-decoration: underline 3px #fd5e53;
+  text-underline-offset: 5px;
+}
+
+.card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.category {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(8 11 40 / 72%);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.02em;
 }
 
-.body {
+.bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
-  gap: 10px;
-  padding: 18px 20px 20px;
+  gap: 1px;
+  padding: 12px 14px 12px;
 }
 
 .name {
-  margin: 0;
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.15;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 60%);
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.description {
-  flex: 1 1 auto;
-  margin: 0;
-  color: var(--pm-ink-soft);
-  font-size: 14px;
+.tagline {
+  color: #dfe6ff;
+  font-size: 13px;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 999px;
-  background: #d96a1f;
-  color: #fff;
-  font: inherit;
-  font-weight: 750;
-  text-decoration: none;
-  cursor: pointer;
+@media (max-width: 639px) {
+  .name {
+    font-size: 20px;
+  }
 }
 
-.cta:hover {
-  background: #c55d18;
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .image {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-visible,
+  .card:hover .image,
+  .card:focus-visible .image,
+  .card:active {
+    transform: none;
+  }
 }
 
-.ctaDisabled {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 10px 18px;
-  border: 1px dashed var(--pm-line);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--pm-ink-soft);
-  font-weight: 700;
-  cursor: default;
+/* Illustration détourée au premier plan (voiture de Léo) : seul le transform change au survol. */
+.overlay {
+  position: absolute;
+  right: 6%;
+  bottom: 14%;
+  z-index: 0;
+  height: 62%;
+  width: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 10px rgb(0 0 0 / 35%));
+  transform-origin: 50% 100%;
+  transition: transform 500ms cubic-bezier(0.22, 0.8, 0.25, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .overlay,
+  .card:focus-visible .overlay {
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    transition: none;
+  }
+
+  .card:hover .overlay,
+  .card:focus-visible .overlay {
+    transform: none;
+  }
 }

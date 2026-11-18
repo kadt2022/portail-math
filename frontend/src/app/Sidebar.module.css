@@ -390,3 +390,75 @@
   .collapsed .courseMenuButton.linkActive { background: var(--sidebar-active); color: var(--sidebar-active-ink); }
   .collapsed .courseMenuButton.linkActive .num { color: var(--sidebar-active-ink); }
 }
+
+/* Habillage « Games » (catalogue /jeux uniquement) : même structure, palette nuit/indigo. */
+.sidebarGames {
+  --sidebar-ink: #dfe6ff;
+  --sidebar-muted: #9aa6e0;
+  --sidebar-accent: #aab4ff;
+  --sidebar-hover: rgb(255 255 255 / 9%);
+  --sidebar-panel: rgb(255 255 255 / 5%);
+  --sidebar-active: #fd5e53;
+  --sidebar-active-ink: #14213d;
+  border-right: 1px solid rgb(255 255 255 / 10%);
+  background: linear-gradient(180deg, #0a0b12 0%, #10111b 100%);
+}
+
+.sidebarGames .navSection {
+  border-color: rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 4%);
+}
+
+.sidebarGames .navSectionTitle {
+  border-bottom-color: rgb(255 255 255 / 10%);
+}
+
+.sidebarGames .linkActive:hover {
+  background: #ff7a6b;
+  color: #14213d;
+}
+
+.sidebarGames .levelLinkActive {
+  background: rgb(253 94 83 / 18%);
+  color: #ff8a73;
+}
+
+.sidebarGames .secondaryNotice strong {
+  background: rgb(255 255 255 / 10%);
+}
+
+/* Habillage « Bibliothèque » (catalogue /bibliotheque uniquement) : pétrole profond et or. */
+.sidebarLibrary {
+  --sidebar-ink: #dfe6ff;
+  --sidebar-muted: #9aa6e0;
+  --sidebar-accent: #aab4ff;
+  --sidebar-hover: rgb(255 255 255 / 9%);
+  --sidebar-panel: rgb(255 255 255 / 5%);
+  --sidebar-active: #fd5e53;
+  --sidebar-active-ink: #14213d;
+  border-right: 1px solid rgb(255 255 255 / 10%);
+  background: linear-gradient(180deg, #0a0b12 0%, #10111b 100%);
+}
+
+.sidebarLibrary .navSection {
+  border-color: rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 4%);
+}
+
+.sidebarLibrary .navSectionTitle {
+  border-bottom-color: rgb(255 255 255 / 10%);
+}
+
+.sidebarLibrary .linkActive:hover {
+  background: #ff7a6b;
+  color: #14213d;
+}
+
+.sidebarLibrary .levelLinkActive {
+  background: rgb(253 94 83 / 22%);
+  color: #ff8a73;
+}
+
+.sidebarLibrary .secondaryNotice strong {
+  background: rgb(255 255 255 / 10%);
+}

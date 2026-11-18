@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import mathPrimaryFiveCover from "../assets/library-math-primary-five-cover.webp";
-import mathPrimaryOneCover from "../assets/library-math-primary-one-cover.webp";
-import mathPrimaryThreeCover from "../assets/library-math-primary-three-cover.webp";
-import mathPrimaryTwoCover from "../assets/library-math-primary-two-cover.webp";
+// Miniatures 420 px (35-47 Ko) : les couvertures d'origine (834 px, 84-105 Ko) ne servent qu'à les produire.
+import mathPrimaryFiveCover from "./assets/cover-five.webp";
+import mathPrimaryOneCover from "./assets/cover-one.webp";
+import mathPrimaryThreeCover from "./assets/cover-three.webp";
+import mathPrimaryTwoCover from "./assets/cover-two.webp";
 
 export interface LibraryBook {
   id: string;
@@ -11,6 +12,8 @@ export interface LibraryBook {
   descriptionKey: string;
   levelKey: string;
   subjectKey: string;
+  /** Collection du livre : pas encore fournie par le backend, tous les livres sont de la collection Mbuyamba. */
+  collectionKey: string;
   formatKey: string;
   pages: number;
   cover?: string;
@@ -56,6 +59,7 @@ function toBook(dto: LibraryBookDto): LibraryBook {
     descriptionKey: dto.descriptionKey,
     levelKey: dto.levelKey,
     subjectKey: dto.subjectKey,
+    collectionKey: "book.collection",
     formatKey: dto.formatKey,
     pages: dto.pages,
     ...(covers[dto.id] ? { cover: covers[dto.id] } : {}),

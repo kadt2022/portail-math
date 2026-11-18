@@ -1,35 +1,192 @@
+/* Espace des jeux : panneau bleu nuit, sobre autour de cartes très colorées. */
 .page {
-  padding: 40px 0 64px;
+  display: flex;
+  flex-direction: column;
+  --page-gap: clamp(24px, 3vw, 40px);
+  gap: var(--page-gap);
+  padding: clamp(14px, 2.2vw, 26px) 0 40px;
+  color: #fff;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  isolation: isolate;
+}
+
+/* La lueur descend sous le haut de la bannière de Léo : le bleu se prolonge dans l'image, sans coupure. Pas de cadre : une simple lueur qui gagne en lumière vers la droite et se fond dans le fond noir (en bas comme à gauche). */
+.header::before {
+  position: absolute;
+  inset: -30px -16px -200px -16px;
+  z-index: -1;
+  background: linear-gradient(100deg, rgb(74 86 201 / 0%) 0%, rgb(74 86 201 / 22%) 35%, rgb(100 112 226 / 46%) 70%, rgb(135 147 248 / 66%) 100%);
+  content: "";
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 85%) 22%, rgb(0 0 0 / 60%) 42%, rgb(0 0 0 / 32%) 62%, rgb(0 0 0 / 12%) 82%, transparent 100%);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .header::before {
+    inset: -30px -24px -200px -24px;
+  }
 }
 
 .eyebrow {
   margin: 0;
-  color: var(--pm-accent-dark);
+  color: #fd5e53;
   font-size: 12px;
   font-weight: 850;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .title {
-  margin: 8px 0 28px;
-  font-size: clamp(26px, 4vw, 36px);
+  margin: 2px 0 0;
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 900;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: #dfe6ff;
+  font-size: clamp(14px, 1.5vw, 17px);
+  font-weight: 500;
+}
+
+.search {
+  flex: 0 1 280px;
+}
+
+.search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 94%);
+  color: #14213d;
+  font: inherit;
+}
+
+.search input::placeholder {
+  color: #5a6488;
+}
+
+.search input:focus-visible {
+  border-color: transparent;
+  outline: 3px solid rgb(255 255 255 / 45%);
+  outline-offset: 2px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: rgb(255 255 255 / 9%);
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #dfe6ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.chip:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.chip:focus-visible {
+  outline-color: #fd5e53;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: #fd5e53;
+  background: #fd5e53;
+  color: #14213d;
+}
+
+.count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding: 28px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 8%);
+  color: #dfe6ff;
+  text-align: center;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  /* 12 colonnes : divisible par 1, 2, 3, 4 et 6, chaque carte en occupe une part entière (voir gallery-layout.ts). */
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  /* Écart vertical constant ; l'écart horizontal s'adapte : 11 écarts de 40 px dépasseraient un écran de téléphone. */
+  row-gap: 40px;
+  column-gap: 0;
 }
 
-@media (min-width: 620px) {
+@media (min-width: 560px) {
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
   }
 }
 
-@media (min-width: 1040px) {
+@media (min-width: 900px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 40px;
+  }
+}
+
+@media (max-width: 899px) {
+  .chip {
+    min-height: 44px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    margin-inline: -14px;
+    padding: 0 14px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .chip {
+    flex: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .page {
+    margin-top: 12px;
+    border-radius: 22px;
+  }
+
+  .search {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
   }
 }
