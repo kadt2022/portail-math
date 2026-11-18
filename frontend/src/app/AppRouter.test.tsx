@@ -57,6 +57,23 @@ describe("Routeur du portail React", () => {
     expect(within(nav).getByRole("link", { name: "À propos" })).toHaveAttribute("href", "/app/a-propos");
   });
 
+  it("n'applique l'habillage Games qu'au catalogue /app/jeux, pas aux autres pages", () => {
+    const games = renderAt("/app/jeux");
+    expect(games.container.querySelector('[data-theme="games"]')).not.toBeNull();
+    games.unmount();
+
+    mockLibraryCatalogue();
+    const library = renderAt("/app/bibliotheque");
+    expect(library.container.querySelector('[data-theme="library"]')).not.toBeNull();
+    library.unmount();
+
+    for (const path of ["/app", "/app/progression", "/app/a-propos", "/app/bibliotheque/math-primary-one"]) {
+      const other = renderAt(path);
+      expect(other.container.querySelector("[data-theme]")).toBeNull();
+      other.unmount();
+    }
+  });
+
   it("affiche le catalogue sur /app/jeux", () => {
     renderAt("/app/jeux");
     expect(screen.getByRole("heading", { level: 1, name: /les jeux/i })).toBeInTheDocument();
@@ -66,8 +83,8 @@ describe("Routeur du portail React", () => {
   it("affiche la bibliothèque et son premier livre", async () => {
     mockLibraryCatalogue();
     renderAt("/app/bibliotheque");
-    expect(screen.getByRole("heading", { level: 1, name: /livres pour apprendre autrement/i })).toBeInTheDocument();
-    const bookLinks = await screen.findAllByRole("link", { name: /lire le livre/i });
+    expect(screen.getByRole("heading", { level: 1, name: /^bibliothèque$/i })).toBeInTheDocument();
+    const bookLinks = await screen.findAllByRole("link", { name: /ouvrir le livre/i });
     expect(bookLinks).toHaveLength(4);
     expect(bookLinks[0].getAttribute("href")).toMatch(
       /\/app\/bibliotheque\/math-primary-one$/,

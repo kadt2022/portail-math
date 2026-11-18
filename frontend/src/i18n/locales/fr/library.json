@@ -1,8 +1,9 @@
 {
   "page": {
     "eyebrow": "Bibliothèque Mbuyamba",
-    "title": "Des livres pour apprendre autrement",
-    "description": "Retrouve des livres éducatifs conçus pour observer, manipuler, comprendre et progresser à ton rythme."
+    "title": "Bibliothèque",
+    "description": "Retrouve des livres éducatifs conçus pour observer, manipuler, comprendre et progresser à ton rythme.",
+    "subtitle": "Des livres pour apprendre autrement"
   },
   "selection": {
     "eyebrow": "À découvrir",
@@ -10,7 +11,8 @@
     "count_one": "{{count}} livre",
     "count_other": "{{count}} livres",
     "loading": "Chargement de la bibliothèque…",
-    "error": "La bibliothèque est momentanément indisponible. Réessaie dans un instant."
+    "error": "La bibliothèque est momentanément indisponible. Réessaie dans un instant.",
+    "noResult": "Aucun livre ne correspond. Essaie un autre titre !"
   },
   "book": {
     "collection": "Collection Mbuyamba Education",
@@ -24,7 +26,8 @@
     "pages_other": "{{count}} pages",
     "read": "Lire le livre",
     "download": "Télécharger",
-    "readerNote": "Ouvre le livre dans le lecteur Mbuyamba."
+    "readerNote": "Ouvre le livre dans le lecteur Mbuyamba.",
+    "openAria": "Ouvrir le livre {{title}}, {{level}}"
   },
   "books": {
     "mathPrimaryOne": {
@@ -77,5 +80,16 @@
     "fitPage": "Ajuster à la page",
     "fitWidth": "Ajuster à la largeur",
     "zoom": "Zoom"
+  },
+  "search": {
+    "label": "Chercher un livre",
+    "placeholder": "Chercher un livre"
+  },
+  "filters": {
+    "label": "Filtrer les livres",
+    "all": "Tous les livres",
+    "subject": "Matière",
+    "level": "Par niveau",
+    "collection": "Par collection"
   }
 }

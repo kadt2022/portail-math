@@ -1,7 +1,15 @@
 {
   "cataloguePage": {
-    "eyebrow": "Catalogue",
-    "title": "Les jeux"
+    "title": "Les jeux",
+    "subtitle": "Joue, découvre, apprends.",
+    "searchLabel": "Chercher un jeu",
+    "searchPlaceholder": "Chercher un jeu",
+    "filterLabel": "Filtrer par univers",
+    "all": "Tous les jeux",
+    "galleryTitle": "Tous les jeux",
+    "noResult": "Aucun jeu ne porte ce nom. Essaie un autre mot !",
+    "resultCount_one": "{{count}} jeu",
+    "resultCount_other": "{{count}} jeux"
   },
   "badge": {
     "new": "Nouveau"
@@ -9,17 +17,20 @@
   "multiplicationTrain": {
     "name": "Le Train des multiplications",
     "description": "Apprends les tables de 2 et 5 en faisant avancer ton train.",
-    "cta": "Jouer"
+    "cta": "Jouer",
+    "tagline": "Roule sur les tables"
   },
   "fractionRiver": {
     "name": "La Rivière des fractions",
     "description": "Traverse la rivière en reconnaissant les bonnes fractions.",
-    "cta": "Jouer"
+    "cta": "Jouer",
+    "tagline": "Traverse la rivière"
   },
   "fluxForge": {
     "name": "Flux Forge",
     "description": "Deviens un petit ingénieur et construis la cabane du village.",
-    "cta": "Jouer"
+    "cta": "Jouer",
+    "tagline": "Construis le village"
   },
   "grilleMagique": {
     "name": "Les Tuiles magiques",
@@ -64,12 +75,14 @@
         "nextLevel": "Niveau suivant",
         "backToGames": "Retour aux jeux"
       }
-    }
+    },
+    "tagline": "Glisse les tuiles"
   },
   "leoDriving": {
     "name": "Conduire avec Léo",
     "description": "Prends le volant de Léo, respecte les feux et livre les pizzas dans toute la ville.",
-    "cta": "Prendre le volant"
+    "cta": "Prendre le volant",
+    "tagline": "Livre les pizzas en ville"
   },
   "turboPulse": {
     "name": "Turbo Pulse",
@@ -126,12 +139,14 @@
         "fullscreenOn": "Plein écran",
         "fullscreenOff": "Quitter le plein écran"
       }
-    }
+    },
+    "tagline": "Vise, calcule, enchaîne"
   },
   "newGame": {
     "name": "Nouveau jeu éducatif",
     "description": "Une nouvelle aventure mathématique arrive bientôt.",
-    "cta": "Bientôt disponible"
+    "cta": "Bientôt disponible",
+    "tagline": "Bientôt"
   },
   "comingSoonPage": {
     "eyebrow": "Nouveau jeu éducatif",
@@ -148,5 +163,21 @@
       "name": "Le Constructeur de formes",
       "description": "Assemble des formes pour découvrir la géométrie."
     }
+  },
+  "categories": {
+    "driving": "Conduite",
+    "calculation": "Défis de calcul",
+    "logic": "Logique",
+    "discovery": "Découverte"
+  },
+  "featured": {
+    "label": "À la une",
+    "educational": "Jeu éducatif",
+    "cta": "Jouer",
+    "aria": "Jouer à {{name}}"
+  },
+  "card": {
+    "playAria": "Jouer à {{name}}",
+    "soonAria": "{{name}} : bientôt disponible"
   }
 }

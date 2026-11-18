@@ -1,35 +1,150 @@
+/* Espace des jeux : panneau bleu nuit, sobre autour de cartes très colorées. */
 .page {
-  padding: 40px 0 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(14px, 2.2vw, 26px) 0 40px;
+  color: #fff;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .eyebrow {
   margin: 0;
-  color: var(--pm-accent-dark);
+  color: #fd5e53;
   font-size: 12px;
   font-weight: 850;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .title {
-  margin: 8px 0 28px;
-  font-size: clamp(26px, 4vw, 36px);
+  margin: 2px 0 0;
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 900;
+}
+
+.search {
+  flex: 0 1 280px;
+}
+
+.search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+  font: inherit;
+}
+
+.search input::placeholder {
+  color: #aab4e6;
+}
+
+.search input:focus-visible {
+  border-color: #fd5e53;
+  outline-color: #fd5e53;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: transparent;
+  color: #dfe6ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.chip:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.chip:focus-visible {
+  outline-color: #fd5e53;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: #fd5e53;
+  background: #fd5e53;
+  color: #14213d;
+}
+
+.count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding: 28px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 8%);
+  color: #dfe6ff;
+  text-align: center;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  /* 12 colonnes : divisible par 1, 2, 3, 4 et 6, chaque carte en occupe une part entière (voir gallery-layout.ts). */
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 40px;
 }
 
-@media (min-width: 620px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 899px) {
+  .chip {
+    min-height: 44px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    margin-inline: -14px;
+    padding: 0 14px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .chip {
+    flex: none;
   }
 }
 
-@media (min-width: 1040px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 639px) {
+  .page {
+    margin-top: 12px;
+    border-radius: 22px;
+  }
+
+  .search {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
   }
 }

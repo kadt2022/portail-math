@@ -34,7 +34,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(turboPulse);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(requestFullscreen).toHaveBeenCalledOnce();
     expect(lock).toHaveBeenCalledWith("landscape");
@@ -50,7 +50,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(turboPulse);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
   });
@@ -62,7 +62,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(turboPulse);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
   });
@@ -75,7 +75,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(turboPulse);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
   });
@@ -87,7 +87,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(grilleMagique);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(requestFullscreen).not.toHaveBeenCalled();
     expect(await screen.findByText(`Destination atteinte : ${grilleMagique.href}`)).toBeInTheDocument();

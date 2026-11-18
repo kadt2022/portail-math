@@ -12,6 +12,10 @@ export function AppLayout() {
   const { t } = useTranslation("common");
   const location = useLocation();
   const isLibraryReader = /^\/bibliotheque\/[^/]+$/.test(location.pathname);
+  // Habillages propres à deux espaces (catalogue des jeux, catalogue de la bibliothèque) : chacun est limité à
+  // sa page et ne touche aucune autre page du portail. Le lecteur de livre a sa propre mise en page.
+  const catalogue = location.pathname.replace(/\/$/, "");
+  const space: "games" | "library" | undefined = catalogue === "/jeux" ? "games" : catalogue === "/bibliotheque" ? "library" : undefined;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navId = useId();
@@ -79,7 +83,11 @@ export function AppLayout() {
   }
 
   return (
-    <div ref={shellRef} className={`${styles.shell}${sidebarCollapsed ? ` ${styles.sidebarCollapsed}` : ""}`}>
+    <div
+      ref={shellRef}
+      className={`${styles.shell}${sidebarCollapsed ? ` ${styles.sidebarCollapsed}` : ""}${space === "games" ? ` ${styles.gamesTheme}` : ""}${space === "library" ? ` ${styles.libraryTheme}` : ""}`}
+      data-theme={space}
+    >
       <a className={styles.skipLink} href="#contenu">
         {t("skipToContent")}
       </a>
@@ -131,6 +139,7 @@ export function AppLayout() {
         onExpand={() => setSidebarCollapsed(false)}
         onNavigate={() => setSidebarOpen(false)}
         navId={navId}
+        theme={space}
       />
 
       <div className={`${styles.scroller}${sidebarOpen ? ` ${styles.scrollerLocked}` : ""}`}>

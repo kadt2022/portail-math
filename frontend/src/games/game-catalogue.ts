@@ -1,104 +1,132 @@
-// Source unique des jeux affichés à la fois par le tableau de bord et par le
-// catalogue React. Les moteurs historiques restent servis dans des coquilles
-// HTML statiques : ce ne sont pas des routes clientes du SPA.
+// Source unique des jeux affichés par le catalogue React. Les moteurs
+// historiques restent servis dans des coquilles HTML statiques : ce ne sont pas
+// des routes clientes du SPA.
 //
-// `nameKey` / `descriptionKey` / `ctaLabelKey` pointent vers le namespace
-// "games" (voir frontend/src/i18n/locales/*/games.json) : jamais de texte
-// affiché figé ici, pour que le Dashboard reste bilingue sans dupliquer
-// cette liste.
+// `nameKey` / `taglineKey` pointent vers le namespace "games" (voir
+// frontend/src/i18n/locales/*/games.json) : jamais de texte affiché figé ici.
+// Les vignettes sont importées par le build (hachées, compressées en WebP,
+// ≈ 11-80 Ko) et chargées à la demande : aucune ne dépend d'un moteur de jeu.
 
-import leoCarUrl from "../prototypes/leo-livreur/assets/leo-car-right.webp";
+import fluxForgeThumb from "./assets/thumb-flux-forge.webp";
+import fractionRiverThumb from "./assets/thumb-fraction-river.webp";
+import leoCar from "./assets/leo-car-front-banner.webp";
+import leoCountryside from "./assets/leo-countryside-1280.webp";
+import multiplicationTrainThumb from "./assets/thumb-multiplication-train.webp";
+import tuilesMagiquesThumb from "./assets/thumb-tuiles-magiques.webp";
+import turboPulseThumb from "./assets/thumb-turbo-pulse.webp";
 
 export type GameAvailability = "standalone" | "react" | "coming-soon";
 
-export type GameSceneId = "train" | "new-game" | "grille-magique" | "turbo-pulse" | "flux-forge";
+export type GameCategoryId = "driving" | "calculation" | "logic" | "discovery";
+
+export interface GameCategory {
+  id: GameCategoryId;
+  /** Clé du namespace "games". */
+  labelKey: string;
+}
+
+// Seules les catégories qui contiennent réellement un jeu jouable sont affichées
+// (voir availableCategories) : aucune catégorie vide n'est présentée comme remplie.
+export const gameCategories: GameCategory[] = [
+  { id: "driving", labelKey: "categories.driving" },
+  { id: "calculation", labelKey: "categories.calculation" },
+  { id: "logic", labelKey: "categories.logic" },
+  { id: "discovery", labelKey: "categories.discovery" },
+];
 
 export interface GameCatalogueEntry {
   id: string;
   nameKey: string;
+  /** Accroche très courte (quelques mots) affichée sur la carte. */
+  taglineKey: string;
+  /** Description longue : réservée à une future page de détail, absente des cartes. */
   descriptionKey: string;
-  ctaLabelKey: string;
   href: string;
   availability: GameAvailability;
-  // Une vraie photo (jeux déjà illustrés) OU une scène SVG dessinée pour ce
-  // jeu (aucun visuel n'existe encore pour lui) — jamais les deux.
-  imageSrc?: string;
-  /** Illustration détourée (fond transparent) : affichée entière sur un fond de scène, jamais rognée. */
-  imageFit?: "cover" | "contain";
-  sceneId?: GameSceneId;
+  categoryId: GameCategoryId;
+  /** Jeu mis en avant par la bannière « À la une » (un seul à la fois). */
+  featured?: boolean;
+  thumbnail?: string;
+  /** Illustration détourée posée au premier plan de la vignette (ex. la voiture de Léo). */
+  overlay?: string;
+  /** Point focal de la vignette (object-position) : garde l'essentiel visible quand le cadre recadre. */
+  focus?: string;
 }
 
 export const gameCatalogue: GameCatalogueEntry[] = [
   {
-    id: "multiplication-train",
-    nameKey: "multiplicationTrain.name",
-    descriptionKey: "multiplicationTrain.description",
-    ctaLabelKey: "multiplicationTrain.cta",
-    href: "/games/multiplication-train.html",
-    availability: "standalone",
-    sceneId: "train",
-  },
-  {
-    id: "fraction-river",
-    nameKey: "fractionRiver.name",
-    descriptionKey: "fractionRiver.description",
-    ctaLabelKey: "fractionRiver.cta",
-    href: "/games/fraction-river.html",
-    availability: "standalone",
-    // Recadrée et compressée depuis l'illustration déjà utilisée par le jeu :
-    // voir images/dashboard/riviere-carte.webp (75 Ko, contre 2,6 Mo pour
-    // l'originale, qui inclut aussi le parchemin vide du jeu, inutile ici).
-    imageSrc: "/images/dashboard/riviere-carte.webp",
-  },
-  {
-    id: "grille-magique",
-    nameKey: "grilleMagique.name",
-    descriptionKey: "grilleMagique.description",
-    ctaLabelKey: "grilleMagique.cta",
-    href: "/jeux/grille-magique",
+    id: "conduire-avec-leo",
+    nameKey: "leoDriving.name",
+    taglineKey: "leoDriving.tagline",
+    descriptionKey: "leoDriving.description",
+    // Ouvre directement l'écran de conduite plein écran.
+    href: "/jeux/conduire-avec-leo",
     availability: "react",
-    sceneId: "grille-magique",
+    categoryId: "driving",
+    featured: true,
+    thumbnail: leoCountryside,
+    // Voiture de face, détourée, posée sur le décor : même illustration que la bannière.
+    overlay: leoCar,
   },
   {
     id: "turbo-pulse",
     nameKey: "turboPulse.name",
+    taglineKey: "turboPulse.tagline",
     descriptionKey: "turboPulse.description",
-    ctaLabelKey: "turboPulse.cta",
     href: "/jeux/turbo-pulse",
     availability: "react",
-    sceneId: "turbo-pulse",
+    categoryId: "calculation",
+    thumbnail: turboPulseThumb,
   },
   {
-    id: "conduire-avec-leo",
-    nameKey: "leoDriving.name",
-    descriptionKey: "leoDriving.description",
-    ctaLabelKey: "leoDriving.cta",
-    // Ouvre directement l'écran de conduite plein écran.
-    href: "/jeux/conduire-avec-leo",
+    id: "multiplication-train",
+    nameKey: "multiplicationTrain.name",
+    taglineKey: "multiplicationTrain.tagline",
+    descriptionKey: "multiplicationTrain.description",
+    href: "/games/multiplication-train.html",
+    availability: "standalone",
+    categoryId: "calculation",
+    thumbnail: multiplicationTrainThumb,
+  },
+  {
+    id: "fraction-river",
+    nameKey: "fractionRiver.name",
+    taglineKey: "fractionRiver.tagline",
+    descriptionKey: "fractionRiver.description",
+    href: "/games/fraction-river.html",
+    availability: "standalone",
+    categoryId: "discovery",
+    thumbnail: fractionRiverThumb,
+  },
+  {
+    id: "grille-magique",
+    nameKey: "grilleMagique.name",
+    taglineKey: "grilleMagique.tagline",
+    descriptionKey: "grilleMagique.description",
+    href: "/jeux/grille-magique",
     availability: "react",
-    // Illustration déjà utilisée par le jeu : la voiture rouge de Léo (24 Ko).
-    // Importée par le build du front : aucune copie à servir par le backend.
-    imageSrc: leoCarUrl,
-    imageFit: "contain",
+    categoryId: "logic",
+    thumbnail: tuilesMagiquesThumb,
   },
   {
     id: "flux-forge",
     nameKey: "fluxForge.name",
+    taglineKey: "fluxForge.tagline",
     descriptionKey: "fluxForge.description",
-    ctaLabelKey: "fluxForge.cta",
     href: "/games/flux-forge.html",
     availability: "standalone",
-    sceneId: "flux-forge",
+    categoryId: "discovery",
+    thumbnail: fluxForgeThumb,
   },
   {
     id: "new-game",
     nameKey: "newGame.name",
+    taglineKey: "newGame.tagline",
     descriptionKey: "newGame.description",
-    ctaLabelKey: "newGame.cta",
     // Relatif au basename "/app" du routeur : c'est ce que <Link> attend.
     href: "/jeux/nouveau-jeu-react",
     availability: "coming-soon",
-    sceneId: "new-game",
+    categoryId: "discovery",
   },
 ];
 
@@ -123,3 +151,12 @@ export const upcomingGames: UpcomingGameEntry[] = [
     accent: "#5448e5",
   },
 ];
+
+/** Jeux réellement jouables : les entrées « bientôt » ne sont pas listées comme des cartes de jeu. */
+export const playableGames = gameCatalogue.filter((game) => game.availability !== "coming-soon");
+
+export const featuredGame = playableGames.find((game) => game.featured);
+
+export const availableCategories = gameCategories.filter((category) =>
+  playableGames.some((game) => game.categoryId === category.id),
+);

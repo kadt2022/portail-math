@@ -1,8 +1,9 @@
 {
   "page": {
     "eyebrow": "Mbuyamba Library",
-    "title": "Books for a different way to learn",
-    "description": "Discover educational books designed to help you observe, explore, understand, and progress at your own pace."
+    "title": "Library",
+    "description": "Discover educational books designed to help you observe, explore, understand, and progress at your own pace.",
+    "subtitle": "Books to learn differently"
   },
   "selection": {
     "eyebrow": "Featured",
@@ -10,7 +11,8 @@
     "count_one": "{{count}} book",
     "count_other": "{{count}} books",
     "loading": "Loading the library…",
-    "error": "The library is temporarily unavailable. Please try again shortly."
+    "error": "The library is temporarily unavailable. Please try again shortly.",
+    "noResult": "No book matches. Try another title!"
   },
   "book": {
     "collection": "Mbuyamba Education Collection",
@@ -24,7 +26,8 @@
     "pages_other": "{{count}} pages",
     "read": "Read the book",
     "download": "Download",
-    "readerNote": "Open the book in the Mbuyamba reader."
+    "readerNote": "Open the book in the Mbuyamba reader.",
+    "openAria": "Open the book {{title}}, {{level}}"
   },
   "books": {
     "mathPrimaryOne": {
@@ -77,5 +80,16 @@
     "fitPage": "Fit page",
     "fitWidth": "Fit width",
     "zoom": "Zoom"
+  },
+  "search": {
+    "label": "Search for a book",
+    "placeholder": "Search for a book"
+  },
+  "filters": {
+    "label": "Filter the books",
+    "all": "All books",
+    "subject": "Subject",
+    "level": "By level",
+    "collection": "By collection"
   }
 }
