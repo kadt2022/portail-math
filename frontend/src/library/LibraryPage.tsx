@@ -14,8 +14,11 @@ const EAGER_COVERS = 8;
 // Couvertures de taille raisonnable : au moins ~200 px de large, de 2 (téléphone) à 6 par rangée.
 // Toutes les rangées partagent la même largeur de couverture ; une rangée plus courte est centrée.
 const MIN_CARD = 200;
-const GAP = 40;
-const maxBooksPerRow = (width: number) => Math.min(6, Math.max(2, Math.floor((width + GAP) / (MIN_CARD + GAP))));
+// Largeur maximale d'une couverture : au-delà, l'espace restant est réparti entre les livres et sur les côtés.
+const MAX_CARD = 240;
+// Écart entre couvertures : large sur ordinateur, resserré sur téléphone (sinon il mange la largeur).
+const gapFor = (width: number) => (width < 640 ? 16 : width < 900 ? 24 : 40);
+const maxBooksPerRow = (width: number) => Math.min(6, Math.max(2, Math.floor((width + gapFor(width)) / (MIN_CARD + gapFor(width)))));
 
 export function LibraryPage() {
   const { t } = useTranslation("library");
@@ -23,6 +26,7 @@ export function LibraryPage() {
   const [filters, setFilters] = useState<LibraryFilters>(noLibraryFilters);
   const galleryRef = useRef<HTMLDivElement>(null);
   const [maxPerRow, setMaxPerRow] = useState(4);
+  const [gap, setGap] = useState(40);
 
   // Les filtres viennent des livres réellement disponibles : jamais de catégorie fictive.
   const subjects = useMemo(() => distinctValues(books, (book) => t(book.subjectKey)), [books, t]);
@@ -38,7 +42,11 @@ export function LibraryPage() {
   useLayoutEffect(() => {
     const gallery = galleryRef.current;
     if (!gallery) return;
-    const update = () => setMaxPerRow(maxBooksPerRow(gallery.getBoundingClientRect().width || window.innerWidth));
+    const update = () => {
+      const width = gallery.getBoundingClientRect().width || window.innerWidth;
+      setMaxPerRow(maxBooksPerRow(width));
+      setGap(gapFor(width));
+    };
     update();
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(update);
@@ -57,7 +65,7 @@ export function LibraryPage() {
     }
     return result;
   }, [visibleBooks, maxPerRow]);
-  const columns = maxPerRow;
+  const columns = rows[0]?.length ?? 1;
 
   function toggle(field: "subject" | "level" | "collection", value: string) {
     setFilters((current) => ({ ...current, [field]: current[field] === value ? null : value }));
@@ -125,12 +133,12 @@ export function LibraryPage() {
         )}
 
         {visibleBooks.length > 0 ? (
-          <div ref={galleryRef} className={styles.gallery}>
+          <div ref={galleryRef} className={styles.gallery} style={{ gap }}>
             {rows.map((row, rowIndex) => (
               <div
                 key={row[0].id}
                 className={styles.row}
-                style={{ gridTemplateColumns: `repeat(${row.length}, calc((100% - ${(columns - 1) * GAP}px) / ${columns}))` }}
+                style={{ gap, gridTemplateColumns: `repeat(${row.length}, min(${MAX_CARD}px, calc((100% - ${(columns - 1) * gap}px) / ${columns})))` }}
               >
                 {row.map((book, index) => (
                   <BookCard key={book.id} book={book} lazy={rows.slice(0, rowIndex).reduce((n, r) => n + r.length, 0) + index >= EAGER_COVERS} />

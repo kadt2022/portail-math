@@ -2,7 +2,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: clamp(24px, 3vw, 40px);
   padding: clamp(18px, 3vw, 32px) 0 56px;
 }
 
@@ -50,18 +50,19 @@
   padding: 0 16px;
   border: 1px solid rgb(255 255 255 / 18%);
   border-radius: 999px;
-  background: rgb(255 255 255 / 8%);
-  color: #fff;
+  background: rgb(255 255 255 / 94%);
+  color: #14213d;
   font: inherit;
 }
 
 .search input::placeholder {
-  color: #aab4e6;
+  color: #5a6488;
 }
 
 .search input:focus-visible {
-  border-color: #fd5e53;
-  outline-color: #fd5e53;
+  border-color: transparent;
+  outline: 3px solid rgb(255 255 255 / 45%);
+  outline-offset: 2px;
 }
 
 .filters {
@@ -152,7 +153,8 @@
 .row {
   display: grid;
   gap: 40px;
-  justify-content: center;
+  /* Les livres se répartissent sur toute la largeur : écarts réguliers, marges latérales réduites. */
+  justify-content: space-evenly;
 }
 
 @media (max-width: 680px) {

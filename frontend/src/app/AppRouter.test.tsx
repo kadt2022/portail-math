@@ -74,6 +74,24 @@ describe("Routeur du portail React", () => {
     }
   });
 
+  it("replie le menu latéral par défaut sur les catalogues Jeux et Bibliothèque, pas ailleurs", () => {
+    // Bouton du menu pour ordinateur : « Déployer le menu » quand il est replié, « Réduire le menu » quand il est déployé (ou leurs équivalents anglais).
+    const desktopToggle = () => screen.getAllByLabelText(/(déployer|réduire|expand|collapse).*menu/i)[0];
+
+    const games = renderAt("/app/jeux");
+    expect(desktopToggle()).toHaveAttribute("aria-expanded", "false");
+    games.unmount();
+
+    mockLibraryCatalogue();
+    const library = renderAt("/app/bibliotheque");
+    expect(desktopToggle()).toHaveAttribute("aria-expanded", "false");
+    library.unmount();
+
+    const home = renderAt("/app");
+    expect(desktopToggle()).toHaveAttribute("aria-expanded", "true");
+    home.unmount();
+  });
+
   it("affiche le catalogue sur /app/jeux", () => {
     renderAt("/app/jeux");
     expect(screen.getByRole("heading", { level: 1, name: /les jeux/i })).toBeInTheDocument();

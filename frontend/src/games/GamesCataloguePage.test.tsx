@@ -15,11 +15,19 @@ function renderPage() {
 }
 
 describe("GamesCataloguePage", () => {
+  it("annonce l'espace des jeux avec son sous-titre", () => {
+    renderPage();
+    expect(screen.getByRole("heading", { level: 1, name: "Les jeux" })).toBeInTheDocument();
+    expect(screen.getByText("Découvre, joue et apprends avec nos jeux éducatifs")).toBeInTheDocument();
+  });
+
   it("met Léo à la une avec une bannière entièrement cliquable", () => {
     renderPage();
     const banner = screen.getAllByRole("link", { name: "Jouer à Conduire avec Léo" })[0];
     expect(banner).toHaveAttribute("href", "/jeux/conduire-avec-leo");
-    expect(within(banner).getByText("Jeu éducatif")).toBeInTheDocument();
+    // La bannière ne porte plus de pastilles (« Jeu éducatif », catégorie) : seulement le titre et l'accroche.
+    expect(within(banner).queryByText("Jeu éducatif")).not.toBeInTheDocument();
+    expect(within(banner).getByText("Conduire avec Léo")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^Jouer/ })).not.toBeInTheDocument();
   });
 

@@ -2,17 +2,37 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  --page-gap: clamp(24px, 3vw, 40px);
+  gap: var(--page-gap);
   padding: clamp(14px, 2.2vw, 26px) 0 40px;
   color: #fff;
 }
 
 .header {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+  isolation: isolate;
+}
+
+/* La lueur descend sous le haut de la bannière de Léo : le bleu se prolonge dans l'image, sans coupure. Pas de cadre : une simple lueur qui gagne en lumière vers la droite et se fond dans le fond noir (en bas comme à gauche). */
+.header::before {
+  position: absolute;
+  inset: -30px -16px -200px -16px;
+  z-index: -1;
+  background: linear-gradient(100deg, rgb(74 86 201 / 0%) 0%, rgb(74 86 201 / 22%) 35%, rgb(100 112 226 / 46%) 70%, rgb(135 147 248 / 66%) 100%);
+  content: "";
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 85%) 22%, rgb(0 0 0 / 60%) 42%, rgb(0 0 0 / 32%) 62%, rgb(0 0 0 / 12%) 82%, transparent 100%);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .header::before {
+    inset: -30px -24px -200px -24px;
+  }
 }
 
 .eyebrow {
@@ -30,6 +50,13 @@
   font-weight: 900;
 }
 
+.subtitle {
+  margin: 6px 0 0;
+  color: #dfe6ff;
+  font-size: clamp(14px, 1.5vw, 17px);
+  font-weight: 500;
+}
+
 .search {
   flex: 0 1 280px;
 }
@@ -38,20 +65,21 @@
   width: 100%;
   min-height: 44px;
   padding: 0 16px;
-  border: 1px solid rgb(255 255 255 / 18%);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: rgb(255 255 255 / 8%);
-  color: #fff;
+  background: rgb(255 255 255 / 94%);
+  color: #14213d;
   font: inherit;
 }
 
 .search input::placeholder {
-  color: #aab4e6;
+  color: #5a6488;
 }
 
 .search input:focus-visible {
-  border-color: #fd5e53;
-  outline-color: #fd5e53;
+  border-color: transparent;
+  outline: 3px solid rgb(255 255 255 / 45%);
+  outline-offset: 2px;
 }
 
 .chips {
@@ -61,11 +89,11 @@
 }
 
 .chip {
+  background: rgb(255 255 255 / 9%);
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 18%);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: transparent;
   color: #dfe6ff;
   cursor: pointer;
   font: inherit;
@@ -111,7 +139,21 @@
   display: grid;
   /* 12 colonnes : divisible par 1, 2, 3, 4 et 6, chaque carte en occupe une part entière (voir gallery-layout.ts). */
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 40px;
+  /* Écart vertical constant ; l'écart horizontal s'adapte : 11 écarts de 40 px dépasseraient un écran de téléphone. */
+  row-gap: 40px;
+  column-gap: 0;
+}
+
+@media (min-width: 560px) {
+  .grid {
+    column-gap: 20px;
+  }
+}
+
+@media (min-width: 900px) {
+  .grid {
+    column-gap: 40px;
+  }
 }
 
 @media (max-width: 899px) {

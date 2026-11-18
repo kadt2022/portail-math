@@ -17,7 +17,13 @@ export function AppLayout() {
   const catalogue = location.pathname.replace(/\/$/, "");
   const space: "games" | "library" | undefined = catalogue === "/jeux" ? "games" : catalogue === "/bibliotheque" ? "library" : undefined;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Sur les catalogues « Jeux » et « Bibliothèque », le menu latéral est replié par défaut (plus de place pour le contenu).
+  // Le choix de l'utilisateur prime ensuite, mais ne se perpétue pas d'un type de page à l'autre : en revenant sur une
+  // autre page, le menu retrouve son état habituel (déployé).
+  const collapsedByDefault = space !== undefined;
+  const [collapseChoice, setCollapseChoice] = useState<{ forDefault: boolean; collapsed: boolean } | null>(null);
+  const sidebarCollapsed = collapseChoice && collapseChoice.forDefault === collapsedByDefault ? collapseChoice.collapsed : collapsedByDefault;
+  const setSidebarCollapsed = (collapsed: boolean) => setCollapseChoice({ forDefault: collapsedByDefault, collapsed });
   const navId = useId();
   const shellRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -100,7 +106,7 @@ export function AppLayout() {
           aria-controls={navId}
           aria-label={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
           title={sidebarCollapsed ? t("expandMenu") : t("collapseMenu")}
-          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
           <span />
         </button>

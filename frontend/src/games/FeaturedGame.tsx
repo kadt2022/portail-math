@@ -2,13 +2,57 @@ import { Fragment, useEffect, useRef, useState, type PointerEvent } from "react"
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import skylineUrl from "../prototypes/leo-livreur/assets/leo-world-city-skyline-v1.webp";
+import countrysideUrl from "../prototypes/leo-livreur/assets/leo-countryside-v1.webp";
 
+import skylineUrl from "./assets/leo-city-skyline-2k.webp";
+import intercityBusUrl from "./assets/leo-bus-intercity.webp";
 import carUrl from "./assets/leo-car-front-banner.webp";
 import profileUrl from "./assets/leo-car-profile-banner.webp";
-import countrysideUrl from "./assets/leo-countryside-1280.webp";
 import type { GameCatalogueEntry } from "./game-catalogue";
 import styles from "./FeaturedGame.module.css";
+
+// Véhicules de la voie d'en face : ils roulent lentement de droite à gauche, une fois la voiture
+// de Léo arrêtée. Géométrie des roues en pixels de l'image (cx, cy = centre ; r = rayon), mesurée sur chaque dessin.
+interface Wheel {
+  cx: number;
+  cy: number;
+  r: number;
+}
+interface TrafficBus {
+  id: string;
+  src: string;
+  width: number;
+  height: number;
+  wheels: Wheel[];
+  delay: number;
+}
+const TRAFFIC: TrafficBus[] = [
+  {
+    id: "intercity",
+    src: intercityBusUrl,
+    width: 1970,
+    height: 660,
+    wheels: [
+      { cx: 514, cy: 555, r: 98 },
+      { cx: 1472, cy: 555, r: 100 },
+    ],
+    delay: 9400,
+  },
+];
+
+// Un disque de l'image posé sur chaque roue puis mis en rotation (même technique que pour la voiture de Léo).
+function wheelStyle(bus: TrafficBus, wheel: Wheel, src: string) {
+  const { width, height } = bus;
+  const size = wheel.r * 2;
+  return {
+    left: `${((wheel.cx - wheel.r) / width) * 100}%`,
+    top: `${((wheel.cy - wheel.r) / height) * 100}%`,
+    width: `${(size / width) * 100}%`,
+    backgroundImage: `url(${src})`,
+    backgroundSize: `${(width / size) * 100}% auto`,
+    backgroundPosition: `${((wheel.cx - wheel.r) / (width - size)) * 100}% ${((wheel.cy - wheel.r) / (height - size)) * 100}%`,
+  };
+}
 
 interface FeaturedGameProps {
   game: GameCatalogueEntry;
@@ -46,11 +90,25 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
       onPointerEnter={onPointerEnter}
       onFocus={(event) => event.currentTarget.matches(":focus-visible") && replay()}
     >
-      <img className={styles.sky} src={countrysideUrl} alt="" width={1280} height={427} fetchPriority="high" decoding="async" />
-      <img className={styles.city} src={skylineUrl} alt="" width={1024} height={341} decoding="async" />
+      <img className={styles.sky} src={countrysideUrl} alt="" width={2172} height={724} fetchPriority="high" decoding="async" />
+      <img className={styles.city} src={skylineUrl} alt="" width={2048} height={682} decoding="async" />
       <span className={styles.road} aria-hidden="true" />
       <Fragment key={play}>
         <span className={styles.carShadow} aria-hidden="true" />
+        {TRAFFIC.map((bus) => (
+          <span key={bus.id} className={styles.lane} style={{ animationDelay: `${bus.delay}ms` }} aria-hidden="true">
+            <span className={styles.bus} style={{ aspectRatio: `${bus.width} / ${bus.height}` }}>
+              <img src={bus.src} alt="" width={900} height={Math.round((bus.height * 900) / bus.width)} decoding="async" />
+              {bus.wheels.map((wheel) => (
+                <span
+                  key={wheel.cx}
+                  className={styles.busWheel}
+                  style={{ ...wheelStyle(bus, wheel, bus.src), animationDelay: `${bus.delay}ms` }}
+                />
+              ))}
+            </span>
+          </span>
+        ))}
         <span className={styles.run} aria-hidden="true">
           <span className={styles.profile}>
             <img src={profileUrl} alt="" width={700} height={409} decoding="async" />
@@ -66,10 +124,6 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
         <span className={styles.kicker}>{t("featured.label")}</span>
         <span className={styles.title}>{name}</span>
         <span className={styles.tagline}>{t(game.taglineKey)}</span>
-        <span className={styles.tags}>
-          <span>{t("featured.educational")}</span>
-          <span>{t(`categories.${game.categoryId}`)}</span>
-        </span>
       </span>
     </Link>
   );

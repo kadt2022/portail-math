@@ -59,6 +59,7 @@ export function GamesCataloguePage() {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>{t("cataloguePage.title")}</h1>
+          <p className={styles.subtitle}>{t("cataloguePage.subtitle")}</p>
         </div>
         <div className={styles.search} role="search">
           <input
