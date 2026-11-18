@@ -13,6 +13,7 @@ export const ZONE_SPEED_LIMITS_KMH: Record<WorldZoneKind, number> = {
   village: 50,
   bridge: 70,
   "city-entry": 50,
+  boulevard: 40,
   residential: 50,
   market: 50,
   school: 30,

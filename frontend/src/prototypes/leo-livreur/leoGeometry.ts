@@ -34,7 +34,22 @@ export const VEHICLE_LENGTH = 124;
 export const VEHICLE_WIDTH = 36;
 
 /** Maisons rapprochées du bord, en conservant une marge hors chaussée. */
-export const HOUSE_ROW_Y = 880;
+/** Ligne de base des façades côté bas : les maisons reposent sur le jardin derrière le trottoir. */
+export const HOUSE_ROW_Y = 865;
+export const HOUSE_ROW_NORTH_Y = ROAD_Y - (HOUSE_ROW_Y - ROAD_Y);
+export const ZONE1_HOUSE_COUNT = 32;
+export const ZONE1_FIRST_HOUSE_X = 500;
+export const ZONE1_HOUSE_SPACING = 210;
+const ZONE1_SEGMENT_WIDTH = 2400;
+
+/** Évite qu'un grand sprite de maison soit coupé exactement sur une frontière de zone. */
+export function zone1HouseX(index: number) {
+  let x = ZONE1_FIRST_HOUSE_X + index * ZONE1_HOUSE_SPACING;
+  for (let boundary = ZONE1_SEGMENT_WIDTH; boundary <= 3 * ZONE1_SEGMENT_WIDTH; boundary += ZONE1_SEGMENT_WIDTH) {
+    if (Math.abs(x - boundary) < 130) x += x < boundary ? -150 : 150;
+  }
+  return x;
+}
 
 export const START_POSITION = { x: 300, y: MAIN_LANE_Y } as const;
 
@@ -48,43 +63,21 @@ export interface LeoDestination {
   house: { x: number; y: number };
 }
 
-const INITIAL_DESTINATIONS: readonly LeoDestination[] = [
-  {
-    id: "house-1",
-    label: "Maison 1",
-    stop: { x: 750, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 750, y: HOUSE_ROW_Y },
+/** Les 32 maisons de la Zone 1, réparties avant le pont et dans l'ordre du parcours. */
+const INITIAL_DESTINATIONS: readonly LeoDestination[] = Array.from(
+  { length: ZONE1_HOUSE_COUNT },
+  (_, index) => {
+    const x = zone1HouseX(index);
+    const houseY = index % 2 === 0 ? HOUSE_ROW_NORTH_Y : HOUSE_ROW_Y;
+    return {
+      id: `house-${index + 1}`,
+      label: `Maison ${index + 1}`,
+      stop: { x, y: MAIN_LANE_Y },
+      radius: 90,
+      house: { x, y: houseY },
+    };
   },
-  {
-    id: "house-2",
-    label: "Maison 2",
-    stop: { x: 1050, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1050, y: HOUSE_ROW_Y },
-  },
-  {
-    id: "house-3",
-    label: "Maison 3",
-    stop: { x: 1350, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1350, y: HOUSE_ROW_Y },
-  },
-  {
-    id: "house-4",
-    label: "Maison 4",
-    stop: { x: 1650, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1650, y: HOUSE_ROW_Y },
-  },
-  ...[2600, 3800, 5100, 6400, 7700, 9000, 10300, 11600].map((x, index) => ({
-    id: `house-${index + 5}`,
-    label: `Maison ${index + 5}`,
-    stop: { x, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x, y: HOUSE_ROW_Y },
-  })),
-];
+);
 
 export const DESTINATIONS: readonly LeoDestination[] = INITIAL_DESTINATIONS;
 

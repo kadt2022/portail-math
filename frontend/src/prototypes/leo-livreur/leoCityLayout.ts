@@ -110,9 +110,11 @@ export function cityLayout(): CityLayout {
  * douceur : campagne (rien), pont (regarde plus haut), ville (plus haut et plus large).
  */
 export function cameraProfile(x: number, bridgeOffset: number) {
-  const city = cityLayout();
   const bridge = bridgeBlend(x, BRIDGE_START_X, BRIDGE_END_X);
-  const town = bridgeBlend(x, BRIDGE_END_X, city.panelEnd, 800);
+  // Après l'entrée de ville, le parcours reste urbain (zone 4 puis quartiers suivants).
+  // Le profil se défait naturellement si Léo recule vers le pont, mais ne retombe plus
+  // au profil campagne entre deux panneaux urbains.
+  const town = Math.max(0, Math.min(1, (x - (BRIDGE_END_X - 800)) / 800));
   return {
     offset: bridgeOffset * bridge * (1 - town) + CITY_CAMERA_OFFSET * town,
     zoomFactor: 1 - (1 - CITY_ZOOM_FACTOR) * town,

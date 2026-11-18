@@ -2,10 +2,10 @@
 export const WORLD_ZONE_WIDTH = 2400;
 export const WORLD_ZONE_WINDOW = 3;
 
-export type WorldZoneKind = "village" | "bridge" | "city-entry" | "residential" | "market" | "school";
+export type WorldZoneKind = "village" | "bridge" | "city-entry" | "boulevard" | "residential" | "market" | "school";
 
 const ZONE_SEQUENCE: readonly WorldZoneKind[] = [
-  "village", "village", "village", "bridge", "bridge", "city-entry", "residential", "market", "school",
+  "village", "village", "village", "bridge", "bridge", "city-entry", "boulevard", "residential", "market", "school",
 ];
 const REPEATING_ZONE_START = 5;
 

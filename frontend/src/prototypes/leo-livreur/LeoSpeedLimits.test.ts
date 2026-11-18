@@ -32,10 +32,11 @@ const step = (manager: TrafficManager) => manager.update(FRAME, { viewMinX: -1e9
 describe("limites de vitesse par zone", () => {
   it("fixe une limite à chaque zone : village 50, pont 70, ville 50, école 30 km/h", () => {
     expect(ZONE_SPEED_LIMITS_KMH.village).toBe(50);
+    expect(ZONE_SPEED_LIMITS_KMH.boulevard).toBe(40);
     expect(pxToKmh(speedLimitAt(WORLD_ZONE_WIDTH * 0.5))).toBeCloseTo(50, 9);
     expect(pxToKmh(speedLimitAt((BRIDGE_START_X + BRIDGE_END_X) / 2))).toBeCloseTo(70, 9);
     expect(pxToKmh(speedLimitAt(BRIDGE_END_X + 100))).toBeCloseTo(50, 9);
-    expect(pxToKmh(speedLimitAt(WORLD_ZONE_WIDTH * 8.5))).toBeCloseTo(30, 9);
+    expect(pxToKmh(speedLimitAt(WORLD_ZONE_WIDTH * 9.5))).toBeCloseTo(30, 9);
   });
 
   it("anticipe une zone plus lente : la limite à respecter décroît continûment jusqu'au panneau", () => {
@@ -106,7 +107,7 @@ describe("le trafic adapte sa vitesse à la zone", () => {
       if (vehicle.x > BRIDGE_START_X && vehicle.x < BRIDGE_END_X) fastest = Math.max(fastest, pxToKmh(vehicle.speed));
     }
     expect(fastest).toBeGreaterThan(65);
-    const school = driver("same", WORLD_ZONE_WIDTH * 8 - 1500, 1, kmhToPx(50));
+    const school = driver("same", WORLD_ZONE_WIDTH * 9 - 1500, 1, kmhToPx(50));
     for (let frame = 0; frame < 60 * 10; frame += 1) step(school.manager);
     expect(pxToKmh(school.vehicle.speed)).toBeLessThanOrEqual(31);
   });

@@ -10,15 +10,37 @@ import taxiTrafficUrl from "./assets/leo-traffic-taxi-occupied-v1.webp";
 import minibusTrafficUrl from "./assets/leo-traffic-minibus-v1.webp";
 import frontCarUrl from "./assets/leo-car-front.webp";
 import houseUrl from "./assets/leo-house-turquoise.webp";
+import nearSideHouseUrl from "./assets/leo-house-near-side-v1.png";
+import villageTreeUrl from "./assets/leo-tree-v1.png";
+import nearSideFlowersUrl from "./assets/leo-flowers-near-side-v1.png";
+import nearSideGardenUrl from "./assets/leo-garden-near-side-v1.jpg";
+import houseYellowUrl from "./assets/leo-house-yellow-v1-compact.png";
 import leftCarUrl from "./assets/leo-car-left.webp";
 import rightCarUrl from "./assets/leo-car-right.webp";
 import bridgeLayerUrl from "./assets/leo-world-suspension-bridge-layer-v2.webp";
 import bridgeDeckUrl from "./assets/leo-world-bridge-deck-v1.webp";
 import bridgeRailUrl from "./assets/leo-world-bridge-rail-v1.webp";
+import villageBackdropUrl from "./assets/leo-world-village-zone1-backdrop-v1.png";
 import { BRIDGE_CAMERA_OFFSET, bridgeLayout, cameraZoomFor, DECK, RAIL, SKY_COLOR, SUSPENSION, WATER_COLOR } from "./leoBridgeLayout";
 import cityTopUrl from "./assets/leo-world-city-top-v1.webp";
 import cityBottomUrl from "./assets/leo-world-city-bottom-v1.webp";
+import boulevardZone4Url from "./assets/leo-world-boulevard-zone4-v7-seated-below-crop.png";
+import pedestrianManUrl from "./assets/leo-pedestrian-man-walk-v1.png";
+import pedestrianWomanUrl from "./assets/leo-pedestrian-woman-walk-v1.png";
+import pedestrianChildUrl from "./assets/leo-pedestrian-child-walk-v1.png";
+import pedestrianDepthFrontUrl from "./assets/leo-pedestrian-depth-front-walk-v1.png";
+import pedestrianDepthBackUrl from "./assets/leo-pedestrian-depth-back-walk-v1.png";
 import { cameraProfile, CITY_FADE, CITY_REF, cityLayout } from "./leoCityLayout";
+import { BOULEVARD_FADE, BOULEVARD_REF, boulevardLayout, boulevardSignals } from "./leoBoulevardLayout";
+import {
+  boulevardDepthPedestrians,
+  boulevardPedestrians,
+  pedestrianExitAlpha,
+  PEDESTRIAN_FRAME,
+  PEDESTRIAN_FRAMES,
+  type DepthPedestrianSpec,
+  type PedestrianSpec,
+} from "./leoPedestrians";
 import crossBusUrl from "./assets/leo-cross-bus-v1.webp";
 import crossLimousineUrl from "./assets/leo-cross-limousine-v1.webp";
 import crossSedanUrl from "./assets/leo-cross-sedan-v1.webp";
@@ -167,14 +189,33 @@ const TEXTURE_URLS: Record<string, string> = {
   "leo-car-front": frontCarUrl,
   "leo-car-back": backCarUrl,
   "leo-house": houseUrl,
+  "leo-house-near-side": nearSideHouseUrl,
+  "leo-tree": villageTreeUrl,
+  "leo-flowers-near-side": nearSideFlowersUrl,
+  "leo-garden-near-side": nearSideGardenUrl,
+  "leo-house-yellow": houseYellowUrl,
   "leo-world-bridge-deck": bridgeDeckUrl,
   "leo-world-bridge-rail": bridgeRailUrl,
   "leo-world-suspension-bridge-layer": bridgeLayerUrl,
+  "leo-world-village-zone1-backdrop": villageBackdropUrl,
   "leo-world-city-top": cityTopUrl,
   "leo-world-city-bottom": cityBottomUrl,
+  "leo-world-boulevard-zone4": boulevardZone4Url,
+  "leo-pedestrian-man-sheet": pedestrianManUrl,
+  "leo-pedestrian-woman-sheet": pedestrianWomanUrl,
+  "leo-pedestrian-child-sheet": pedestrianChildUrl,
+  "leo-pedestrian-depth-front-sheet": pedestrianDepthFrontUrl,
+  "leo-pedestrian-depth-back-sheet": pedestrianDepthBackUrl,
   "leo-cross-sedan-turn": crossSedanTurnUrl,
 };
 const BRIDGE_SOURCE_KEY = "leo-world-suspension-bridge-layer";
+const PEDESTRIAN_SHEETS = [
+  ["leo-pedestrian-man-sheet", "leo-pedestrian-man"],
+  ["leo-pedestrian-woman-sheet", "leo-pedestrian-woman"],
+  ["leo-pedestrian-child-sheet", "leo-pedestrian-child"],
+  ["leo-pedestrian-depth-front-sheet", "leo-pedestrian-depth-front"],
+  ["leo-pedestrian-depth-back-sheet", "leo-pedestrian-depth-back"],
+] as const;
 const FADED_BRIDGE_KEYS = [
   "leo-world-suspension-bridge-layer-faded",
   "leo-world-suspension-bridge-layer-faded-start",
@@ -191,6 +232,7 @@ const derivedTexturesFor = (bundle: BundleId): string[] => {
       ...SHEET_VIEWS.flatMap((view) => (SHEET_WHEELS[view.angle] ?? []).map((_wheel, index) => turnWheelTextureKey(view.angle, index))),
       wheelTextureKey(SEDAN_TURN_PROFILE, 0),
       wheelTextureKey(SEDAN_TURN_PROFILE, 1),
+      ...PEDESTRIAN_SHEETS.map(([, textureKey]) => textureKey),
     ];
   }
   return [];
@@ -208,9 +250,18 @@ const ROAD_SURFACE_COLOR = 0x4b4b55;
 /** Fondus du calque de suspension, en fraction de sa largeur : court entre copies, long aux deux bouts du pont. */
 const SHORT_FADE = 0.12;
 const BRIDGE_ENTRY_FADE = 0.4;
-/** Quatre copies du premier groupe de huit maisons : 8 × (1 + n) = 40 maisons. */
-const VILLAGE_COPY_COUNT = 4;
-const VILLAGE_BLOCK_SPACING = 1350;
+const HOUSE_SIGN_STYLE = {
+  fontFamily: "Arial Black, Arial, sans-serif",
+  fontSize: "16px",
+  color: "#17324d",
+  stroke: "#ffffff",
+  strokeThickness: 4,
+  align: "center" as const,
+};
+const FAR_SIDE_HOUSE_KEYS = [
+  "leo-house",
+  "leo-house-yellow",
+] as const;
 
 const wheelTextureKey = (spec: VehicleSpec, index: number) => `wheel-${spec.textureKey}-${index}`;
 
@@ -220,6 +271,23 @@ interface TrafficView {
   wheels: [Phaser.GameObjects.Image, Phaser.GameObjects.Image];
   spec: VehicleSpec | null;
   flipped: boolean;
+}
+
+interface PedestrianView {
+  sprite: Phaser.GameObjects.Sprite;
+  spec: PedestrianSpec;
+  x: number;
+  direction: 1 | -1;
+  walked: number;
+  gone: boolean;
+}
+
+interface DepthPedestrianView {
+  sprite: Phaser.GameObjects.Sprite;
+  spec: DepthPedestrianSpec;
+  y: number;
+  walked: number;
+  gone: boolean;
 }
 
 export class LeoLivreurScene extends Phaser.Scene {
@@ -240,9 +308,13 @@ export class LeoLivreurScene extends Phaser.Scene {
   private travelledPx = 0;
   /** Contrôleur de feux commun : il ne rend jamais le vert à des mouvements incompatibles. */
   private readonly intersection = new IntersectionController();
+  /** Même contrôleur que la zone 3, dédié aux trois carrefours du boulevard. */
+  private readonly boulevardIntersection = new IntersectionController();
   private lightGraphics?: Phaser.GameObjects.Graphics;
   private mainHeads?: Phaser.GameObjects.Graphics;
   private mainHeadDrawn: LightState | null = null;
+  private boulevardHeads?: Phaser.GameObjects.Graphics;
+  private boulevardHeadDrawn: LightState | null = null;
   private readonly cross = new CrossTrafficManager({ capacity: CROSS_CAPACITY, specs: CROSS_SPECS });
   private crossViews?: CrossViews;
   // Rue des Jardins : une berline de face qui avance en profondeur, sans virage (expérience).
@@ -262,6 +334,8 @@ export class LeoLivreurScene extends Phaser.Scene {
   private sceneryZones = new Map<number, Phaser.GameObjects.Container>();
   private roadZones = new Map<number, Phaser.GameObjects.Graphics>();
   private bridgeDecorZones = new Map<number, Phaser.GameObjects.GameObject[]>();
+  private pedestrians: PedestrianView[] = [];
+  private depthPedestrians: DepthPedestrianView[] = [];
   private lastZoneWindow = "";
   // Mode diagnostic : développement uniquement, activé par ?debug (pas de route ni d'API).
   private readonly debugMode = import.meta.env.DEV
@@ -391,7 +465,11 @@ export class LeoLivreurScene extends Phaser.Scene {
     if (bundle === "bridge") {
       return ["leo-world-bridge-rail", ...FADED_BRIDGE_KEYS].every((key) => this.textures.exists(key));
     }
-    return ["leo-world-city-top", "leo-world-city-bottom", ...SHEET_VIEWS.map((view) => turnTextureKey(view.angle))]
+    return [
+      "leo-world-city-top", "leo-world-city-bottom", "leo-world-boulevard-zone4",
+      ...PEDESTRIAN_SHEETS.map(([, textureKey]) => textureKey),
+      ...SHEET_VIEWS.map((view) => turnTextureKey(view.angle)),
+    ]
       .every((key) => this.textures.exists(key));
   }
 
@@ -451,6 +529,7 @@ export class LeoLivreurScene extends Phaser.Scene {
       this.createWheelTextures(SEDAN_TURN_PROFILE);
       this.textures.remove(TURN_SHEET.key);
     }
+    this.createPedestrianTextures();
     if (this.depthSprites.size === 0) {
       // Les 7 vues de la berline : ancrées au contact au sol de la roue avant gauche. Aucune rotation, aucun miroir.
       for (const view of SHEET_VIEWS) {
@@ -460,6 +539,93 @@ export class LeoLivreurScene extends Phaser.Scene {
           return { holder: this.add.container(0, 0, [disc]).setVisible(false), disc };
         }));
       }
+    }
+    this.createPedestrians();
+  }
+
+  /** Convertit les trois planches transparentes en vraies planches Phaser à quatre images. */
+  private createPedestrianTextures() {
+    for (const [sheetKey, textureKey] of PEDESTRIAN_SHEETS) {
+      if (this.textures.exists(textureKey) || !this.textures.exists(sheetKey)) continue;
+      const source = this.textures.get(sheetKey).getSourceImage() as HTMLImageElement;
+      this.textures.addSpriteSheet(textureKey, source, {
+        frameWidth: PEDESTRIAN_FRAME.width,
+        frameHeight: PEDESTRIAN_FRAME.height,
+      });
+    }
+  }
+
+  /** Les passants ne sont présents que lorsque le lot urbain est prêt, puis sont recyclés avec lui. */
+  private createPedestrians() {
+    if (this.pedestrians.length > 0) return;
+    this.pedestrians = boulevardPedestrians().map((spec) => {
+      const direction = (Math.sign(spec.speed) || 1) as 1 | -1;
+      const sprite = this.add.sprite(spec.x, spec.groundY, spec.textureKey, PEDESTRIAN_FRAMES[spec.phase])
+        .setOrigin(0.5, 1)
+        .setScale(spec.scale)
+        .setDepth(4);
+      sprite.setFlipX(direction !== spec.nativeDirection);
+      return { sprite, spec, x: spec.x, direction, walked: 0, gone: false };
+    });
+    this.depthPedestrians = boulevardDepthPedestrians().map((spec) => ({
+      sprite: this.add.sprite(spec.x, spec.y, spec.textureKey, PEDESTRIAN_FRAMES[spec.phase])
+        .setOrigin(0.5, 1)
+        .setScale(spec.startScale)
+        // Au-dessus du décor urbain (1.55–2), sous les véhicules (6+), pour rester lisible sans flotter.
+        .setDepth(5.2),
+      spec,
+      y: spec.y,
+      walked: 0,
+      gone: false,
+    }));
+  }
+
+  /** Marche régulière : déplacement horizontal et changement de pose, sans rebond ni mouvement vertical. */
+  private updatePedestrians(seconds: number) {
+    const pedestrianMayCross = this.boulevardIntersection.state.main === "RED";
+    for (const pedestrian of this.pedestrians) {
+      if (pedestrian.gone) continue;
+      const speed = Math.abs(pedestrian.spec.speed);
+      let distance = speed * seconds;
+      const waitAt = pedestrian.spec.waitAtX;
+      const reachesSignal = waitAt !== undefined && pedestrian.direction * (waitAt - pedestrian.x) >= 0
+        && pedestrian.direction * (waitAt - (pedestrian.x + pedestrian.direction * distance)) < 0;
+      if (reachesSignal && !pedestrianMayCross) {
+        distance = Math.max(0, Math.abs(waitAt - pedestrian.x));
+      }
+      pedestrian.x += pedestrian.direction * distance;
+      pedestrian.walked += distance;
+      const reachedExit = pedestrian.direction * (pedestrian.x - pedestrian.spec.exitX) >= 0;
+      const alpha = pedestrianExitAlpha(pedestrian.x, pedestrian.spec);
+      if (reachedExit || alpha <= 0) {
+        pedestrian.gone = true;
+        pedestrian.sprite.setVisible(false);
+        continue;
+      }
+      // Une foulée = environ 24 px : quatre poses réparties sur 6 px donnent une cadence liée à la vitesse.
+      const frame = PEDESTRIAN_FRAMES[Math.floor(pedestrian.walked / 6) % PEDESTRIAN_FRAMES.length];
+      pedestrian.sprite.setPosition(pedestrian.x, pedestrian.spec.groundY).setFrame(frame).setAlpha(alpha);
+    }
+    for (const pedestrian of this.depthPedestrians) {
+      if (pedestrian.gone) continue;
+      let distance = pedestrian.spec.speed * seconds;
+      const reachesSignal = Math.sign(distance) * (pedestrian.spec.waitY - pedestrian.y) >= 0
+        && Math.sign(distance) * (pedestrian.spec.waitY - (pedestrian.y + distance)) < 0;
+      if (reachesSignal && !pedestrianMayCross) distance = pedestrian.spec.waitY - pedestrian.y;
+      pedestrian.y += distance;
+      pedestrian.walked += Math.abs(distance);
+      const total = Math.abs(pedestrian.spec.exitY - pedestrian.spec.y);
+      const progress = Math.min(1, Math.abs(pedestrian.y - pedestrian.spec.y) / total);
+      const scale = Phaser.Math.Linear(pedestrian.spec.startScale, pedestrian.spec.endScale, progress);
+      const alpha = Math.max(0, Math.min(1, Math.abs(pedestrian.spec.exitY - pedestrian.y) / 38));
+      const reachedExit = Math.sign(pedestrian.spec.speed) * (pedestrian.y - pedestrian.spec.exitY) >= 0;
+      if (reachedExit || alpha <= 0) {
+        pedestrian.gone = true;
+        pedestrian.sprite.setVisible(false);
+        continue;
+      }
+      const frame = PEDESTRIAN_FRAMES[Math.floor(pedestrian.walked / 5) % PEDESTRIAN_FRAMES.length];
+      pedestrian.sprite.setPosition(pedestrian.spec.x, pedestrian.y).setScale(scale).setAlpha(alpha).setFrame(frame);
     }
   }
 
@@ -477,6 +643,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       for (const wheels of this.depthWheels.values()) for (const wheel of wheels) wheel.holder.destroy();
       this.depthSprites.clear();
       this.depthWheels.clear();
+      for (const pedestrian of this.pedestrians) pedestrian.sprite.destroy();
+      this.pedestrians = [];
+      for (const pedestrian of this.depthPedestrians) pedestrian.sprite.destroy();
+      this.depthPedestrians = [];
       for (const view of this.trafficViews) {
         if (view.spec === SEDAN_TURN_PROFILE) {
           view.spec = null;
@@ -722,6 +892,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.updateWorldZones();
     if (this.motion.x > WORLD_WIDTH - 20_000) this.cameras.main.setBounds(0, 0, this.motion.x + 1_000_000, WORLD_HEIGHT);
     this.updateTraffic(seconds, delta);
+    this.updatePedestrians(seconds);
     if (!this.car) return;
     const steeringPulseActive = this.time.now < this.steeringPulseUntil;
     const playerResuming = this.controls.forward || this.controls.reverse || this.controls.left || this.controls.right || steeringPulseActive;
@@ -836,6 +1007,8 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.traffic.reset();
     this.cross.reset();
     this.depthTraffic.reset();
+    this.intersection.reset();
+    this.boulevardIntersection.reset();
     this.intersection.reset();
     this.signalJudge.reset();
     this.signalReadoutKey = "";
@@ -1034,6 +1207,26 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
   }
 
+  /** Les têtes dessinées sur le panorama de zone 4 sont recouvertes par leur état réel. */
+  private drawBoulevardHeads(state: LightState) {
+    const g = this.boulevardHeads;
+    if (!g || !g.active || this.boulevardHeadDrawn === state) return;
+    this.boulevardHeadDrawn = state;
+    g.clear();
+    for (const signal of boulevardSignals()) {
+      const w = 42;
+      const h = 88;
+      g.fillStyle(0x1d2430, 1).fillRoundedRect(signal.x - w / 2, signal.y - h / 2, w, h, 8);
+      g.lineStyle(3, 0x0b0f16, 1).strokeRoundedRect(signal.x - w / 2, signal.y - h / 2, w, h, 8);
+      const lamps: Array<[LightState, number, number]> = [["RED", -25, 0xff3b30], ["YELLOW", 0, 0xffc21a], ["GREEN", 25, 0x2ee06b]];
+      for (const [lamp, offset, color] of lamps) {
+        const lit = lamp === state;
+        if (lit) g.fillStyle(color, 0.28).fillCircle(signal.x, signal.y + offset, 16);
+        g.fillStyle(lit ? color : 0x39414d, 1).fillCircle(signal.x, signal.y + offset, 8);
+      }
+    }
+  }
+
   /**
    * Indicateur d'approche : distance jusqu'à la ligne d'arrêt, dans les mêmes unités que le compteur. On ne republie
    * que lorsque ce qui est affiché change (dizaine de mètres, état du feu, consigne).
@@ -1133,7 +1326,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       { y: DECK.firstRow, h: DECK.lastRow - DECK.firstRow + 1 }, layout.deckTop - DECK.firstRow * layout.deckScale, 1,
       startX, endX);
 
-    if (this.assets.state("city") === "ready") this.addCityDecor(objects, strip, startX, endX);
+    if (this.assets.state("city") === "ready") {
+      this.addCityDecor(objects, strip, startX, endX);
+      this.addBoulevardDecor(objects, strip, startX, endX);
+    }
 
     if (endX <= bridgeStartX || startX >= bridgeEndX) return objects;
     // Pont pas encore téléchargé : aucune texture manquante affichée (la conduite attend le lot, voir assetsBlocking).
@@ -1146,21 +1342,6 @@ export class LeoLivreurScene extends Phaser.Scene {
     fadedStrip("leo-world-bridge-rail", bridgeStartX, layout.railTileWidth, layout.railScale,
       { y: RAIL.wallTopRow, h: RAIL.baseRow - RAIL.wallTopRow + 6 }, layout.frontRailBase - RAIL.baseRow * layout.railScale, 11,
       bridgeStartX, bridgeEndX);
-
-    // Ciel au-dessus et eau au-dessous (écrans hauts), fondus comme le reste du pont.
-    const band = this.add.graphics().setDepth(-4.5);
-    const fillBand = (color: number, y0: number, y1: number) => {
-      const from = Math.max(startX, bridgeStartX);
-      const to = Math.min(endX, bridgeEndX);
-      const fadeIn = startX <= bridgeStartX ? Math.min(ramp, to - from) : 0;
-      const fadeOut = endX >= bridgeEndX ? Math.min(ramp, to - from - fadeIn) : 0;
-      band.fillStyle(color, 1).fillRect(from + fadeIn, y0, to - from - fadeIn - fadeOut, y1 - y0);
-      if (fadeIn > 0) band.fillGradientStyle(color, color, color, color, 0, 1, 0, 1).fillRect(from, y0, fadeIn, y1 - y0);
-      if (fadeOut > 0) band.fillGradientStyle(color, color, color, color, 1, 0, 1, 0).fillRect(to - fadeOut, y0, fadeOut, y1 - y0);
-    };
-    fillBand(SKY_COLOR, 0, layout.topPartBottom - SUSPENSION.topEnd * SUSPENSION.height * layout.suspensionScale + 4);
-    fillBand(WATER_COLOR, layout.bottomPartTop + (1 - SUSPENSION.bottomStart) * SUSPENSION.height * layout.suspensionScale - 4, WORLD_HEIGHT);
-    objects.push(band);
 
     // Calque de suspension : partie haute (pylônes, câbles) derrière, partie basse (arches, rivière) sous le tablier.
     if (kind === "bridge") {
@@ -1215,15 +1396,13 @@ export class LeoLivreurScene extends Phaser.Scene {
       const from = city.panelX;
       const to = city.panelEnd;
       const inEnd = from + CITY_FADE;
-      const outStart = to - CITY_FADE;
-      strip(key, from, city.panelWidth, city.scale, { y: cropY, h: cropH }, topOfFrame, depth, inEnd, outStart);
+      // La zone 4 recouvre les 300 derniers pixels de ce panneau. On garde donc la zone 3
+      // totalement opaque jusqu'à son bord droit ; le panneau suivant passe devant en fondu.
+      // Ainsi, la somme des opacités ne tombe jamais sous 1 et aucun ciel bleu ne transparaît.
+      strip(key, from, city.panelWidth, city.scale, { y: cropY, h: cropH }, topOfFrame, depth, inEnd, to);
       for (let x = from; x < inEnd; x += step) {
         const alpha = Math.max(0.03, Math.min(1, (x + step / 2 - from) / CITY_FADE));
         strip(key, from, city.panelWidth, city.scale, { y: cropY, h: cropH }, topOfFrame, depth, x, Math.min(x + step, inEnd), alpha);
-      }
-      for (let x = outStart; x < to; x += step) {
-        const alpha = Math.max(0.03, Math.min(1, (to - (x + step / 2)) / CITY_FADE));
-        strip(key, from, city.panelWidth, city.scale, { y: cropY, h: cropH }, topOfFrame, depth, x, Math.min(x + step, to), alpha);
       }
     };
     // Ciel plein sous le fondu croisé pont → ville : pas de trou vert pendant la transition.
@@ -1261,24 +1440,235 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Zone 4 : le panorama fourni est utilisé sans sa chaussée peinte. Le haut et la promenade du bas
+   * encadrent donc la route continue du moteur ; un fondu court le raccorde à l'entrée de ville puis
+   * au quartier résidentiel suivant. Les trois boîtiers sont redessinés par Phaser afin d'afficher
+   * leur cycle réel et d'arrêter le trafic à leurs lignes.
+   */
+  private addBoulevardDecor(
+    objects: Phaser.GameObjects.GameObject[],
+    strip: (
+      key: string, anchor: number, tileWidth: number, scale: number,
+      crop: { y: number; h: number }, topOfFrame: number, depth: number, a: number, b: number, alpha?: number,
+    ) => void,
+    startX: number,
+    endX: number,
+  ) {
+    const boulevard = boulevardLayout();
+    if (endX <= boulevard.panelX - BOULEVARD_FADE || startX >= boulevard.panelEnd + BOULEVARD_FADE) return;
+    const step = 40;
+    const drawSlice = (a: number, b: number, alpha = 1) => {
+      strip(
+        "leo-world-boulevard-zone4",
+        boulevard.panelX,
+        boulevard.panelWidth,
+        boulevard.scale,
+        { y: 0, h: BOULEVARD_REF.topRows },
+        boulevard.topY,
+        1.55,
+        a,
+        b,
+        alpha,
+      );
+      strip(
+        "leo-world-boulevard-zone4",
+        boulevard.panelX,
+        boulevard.panelWidth,
+        boulevard.scale,
+        { y: BOULEVARD_REF.bottomStartRow, h: BOULEVARD_REF.bottomRows },
+        boulevard.bottomOriginY,
+        1.55,
+        a,
+        b,
+        alpha,
+      );
+    };
+    const inEnd = boulevard.panelX + BOULEVARD_FADE;
+    const outStart = boulevard.panelEnd - BOULEVARD_FADE;
+    drawSlice(inEnd, outStart);
+    for (let x = boulevard.panelX; x < inEnd; x += step) {
+      const alpha = Math.max(0.03, Math.min(1, (x + step / 2 - boulevard.panelX) / BOULEVARD_FADE));
+      drawSlice(x, Math.min(x + step, inEnd), alpha);
+    }
+    for (let x = outStart; x < boulevard.panelEnd; x += step) {
+      const alpha = Math.max(0.03, Math.min(1, (boulevard.panelEnd - (x + step / 2)) / BOULEVARD_FADE));
+      drawSlice(x, Math.min(x + step, boulevard.panelEnd), alpha);
+    }
+    // Le panorama s'arrête avant la limite verticale du monde. On prolonge son herbe
+    // sous la promenade, plutôt que de laisser apparaître le vert générique de la scène.
+    const grass = this.add.graphics().setDepth(1.5);
+    // Dégradé raccordé à la dernière rangée d'herbe : aucune bande uniforme ne révèle la hauteur mobile.
+    grass.fillGradientStyle(0x8fbd4c, 0x8fbd4c, 0x8da502, 0x8da502, 1, 1, 1, 1).fillRect(
+      Math.max(startX, boulevard.panelX),
+      boulevard.bottomEnd - 2,
+      Math.min(endX, boulevard.panelEnd) - Math.max(startX, boulevard.panelX),
+      WORLD_HEIGHT - boulevard.bottomEnd + 2,
+    );
+    objects.push(grass);
+    const signals = boulevardSignals().filter((signal) => signal.x >= startX && signal.x < endX);
+    if (signals.length === 0) return;
+    const lines = this.add.graphics().setDepth(1.2);
+    const roadTop = ROAD_Y - ROAD_HALF_WIDTH;
+    for (const signal of signals) {
+      lines.fillStyle(0xffffff, 0.95).fillRect(signal.stopLineEast, ROAD_Y + 8, 8, ROAD_HALF_WIDTH - 12);
+      lines.fillStyle(0xffffff, 0.95).fillRect(signal.stopLineWest, roadTop + 4, 8, ROAD_HALF_WIDTH - 12);
+    }
+    objects.push(lines);
+    this.boulevardHeads = this.add.graphics().setDepth(3);
+    this.boulevardHeadDrawn = null;
+    objects.push(this.boulevardHeads);
+    this.drawBoulevardHeads(this.boulevardIntersection.state.main);
+  }
+
+  private addNearSideHouse(container: Phaser.GameObjects.Container, x: number, address: number, sidewalkEdge: number) {
+    const plotIndex = address / 2 - 1;
+    const direction = plotIndex % 3 === 1 ? -1 : 1;
+    // Sur les 300 lignes du PNG, la silhouette occupe les lignes 19 à 282.
+    const visibleTop = 19 / 300;
+    const visibleHeight = 264 / 300;
+    const height = Math.min(176 - (plotIndex % 3) * 3, (WORLD_HEIGHT - sidewalkEdge - 2) / visibleHeight);
+    const top = sidewalkEdge + 1 - height * visibleTop;
+    const plot = this.add.image(x, top, "leo-house-near-side").setOrigin(0.5, 0).setFlipX(direction < 0);
+    plot.setDisplaySize(Math.min(305, height * (plot.width / plot.height) * 1.10), height);
+
+    // Ancrages du portillon et du poteau, mesurés dans le sprite.
+    const gateX = x + direction * plot.displayWidth * 0.274;
+    const gateY = top + height * 0.29;
+    const garden = this.add.graphics();
+    garden.fillStyle(0xd9b998, 1).fillPoints([
+      new Phaser.Math.Vector2(gateX + direction * 15 - 7, sidewalkEdge),
+      new Phaser.Math.Vector2(gateX + direction * 15 + 7, sidewalkEdge),
+      new Phaser.Math.Vector2(gateX + 7, gateY),
+      new Phaser.Math.Vector2(gateX - 7, gateY),
+    ], true);
+    container.add([garden, plot]);
+
+    const signX = x + direction * plot.displayWidth * 0.33;
+    const signY = top + height * 0.254;
+    container.add([
+      this.add.rectangle(signX, signY, 26, 20, 0xfff4cf).setStrokeStyle(2, 0x2d5270),
+      this.add.text(signX, signY, String(address), { ...HOUSE_SIGN_STYLE, fontSize: "16px" }).setOrigin(0.5),
+    ]);
+  }
+
+  private addNearSidePlanting(
+    container: Phaser.GameObjects.Container, startX: number, endX: number, sidewalkEdge: number,
+  ) {
+    const houses = DESTINATIONS.filter(({ house }) => house.y > ROAD_Y).map(({ house }) => house.x);
+    const treePositions = [140, 415, ...houses.slice(1).map((x, index) => (houses[index] + x) / 2)];
+    const shadows = this.add.graphics();
+    container.add(shadows);
+    for (const [index, x] of treePositions.entries()) {
+      if (x < startX || x >= endX) continue;
+      const treeBase = WORLD_HEIGHT - [2, 6, 5, 3][index % 4];
+      const crownTop = sidewalkEdge + [3, 8, 17, 6][index % 4];
+      const tree = this.add.image(x, treeBase, "leo-tree").setOrigin(0.5, 1);
+      tree.setScale((treeBase - crownTop) / tree.height).setFlipX(index % 2 === 1);
+      shadows.fillStyle(0x304d24, 0.2).fillEllipse(x + 16, treeBase - 8, tree.displayWidth * 0.55, 15);
+      container.add(tree);
+
+      const direction = index % 2 === 0 ? 1 : -1;
+      const flowers = this.add.image(x + direction * 51, treeBase - 13, "leo-flowers-near-side").setOrigin(0.5, 1);
+      const width = 139 + (index % 3) * 9;
+      flowers.setScale(width / flowers.width).setFlipX(direction < 0);
+      container.add(flowers);
+    }
+  }
+
   private createWorldZone(id: number) {
-    const { startX, endX } = zoneForWorldX(id * WORLD_ZONE_WIDTH);
+    const { startX, endX, kind } = zoneForWorldX(id * WORLD_ZONE_WIDTH);
     const container = this.add.container(0, 0).setDepth(-5);
     const width = endX - startX;
     const centerX = (startX + endX) / 2;
     container.add(this.add.rectangle(centerX, WORLD_HEIGHT / 2, width, WORLD_HEIGHT, WORLD_BACKGROUND_COLOR).setDepth(-5));
-    for (let copy = 0; copy <= VILLAGE_COPY_COUNT; copy += 1) {
-      const offsetX = copy * VILLAGE_BLOCK_SPACING;
-      for (const destination of DESTINATIONS.slice(0, 4)) {
-        const x = destination.house.x + offsetX;
+    if (kind === "bridge") {
+      const bridge = bridgeLayout();
+      const waterY = bridge.bottomPartTop + (1 - SUSPENSION.bottomStart) * SUSPENSION.height * bridge.suspensionScale - 4;
+      container.add(this.add.rectangle(centerX, bridge.topPartBottom / 2, width, bridge.topPartBottom, SKY_COLOR).setDepth(-4.95));
+      container.add(this.add.rectangle(centerX, (waterY + WORLD_HEIGHT) / 2, width, WORLD_HEIGHT - waterY, WATER_COLOR).setDepth(-4.95));
+    }
+
+    if (kind === "village") {
+      const backdropWidth = 2172;
+      const backdropHeight = 724;
+      for (let tileX = Math.floor(startX / backdropWidth) * backdropWidth; tileX < endX; tileX += backdropWidth) {
+        const from = Math.max(startX, tileX);
+        const to = Math.min(endX, tileX + backdropWidth);
+        if (to <= from) continue;
+        container.add(this.add.image(tileX, 0, "leo-world-village-zone1-backdrop")
+          .setOrigin(0, 0)
+          .setCrop(from - tileX, 0, to - from, backdropHeight)
+          .setDepth(-4.9));
+      }
+      const sidewalkEdge = bridgeLayout().deckBottom;
+      const gardenFrame = this.textures.getFrame("leo-garden-near-side");
+      const gardenScale = (WORLD_HEIGHT - sidewalkEdge) / gardenFrame.height;
+      const gardenTileWidth = gardenFrame.width * gardenScale;
+      // Le motif est ancré dans le monde et déborde visuellement d'une zone de chargement à l'autre.
+      for (let tileX = Math.floor(startX / gardenTileWidth) * gardenTileWidth; tileX < endX; tileX += gardenTileWidth) {
+        const from = Math.max(startX, tileX);
+        const to = Math.min(endX, tileX + gardenTileWidth);
+        if (to <= from) continue;
+        container.add(this.add.image(tileX, sidewalkEdge, "leo-garden-near-side").setOrigin(0, 0)
+          .setScale(gardenScale).setCrop((from - tileX) / gardenScale, 0, (to - from) / gardenScale, gardenFrame.height));
+      }
+      this.addNearSidePlanting(container, startX, endX, sidewalkEdge);
+      for (const destination of DESTINATIONS) {
+        const { x, y } = destination.house;
         if (x < startX || x >= endX) continue;
-        container.add(this.add.image(x, destination.house.y, "leo-house")
-          .setDisplaySize(230, 153)
+        const index = Number(destination.id.replace("house-", "")) - 1;
+        if (y > ROAD_Y) {
+          this.addNearSideHouse(container, x, index + 1, sidewalkEdge);
+          continue;
+        }
+        const houseKey = FAR_SIDE_HOUSE_KEYS[(index / 2) % FAR_SIDE_HOUSE_KEYS.length];
+        const houseSource = this.textures.get(houseKey).getSourceImage() as HTMLImageElement;
+        const houseBaseY = ROAD_Y - ROAD_HALF_WIDTH - 100;
+        container.add(this.add.image(x, houseBaseY, houseKey)
+          .setOrigin(0.5, 1)
+          .setScale(210 / houseSource.width)
           .setDepth(2));
-        const oppositeY = ROAD_Y - (destination.house.y - ROAD_Y);
-        container.add(this.add.image(x, oppositeY, "leo-house")
-          .setDisplaySize(230, 153)
-          .setDepth(2));
+        const signX = x + 70;
+        const signY = houseBaseY - 28;
+        container.add(this.add.rectangle(signX, signY, 30, 23, 0xfff4cf, 0.98)
+          .setStrokeStyle(2, 0x2d5270, 1)
+          .setDepth(2.5));
+        container.add(this.add.text(signX, signY, destination.label.replace("Maison ", ""), HOUSE_SIGN_STYLE)
+          .setOrigin(0.5)
+          .setDepth(2.6));
+      }
+    } else if (kind !== "bridge") {
+      // Après l'entrée de ville, aucune zone ne retombe sur un écran vert vide. Les panneaux illustrés
+      // restent au premier plan ; cette rangée déterministe prend le relais dans leurs fondus et entre
+      // les futurs décors résidentiel, marché et école.
+      container.add(this.add.rectangle(
+        centerX,
+        (ROAD_Y - ROAD_HALF_WIDTH) / 2,
+        width,
+        ROAD_Y - ROAD_HALF_WIDTH,
+        SKY_COLOR,
+      ).setDepth(-4.9));
+      const spacing = 330;
+      const first = startX + 165;
+      const revealX = kind === "boulevard"
+        ? boulevardLayout().panelEnd - BOULEVARD_FADE
+        : startX;
+      for (let x = first, slot = 0; x < endX; x += spacing, slot += 1) {
+        const size = (id + slot) % 3 === 0 ? { width: 245, height: 163 } : { width: 220, height: 147 };
+        // Le tablier inclut ses trottoirs au-delà de la chaussée : les façades doivent
+        // rester derrière ses bords (mêmes lignes que les maisons historiques).
+        const northY = ROAD_Y - (DESTINATIONS[0].house.y - ROAD_Y);
+        const southY = DESTINATIONS[0].house.y;
+        if (x + size.width / 2 >= revealX) {
+          container.add(this.add.image(x, northY, "leo-house").setDisplaySize(size.width, size.height).setDepth(2));
+        }
+        // Rangée sud décalée d'un demi-pas : pas de répétition en grille parfaite.
+        if (x + spacing / 2 < endX && x + spacing / 2 + size.width / 2 >= revealX) {
+          container.add(this.add.image(x + spacing / 2, southY, "leo-house")
+            .setDisplaySize(size.width, size.height)
+            .setDepth(2));
+        }
       }
     }
     return container;
@@ -1336,9 +1726,25 @@ export class LeoLivreurScene extends Phaser.Scene {
       sideBusy: this.cross.turnZoneBusy() || this.depthTraffic.busy(),
     });
     const phase = this.intersection.state;
+    const boulevardSignalList = boulevardSignals();
+    const boulevardBox = {
+      minX: boulevardSignalList[0].stopLineEast - 35,
+      maxX: boulevardSignalList[boulevardSignalList.length - 1].stopLineWest + 35,
+    };
+    const leoOnBoulevard = Math.abs(this.motion.speed) > 15
+      && this.motion.x + VEHICLE_LENGTH / 2 > boulevardBox.minX
+      && this.motion.x - VEHICLE_LENGTH / 2 < boulevardBox.maxX;
+    // Même machine à états que la zone 3 : les rues secondaires (et les passants) reçoivent le vert
+    // uniquement quand l'axe principal est rouge. Aucun état de Léo n'est partagé avec le trafic.
+    this.boulevardIntersection.update(seconds, {
+      mainBusy: this.traffic.movingIn(boulevardBox.minX, boulevardBox.maxX) || leoOnBoulevard,
+      sideBusy: false,
+    });
+    const boulevardPhase = this.boulevardIntersection.state;
     // La tête de feu de l'illustration surplombe l'avenue : elle montre l'état de la rue perpendiculaire.
     this.drawLight(phase.side);
     this.drawMainHeads(phase.main);
+    this.drawBoulevardHeads(boulevardPhase.main);
     const nearCity = Math.abs(this.motion.x - city.mouthLeft) < 1600;
     // Expérience de la rue des Jardins : aucun virage. Le trafic perpendiculaire qui tourne est mis à l arrêt.
     this.cross.cap = 0;
@@ -1357,6 +1763,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       signals: [
         { lineX: city.stopLineEast, direction: 1, state: phase.main },
         { lineX: city.stopLineWest, direction: -1, state: phase.main },
+        ...boulevardSignalList.flatMap((signal) => [
+          { lineX: signal.stopLineEast, direction: 1 as const, state: boulevardPhase.main },
+          { lineX: signal.stopLineWest, direction: -1 as const, state: boulevardPhase.main },
+        ]),
       ],
     });
     this.listenToTraffic(seconds);
