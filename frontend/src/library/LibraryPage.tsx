@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { YambaGuide } from "../courses/components/YambaGuide";
 import { distributeRows } from "../games/gallery-layout";
 import { BookCard } from "./BookCard";
-import { distinctValues, filterBooks, noLibraryFilters, type LibraryFilters } from "./library-filters";
+import { filterBooks, filterOptions, noLibraryFilters, type FilterOption, type LibraryFilters } from "./library-filters";
+import { chunkRows, sharedColumns } from "./library-rows";
 import { useLibraryCatalogue } from "./library-catalogue";
 import styles from "./LibraryPage.module.css";
 
@@ -29,9 +30,10 @@ export function LibraryPage() {
   const [gap, setGap] = useState(40);
 
   // Les filtres viennent des livres réellement disponibles : jamais de catégorie fictive.
-  const subjects = useMemo(() => distinctValues(books, (book) => t(book.subjectKey)), [books, t]);
-  const levels = useMemo(() => distinctValues(books, (book) => t(book.levelKey)), [books, t]);
-  const collections = useMemo(() => distinctValues(books, (book) => t(book.collectionKey)), [books, t]);
+  // Les filtres mémorisent des clés (indépendantes de la langue) : changer de langue ne les vide pas.
+  const subjects = useMemo(() => filterOptions(books, (book) => book.subjectKey, (key) => t(key)), [books, t]);
+  const levels = useMemo(() => filterOptions(books, (book) => book.levelKey, (key) => t(key)), [books, t]);
+  const collections = useMemo(() => filterOptions(books, (book) => book.collectionKey, (key) => t(key)), [books, t]);
 
   const visibleBooks = useMemo(() => filterBooks(books, filters, (key) => t(key)), [books, filters, t]);
   const filtering = filters.subject !== null || filters.level !== null || filters.collection !== null;
@@ -54,21 +56,19 @@ export function LibraryPage() {
     return () => observer.disconnect();
   }, [hasGallery]);
 
-  // Toutes les rangées utilisent la même largeur de couverture : une dernière rangée plus courte est centrée,
-  // et un ou deux livres ne sont jamais agrandis pour remplir la ligne (une couverture est un format vertical).
-  const rows = useMemo(() => {
-    const result: typeof visibleBooks[] = [];
-    let start = 0;
-    for (const size of distributeRows(visibleBooks.length, maxPerRow)) {
-      result.push(visibleBooks.slice(start, start + size));
-      start += size;
-    }
-    return result;
-  }, [visibleBooks, maxPerRow]);
-  const columns = rows[0]?.length ?? 1;
+  // Toutes les rangées utilisent la même largeur de couverture, calculée sur la rangée la plus longue : un livre isolé
+  // en tête ne fait pas déborder la rangée suivante, et un ou deux livres ne sont jamais agrandis pour remplir la ligne.
+  const rows = useMemo(() => chunkRows(visibleBooks, distributeRows(visibleBooks.length, maxPerRow)), [visibleBooks, maxPerRow]);
+  const columns = sharedColumns(rows);
 
   function toggle(field: "subject" | "level" | "collection", value: string) {
-    setFilters((current) => ({ ...current, [field]: current[field] === value ? null : value }));
+    setFilters((current) => ({ ...current, [field]: current[field] !== null && t(current[field]) === t(value) ? null : value }));
+  }
+
+  // Un filtre est actif quand son texte traduit correspond à celui de l'option (plusieurs clés peuvent porter le même texte).
+  function optionChip(field: "subject" | "level" | "collection", option: FilterOption) {
+    const selected = filters[field];
+    return chip(option.label, selected !== null && t(selected) === option.label, () => toggle(field, option.key));
   }
 
   function chip(label: string, pressed: boolean, onClick: () => void) {
@@ -105,17 +105,17 @@ export function LibraryPage() {
           {chip(t("filters.all"), !filtering, () =>
             setFilters((current) => ({ ...current, subject: null, level: null, collection: null })),
           )}
-          {subjects.map((label) => chip(label, filters.subject === label, () => toggle("subject", label)))}
+          {subjects.map((option) => optionChip("subject", option))}
           {levels.length > 1 && (
             <span className={styles.group} role="group" aria-label={t("filters.level")}>
               <span className={styles.groupLabel} aria-hidden="true">{t("filters.level")}</span>
-              {levels.map((label) => chip(label, filters.level === label, () => toggle("level", label)))}
+              {levels.map((option) => optionChip("level", option))}
             </span>
           )}
           {collections.length > 1 && (
             <span className={styles.group} role="group" aria-label={t("filters.collection")}>
               <span className={styles.groupLabel} aria-hidden="true">{t("filters.collection")}</span>
-              {collections.map((label) => chip(label, filters.collection === label, () => toggle("collection", label)))}
+              {collections.map((option) => optionChip("collection", option))}
             </span>
           )}
         </div>

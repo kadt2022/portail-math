@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { distinctValues, filterBooks, noLibraryFilters, normalizeText } from "./library-filters";
+import { distinctValues, filterBooks, filterOptions, noLibraryFilters, normalizeText } from "./library-filters";
 import type { LibraryBook } from "./library-catalogue";
 
 const book = (id: string, levelKey: string, subjectKey = "subject.math", collectionKey = "collection.a"): LibraryBook => ({
@@ -54,5 +54,23 @@ describe("filtres de la bibliothèque", () => {
     expect(filterBooks(books, { ...noLibraryFilters, query: "MATHEMATIQUES" }, label).map((b) => b.id)).toEqual(["one", "two"]);
     expect(filterBooks(books, { ...noLibraryFilters, query: "1re" }, label).map((b) => b.id)).toEqual(["one"]);
     expect(filterBooks(books, { ...noLibraryFilters, query: "zzz" }, label)).toEqual([]);
+  });
+
+  it("déduplique les options sur le texte traduit et garde la première clé", () => {
+    const many = [book("a", "level.1", "subject.math"), book("b", "level.1", "subject.math2"), book("c", "level.2", "subject.science")];
+    const labels2: Record<string, string> = { "subject.math": "Mathématiques", "subject.math2": "Mathématiques", "subject.science": "Sciences" };
+    const options = filterOptions(many, (b) => b.subjectKey, (key) => labels2[key] ?? key);
+    expect(options).toEqual([
+      { key: "subject.math", label: "Mathématiques" },
+      { key: "subject.science", label: "Sciences" },
+    ]);
+  });
+
+  it("un filtre (clé) reste valable quand la langue change", () => {
+    const fr: Record<string, string> = { "level.2": "2e primaire", "subject.math": "Mathématiques" };
+    const en: Record<string, string> = { "level.2": "Grade 2", "subject.math": "Mathematics" };
+    const filters = { ...noLibraryFilters, level: "level.2" };
+    expect(filterBooks(books, filters, (key) => fr[key] ?? labels[key] ?? key).map((b) => b.id)).toEqual(["two", "sci"]);
+    expect(filterBooks(books, filters, (key) => en[key] ?? labels[key] ?? key).map((b) => b.id)).toEqual(["two", "sci"]);
   });
 });

@@ -1,13 +1,15 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import i18next from "i18next";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { LibraryPage } from "./LibraryPage";
 import { mockLibraryCatalogue } from "./library-catalogue.fixture";
 
-afterEach(() => {
+afterEach(async () => {
   vi.unstubAllGlobals();
+  await i18next.changeLanguage("fr");
 });
 
 function renderPage() {
@@ -73,6 +75,23 @@ describe("Bibliothèque", () => {
 
     await user.click(screen.getByRole("button", { name: "Tous les livres" }));
     expect(screen.getAllByRole("link", { name: /ouvrir le livre/i })).toHaveLength(4);
+  });
+
+  it("garde le filtre choisi quand la langue change", async () => {
+    const user = userEvent.setup();
+    mockLibraryCatalogue();
+    renderPage();
+    await screen.findByText("4 livres");
+
+    await user.click(screen.getByRole("button", { name: "3e primaire" }));
+    expect(screen.getAllByRole("link", { name: /ouvrir le livre/i })).toHaveLength(1);
+
+    await act(() => i18next.changeLanguage("en"));
+    const filters = screen.getByRole("group", { name: /filter/i });
+    // Toujours un seul livre, et exactement un filtre actif (hors « tous »).
+    expect(screen.getAllByRole("link", { name: /open|ouvrir/i })).toHaveLength(1);
+    const pressed = within(filters).getAllByRole("button").filter((button) => button.getAttribute("aria-pressed") === "true");
+    expect(pressed).toHaveLength(1);
   });
 
   it("recherche un livre par son titre, sans tenir compte des accents ni de la casse", async () => {
