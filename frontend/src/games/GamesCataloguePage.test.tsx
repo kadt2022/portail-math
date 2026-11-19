@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { availableCategories, featuredGame, gameCatalogue, playableGames } from "./game-catalogue";
 import { GamesCataloguePage } from "./GamesCataloguePage";
@@ -118,5 +118,133 @@ describe("Barre basse mobile des jeux", () => {
     await user.click(within(bar).getByRole("button", { name: "Mes jeux" }));
     expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
     expect(filters).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+// --- Les Tuiles magiques jouables dans la page Jeux (ordinateur) et en plein écran immersif (téléphone) ---
+
+function stubDevice(immersive: boolean) {
+  vi.stubGlobal("matchMedia", () => ({
+    matches: immersive,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }));
+}
+
+const tilesLink = () => screen.getByRole("link", { name: "Jouer à Les Tuiles magiques" });
+// Le jeu est chargé à la demande : on laisse le temps au chargement du module même sur une machine chargée.
+const gameRegion = () => screen.findByRole("region", { name: "Jeu Les Tuiles magiques" }, { timeout: 8000 });
+const movesOf = (region: HTMLElement) => within(region).getAllByRole("term").find((t) => t.textContent === "Déplacements")?.nextElementSibling?.textContent;
+
+describe("Les Tuiles magiques dans la page Jeux", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("garde un vrai lien vers l'adresse du jeu, ouvert sur place au clic simple", async () => {
+    stubDevice(false);
+    const user = userEvent.setup();
+    renderPage();
+    expect(tilesLink()).toHaveAttribute("href", "/jeux/grille-magique");
+    expect(screen.queryByRole("region", { name: "Jeu Les Tuiles magiques" })).not.toBeInTheDocument();
+    await user.click(tilesLink());
+    expect(await gameRegion()).toBeInTheDocument();
+  });
+
+  it("ne détourne pas le clic avec un modificateur (nouvel onglet) : le lien normal s'applique", async () => {
+    stubDevice(false);
+    const user = userEvent.setup();
+    renderPage();
+    await user.keyboard("{Control>}");
+    await user.click(tilesLink());
+    await user.keyboard("{/Control}");
+    expect(screen.queryByRole("region", { name: "Jeu Les Tuiles magiques" })).not.toBeInTheDocument();
+  });
+
+  it("ordinateur : le jeu se joue dans la page, les autres jeux restent en dessous, sans quitter la page", async () => {
+    stubDevice(false);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(tilesLink());
+    const region = await gameRegion();
+    // Le jeu n'est pas en plein écran : il est dans le flux de la page, au-dessus des autres jeux.
+    expect(region.className).not.toMatch(/fullscreen/);
+    const heading = screen.getByRole("heading", { level: 2, name: "Autres jeux du portail" });
+    expect(region.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Le jeu ouvert n'est plus proposé en dessous, les autres si ; la bannière de Léo laisse la place.
+    expect(screen.queryByRole("link", { name: "Jouer à Les Tuiles magiques" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /^Jouer à/ }).length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { level: 1, name: "Les jeux" })).toBeInTheDocument();
+    // Les 9 cases sont jouables sur place.
+    await user.click(within(region).getAllByRole("button", { name: /déplaçable vers la case vide/ })[0]);
+    expect(movesOf(region)).toBe("1");
+  });
+
+  it("ordinateur : plein écran puis retour, partie conservée ; fermer puis rouvrir reprend la partie", async () => {
+    stubDevice(false);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(tilesLink());
+    const region = await gameRegion();
+    await user.click(within(region).getAllByRole("button", { name: /déplaçable vers la case vide/ })[0]);
+    await user.click(within(region).getByRole("button", { name: "Passer en plein écran" }));
+    expect(region.className).toMatch(/fullscreen/);
+    // Le reste de la page est inerte derrière le jeu.
+    expect(document.querySelectorAll("[inert]").length).toBeGreaterThan(0);
+    expect(movesOf(region)).toBe("1");
+    await user.click(within(region).getByRole("button", { name: "Quitter le plein écran" }));
+    expect(region.className).not.toMatch(/fullscreen/);
+    expect(document.querySelectorAll("[inert]")).toHaveLength(0);
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
+    // Le jeu fermé réapparaît dans la galerie ; le rouvrir reprend la même partie.
+    await user.click(tilesLink());
+    expect(region.closest("[hidden]")).toBeNull();
+    expect(movesOf(region)).toBe("1");
+  });
+
+  it("première ouverture : le tutoriel guide l'enfant dans la page ; une fois passé, il ne revient plus tout seul", async () => {
+    stubDevice(false);
+    window.localStorage.removeItem("mbuyamba:tuiles-magiques:tutoriel");
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(tilesLink());
+    const region = await gameRegion();
+    expect(within(region).getByTestId("tutorial-panel")).toHaveTextContent("Touche la carte magique pour la révéler.");
+    await user.click(within(region).getByRole("button", { name: "Passer le tutoriel" }));
+    expect(within(region).queryByTestId("tutorial-panel")).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("mbuyamba:tuiles-magiques:tutoriel")).toBe("fait");
+  });
+
+  it("téléphone : le toucher ouvre directement le jeu en plein écran immersif, sans les autres jeux", async () => {
+    stubDevice(true);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(tilesLink());
+    const region = await gameRegion();
+    expect(region.className).toMatch(/fullscreen/);
+    // Pendant la partie, le catalogue est inerte (ni focus ni lecture d'écran) : les autres jeux ne sont pas accessibles.
+    expect(document.querySelectorAll("[inert]").length).toBeGreaterThan(0);
+    expect(within(region).queryByRole("button", { name: "Passer en plein écran" })).not.toBeInTheDocument();
+    await user.click(within(region).getAllByRole("button", { name: /déplaçable vers la case vide/ })[0]);
+    expect(movesOf(region)).toBe("1");
+  });
+
+  it("téléphone : « Quitter » ramène au catalogue et à ses autres jeux, la partie reste reprenable", async () => {
+    stubDevice(true);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(tilesLink());
+    const region = await gameRegion();
+    await user.click(within(region).getAllByRole("button", { name: /déplaçable vers la case vide/ })[0]);
+    await user.click(within(region).getByRole("button", { name: "Quitter" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
+    expect(document.querySelectorAll("[inert]")).toHaveLength(0);
+    expect(screen.getByRole("link", { name: "Jouer à Les Tuiles magiques" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /^Jouer à/ }).length).toBeGreaterThan(1);
+    await user.click(tilesLink());
+    expect(region.className).toMatch(/fullscreen/);
+    expect(movesOf(region)).toBe("1");
   });
 });

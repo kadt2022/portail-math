@@ -26,6 +26,8 @@ function movesValue() {
 describe("Les Tuiles magiques", () => {
   beforeEach(() => {
     vi.spyOn(Math, "random").mockReturnValue(0);
+    // Tutoriel déjà fait : ces tests visent la grille normale, pas la grille pédagogique.
+    window.localStorage.setItem("mbuyamba:tuiles-magiques:tutoriel", "fait");
   });
 
   afterEach(() => {
@@ -178,5 +180,29 @@ describe("Les Tuiles magiques", () => {
     // la partie reste jouable : un nouveau déplacement légal est toujours possible
     const stillPlayable = screen.getAllByRole("button", { name: /déplaçable vers la case vide/ });
     expect(stillPlayable.length).toBeGreaterThan(0);
+  });
+
+  it("page autonome : le plein écran est au choix sur ordinateur et la partie reste en place", async () => {
+    const user = userEvent.setup();
+    renderGame();
+    await user.click(screen.getByRole("button", { name: "Ligne 1, colonne 2, valeur 2, déplaçable vers la case vide." }));
+    await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
+    expect(screen.getByRole("region", { name: "Jeu Les Tuiles magiques" }).className).toMatch(/fullscreen/);
+    expect(movesValue()).toBe("1");
+    await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
+    expect(movesValue()).toBe("1");
+    expect(screen.getByRole("link", { name: "Retour aux jeux" })).toHaveAttribute("href", "/jeux");
+  });
+
+  it("page autonome sur téléphone : « Quitter » ramène à l'affichage normal de la page", async () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener: () => undefined, removeEventListener: () => undefined }));
+    const user = userEvent.setup();
+    renderGame();
+    await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
+    const region = screen.getByRole("region", { name: "Jeu Les Tuiles magiques" });
+    expect(region.className).toMatch(/fullscreen/);
+    await user.click(screen.getByRole("button", { name: "Quitter" }));
+    expect(region.className).not.toMatch(/fullscreen/);
+    vi.unstubAllGlobals();
   });
 });
