@@ -56,7 +56,7 @@ describe("Bibliothèque", () => {
     renderPage();
     await screen.findByText("4 livres");
     const filters = screen.getByRole("group", { name: "Filtrer les livres" });
-    const names = within(filters).getAllByRole("button").map((button) => button.textContent);
+    const names = within(filters).getAllByRole("button").filter((button) => button.hasAttribute("aria-pressed")).map((button) => button.textContent);
     expect(names).toEqual(["Tous les livres", "Mathématiques", "1re primaire", "2e primaire", "3e primaire", "5e primaire"]);
     // Une seule collection : « Par collection » n'est pas affiché (il ne filtrerait rien).
     expect(within(filters).queryByText("Par collection")).not.toBeInTheDocument();
@@ -137,5 +137,48 @@ describe("Bibliothèque", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("La bibliothèque est momentanément indisponible");
     expect(screen.queryByText("1re primaire")).not.toBeInTheDocument();
+  });
+});
+
+describe("Barre basse mobile de la bibliothèque", () => {
+  it("propose Accueil, Recherche, Filtres et Mes livres", async () => {
+    mockLibraryCatalogue();
+    renderPage();
+    await screen.findByText("4 livres");
+    const bar = screen.getByRole("navigation", { name: "Navigation de la bibliothèque" });
+    expect(within(bar).getByRole("link", { name: "Accueil" })).toHaveAttribute("href", "/");
+    for (const name of ["Recherche", "Filtres", "Mes livres"]) {
+      expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
+    }
+    expect(within(bar).getByRole("button", { name: "Mes livres" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("ouvre la recherche au clic, y place le curseur, et Échap la referme", async () => {
+    mockLibraryCatalogue();
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText("4 livres");
+    const button = screen.getByRole("button", { name: "Recherche" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("searchbox", { name: "Chercher un livre" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("ouvre le panneau des filtres, filtre par niveau et vide tout avec Mes livres", async () => {
+    mockLibraryCatalogue();
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText("4 livres");
+    const filtersButton = screen.getByRole("button", { name: "Filtres" });
+    await user.click(filtersButton);
+    expect(filtersButton).toHaveAttribute("aria-expanded", "true");
+    await user.click(screen.getByRole("button", { name: "2e primaire" }));
+    expect(await screen.findByText("1 livre")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Mes livres" }));
+    expect(filtersButton).toHaveAttribute("aria-expanded", "false");
+    expect(await screen.findByText("4 livres")).toBeInTheDocument();
   });
 });

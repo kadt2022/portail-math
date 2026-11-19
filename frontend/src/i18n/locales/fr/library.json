@@ -91,5 +91,15 @@
     "subject": "Matière",
     "level": "Par niveau",
     "collection": "Par collection"
+  },
+  "bar": {
+    "label": "Navigation de la bibliothèque",
+    "home": "Accueil",
+    "search": "Recherche",
+    "filters": "Filtres",
+    "myBooks": "Mes livres",
+    "panelTitle": "Filtres",
+    "close": "Fermer",
+    "show": "Voir les livres"
   }
 }

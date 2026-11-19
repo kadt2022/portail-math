@@ -11,6 +11,16 @@
     "resultCount_one": "{{count}} game",
     "resultCount_other": "{{count}} games"
   },
+  "bar": {
+    "label": "Games navigation",
+    "home": "Home",
+    "search": "Search",
+    "filters": "Filters",
+    "myGames": "My games",
+    "panelTitle": "Filters",
+    "close": "Close",
+    "show": "Show games"
+  },
   "badge": {
     "new": "New"
   },

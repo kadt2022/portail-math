@@ -1,6 +1,7 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
 import { YambaGuide } from "../courses/components/YambaGuide";
 import { distributeRows } from "../games/gallery-layout";
 import { BookCard } from "./BookCard";
@@ -21,10 +22,16 @@ const MAX_CARD = 240;
 const gapFor = (width: number) => (width < 640 ? 16 : width < 900 ? 24 : 40);
 const maxBooksPerRow = (width: number) => Math.min(6, Math.max(2, Math.floor((width + gapFor(width)) / (MIN_CARD + gapFor(width)))));
 
+
 export function LibraryPage() {
   const { t } = useTranslation("library");
   const { books, loading, error } = useLibraryCatalogue();
   const [filters, setFilters] = useState<LibraryFilters>(noLibraryFilters);
+  // Sur téléphone, la recherche et les filtres sont rangés dans la barre basse : un seul panneau ouvert à la fois.
+  const [panel, setPanel] = useState<MobilePanel>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchBarId = "library-search";
+  const filtersId = "library-filters";
   const galleryRef = useRef<HTMLDivElement>(null);
   const [maxPerRow, setMaxPerRow] = useState(4);
   const [gap, setGap] = useState(40);
@@ -61,6 +68,29 @@ export function LibraryPage() {
   const rows = useMemo(() => chunkRows(visibleBooks, distributeRows(visibleBooks.length, maxPerRow)), [visibleBooks, maxPerRow]);
   const columns = sharedColumns(rows);
 
+  useEffect(() => {
+    if (panel === "search") searchInputRef.current?.focus();
+  }, [panel]);
+
+  // Échap referme le panneau ouvert.
+  useEffect(() => {
+    if (!panel) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPanel(null);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [panel]);
+
+  const togglePanel = (next: "search" | "filters") => setPanel((current) => (current === next ? null : next));
+
+  // « Mes livres » : retour à la liste complète (panneaux fermés, recherche et filtres vidés), en haut du catalogue.
+  function showMyBooks() {
+    setPanel(null);
+    setFilters(noLibraryFilters);
+    window.scrollTo?.({ top: 0 });
+  }
+
   function toggle(field: "subject" | "level" | "collection", value: string) {
     setFilters((current) => ({ ...current, [field]: current[field] !== null && t(current[field]) === t(value) ? null : value }));
   }
@@ -89,8 +119,9 @@ export function LibraryPage() {
         <div className={styles.guide}>
           <YambaGuide name="Yamba" message={t("page.description")} compact />
         </div>
-        <div className={styles.search} role="search">
+        <div id={searchBarId} className={`${styles.search}${panel === "search" ? ` ${styles.panelOpen}` : ""}`} role="search">
           <input
+            ref={searchInputRef}
             type="search"
             value={filters.query}
             onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
@@ -101,7 +132,11 @@ export function LibraryPage() {
       </header>
 
       {books.length > 0 && (
-        <div className={styles.filters} role="group" aria-label={t("filters.label")}>
+        <div id={filtersId} className={`${styles.filters}${panel === "filters" ? ` ${styles.panelOpen}` : ""}`} role="group" aria-label={t("filters.label")}>
+          <div className={styles.sheetHead}>
+            <strong>{t("bar.panelTitle")}</strong>
+            <button type="button" className={styles.sheetClose} onClick={() => setPanel(null)}>{t("bar.close")}</button>
+          </div>
           {chip(t("filters.all"), !filtering, () =>
             setFilters((current) => ({ ...current, subject: null, level: null, collection: null })),
           )}
@@ -118,8 +153,12 @@ export function LibraryPage() {
               {collections.map((option) => optionChip("collection", option))}
             </span>
           )}
+          <button type="button" className={styles.sheetShow} onClick={() => setPanel(null)}>
+            {t("bar.show")} ({visibleBooks.length})
+          </button>
         </div>
       )}
+      {panel === "filters" && <div className={styles.scrim} aria-hidden="true" onClick={() => setPanel(null)} />}
 
       <section className={styles.catalogue} aria-label={t("selection.title")}>
         {loading && <p className={styles.status}>{t("selection.loading")}</p>}
@@ -150,6 +189,18 @@ export function LibraryPage() {
           !loading && !error && <p className={styles.empty}>{t("selection.noResult")}</p>
         )}
       </section>
+
+      <MobileTabBar
+        label={t("bar.label")}
+        labels={{ home: t("bar.home"), search: t("bar.search"), filters: t("bar.filters"), mine: t("bar.myBooks") }}
+        panel={panel}
+        onTogglePanel={togglePanel}
+        searchId={searchBarId}
+        filtersId={filtersId}
+        filtersActive={filtering}
+        mineActive={panel === null && !filtering && filters.query === ""}
+        onMine={showMyBooks}
+      />
     </div>
   );
 }

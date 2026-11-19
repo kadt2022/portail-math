@@ -483,3 +483,11 @@
   border-top-color: rgb(255 255 255 / 10%);
   background: linear-gradient(135deg, #0a0b12 0%, #10111b 100%);
 }
+
+/* Jeux et Bibliothèque sur téléphone : la barre basse fixe ne doit pas masquer le pied de page. */
+@media (max-width: 680px) {
+  .libraryTheme .footer,
+  .gamesTheme .footer {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
