@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -219,9 +219,12 @@ describe("Parcours EXETAT React", () => {
     renderResults();
 
     expect(await screen.findByText("80%")).toBeInTheDocument();
-    const stored = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
-    expect(stored.subjects.cercle.attemptCount).toBe(1);
-    expect(stored.recordedQuizIds).toEqual(["quiz-1"]);
+    // L'enregistrement se fait dans un useEffect : on attend qu'il soit écrit.
+    await waitFor(() => {
+      const stored = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
+      expect(stored.subjects?.cercle?.attemptCount).toBe(1);
+      expect(stored.recordedQuizIds).toEqual(["quiz-1"]);
+    });
 
     await user.click(screen.getByRole("button", { name: /revoir mes erreurs/i }));
     expect(await screen.findByText("quiz de révision atteint")).toBeInTheDocument();
