@@ -99,8 +99,12 @@ describe("PdfReader", () => {
     await waitFor(() => expect(container.querySelector("article[data-page='1'] canvas")).not.toBeNull());
     const frame = container.querySelector<HTMLElement>("article[data-page='1']")!;
     const canvas = frame.querySelector<HTMLCanvasElement>("canvas")!;
-    expect(frame.style.width).toBe(canvas.style.width);
-    expect(frame.style.height).toBe(canvas.style.height);
+    // La taille du canvas est écrite après son apparition : on attend qu'elle soit posée.
+    await waitFor(() => {
+      expect(canvas.style.width).not.toBe("");
+      expect(frame.style.width).toBe(canvas.style.width);
+      expect(frame.style.height).toBe(canvas.style.height);
+    });
   });
 
   it("garde le format A4 inchangé pour les livres A4", async () => {
