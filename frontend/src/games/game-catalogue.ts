@@ -44,6 +44,8 @@ export interface GameCatalogueEntry {
   href: string;
   availability: GameAvailability;
   categoryId: GameCategoryId;
+  /** Jeu qui se joue directement dans la page « Jeux » (sans changer de page) ; son adresse reste valable pour un accès direct. */
+  embed?: boolean;
   /** Jeu mis en avant par la bannière « À la une » (un seul à la fois). */
   featured?: boolean;
   thumbnail?: string;
@@ -106,6 +108,7 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/grille-magique",
     availability: "react",
     categoryId: "logic",
+    embed: true,
     thumbnail: tuilesMagiquesThumb,
   },
   {

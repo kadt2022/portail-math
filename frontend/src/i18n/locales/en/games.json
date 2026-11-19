@@ -6,6 +6,8 @@
     "searchPlaceholder": "Search for a game",
     "filterLabel": "Filter by universe",
     "all": "All games",
+    "loading": "Loading the game…",
+    "otherGames": "Other games from the portal",
     "galleryTitle": "All games",
     "noResult": "No game has this name. Try another word!",
     "resultCount_one": "{{count}} game",
@@ -80,10 +82,64 @@
         "rowIncorrect": "Row {{index}} is incorrect.",
         "colIncorrect": "Column {{index}} is incorrect."
       },
+      "tutorial": {
+        "progress": "Step {{current}} of {{total}}",
+        "reveal": "Tap the magic card to reveal it.",
+        "rows": "Each row must give the result shown on the right.",
+        "cols": "Each column must give the result shown below.",
+        "moveFirst": "Tap this tile to slide it into the empty cell.",
+        "move": "Well done! Tap the next tile to slide it into the empty cell.",
+        "replan": "No problem, we adapt! Here is the next tile to tap.",
+        "place": "Perfect! The empty cell is in the centre: tap the magic card to place it.",
+        "victory": "Well done! You solved your first game!",
+        "next": "I understand",
+        "skip": "Skip the tutorial",
+        "replay": "Replay the tutorial"
+      },
+      "hint": {
+        "button": "Hint",
+        "aria": "Ask for a hint",
+        "move": "Hint: the {{value}} goes in row {{row}}, column {{col}}.",
+        "center": "Everything is in place: bring the empty cell back to the centre, then place the card.",
+        "done": "Well done, the grid is complete!"
+      },
+      "screen": {
+        "label": "Magic Tiles game",
+        "enter": "Enter full screen",
+        "exit": "Exit full screen",
+        "enterShort": "Full screen",
+        "exitShort": "Shrink",
+        "closeShort": "Close",
+        "close": "Close the game and see the other games",
+        "leave": "Leave",
+        "rotate": "Turn your phone sideways for a bigger board."
+      },
       "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart with a new grid",
         "newGrid": "New grid",
         "nextLevel": "Next level",
         "backToGames": "Back to games"
+      },
+      "player": {
+        "controls": "Game controls",
+        "play": "Play",
+        "pause": "Pause",
+        "resume": "Resume",
+        "pausedTitle": "Game paused"
+      },
+      "howTo": {
+        "button": "How to play",
+        "title": "How to play",
+        "close": "Close the instructions",
+        "step1Title": "Look at the sums",
+        "step1": "Every row and every column must give the result shown.",
+        "step2Title": "Move the tiles",
+        "step2": "Slide tiles into the empty space to arrange the numbers.",
+        "step3Title": "Place the magic card",
+        "step3": "Bring the empty space to the centre, then place the magic card.",
+        "step4Title": "Check and win",
+        "step4": "When every sum is correct, finish the level and earn stars."
       }
     },
     "tagline": "Slide the tiles"

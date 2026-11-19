@@ -6,6 +6,8 @@
     "searchPlaceholder": "Chercher un jeu",
     "filterLabel": "Filtrer par univers",
     "all": "Tous les jeux",
+    "loading": "Chargement du jeu…",
+    "otherGames": "Autres jeux du portail",
     "galleryTitle": "Tous les jeux",
     "noResult": "Aucun jeu ne porte ce nom. Essaie un autre mot !",
     "resultCount_one": "{{count}} jeu",
@@ -80,10 +82,64 @@
         "rowIncorrect": "Ligne {{index}} incorrecte.",
         "colIncorrect": "Colonne {{index}} incorrecte."
       },
+      "tutorial": {
+        "progress": "Étape {{current}} sur {{total}}",
+        "reveal": "Touche la carte magique pour la révéler.",
+        "rows": "Chaque ligne doit donner le résultat indiqué à droite.",
+        "cols": "Chaque colonne doit donner le résultat indiqué en bas.",
+        "moveFirst": "Touche cette tuile pour la glisser vers la case vide.",
+        "move": "Bien joué ! Touche la tuile suivante pour la glisser vers la case vide.",
+        "replan": "On s’adapte ! Voici la prochaine tuile à toucher.",
+        "place": "Parfait ! La case vide est au centre : touche la carte magique pour la poser.",
+        "victory": "Bravo ! Tu as résolu ta première partie !",
+        "next": "J’ai compris",
+        "skip": "Passer le tutoriel",
+        "replay": "Revoir le tutoriel"
+      },
+      "hint": {
+        "button": "Indice",
+        "aria": "Demander un indice",
+        "move": "Indice : le {{value}} va en ligne {{row}}, colonne {{col}}.",
+        "center": "Tout est en place : ramène la case vide au centre, puis pose la carte.",
+        "done": "Bravo, la grille est terminée !"
+      },
+      "screen": {
+        "label": "Jeu Les Tuiles magiques",
+        "enter": "Passer en plein écran",
+        "exit": "Quitter le plein écran",
+        "enterShort": "Plein écran",
+        "exitShort": "Réduire",
+        "closeShort": "Fermer",
+        "close": "Fermer le jeu et retrouver les autres jeux",
+        "leave": "Quitter",
+        "rotate": "Tourne ton téléphone en mode paysage pour un plateau plus grand."
+      },
       "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer avec une nouvelle grille",
         "newGrid": "Nouvelle grille",
         "nextLevel": "Niveau suivant",
         "backToGames": "Retour aux jeux"
+      },
+      "player": {
+        "controls": "Commandes du jeu",
+        "play": "Jouer",
+        "pause": "Pause",
+        "resume": "Reprendre",
+        "pausedTitle": "Jeu en pause"
+      },
+      "howTo": {
+        "button": "Comment jouer",
+        "title": "Comment jouer",
+        "close": "Fermer les instructions",
+        "step1Title": "Observe les sommes",
+        "step1": "Chaque ligne et chaque colonne doit donner le résultat indiqué.",
+        "step2Title": "Déplace les tuiles",
+        "step2": "Fais glisser les tuiles vers la case vide pour organiser les nombres.",
+        "step3Title": "Place la carte magique",
+        "step3": "Ramène la case vide au centre, puis place la carte magique.",
+        "step4Title": "Valide et gagne",
+        "step4": "Lorsque toutes les opérations sont correctes, termine le niveau et gagne des étoiles."
       }
     },
     "tagline": "Glisse les tuiles"

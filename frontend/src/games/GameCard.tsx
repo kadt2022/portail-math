@@ -10,11 +10,13 @@ interface GameCardProps {
   game: GameCatalogueEntry;
   /** Place dans la galerie (colonnes et proportions) ; sans elle, la carte prend sa taille naturelle. */
   placement?: CardPlacement;
+  /** Jeux intégrés à la page : le clic ouvre le jeu sur place au lieu de changer de page (l’adresse reste un vrai lien). */
+  onOpen?: (game: GameCatalogueEntry) => void;
 }
 
 // Toute la carte est le lien : pas de bouton « Jouer » séparé. L'illustration occupe
 // la carte entière, le titre et l'accroche sont posés sur une bande en bas.
-export function GameCard({ game, placement }: GameCardProps) {
+export function GameCard({ game, placement, onOpen }: GameCardProps) {
   const { t } = useTranslation("games");
   const navigate = useNavigate();
   const name = t(game.nameKey);
@@ -49,6 +51,16 @@ export function GameCard({ game, placement }: GameCardProps) {
     [game, navigate],
   );
 
+  // Clic simple : le jeu s’ouvre dans la page. Clic avec modificateur (nouvel onglet) : le lien normal s’applique.
+  const openInPage = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!onOpen || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      onOpen(game);
+    },
+    [game, onOpen],
+  );
+
   const content = (
     <>
       {game.thumbnail ? (
@@ -75,7 +87,7 @@ export function GameCard({ game, placement }: GameCardProps) {
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : undefined}>
+      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : game.embed ? openInPage : undefined}>
         {content}
       </Link>
     );
