@@ -1,6 +1,10 @@
 /* Les Tuiles magiques : nuit étoilée, tuiles en pierres précieuses, cadre doré. Tout se dimensionne d'après la taille réelle du jeu
    (container queries) : même rendu dans la page (ordinateur), en plein écran, en paysage ou en portrait sur téléphone. */
 
+.root:focus {
+  outline: none;
+}
+
 .root {
   position: relative;
   display: flex;

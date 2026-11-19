@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import { useTranslation } from "react-i18next";
 
 import yambaHead from "../../assets/yamba-head.jpg";
+import { useInertOutside } from "../useInertOutside";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "../fullscreen";
 import {
   applyMove,
@@ -130,6 +131,8 @@ export function GrilleMagiqueGame({
   const [howToOpen, setHowToOpen] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
+  // Plein écran (natif ou repli CSS) : le reste de l’application est inerte, le focus reste dans le jeu.
+  useInertOutside(rootRef, fullscreen);
   const nativeFullscreen = useRef(false);
   const tileRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const focusTargetRef = useRef<number | null>(null);
@@ -383,6 +386,7 @@ export function GrilleMagiqueGame({
   return (
     <div
       ref={rootRef}
+      tabIndex={-1}
       className={`${styles.root}${fullscreen ? ` ${styles.fullscreen}` : ""}`}
       role="region"
       aria-label={t("grilleMagique.game.screen.label")}
