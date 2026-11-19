@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { availableCategories, featuredGame, gameCatalogue, playableGames } from "./game-catalogue";
 import { GamesCataloguePage } from "./GamesCataloguePage";
@@ -113,7 +113,10 @@ describe("Barre basse mobile des jeux", () => {
     const filters = within(bar).getByRole("button", { name: "Filtres" });
     await user.click(filters);
     expect(filters).toHaveAttribute("aria-expanded", "true");
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
     await user.click(within(bar).getByRole("button", { name: "Mes jeux" }));
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
     expect(filters).toHaveAttribute("aria-expanded", "false");
   });
 });

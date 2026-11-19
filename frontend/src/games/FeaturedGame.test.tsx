@@ -75,3 +75,18 @@ describe("Ondulation du décor", () => {
     expect(banner).toHaveAttribute("href", "/jeux/conduire-avec-leo");
   });
 });
+
+describe("Dégradé au toucher", () => {
+  it("un toucher lance le dégradé, un autre le relance, sans retarder le lien", () => {
+    renderBanner();
+    const banner = screen.getByRole("link", { name: "Jouer à Conduire avec Léo" });
+    expect(banner.className).not.toMatch(/glowTouch/);
+    fireEvent.pointerDown(banner, { pointerType: "touch", clientX: 10, clientY: 10 });
+    expect(banner.className).toMatch(/glowTouch/);
+    fireEvent.pointerDown(banner, { pointerType: "touch", clientX: 20, clientY: 20 });
+    expect(banner.className).toMatch(/glowTouch/);
+    // La souris ne lance pas ce dégradé : il est réservé au toucher (au survol, il vient du style).
+    fireEvent.pointerDown(banner, { pointerType: "mouse" });
+    expect(banner).toHaveAttribute("href", "/jeux/conduire-avec-leo");
+  });
+});

@@ -24,6 +24,7 @@ export function GamesCataloguePage() {
   // Sur téléphone, la recherche et les filtres sont rangés dans la barre basse : un seul panneau ouvert à la fois.
   const [panel, setPanel] = useState<MobilePanel>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
   const searchId = "games-search";
   const filtersId = "games-filters";
 
@@ -78,13 +79,14 @@ export function GamesCataloguePage() {
     setPanel(null);
     setCategory("all");
     setQuery("");
-    window.scrollTo?.({ top: 0 });
+    // Le défilement se fait dans le conteneur de la page (pas dans la fenêtre) : on ramène le haut de la page à l’écran.
+    pageRef.current?.scrollIntoView?.({ block: "start" });
   }
 
   const placements = galleryPlacements(visibleGames.length, maxPerRow);
 
   return (
-    <div className={styles.page}>
+    <div ref={pageRef} className={styles.page}>
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>{t("cataloguePage.title")}</h1>

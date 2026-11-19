@@ -30,6 +30,7 @@ export function LibraryPage() {
   // Sur téléphone, la recherche et les filtres sont rangés dans la barre basse : un seul panneau ouvert à la fois.
   const [panel, setPanel] = useState<MobilePanel>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
   const searchBarId = "library-search";
   const filtersId = "library-filters";
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -88,7 +89,8 @@ export function LibraryPage() {
   function showMyBooks() {
     setPanel(null);
     setFilters(noLibraryFilters);
-    window.scrollTo?.({ top: 0 });
+    // Le défilement se fait dans le conteneur de la page (pas dans la fenêtre) : on ramène le haut du catalogue à l’écran.
+    pageRef.current?.scrollIntoView?.({ block: "start" });
   }
 
   function toggle(field: "subject" | "level" | "collection", value: string) {
@@ -110,7 +112,7 @@ export function LibraryPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div ref={pageRef} className={styles.page}>
       <header className={styles.heading}>
         <div className={styles.titleBlock}>
           <h1>{t("page.title")}</h1>

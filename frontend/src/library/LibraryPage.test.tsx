@@ -177,7 +177,11 @@ describe("Barre basse mobile de la bibliothèque", () => {
     expect(filtersButton).toHaveAttribute("aria-expanded", "true");
     await user.click(screen.getByRole("button", { name: "2e primaire" }));
     expect(await screen.findByText("1 livre")).toBeInTheDocument();
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
     await user.click(screen.getByRole("button", { name: "Mes livres" }));
+    // Le haut du catalogue est ramené à l’écran par son conteneur de défilement, pas par la fenêtre.
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
     expect(filtersButton).toHaveAttribute("aria-expanded", "false");
     expect(await screen.findByText("4 livres")).toBeInTheDocument();
   });
