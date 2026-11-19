@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { availableCategories, featuredGame, gameCatalogue, playableGames } from "./game-catalogue";
 import { GamesCataloguePage } from "./GamesCataloguePage";
@@ -48,7 +48,7 @@ describe("GamesCataloguePage", () => {
   it("ne propose que des catégories contenant au moins un jeu", () => {
     renderPage();
     const filters = screen.getByRole("group", { name: "Filtrer par univers" });
-    expect(within(filters).getAllByRole("button")).toHaveLength(availableCategories.length + 1);
+    expect(within(filters).getAllByRole("button").filter((button) => button.hasAttribute("aria-pressed"))).toHaveLength(availableCategories.length + 1);
     for (const category of availableCategories) {
       expect(playableGames.some((game) => game.categoryId === category.id)).toBe(true);
     }
@@ -95,5 +95,28 @@ describe("GamesCataloguePage", () => {
     await user.click(screen.getByRole("button", { name: "Conduite" }));
     expect(localStorage.length).toBe(0);
     expect(sessionStorage.length).toBe(0);
+  });
+});
+
+describe("Barre basse mobile des jeux", () => {
+  it("propose Accueil, Recherche, Filtres et Mes jeux, et ouvre recherche et filtres", async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><GamesCataloguePage /></MemoryRouter>);
+    const bar = screen.getByRole("navigation", { name: "Navigation des jeux" });
+    expect(within(bar).getByRole("link", { name: "Accueil" })).toHaveAttribute("href", "/");
+    const search = within(bar).getByRole("button", { name: "Recherche" });
+    await user.click(search);
+    expect(search).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("searchbox", { name: "Chercher un jeu" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(search).toHaveAttribute("aria-expanded", "false");
+    const filters = within(bar).getByRole("button", { name: "Filtres" });
+    await user.click(filters);
+    expect(filters).toHaveAttribute("aria-expanded", "true");
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    await user.click(within(bar).getByRole("button", { name: "Mes jeux" }));
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
+    expect(filters).toHaveAttribute("aria-expanded", "false");
   });
 });

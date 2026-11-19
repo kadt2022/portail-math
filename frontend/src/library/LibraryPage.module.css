@@ -198,3 +198,95 @@
 .guide [class*="bubble"]::before {
   background: rgb(255 255 255 / 8%);
 }
+
+/* Panneau de filtres et fond : réservés au téléphone (voir le bloc @media plus bas). */
+@media (min-width: 681px) {
+  .sheetHead,
+  .sheetShow,
+  .scrim {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Recherche et filtres quittent l'écran : ils s'ouvrent depuis la barre basse. */
+  .search,
+  .filters {
+    display: none;
+  }
+
+  .search.panelOpen {
+    position: fixed;
+    right: 12px;
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    z-index: 41;
+    display: block;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 20px;
+    background: #14162a;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 50%);
+  }
+
+  .filters.panelOpen {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    display: flex;
+    max-height: 70svh;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    border-radius: 24px 24px 0 0;
+    background: #14162a;
+    box-shadow: 0 -12px 40px rgb(0 0 0 / 60%);
+  }
+
+  .sheetHead {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    color: #f2f4ff;
+    font-size: 18px;
+  }
+
+  .sheetClose {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: #aab4ff;
+    font: inherit;
+    font-weight: 700;
+  }
+
+  .sheetShow {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: #fd5e53;
+    color: #14213d;
+    font: inherit;
+    font-weight: 800;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    display: block;
+    background: rgb(5 6 14 / 60%);
+  }
+
+}

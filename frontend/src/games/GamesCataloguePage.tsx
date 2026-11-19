@@ -1,7 +1,8 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
+import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
 import { availableCategories, featuredGame, playableGames, type GameCategoryId } from "./game-catalogue";
 import { FeaturedGame } from "./FeaturedGame";
 import { GameCard } from "./GameCard";
@@ -19,6 +20,13 @@ export function GamesCataloguePage() {
   const { key: visitKey } = useLocation();
   const [category, setCategory] = useState<GameCategoryId | "all">("all");
   const [query, setQuery] = useState("");
+
+  // Sur téléphone, la recherche et les filtres sont rangés dans la barre basse : un seul panneau ouvert à la fois.
+  const [panel, setPanel] = useState<MobilePanel>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const searchId = "games-search";
+  const filtersId = "games-filters";
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [maxPerRow, setMaxPerRow] = useState(3);
@@ -52,17 +60,41 @@ export function GamesCataloguePage() {
     return () => observer.disconnect();
   }, [hasGrid]);
 
+  useEffect(() => {
+    if (panel === "search") searchInputRef.current?.focus();
+  }, [panel]);
+
+  // Échap referme le panneau ouvert.
+  useEffect(() => {
+    if (!panel) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPanel(null);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [panel]);
+
+  // « Mes jeux » : retour à la liste complète (panneaux fermés, recherche et univers vidés), en haut de la page.
+  function showAllGames() {
+    setPanel(null);
+    setCategory("all");
+    setQuery("");
+    // Le défilement se fait dans le conteneur de la page (pas dans la fenêtre) : on ramène le haut de la page à l’écran.
+    pageRef.current?.scrollIntoView?.({ block: "start" });
+  }
+
   const placements = galleryPlacements(visibleGames.length, maxPerRow);
 
   return (
-    <div className={styles.page}>
+    <div ref={pageRef} className={styles.page}>
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>{t("cataloguePage.title")}</h1>
           <p className={styles.subtitle}>{t("cataloguePage.subtitle")}</p>
         </div>
-        <div className={styles.search} role="search">
+        <div id={searchId} className={`${styles.search}${panel === "search" ? ` ${styles.panelOpen}` : ""}`} role="search">
           <input
+            ref={searchInputRef}
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -74,7 +106,11 @@ export function GamesCataloguePage() {
 
       {featuredGame && !filtering ? <FeaturedGame key={visitKey} game={featuredGame} /> : null}
 
-      <div className={styles.chips} role="group" aria-label={t("cataloguePage.filterLabel")}>
+      <div id={filtersId} className={`${styles.chips}${panel === "filters" ? ` ${styles.panelOpen}` : ""}`} role="group" aria-label={t("cataloguePage.filterLabel")}>
+        <div className={styles.sheetHead}>
+          <strong>{t("bar.panelTitle")}</strong>
+          <button type="button" className={styles.sheetClose} onClick={() => setPanel(null)}>{t("bar.close")}</button>
+        </div>
         <button type="button" className={styles.chip} aria-pressed={category === "all"} onClick={() => setCategory("all")}>
           {t("cataloguePage.all")}
         </button>
@@ -89,7 +125,11 @@ export function GamesCataloguePage() {
             {t(item.labelKey)}
           </button>
         ))}
+        <button type="button" className={styles.sheetShow} onClick={() => setPanel(null)}>
+          {t("bar.show")} ({visibleGames.length})
+        </button>
       </div>
+      {panel === "filters" && <div className={styles.scrim} aria-hidden="true" onClick={() => setPanel(null)} />}
 
       <p className={styles.count} role="status">{t("cataloguePage.resultCount", { count: visibleGames.length })}</p>
       {visibleGames.length > 0 ? (
@@ -101,6 +141,18 @@ export function GamesCataloguePage() {
       ) : (
         <p className={styles.empty}>{t("cataloguePage.noResult")}</p>
       )}
+
+      <MobileTabBar
+        label={t("bar.label")}
+        labels={{ home: t("bar.home"), search: t("bar.search"), filters: t("bar.filters"), mine: t("bar.myGames") }}
+        panel={panel}
+        onTogglePanel={(next) => setPanel((current) => (current === next ? null : next))}
+        searchId={searchId}
+        filtersId={filtersId}
+        filtersActive={category !== "all"}
+        mineActive={panel === null && !filtering}
+        onMine={showAllGames}
+      />
     </div>
   );
 }

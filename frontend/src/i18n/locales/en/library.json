@@ -91,5 +91,15 @@
     "subject": "Subject",
     "level": "By level",
     "collection": "By collection"
+  },
+  "bar": {
+    "label": "Library navigation",
+    "home": "Home",
+    "search": "Search",
+    "filters": "Filters",
+    "myBooks": "My books",
+    "panelTitle": "Filters",
+    "close": "Close",
+    "show": "Show books"
   }
 }

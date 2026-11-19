@@ -47,6 +47,68 @@
   text-underline-offset: 6px;
 }
 
+/* Onde de lumière : au survol (ou au clavier), un dégradé doux de couleurs chaudes puis fraîches glisse lentement sur la scène
+   et ondule, pour attirer l’œil sans agresser. Posé au-dessus du décor, sous les véhicules et le texte ; seuls transform et opacity animent. */
+.hero::before {
+  position: absolute;
+  inset: -25% 0;
+  z-index: -1;
+  width: 220%;
+  background:
+    radial-gradient(ellipse 22% 60% at 20% 55%, rgb(255 160 90 / 46%), transparent 70%),
+    radial-gradient(ellipse 24% 70% at 45% 40%, rgb(253 94 83 / 42%), transparent 70%),
+    radial-gradient(ellipse 22% 60% at 70% 60%, rgb(190 120 255 / 42%), transparent 70%),
+    radial-gradient(ellipse 22% 70% at 92% 45%, rgb(90 170 255 / 42%), transparent 70%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero:hover::before {
+    opacity: 1;
+    animation: leo-wave 11s ease-in-out infinite alternate;
+  }
+}
+
+.hero:focus-visible::before {
+  opacity: 1;
+  animation: leo-wave 11s ease-in-out infinite alternate;
+}
+
+@keyframes leo-wave {
+  0% {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(-24%, 3%, 0) scale(1.06, 0.94);
+  }
+
+  100% {
+    transform: translate3d(-44%, -2%, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before {
+    display: none;
+  }
+}
+
+/* Ondulation de l’eau : le décor (ciel, ville, route) est redessiné dans ce canvas pendant que les ondes existent, puis
+   le canvas se cache de nouveau (au repos, c’est le décor HTML). Même rectangle que la bannière, sous le voile et les voitures. */
+.ripple {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .hero:active {
   transform: scale(0.99);
 }
@@ -125,7 +187,7 @@
   align-items: flex-start;
   gap: 4px;
   max-width: 760px;
-  padding: clamp(16px, 2.5vw, 28px) clamp(16px, 2.5vw, 28px) calc(var(--hero-h) * 0.2) clamp(20px, 4vw, 56px);
+  padding: clamp(16px, 2.5vw, 28px) clamp(16px, 2.5vw, 28px) calc(var(--hero-h) * 0.29) clamp(20px, 4vw, 56px);
 }
 
 .kicker {
@@ -150,8 +212,8 @@
 
 @media (max-width: 639px) {
   .hero {
-    /* Téléphone : le titre et la recherche prennent plus de place, la bannière se réduit d'autant. */
-    --hero-h: clamp(280px, calc(100svh - 430px - 2 * var(--page-gap, 24px)), 460px);
+    /* Téléphone : la bannière suit la largeur de l'écran (rapport 1,6) et reste compacte ; plus plat (2,5), le texte écrase la voiture. */
+    --hero-h: clamp(220px, calc(100vw / 1.6), 300px);
     height: var(--hero-h);
   }
 
@@ -186,8 +248,6 @@
     transition: none;
   }
 
-  .hero:hover,
-  .hero:focus-visible,
   .hero:active {
     transform: none;
   }
@@ -372,5 +432,29 @@
 @media (prefers-reduced-motion: reduce) {
   .lane {
     display: none;
+  }
+}
+
+/* Téléphone et écran tactile : un toucher fait glisser le dégradé pendant environ 10 s (fondu à l’entrée et à la sortie), puis il
+   s’éteint ; un nouveau toucher le relance. La classe est posée par FeaturedGame.tsx ; elle ne retarde pas l’ouverture du jeu. */
+.glowTouch::before {
+  animation: leo-wave 10s ease-in-out both, leo-glow-touch 10s ease both;
+}
+
+@keyframes leo-glow-touch {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
   }
 }
