@@ -6,9 +6,11 @@ import countrysideUrl from "../prototypes/leo-livreur/assets/leo-countryside-v1.
 
 import skylineUrl from "./assets/leo-city-skyline-2k.webp";
 import intercityBusUrl from "./assets/leo-bus-intercity.webp";
+import roadUrl from "./assets/leo-road-banner.webp";
 import carUrl from "./assets/leo-car-front-banner.webp";
 import profileUrl from "./assets/leo-car-profile-banner.webp";
 import type { GameCatalogueEntry } from "./game-catalogue";
+import { createWaterRipple, type WaterRipple } from "./water-ripple";
 import styles from "./FeaturedGame.module.css";
 
 // Véhicules de la voie d'en face : ils roulent lentement de droite à gauche, une fois la voiture
@@ -82,17 +84,56 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
     if (event.pointerType === "mouse") replay();
   };
 
+  // Ondulation de l’eau sur le décor (ciel, ville, route) : créée au premier passage du pointeur, jamais pour les voitures ni le texte.
+  const heroRef = useRef<HTMLAnchorElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const skyRef = useRef<HTMLImageElement>(null);
+  const cityRef = useRef<HTMLImageElement>(null);
+  const roadRef = useRef<HTMLSpanElement>(null);
+  const ripple = useRef<WaterRipple | null>(null);
+  const rippleTried = useRef(false);
+  const water = () => {
+    if (!rippleTried.current) {
+      rippleTried.current = true;
+      const [hero, canvas, sky, city, road] = [heroRef.current, canvasRef.current, skyRef.current, cityRef.current, roadRef.current];
+      if (hero && canvas && sky && city && road) ripple.current = createWaterRipple({ hero, canvas, sky, city, road, roadSrc: roadUrl });
+    }
+    return ripple.current;
+  };
+  useEffect(() => () => ripple.current?.dispose(), []);
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType === "touch") return;
+    water()?.move(event.clientX, event.clientY);
+  };
+  // Au toucher : une onde brève, tout de suite ; le lien s’ouvre sans attendre.
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType !== "touch") return;
+    water()?.touch(event.clientX, event.clientY);
+    // Dégradé au toucher (~10 s, fondu en entrée et en sortie) ; un nouveau toucher relance l’animation depuis le début.
+    const hero = heroRef.current;
+    if (hero) {
+      hero.classList.remove(styles.glowTouch);
+      void hero.offsetWidth;
+      hero.classList.add(styles.glowTouch);
+    }
+  };
+
   return (
     <Link
+      ref={heroRef}
       className={styles.hero}
       to={game.href}
       aria-label={t("featured.aria", { name })}
       onPointerEnter={onPointerEnter}
+      onPointerMove={onPointerMove}
+      onPointerDown={onPointerDown}
+      onPointerLeave={() => ripple.current?.leave()}
       onFocus={(event) => event.currentTarget.matches(":focus-visible") && replay()}
     >
-      <img className={styles.sky} src={countrysideUrl} alt="" width={2172} height={724} fetchPriority="high" decoding="async" />
-      <img className={styles.city} src={skylineUrl} alt="" width={2048} height={682} decoding="async" />
-      <span className={styles.road} aria-hidden="true" />
+      <img ref={skyRef} className={styles.sky} src={countrysideUrl} alt="" width={2172} height={724} fetchPriority="high" decoding="async" />
+      <img ref={cityRef} className={styles.city} src={skylineUrl} alt="" width={2048} height={682} decoding="async" />
+      <span ref={roadRef} className={styles.road} aria-hidden="true" />
+      <canvas ref={canvasRef} className={styles.ripple} aria-hidden="true" />
       <Fragment key={play}>
         <span className={styles.carShadow} aria-hidden="true" />
         {TRAFFIC.map((bus) => (
