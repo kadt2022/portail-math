@@ -10,6 +10,7 @@ import {
 } from "./TurboPulseGame";
 import { GameAudio } from "../audio/GameAudio";
 import { GAMES_SOUND_STORAGE_KEY, usePageVisible } from "../audio/useGameAudio";
+import { onViewportSettled } from "../viewport-events";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
@@ -247,21 +248,13 @@ export function TurboPulsePlayer({
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(frame);
-    // Rotation et entrée/sortie du plein écran : la mise en page se stabilise un peu après l'évènement, on remesure alors.
-    let timer = 0;
-    const later = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(fit, 250);
-    };
-    window.addEventListener("orientationchange", later);
-    document.addEventListener("fullscreenchange", later);
-    document.addEventListener("webkitfullscreenchange", later);
+    // Rotation, redimensionnement, plein écran et surtout retour de veille : la scène est remesurée et Phaser recalcule sa taille
+    // dès que la nouvelle disposition est appliquée (même si le cadre a retrouvé sa taille d'avant la veille, Phaser a pu en
+    // mémoriser une autre pendant qu'elle était cachée).
+    const stopListening = onViewportSettled(fit);
     return () => {
       observer.disconnect();
-      window.clearTimeout(timer);
-      window.removeEventListener("orientationchange", later);
-      document.removeEventListener("fullscreenchange", later);
-      document.removeEventListener("webkitfullscreenchange", later);
+      stopListening();
     };
   }, []);
 

@@ -80,6 +80,23 @@ describe("page Turbo Pulse", () => {
     height.mockRestore();
   });
 
+  it("retour de veille : la scène est remesurée et Phaser recalcule sa taille, sans recréer le jeu", () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
+    vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    gameMock.refreshLayout.mockClear();
+    Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+    // Deux images d'animation : la nouvelle disposition est appliquée avant la remesure.
+    frames.splice(0).forEach((callback) => callback(0));
+    expect(gameMock.refreshLayout).not.toHaveBeenCalled();
+    frames.splice(0).forEach((callback) => callback(0));
+    expect(gameMock.refreshLayout).toHaveBeenCalled();
+    expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
   it("cadre assez grand : aucune réduction", () => {
     const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(960);
     const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(540);

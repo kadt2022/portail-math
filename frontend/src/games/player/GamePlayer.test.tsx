@@ -230,10 +230,11 @@ describe("Lecteur standard des jeux", () => {
     expect(region().className).toMatch(/screen/);
     expect(region()).toHaveAttribute("data-orientation", "landscape");
     expect(toolbarNames()).toEqual(["Pause", "Recommencer la partie", "Passer en plein écran", "Passer en portrait", "Fermer le jeu et retrouver les autres jeux"]);
-    // Mode 2 : la barre disparaît, seul Quitter ; le lecteur ne redemande pas de plein écran natif (le document l'a déjà).
+    // Mode 2 : la barre disparaît, seul Quitter ; le lecteur lui-même n'est jamais mis en plein écran natif : seul le document
+    // l'est (ici redemandé au toucher, puisque le test n'est pas en plein écran natif, comme après une mise en veille).
     await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
     expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
-    expect(requestFullscreen).not.toHaveBeenCalled();
+    expect(requestFullscreen.mock.contexts.every((target) => target === document.documentElement)).toBe(true);
     await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
     // Mode 3 puis 4 : portrait avec barre, puis portrait sans barre.
     await user.click(screen.getByRole("button", { name: "Passer en portrait" }));
@@ -335,6 +336,65 @@ describe("Lecteur standard des jeux", () => {
     );
     await act(async () => {});
     expect(exit).toHaveBeenCalled();
+    Object.defineProperty(document, "fullscreenElement", { value: null, configurable: true });
+    delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
+  });
+
+  it("mise en veille : la partie affichée se met en pause ; au réveil, rien ne repart tout seul", async () => {
+    // jsdom ne calcule pas la mise en page : le lecteur est déclaré affiché.
+    const rects = vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([{}] as unknown as DOMRectList);
+    render(<ModesGame />);
+    await userEvent.setup().click(screen.getByRole("button", { name: "Jouer un coup" }));
+    Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(screen.getByText("Jeu en pause")).toBeInTheDocument();
+    Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    // Toujours en pause : l'enfant reprend d'un toucher, la partie n'a pas bougé.
+    expect(screen.getByText("Jeu en pause")).toBeInTheDocument();
+    expect(movesShown()).toBe("1");
+    await userEvent.setup().click(screen.getByRole("button", { name: "Reprendre" }));
+    expect(screen.queryByText("Jeu en pause")).not.toBeInTheDocument();
+    rects.mockRestore();
+  });
+
+  it("mise en veille : une partie déjà en pause, terminée ou non affichée n'est pas touchée", () => {
+    const onPause = vi.fn();
+    const rects = vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([{}] as unknown as DOMRectList);
+    const { rerender } = render(<FakeGame paused onPause={onPause} />);
+    window.dispatchEvent(new Event("pagehide"));
+    rerender(<FakeGame ended onPause={onPause} />);
+    window.dispatchEvent(new Event("pagehide"));
+    rects.mockReturnValue([] as unknown as DOMRectList);
+    rerender(<FakeGame onPause={onPause} />);
+    window.dispatchEvent(new Event("pagehide"));
+    expect(onPause).not.toHaveBeenCalled();
+    rects.mockRestore();
+  });
+
+  it("téléphone, après la veille : le premier toucher dans le lecteur rétablit le plein écran natif et l'orientation choisie", async () => {
+    stubPhone();
+    const requestFullscreen = vi.fn(function (this: HTMLElement) {
+      Object.defineProperty(document, "fullscreenElement", { value: this, configurable: true });
+      return Promise.resolve();
+    });
+    HTMLElement.prototype.requestFullscreen = requestFullscreen;
+    const lock = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("screen", { orientation: { lock, unlock: vi.fn() } });
+    render(<FakeGame cover onFullscreenChange={() => undefined} />);
+    // Le navigateur a quitté le plein écran pendant la veille.
+    Object.defineProperty(document, "fullscreenElement", { value: null, configurable: true });
+    await userEvent.setup().click(screen.getByRole("button", { name: "Plateau du jeu" }));
+    expect(requestFullscreen.mock.contexts).toContain(document.documentElement);
+    act(() => {
+      document.dispatchEvent(new Event("fullscreenchange"));
+    });
+    expect(lock).toHaveBeenCalledWith("landscape");
+    vi.unstubAllGlobals();
     Object.defineProperty(document, "fullscreenElement", { value: null, configurable: true });
     delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });

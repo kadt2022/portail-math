@@ -401,8 +401,12 @@ export class TurboPulseScene extends Phaser.Scene {
   // ou pendant un démontage React) au moment où le ResizeObserver externe
   // déclenche cet appel — un plantage silencieux ici ne doit jamais se
   // reproduire au prochain redimensionnement.
+  // Remesure forcée : Phaser relit la taille réelle de son conteneur et recalcule la scène, même s'il croit que rien n'a changé
+  // (une taille transitoire, par exemple celle de l'écran de verrouillage pendant la veille, a pu être mémorisée entre-temps).
   refreshLayout = () => {
-    if (this.scale?.getParentBounds()) this.scale.refresh();
+    if (!this.scale) return;
+    this.scale.getParentBounds();
+    this.scale.refresh();
   };
 
   // Décor purement visuel : ni les positions de collision (défense, canon)

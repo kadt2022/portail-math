@@ -16,6 +16,7 @@ import {
 } from "../fullscreen";
 import { useImmersiveDevice } from "../useImmersiveDevice";
 import { useInertOutside } from "../useInertOutside";
+import { onPageSuspended } from "../viewport-events";
 import styles from "./GamePlayer.module.css";
 
 function Icon({ children }: { children: ReactNode }) {
@@ -249,6 +250,39 @@ export function GamePlayer({
       document.removeEventListener("webkitfullscreenchange", onChange);
     };
   }, [cover, fullscreen, onClose, onFullscreenChange]);
+
+  // Mise en veille, onglet caché, application quittée : la partie affichée se met en pause (chronomètre, animations et musique
+  // arrêtés), sans accélération au retour. Au réveil, rien ne repart tout seul : l'enfant reprend d'un toucher sur « Reprendre »,
+  // une fois le lecteur remis en place. Une partie déjà en pause ou terminée n'est pas touchée.
+  const suspendState = useRef({ paused, ended, onPause });
+  useEffect(() => {
+    suspendState.current = { paused, ended, onPause };
+  });
+  useEffect(
+    () =>
+      onPageSuspended(() => {
+        const root = rootRef.current;
+        const shown = !!root && root.getClientRects().length > 0;
+        const { paused: alreadyPaused, ended: over, onPause: pause } = suspendState.current;
+        if (shown && !alreadyPaused && !over) pause();
+      }),
+    [rootRef],
+  );
+
+  // Téléphone : la veille fait perdre le plein écran natif et le verrouillage de l'orientation. Le navigateur n'autorise à les
+  // redemander que dans un geste : au premier toucher dans le lecteur après le réveil, ils sont rétablis (l'orientation choisie
+  // est reverrouillée dès que le plein écran revient, voir plus haut).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!cover || !root) {
+      return;
+    }
+    const regain = () => {
+      if (!fullscreenElement()) void enterNativeFullscreen(document.documentElement, false);
+    };
+    root.addEventListener("pointerdown", regain, true);
+    return () => root.removeEventListener("pointerdown", regain, true);
+  }, [rootRef, cover]);
 
   // Plein écran de remplacement (navigateur sans plein écran natif) : Échap en sort aussi.
   useEffect(() => {
