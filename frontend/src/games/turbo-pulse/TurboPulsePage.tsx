@@ -2,15 +2,13 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { exitNativeFullscreen } from "../fullscreen";
-import { useImmersiveDevice } from "../useImmersiveDevice";
 import { TurboPulsePlayer } from "./TurboPulsePlayer";
 
 // Page de jeu autonome (adresse directe /jeux/turbo-pulse). Depuis la page « Jeux », le même lecteur se joue
-// directement dans le catalogue (voir GamesCataloguePage) : ici, il occupe sa propre page, en plein écran.
+// directement dans le catalogue (voir GamesCataloguePage) : ici, il occupe sa propre page, en affichage normal (plein écran au choix du joueur).
 export function TurboPulsePage() {
   const navigate = useNavigate();
-  const immersiveDevice = useImmersiveDevice();
-  const [fullscreen, setFullscreen] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
 
   const leave = useCallback(async () => {
     await exitNativeFullscreen();
@@ -19,9 +17,9 @@ export function TurboPulsePage() {
 
   return (
     <TurboPulsePlayer
+      pageHeading
       fullscreen={fullscreen}
       onFullscreenChange={setFullscreen}
-      mobileImmersive={immersiveDevice && fullscreen}
       onClose={() => void leave()}
     />
   );

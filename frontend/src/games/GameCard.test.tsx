@@ -47,6 +47,23 @@ describe("GameCard", () => {
     expect(screen.queryByText(`Destination atteinte : ${turboPulse.href}`)).not.toBeInTheDocument();
   });
 
+  it("signale l'intention de jouer (survol, focus, toucher) avant le clic, pour précharger le jeu", async () => {
+    const onIntent = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <GameCard game={turboPulse} onOpen={() => undefined} onIntent={onIntent} />
+      </MemoryRouter>,
+    );
+    const link = screen.getByRole("link", { name: /Jouer à/ });
+    await user.hover(link);
+    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
+    onIntent.mockClear();
+    await user.tab();
+    expect(link).toHaveFocus();
+    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
+  });
+
   it("garde l'adresse du jeu comme vrai lien quand rien n'ouvre le jeu sur place", async () => {
     const user = userEvent.setup();
     renderCard(turboPulse);

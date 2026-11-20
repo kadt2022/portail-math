@@ -42,6 +42,20 @@ export async function enterNativeFullscreen(element: HTMLElement, lockLandscape:
   return true;
 }
 
+/** Verrouille l'orientation (plein écran natif requis) ; renvoie false (sans erreur) si le navigateur refuse (iOS notamment). */
+export async function lockOrientation(orientation: "landscape" | "portrait"): Promise<boolean> {
+  const lock = (screen.orientation as LockableOrientation | undefined)?.lock;
+  if (!lock) {
+    return false;
+  }
+  try {
+    await lock.call(screen.orientation, orientation);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function exitNativeFullscreen(): Promise<void> {
   const doc = document as FullscreenDocument;
   try {

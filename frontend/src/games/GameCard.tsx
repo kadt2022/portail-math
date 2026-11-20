@@ -12,11 +12,13 @@ interface GameCardProps {
   placement?: CardPlacement;
   /** Jeux intégrés à la page : le clic ouvre le jeu sur place au lieu de changer de page (l’adresse reste un vrai lien). */
   onOpen?: (game: GameCatalogueEntry) => void;
+  /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
+  onIntent?: (gameId: string) => void;
 }
 
 // Toute la carte est le lien : pas de bouton « Jouer » séparé. L'illustration occupe
 // la carte entière, le titre et l'accroche sont posés sur une bande en bas.
-export function GameCard({ game, placement, onOpen }: GameCardProps) {
+export function GameCard({ game, placement, onOpen, onIntent }: GameCardProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
   const style: React.CSSProperties | undefined = placement
@@ -59,10 +61,11 @@ export function GameCard({ game, placement, onOpen }: GameCardProps) {
     </>
   );
   const label = t("card.playAria", { name });
+  const intent = onIntent ? () => onIntent(game.id) : undefined;
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined}>
+      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} onPointerEnter={intent} onPointerDown={intent} onFocus={intent}>
         {content}
       </Link>
     );

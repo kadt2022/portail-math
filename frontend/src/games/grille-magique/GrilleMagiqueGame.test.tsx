@@ -120,22 +120,26 @@ describe("Tuiles magiques : interface jouable", () => {
     await user.click(screen.getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
     expect(onClose).toHaveBeenCalled();
     rerender(<GrilleMagiqueGame fullscreen onFullscreenChange={onFullscreenChange} />);
+    expect(screen.queryByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
     expect(onFullscreenChange).toHaveBeenLastCalledWith(false);
   });
 
-  it("sur téléphone : un seul bouton « Quitter » visible, pas de bascule de plein écran, et la suggestion de tourner l'appareil", async () => {
+  it("plein écran : plus de barre, seul « Quitter » ; la partie et le tutoriel restent jouables", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    renderGame({ fullscreen: true, mobileImmersive: true, onClose, onFullscreenChange: vi.fn() });
-    expect(screen.queryByRole("button", { name: "Passer en plein écran" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Quitter le plein écran" })).not.toBeInTheDocument();
-    expect(screen.getByText(/Tourne ton téléphone en mode paysage/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Quitter" }));
-    expect(onClose).toHaveBeenCalled();
+    const onFullscreenChange = vi.fn();
+    renderGame({ fullscreen: true, onClose, onFullscreenChange });
+    expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Comment jouer" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Ligne 1, colonne 2, valeur 2, déplaçable vers la case vide." }));
+    expect(stat("Déplacements")).toBe("1");
+    await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
+    expect(onFullscreenChange).toHaveBeenCalledWith(false);
+    expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("demande le plein écran natif (et le paysage sur téléphone), puis en sort quand l'affichage normal revient", async () => {
+  it("demande le plein écran natif et l'orientation choisie (paysage par défaut), puis en sort quand l'affichage normal revient", async () => {
     const request = vi.fn().mockResolvedValue(undefined);
     HTMLElement.prototype.requestFullscreen = request;
     const lock = vi.fn().mockResolvedValue(undefined);
@@ -144,40 +148,33 @@ describe("Tuiles magiques : interface jouable", () => {
     const exit = vi.fn().mockResolvedValue(undefined);
     document.exitFullscreen = exit;
 
-    const { rerender } = renderGame({ fullscreen: true, mobileImmersive: true, onClose: vi.fn() });
+    const { rerender } = renderGame({ fullscreen: true, onFullscreenChange: vi.fn() });
     await act(async () => {});
     expect(request).toHaveBeenCalled();
     expect(lock).toHaveBeenCalledWith("landscape");
 
     Object.defineProperty(document, "fullscreenElement", { value: document.body, configurable: true });
-    rerender(<GrilleMagiqueGame fullscreen={false} mobileImmersive onClose={vi.fn()} />);
+    rerender(<GrilleMagiqueGame fullscreen={false} onFullscreenChange={vi.fn()} />);
     await act(async () => {});
     expect(exit).toHaveBeenCalled();
     expect(unlock).toHaveBeenCalled();
     vi.unstubAllGlobals();
+    Object.defineProperty(document, "fullscreenElement", { value: null, configurable: true });
     delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });
 
-  it("une sortie du plein écran par le système (retour, Échap) ramène le jeu : téléphone = quitter, ordinateur = affichage normal", async () => {
+  it("une sortie du plein écran par le système (retour, Échap) ramène à l'affichage normal, sans fermer le jeu", async () => {
     HTMLElement.prototype.requestFullscreen = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal("screen", { orientation: { lock: vi.fn().mockResolvedValue(undefined), unlock: vi.fn() } });
-
     const onClose = vi.fn();
-    const phone = renderGame({ fullscreen: true, mobileImmersive: true, onClose });
-    await act(async () => {});
-    act(() => {
-      document.dispatchEvent(new Event("fullscreenchange"));
-    });
-    expect(onClose).toHaveBeenCalled();
-    phone.unmount();
-
     const onFullscreenChange = vi.fn();
-    renderGame({ fullscreen: true, onFullscreenChange });
+    renderGame({ fullscreen: true, onClose, onFullscreenChange });
     await act(async () => {});
     act(() => {
       document.dispatchEvent(new Event("webkitfullscreenchange"));
     });
     expect(onFullscreenChange).toHaveBeenCalledWith(false);
+    expect(onClose).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
     delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });
@@ -193,17 +190,17 @@ describe("Tuiles magiques : interface jouable", () => {
     delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });
 
-  it("lecteur : une barre unique avec Jouer, Pause, Recommencer, Indice, Plein écran et Fermer, sans boutons de vidéo", () => {
+  it("lecteur : une barre unique avec un bouton Pause/Jouer, Recommencer, Indice, Plein écran et Fermer, sans boutons de vidéo", () => {
     renderGame({ onFullscreenChange: () => undefined, onClose: () => undefined });
     const bar = screen.getByRole("toolbar", { name: "Commandes du jeu" });
     const names = within(bar)
       .getAllByRole("button")
       .map((button) => button.getAttribute("aria-label") ?? button.textContent);
     expect(names).toEqual([
-      "Jouer",
       "Pause",
       "Recommencer avec une nouvelle grille",
       "Demander un indice",
+      "Son activé",
       "Passer en plein écran",
       "Fermer le jeu et retrouver les autres jeux",
     ]);
@@ -211,20 +208,15 @@ describe("Tuiles magiques : interface jouable", () => {
     expect(screen.queryByRole("button", { name: /précédent|suivant/i })).not.toBeInTheDocument();
   });
 
-  it("Jouer et Pause reflètent l'état réel : un seul est enfoncé à la fois", async () => {
+  it("un seul bouton de lecture, qui reflète l'état réel : « Pause » pendant la partie, « Jouer » en pause", async () => {
     const user = userEvent.setup();
     renderGame();
-    const play = screen.getByRole("button", { name: "Jouer" });
-    const pause = screen.getByRole("button", { name: "Pause" });
-    expect(play).toHaveAttribute("aria-pressed", "true");
-    expect(pause).toHaveAttribute("aria-pressed", "false");
-    await user.click(pause);
-    expect(play).toHaveAttribute("aria-pressed", "false");
-    expect(pause).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("button", { name: "Jouer" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Pause" }));
     expect(screen.getByText("Jeu en pause")).toBeInTheDocument();
-    await user.click(play);
-    expect(play).toHaveAttribute("aria-pressed", "true");
-    expect(pause).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("button", { name: "Pause" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Jouer" }));
+    expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
     expect(screen.queryByText("Jeu en pause")).not.toBeInTheDocument();
   });
 
@@ -261,7 +253,7 @@ describe("Tuiles magiques : interface jouable", () => {
     renderGame();
     await user.click(screen.getByRole("button", { name: "Pause" }));
     await user.click(screen.getByRole("button", { name: "Recommencer avec une nouvelle grille" }));
-    expect(screen.getByRole("button", { name: "Jouer" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
     expect(screen.queryByText("Jeu en pause")).not.toBeInTheDocument();
     expect(stat("Temps")).toBe("00:00");
   });

@@ -2,12 +2,15 @@ import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState 
 import { useTranslation } from "react-i18next";
 
 import {
+  MIN_WORLD_HEIGHT,
+  MIN_WORLD_WIDTH,
   mountTurboPulseGame,
   type TurboPulseController,
   type TurboPulseSnapshot,
 } from "./TurboPulseGame";
-import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "../fullscreen";
-import { useInertOutside } from "../useInertOutside";
+import { GameAudio } from "../audio/GameAudio";
+import { GAMES_SOUND_STORAGE_KEY, usePageVisible } from "../audio/useGameAudio";
+import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
 import styles from "./TurboPulsePlayer.module.css";
@@ -45,56 +48,57 @@ const INITIAL_SNAPSHOT: TurboPulseSnapshot = {
   paused: false,
 };
 
-function PausePanel({ onResume }: { onResume: () => void }) {
+// Fenêtre de fin de niveau : petite, centrée sur le jeu, trois informations au plus (résultat, score, action). Le décor reste
+// visible derrière un léger voile. Les mécanismes de victoire, d'échec et de progression restent ceux du moteur.
+function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onAction: () => void }) {
   const { t } = useTranslation("games");
+  const failed = snapshot.status === "failed";
+  const mastered = snapshot.status === "mastered";
+  const title = failed ? t("turboPulse.game.end.failTitle") : mastered ? t("turboPulse.game.success.masteredTitle") : t("turboPulse.game.end.winTitle");
+  const attemptsNote =
+    snapshot.failureAction === "restart-run"
+      ? t("turboPulse.game.end.noAttemptLeft")
+      : snapshot.expertAttemptUsed
+        ? t("turboPulse.game.end.attemptsLeft", { count: Math.max(0, 3 - snapshot.expertAttemptUsed) })
+        : "";
+  // Échec : on réessaie le niveau ; après la dernière tentative experte, le parcours reprend au niveau 1 (le bouton le dit).
+  const action = failed
+    ? snapshot.failureAction === "restart-run"
+      ? t("turboPulse.game.actions.restartRun")
+      : t("turboPulse.game.end.retry")
+    : mastered
+      ? t("turboPulse.game.actions.playAgain")
+      : t("turboPulse.game.end.next");
   return (
-    <div className={styles.pauseBackdrop} role="presentation">
-      <section className={styles.pauseCard} role="dialog" aria-modal="true" aria-labelledby="turbo-pause-title">
-        <h2 id="turbo-pause-title">{t("turboPulse.game.paused.title")}</h2>
-        <p>{t("turboPulse.game.paused.hint")}</p>
-        <button type="button" className={styles.primaryAction} onClick={onResume}>
-          <span aria-hidden="true">▶</span> {t("turboPulse.game.actions.resume")}
-        </button>
-      </section>
-    </div>
-  );
-}
-
-function FailurePanel({ snapshot, onRetry }: { snapshot: TurboPulseSnapshot; onRetry: () => void }) {
-  const { t } = useTranslation("games");
-  const levelNumber = snapshot.levelIndex + 1;
-  const expert = snapshot.levelIndex >= 5;
-  const exhausted = snapshot.failureAction === "restart-run";
-  return (
-    <div className={styles.modalBackdrop} role="presentation">
-      <section className={`${styles.modal} ${styles.failureModal}`} role="dialog" aria-modal="true" aria-labelledby="turbo-failure-title">
-        <span className={styles.modalIcon} aria-hidden="true">💥</span>
-        <p className={styles.modalEyebrow}>{t("turboPulse.game.failure.eyebrow")}</p>
-        <h2 id="turbo-failure-title">
-          {t("turboPulse.game.failure.title", { level: levelNumber, name: snapshot.levelName })}
-        </h2>
-        <button type="button" className={styles.dangerAction} onClick={onRetry}>
-          {exhausted
-            ? t("turboPulse.game.actions.restartRun")
-            : t("turboPulse.game.actions.retryLevel", { level: levelNumber })}
-        </button>
-        <p>
-          {snapshot.intrusions === 1
-            ? t("turboPulse.game.failure.oneIntrusion")
-            : t("turboPulse.game.failure.manyIntrusions", { count: snapshot.intrusions })}
-        </p>
-        <p className={styles.modalDetail}>
-          {snapshot.levelIndex === 6
-            ? t("turboPulse.game.failure.ultraLimit")
-            : t("turboPulse.game.failure.limit", { limit: snapshot.intrusionLimit })}
-        </p>
-        {expert && snapshot.expertAttemptUsed ? (
-          <p className={styles.attemptNote}>
-            {exhausted
-              ? t("turboPulse.game.failure.exhausted")
-              : t("turboPulse.game.failure.attempt", { used: snapshot.expertAttemptUsed, next: snapshot.expertAttemptUsed + 1 })}
+    <div className={styles.endBackdrop} role="presentation">
+      <section className={`${styles.endCard} ${failed ? styles.endFailed : styles.endWon}`} role="dialog" aria-modal="true" aria-labelledby="turbo-end-title">
+        <span className={styles.endIcon} aria-hidden="true">
+          {failed ? (
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M9 9.5h.01M15 9.5h.01M8.5 16c2-1.6 5-1.6 7 0" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" focusable="false">
+              <path d="M7 3h10v2h3a1 1 0 0 1 1 1c0 3.2-1.9 5.4-4.6 5.9A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.6 11.9C4.9 11.4 3 9.2 3 6a1 1 0 0 1 1-1h3V3Zm-1.9 4c.2 1.6 1 2.6 2.2 3A9 9 0 0 1 7 7H5.1Zm13.8 0H17a9 9 0 0 1-.3 3c1.2-.4 2-1.4 2.2-3ZM8 21h8v1H8v-1Z" />
+            </svg>
+          )}
+        </span>
+        <h2 id="turbo-end-title" className={styles.endTitle}>{title}</h2>
+        {failed ? (
+          // Niveaux experts : les tentatives restantes, seulement quand elles comptent.
+          attemptsNote ? <p className={styles.endNote}>{attemptsNote}</p> : null
+        ) : (
+          <p className={styles.endScore}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2-4.6-4.4 6.3-.9L12 2.8Z" />
+            </svg>
+            {t("turboPulse.game.end.score", { score: snapshot.score })}
           </p>
-        ) : null}
+        )}
+        <button type="button" className={styles.endAction} onClick={onAction}>
+          {action}
+        </button>
       </section>
     </div>
   );
@@ -122,56 +126,10 @@ function RankEmblem({ rank, size }: { rank: TurboPulseRank; size: number }) {
   );
 }
 
-// Passage de niveau : l'emblème du rang atteint, un titre court et un seul bouton.
-// Au niveau 7, le titre « Chevalier d'Or » couronne le parcours.
-function SuccessPanel({ snapshot, onNext }: { snapshot: TurboPulseSnapshot; onNext: () => void }) {
-  const { t } = useTranslation("games");
-  const mastered = snapshot.status === "mastered";
-  const rank = rankForLevel(snapshot.levelIndex);
-  return (
-    <div className={styles.goldBackdrop} role="presentation">
-      <section className={styles.goldCard} role="dialog" aria-modal="true" aria-labelledby="turbo-success-title">
-        <RankEmblem rank={rank} size={mastered ? 96 : 78} />
-        <div className={styles.goldStars} aria-hidden="true">
-          <span>★</span>
-          <span>★</span>
-          <span>★</span>
-        </div>
-        <h2 id="turbo-success-title">
-          {mastered
-            ? t("turboPulse.game.success.masteredTitle")
-            : t("turboPulse.game.success.title", { level: snapshot.levelIndex + 1 })}
-        </h2>
-        <p className={styles.goldRank}>{mastered ? t("turboPulse.game.success.knightRank") : t("turboPulse.game.rankLabel", { rank: t(`turboPulse.game.ranks.${rank.id}`) })}</p>
-        <button type="button" className={styles.goldAction} onClick={onNext}>
-          {mastered ? t("turboPulse.game.actions.playAgain") : t("turboPulse.game.actions.nextLevel", { level: snapshot.levelIndex + 2 })}
-        </button>
-      </section>
-    </div>
-  );
-}
-
 function Icon({ children }: { children: ReactNode }) {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       {children}
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
-      <path d="M8 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 8 4.5Z" />
-    </svg>
-  );
-}
-
-function PauseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
-      <rect x="5" y="4" width="5" height="16" rx="1.6" />
-      <rect x="14" y="4" width="5" height="16" rx="1.6" />
     </svg>
   );
 }
@@ -183,10 +141,12 @@ export interface TurboPulsePlayerProps {
   onFullscreenChange?: (next: boolean) => void;
   /** Ferme le jeu (retour à la page des jeux). Absent : pas de bouton. */
   onClose?: () => void;
-  /** Téléphone : le plein écran est la seule présentation, le bouton principal quitte le jeu et l'orientation paysage est demandée. */
-  mobileImmersive?: boolean;
+  /** Téléphone : le lecteur occupe tout l'écran dès l'ouverture, avec sa barre (voir GamePlayer). */
+  cover?: boolean;
   /** Le jeu se met en pause tout seul lorsqu'il n'est plus visible. */
   active?: boolean;
+  /** Page de jeu autonome : le titre est le titre de niveau 1 de la page (dans la page Jeux, c'est le catalogue qui l'a). */
+  pageHeading?: boolean;
 }
 
 // Lecteur de Turbo Pulse, utilisé dans la page « Jeux » (comme les Tuiles magiques) et sur sa page autonome.
@@ -195,18 +155,18 @@ export function TurboPulsePlayer({
   fullscreen = false,
   onFullscreenChange,
   onClose,
-  mobileImmersive = false,
+  cover = false,
   active = true,
+  pageHeading = false,
 }: TurboPulsePlayerProps) {
   const { t } = useTranslation("games");
-  const pageRef = useRef<HTMLElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const gameHostRef = useRef<HTMLDivElement | null>(null);
+  const canvasFrameRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<TurboPulseController | null>(null);
-  const nativeFullscreen = useRef(false);
+  const audioRef = useRef<GameAudio | null>(null);
   const [snapshot, setSnapshot] = useState(INITIAL_SNAPSHOT);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
-  // Plein écran (natif ou repli CSS) : le reste de l'application est inerte, le focus reste dans le jeu.
-  useInertOutside(pageRef, fullscreen);
 
   // Décor chargé par niveau (voir LEVEL_BACKGROUND_MODULES) : re-déclenché
   // uniquement quand levelIndex change réellement, jamais à chaque
@@ -227,10 +187,28 @@ export function TurboPulsePlayer({
 
   useEffect(() => {
     if (!gameHostRef.current) return;
-    controllerRef.current = mountTurboPulseGame(gameHostRef.current, setSnapshot);
+    // Son : musique d'ambiance et effets, sur deux pistes indépendantes (voir GameAudio). La musique n'est téléchargée qu'ici,
+    // à l'ouverture de Turbo Pulse ; les effets sont fabriqués par programmation, sans fichier.
+    const audio = new GameAudio({ storageKey: GAMES_SOUND_STORAGE_KEY });
+    audioRef.current = audio;
+    controllerRef.current = mountTurboPulseGame(gameHostRef.current, setSnapshot, audio);
+    void import("../../assets/turbo-pulse/turbo-pulse-theme.mp3")
+      .then((module) => audio.loadMusic(module.default))
+      .catch(() => undefined);
+    // Le toucher qui a ouvert le jeu autorise déjà le son sur la plupart des navigateurs ; sinon, le prochain toucher dans le
+    // lecteur le réveille (iPhone).
+    audio.unlock();
+    const root = rootRef.current;
+    const unlock = () => audio.unlock();
+    root?.addEventListener("pointerdown", unlock, true);
+    root?.addEventListener("keydown", unlock, true);
     return () => {
+      root?.removeEventListener("pointerdown", unlock, true);
+      root?.removeEventListener("keydown", unlock, true);
       controllerRef.current?.destroy();
       controllerRef.current = null;
+      audio.dispose();
+      audioRef.current = null;
     };
   }, []);
 
@@ -241,55 +219,56 @@ export function TurboPulsePlayer({
   // monde de jeu figé à sa dernière taille connue au lieu de suivre la
   // surface réellement disponible. refreshLayout() remesure et redessine
   // sans jamais recréer la scène ni perdre la partie en cours.
+  //
+  // La scène ne descend jamais sous MIN_WORLD_WIDTH × MIN_WORLD_HEIGHT (règle du moteur). Quand le cadre est plus petit
+  // (téléphone en paysage avec la barre du navigateur, petit lecteur dans la page), la scène garde sa taille minimale et
+  // elle est réduite à l'affichage pour tenir entière dans le cadre : le canon n'est jamais coupé sous la barre de commandes.
   useEffect(() => {
-    if (!gameHostRef.current) return;
-    const observer = new ResizeObserver(() => controllerRef.current?.refreshLayout());
-    observer.observe(gameHostRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // Plein écran natif quand il est disponible ; sinon la présentation immersive CSS (classe « fullscreen ») suffit.
-  useEffect(() => {
-    const root = pageRef.current;
-    if (!root) return;
-    if (fullscreen) {
-      void enterNativeFullscreen(root, mobileImmersive).then((entered) => {
-        nativeFullscreen.current = entered;
-      });
-    } else if (nativeFullscreen.current) {
-      nativeFullscreen.current = false;
-      void exitNativeFullscreen();
-    }
-    controllerRef.current?.refreshLayout();
-  }, [fullscreen, mobileImmersive]);
-
-  // Sortie par le système (geste retour, touche Échap) : le jeu suit, au lieu de rester dans un état incohérent.
-  useEffect(() => {
-    function onChange() {
-      if (nativeFullscreen.current && !fullscreenElement()) {
-        nativeFullscreen.current = false;
-        if (mobileImmersive) onClose?.();
-        else onFullscreenChange?.(false);
+    const frame = canvasFrameRef.current;
+    const host = gameHostRef.current;
+    if (!frame || !host) return;
+    const fit = () => {
+      const width = frame.clientWidth;
+      const height = frame.clientHeight;
+      const ratio = width > 0 && height > 0 ? Math.min(1, width / MIN_WORLD_WIDTH, height / MIN_WORLD_HEIGHT) : 1;
+      // Le conteneur de Phaser prend la taille réelle de la scène (Phaser mesure son conteneur) ; seul le canvas est réduit
+      // à l'affichage (variable --scene-scale), et Phaser recalcule la visée d'après la taille affichée du canvas.
+      if (ratio < 1) {
+        host.style.width = `${width / ratio}px`;
+        host.style.height = `${height / ratio}px`;
+        host.style.setProperty("--scene-scale", String(ratio));
+      } else {
+        host.style.width = "";
+        host.style.height = "";
+        host.style.removeProperty("--scene-scale");
       }
       controllerRef.current?.refreshLayout();
-    }
-    document.addEventListener("fullscreenchange", onChange);
-    document.addEventListener("webkitfullscreenchange", onChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", onChange);
-      document.removeEventListener("webkitfullscreenchange", onChange);
     };
-  }, [mobileImmersive, onClose, onFullscreenChange]);
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(frame);
+    // Rotation et entrée/sortie du plein écran : la mise en page se stabilise un peu après l'évènement, on remesure alors.
+    let timer = 0;
+    const later = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(fit, 250);
+    };
+    window.addEventListener("orientationchange", later);
+    document.addEventListener("fullscreenchange", later);
+    document.addEventListener("webkitfullscreenchange", later);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+      window.removeEventListener("orientationchange", later);
+      document.removeEventListener("fullscreenchange", later);
+      document.removeEventListener("webkitfullscreenchange", later);
+    };
+  }, []);
 
-  useEffect(
-    () => () => {
-      if (nativeFullscreen.current) {
-        nativeFullscreen.current = false;
-        void exitNativeFullscreen();
-      }
-    },
-    [],
-  );
+  // Le lecteur standard gère le plein écran ; Phaser, lui, re-mesure sa scène quand la présentation change.
+  useEffect(() => {
+    controllerRef.current?.refreshLayout();
+  }, [fullscreen, cover]);
 
   // Jeu masqué (fermé, onglet changé) : la partie se met en pause, sans rien perdre.
   useEffect(() => {
@@ -297,59 +276,82 @@ export function TurboPulsePlayer({
     if (!active && running && !snapshot.paused) controllerRef.current?.togglePause();
   }, [active, snapshot.status, snapshot.paused]);
 
+  // Musique : seulement pendant la partie, jeu visible et onglet affiché ; fondu à la pause, en fin de niveau et à la fermeture.
+  const visible = usePageVisible();
+  const musicOn = active && visible && !snapshot.paused && (snapshot.status === "playing" || snapshot.status === "clearing");
+  useEffect(() => {
+    if (musicOn) audioRef.current?.playMusic();
+    else audioRef.current?.pauseMusic();
+  }, [musicOn]);
+
   const rank = rankForLevel(snapshot.levelIndex);
   const progress = Math.min(100, (snapshot.solved / CALCULATIONS_PER_LEVEL) * 100);
   const isSuccess = snapshot.status === "level-complete" || snapshot.status === "mastered";
   const canPause = snapshot.status === "playing" || snapshot.status === "clearing";
+  const rankStyle = { "--rank": rank.accentCss, "--rank-light": rank.lightCss, "--rank-dark": rank.darkCss } as CSSProperties;
 
-  // En plein écran, le header, la barre d'informations, la mission et l'aide
-  // tactile ne sont pas seulement masqués en CSS mais réellement absents du
-  // DOM : rien ne doit rester interactif hors du jeu, et .playArea (donc le
-  // hôte Phaser) n'est jamais concerné par cette bascule.
+  // Le lecteur standard fournit le cadre, l'en-tête, la barre de commandes, la pause et le plein écran ; Turbo Pulse n'apporte
+  // que son moteur Phaser, son décor, ses panneaux de fin de niveau, son indicateur de rang et le bouton Son.
   return (
-    <main
-      ref={pageRef}
-      className={fullscreen ? `${styles.page} ${styles.fullscreen}` : styles.page}
-      style={{ "--rank": rank.accentCss, "--rank-light": rank.lightCss, "--rank-dark": rank.darkCss } as CSSProperties}
-      aria-labelledby="turbo-pulse-title"
+    <GamePlayer
+      rootRef={rootRef}
+      label={t("turboPulse.game.title")}
+      title={t("turboPulse.game.title")}
+      titleIsHeading={pageHeading}
+      stageUnderControls
+      headerCenter={
+        <section className={styles.levelHeader} aria-label={t("turboPulse.game.statusLabel")} style={rankStyle}>
+          <div className={styles.rankBadge}>
+            <RankEmblem rank={rank} size={26} />
+            <strong>{t(`turboPulse.game.ranks.${rank.id}`)}</strong>
+          </div>
+          <div className={styles.levelBlock}>
+            <span>{t("turboPulse.game.level", { level: snapshot.levelIndex + 1 })}</span>
+            <strong>{snapshot.levelName}</strong>
+          </div>
+          <div className={styles.progressBlock}>
+            <div className={styles.progressLabels}>
+              <span>{t("turboPulse.game.progress")}</span>
+              <strong>{snapshot.solved} / {CALCULATIONS_PER_LEVEL}</strong>
+            </div>
+            <div className={styles.progressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={CALCULATIONS_PER_LEVEL} aria-valuenow={snapshot.solved}>
+              <span style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        </section>
+      }
+      stats={[
+        { label: t("turboPulse.game.score"), value: `🏆 ${snapshot.score}` },
+        { label: t("turboPulse.game.streak"), value: `🔥 ${snapshot.streak}` },
+        { label: t("turboPulse.game.defense"), value: `🛡️ ${snapshot.intrusions} / ${snapshot.intrusionLimit}` },
+      ]}
+      paused={snapshot.paused}
+      onPlay={() => snapshot.paused && controllerRef.current?.togglePause()}
+      onPause={() => !snapshot.paused && controllerRef.current?.togglePause()}
+      ended={!canPause}
+      onRestart={() => controllerRef.current?.restartRun()}
+      extraControls={
+        <button
+          type="button"
+          className={playerControlClass}
+          aria-pressed={!snapshot.muted}
+          aria-label={snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")}
+          onClick={() => controllerRef.current?.toggleMuted()}
+        >
+          <Icon>
+            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+            {snapshot.muted ? <path d="m16 9 5 6M21 9l-5 6" /> : <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />}
+          </Icon>
+          <span>{snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")}</span>
+        </button>
+      }
+      fullscreen={fullscreen}
+      onFullscreenChange={onFullscreenChange}
+      onClose={onClose}
+      cover={cover}
     >
-      <header className={styles.topbar}>
-        <div className={styles.brand}>
-          <span className={styles.brandMark} aria-hidden="true">⚡</span>
-          <div>
-            <h1 id="turbo-pulse-title">{t("turboPulse.game.title")}</h1>
-            <p>{t("turboPulse.game.subtitle")}</p>
-          </div>
-        </div>
-      </header>
-
-      <section className={styles.statusBar} aria-label={t("turboPulse.game.statusLabel")}>
-        <div className={styles.rankBadge}>
-          <RankEmblem rank={rank} size={30} />
-          <strong>{t(`turboPulse.game.ranks.${rank.id}`)}</strong>
-        </div>
-        <div className={styles.levelBlock}>
-          <span>{t("turboPulse.game.level", { level: snapshot.levelIndex + 1 })}</span>
-          <strong>{snapshot.levelName}</strong>
-        </div>
-        <div className={styles.progressBlock}>
-          <div className={styles.progressLabels}>
-            <span>{t("turboPulse.game.progress")}</span>
-            <strong>{snapshot.solved} / {CALCULATIONS_PER_LEVEL}</strong>
-          </div>
-          <div className={styles.progressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={CALCULATIONS_PER_LEVEL} aria-valuenow={snapshot.solved}>
-            <span style={{ width: `${progress}%` }} />
-          </div>
-        </div>
-        <dl className={styles.stats}>
-          <div><dt>{t("turboPulse.game.score")}</dt><dd>🏆 {snapshot.score}</dd></div>
-          <div><dt>{t("turboPulse.game.streak")}</dt><dd>🔥 {snapshot.streak}</dd></div>
-          <div><dt>{t("turboPulse.game.defense")}</dt><dd>🛡️ {snapshot.intrusions} / {snapshot.intrusionLimit}</dd></div>
-        </dl>
-      </section>
-
-      <section className={styles.playArea}>
-        <div className={styles.canvasFrame}>
+      <div className={styles.playArea}>
+        <div ref={canvasFrameRef} className={styles.canvasFrame} style={rankStyle}>
           {/* Décor illustré : calque CSS/DOM séparé, derrière le canvas
               Phaser (transparent). Le flou "façon cinéma" est composé une
               fois par le navigateur, jamais recalculé par frame comme le
@@ -364,54 +366,11 @@ export function TurboPulsePlayer({
             <span>{t("turboPulse.game.solve")}</span>
             <strong>{snapshot.operation}</strong>
           </div>
-          {snapshot.paused ? <PausePanel onResume={() => controllerRef.current?.togglePause()} /> : null}
-          {snapshot.status === "failed" ? <FailurePanel snapshot={snapshot} onRetry={() => controllerRef.current?.retryLevel()} /> : null}
-          {isSuccess ? <SuccessPanel snapshot={snapshot} onNext={() => controllerRef.current?.nextLevel()} /> : null}
+          {snapshot.status === "failed" ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.retryLevel()} /> : null}
+          {isSuccess ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.nextLevel()} /> : null}
         </div>
-      </section>
-
-      <div className={styles.controls} role="toolbar" aria-label={t("turboPulse.game.controlsLabel")}>
-        <button type="button" className={styles.ctl} aria-pressed={canPause && !snapshot.paused} disabled={!canPause} onClick={() => snapshot.paused && controllerRef.current?.togglePause()}>
-          <PlayIcon />
-          <span>{t("turboPulse.game.actions.play")}</span>
-        </button>
-        <button type="button" className={styles.ctl} aria-pressed={canPause && snapshot.paused} disabled={!canPause} onClick={() => !snapshot.paused && controllerRef.current?.togglePause()}>
-          <PauseIcon />
-          <span>{t("turboPulse.game.actions.pause")}</span>
-        </button>
-        <button type="button" className={styles.ctl} aria-label={t("turboPulse.game.actions.restartAria")} onClick={() => controllerRef.current?.restartRun()}>
-          <Icon>
-            <path d="M3 12a9 9 0 1 0 3-6.7" />
-            <path d="M3 4v5h5" />
-          </Icon>
-          <span>{t("turboPulse.game.actions.restart")}</span>
-        </button>
-        <span className={styles.ctlSeparator} aria-hidden="true" />
-        <button type="button" className={styles.ctl} aria-pressed={!snapshot.muted} aria-label={snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")} onClick={() => controllerRef.current?.toggleMuted()}>
-          <Icon>
-            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
-            {snapshot.muted ? <path d="m16 9 5 6M21 9l-5 6" /> : <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />}
-          </Icon>
-          <span>{snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")}</span>
-        </button>
-        {onFullscreenChange && !mobileImmersive ? (
-          <button type="button" className={styles.ctl} aria-label={fullscreen ? t("turboPulse.game.actions.fullscreenOff") : t("turboPulse.game.actions.fullscreenOn")} onClick={() => onFullscreenChange(!fullscreen)}>
-            <Icon>
-              {fullscreen ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /> : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
-            </Icon>
-            <span>{fullscreen ? t("turboPulse.game.actions.fullscreenOff") : t("turboPulse.game.actions.fullscreenOn")}</span>
-          </button>
-        ) : null}
-        {onClose ? (
-          <button type="button" className={`${styles.ctl} ${styles.ctlExit}`} aria-label={t("turboPulse.game.actions.exit")} onClick={onClose}>
-            <Icon>
-              <path d="M6 6l12 12M18 6 6 18" />
-            </Icon>
-            <span className={styles.ctlKeep}>{t("turboPulse.game.actions.exit")}</span>
-          </button>
-        ) : null}
+        <p className={styles.srOnly} aria-live="polite">{snapshot.feedback}</p>
       </div>
-      <p className={styles.srOnly} aria-live="polite">{snapshot.feedback}</p>
-    </main>
+    </GamePlayer>
   );
 }

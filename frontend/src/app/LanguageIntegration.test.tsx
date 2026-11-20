@@ -52,11 +52,14 @@ describe("Changement de langue dans l'application", () => {
     expect(within(nav).getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
     expect(within(nav).getByRole("link", { name: "Games" })).toBeInTheDocument();
 
-    const courseNav = screen.getByRole("navigation", { name: /course navigation/i });
-    expect(within(courseNav).getByRole("button", { name: /primary courses/i })).toBeInTheDocument();
-    expect(within(courseNav).getByRole("button", { name: /secondary courses/i })).toBeInTheDocument();
-    expect(within(courseNav).getByRole("link", { name: /exetat preparation/i })).toBeInTheDocument();
-    expect(within(courseNav).getByRole("link", { name: /my progress/i })).toBeInTheDocument();
+    // Page Jeux : une grande recherche centrale remplace les liens de cours de l'en-tête ; ils restent dans le menu principal.
+    expect(screen.getByRole("searchbox", { name: "Search all games" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: /course navigation/i })).not.toBeInTheDocument();
+    expect(within(nav).getByText("Primary courses")).toBeInTheDocument();
+    expect(within(nav).getByText("Secondary courses")).toBeInTheDocument();
+    expect(within(nav).getByRole("link", { name: /prepare for exetat/i })).toBeInTheDocument();
+    expect(within(nav).getAllByText("Free learning path").length).toBeGreaterThan(0);
+    expect(within(nav).getByRole("link", { name: /my progress/i })).toBeInTheDocument();
 
     // Aucune clé i18next non résolue (ex. "welcome.title") ne doit fuiter à
     // l'écran. On inspecte chaque nœud de texte isolément — pas le body

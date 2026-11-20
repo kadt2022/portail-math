@@ -47,8 +47,8 @@ import {
 // Un clamp maison ici (sur worldWidth/worldHeight seuls) laisserait le
 // canvas continuer à rétrécir en dessous pendant que la logique de jeu
 // croirait le monde plus grand qu'il ne l'est réellement à l'écran.
-const MIN_WORLD_WIDTH = 480;
-const MIN_WORLD_HEIGHT = 270;
+export const MIN_WORLD_WIDTH = 480;
+export const MIN_WORLD_HEIGHT = 270;
 const DEFENSE_X = 72;
 const SHOT_SPEED = 620;
 
@@ -68,6 +68,25 @@ export const CANNON_IMAGE_SCALE = 1 / ART_SCALE;
 const CANNON_PLATE_OFFSET_Y = 62;
 // Cadence des étincelles de la traînée du tir.
 const TRAIL_INTERVAL = 0.028;
+
+/**
+ * Force de l'impulsion de combo (0 à 1) selon le nombre de fruits détruits d'un seul tir : rien pour un fruit seul, une impulsion
+ * nette dès deux, puis de plus en plus grande, lumineuse et rapide jusqu'à cinq fruits et au-delà.
+ */
+export function comboPulseIntensity(destroyedCount: number): number {
+  if (destroyedCount < 2) return 0;
+  return Math.min(1, (destroyedCount - 1) / 4);
+}
+
+/**
+ * Sortie sonore du moteur (fournie par le lecteur, voir GameAudio) : le moteur annonce chaque événement au moment exact où il
+ * se produit ; la musique d'ambiance, elle, est gérée à part et n'est jamais interrompue par un effet.
+ */
+export interface TurboPulseSoundOutput {
+  play(effect: "shot" | "explosion" | "levelStart" | "combo" | "wrong" | "intrusion" | "levelComplete" | "levelFailed", options?: { intensity?: number; count?: number }): void;
+  setMuted(muted: boolean): void;
+  readonly muted: boolean;
+}
 
 export type TurboPulseStatus = "playing" | "clearing" | "level-complete" | "failed" | "mastered";
 
@@ -168,9 +187,14 @@ export class TurboPulseScene extends Phaser.Scene {
   private paused = false;
   private completionTimer?: Phaser.Time.TimerEvent;
 
-  constructor(onSnapshot: SnapshotListener) {
+  private readonly audio?: TurboPulseSoundOutput;
+
+  constructor(onSnapshot: SnapshotListener, audio?: TurboPulseSoundOutput) {
     super({ key: "turbo-pulse" });
     this.onSnapshot = onSnapshot;
+    this.audio = audio;
+    // Choix « son coupé » mémorisé par le lecteur : le jeu démarre dans le même état.
+    this.muted = audio?.muted ?? false;
   }
 
   create() {
@@ -305,7 +329,8 @@ export class TurboPulseScene extends Phaser.Scene {
 
   toggleMuted = () => {
     this.muted = !this.muted;
-    this.sound.mute = this.muted;
+    // Commande générale : musique et effets coupés ensemble.
+    this.audio?.setMuted(this.muted);
     this.emitSnapshot();
   };
 
@@ -478,7 +503,7 @@ export class TurboPulseScene extends Phaser.Scene {
     this.setTarget(starting[0].number);
     this.scheduleNextArrival(this.time.now);
     this.feedback = `Niveau ${index + 1} — ${TURBO_LEVELS[index].name}`;
-    this.playSequence(index >= 5 ? [330, 440, 554] : [392, 523], 0.08);
+    this.audio?.play("levelStart", { intensity: index >= 5 ? 1 : 0.3 });
     this.emitSnapshot();
   }
 
@@ -582,7 +607,7 @@ export class TurboPulseScene extends Phaser.Scene {
     const view = this.add.container(muzzleX, muzzleY, [glow, core]).setDepth(4);
     this.shots.push({ view, vx: Math.cos(this.aimAngle) * SHOT_SPEED, vy: Math.sin(this.aimAngle) * SHOT_SPEED, life: 2.4, result: this.operation.result, token: this.operationToken, trail: 0 });
     this.flashMuzzle(muzzleX, muzzleY, accent);
-    this.playTone(230, 0.06, 0.04, "square");
+    this.audio?.play("shot");
   }
 
   // Éclat bref à la bouche du canon au moment du tir.
@@ -606,12 +631,17 @@ export class TurboPulseScene extends Phaser.Scene {
     const destroyed = this.fruits.filter((fruit) => ids.has(fruit.spec.id));
     this.fruits = this.fruits.filter((fruit) => !ids.has(fruit.spec.id));
     destroyed.forEach((fruit, index) => this.explodeFruit(fruit, index === 0));
+    // Une seule explosion sonore par tir, proportionnelle au nombre de boules détruites, puis le scintillement du combo dès deux boules.
+    const comboIntensity = comboPulseIntensity(destroyed.length);
+    this.audio?.play("explosion", { intensity: 0.55 + 0.45 * comboIntensity, count: destroyed.length });
+    if (destroyed.length >= 2) this.audio?.play("combo", { intensity: comboIntensity });
+    // Deux fruits ou plus d'un coup : grande impulsion lumineuse, proportionnelle au combo (effet visuel seul, le score ne change pas).
+    if (destroyed.length >= 2) this.comboPulse(destroyed.map((fruit) => ({ x: fruit.view.x, y: fruit.view.y, color: this.fruitColor(fruit.spec) })));
     this.score += destroyed.length;
     this.streak += 1;
     this.totalSolved += 1;
     if (this.status === "playing") this.solved += 1;
     this.feedback = destroyed.length > 1 ? `Combo ${selected.spec.variantLabel} ×${destroyed.length} !` : `${formatOperation(this.operation)} = ${this.operation.result}`;
-    this.playSequence(destroyed.length >= 3 ? [440, 587, 784] : destroyed.length === 2 ? [480, 700] : [520], 0.065);
 
     if (this.status === "playing" && this.solved >= CALCULATIONS_PER_LEVEL) {
       this.solved = CALCULATIONS_PER_LEVEL;
@@ -630,7 +660,7 @@ export class TurboPulseScene extends Phaser.Scene {
     fruit.view.x += 24;
     this.feedback = "Presque ! Recalcule : la valeur visée n’est pas la réponse.";
     this.tweens.add({ targets: fruit.view, scale: 1.12, yoyo: true, duration: 100 });
-    this.playTone(145, 0.14, 0.05, "sawtooth");
+    this.audio?.play("wrong");
     this.emitSnapshot();
   }
 
@@ -651,9 +681,75 @@ export class TurboPulseScene extends Phaser.Scene {
     this.tweens.add({ targets: fruit.view, scale: 1.65, alpha: 0, angle: 25, duration: 330, ease: "Back.easeIn", onComplete: () => fruit.view.destroy() });
   }
 
+  // Impulsion de combo : un dégradé de lumière (couleur du fruit, couleur du rang, cœur blanc) s'ouvre depuis le centre du combo,
+  // des ondes se propagent en cascade (une par fruit en plus du premier), des liens de lumière relient les fruits détruits et une
+  // gerbe d'étincelles jaillit. Tout grandit avec le nombre de fruits (comboPulseIntensity). En mouvement réduit : seulement la
+  // lumière, plus douce, sans ondes ni secousse. Mélange normal (pas additif) : le canvas du jeu est transparent au-dessus du décor,
+  // un mélange additif y resterait presque invisible.
+  private comboPulse(points: { x: number; y: number; color: number }[]) {
+    const intensity = comboPulseIntensity(points.length);
+    if (intensity === 0) return;
+    const calm = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const centerX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+    const centerY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+    const fruitColor = points[0].color;
+    const accent = this.rank.accent;
+    const light = Number.parseInt(this.rank.lightCss.slice(1), 16);
+    const reach = Math.hypot(this.worldWidth, this.worldHeight) * (0.35 + 0.45 * intensity);
+    const { fruitRadius, scale } = this.metrics;
+    const track = <T extends Phaser.GameObjects.GameObject>(object: T, lifetime: number): T => {
+      this.time.delayedCall(lifetime, () => object.destroy());
+      return object;
+    };
+
+    // 1. Dégradé de lumière : trois halos superposés qui s'ouvrent et s'éteignent.
+    const layers = [
+      { tint: fruitColor, size: 1, alpha: 0.5 + 0.35 * intensity, delay: 0 },
+      { tint: accent, size: 0.7, alpha: 0.45 + 0.3 * intensity, delay: 60 },
+      { tint: 0xffffff, size: 0.35, alpha: 0.55 + 0.3 * intensity, delay: 0 },
+    ];
+    const lightDuration = calm ? 700 : 650 + 500 * intensity;
+    for (const layer of layers) {
+      const start = reach * layer.size * 0.15;
+      const halo = track(this.add.image(centerX, centerY, ENERGY_GLOW_KEY).setTint(layer.tint).setDepth(5).setAlpha(0).setDisplaySize(start, start), lightDuration + layer.delay + 200);
+      // La lumière s'allume vite, reste un instant à son plus fort, puis s'éteint en s'élargissant.
+      const peak = calm ? layer.alpha * 0.6 : layer.alpha;
+      this.tweens.add({ targets: halo, scale: halo.scaleX * 6.5, delay: layer.delay, duration: lightDuration, ease: "Cubic.easeOut" });
+      this.tweens.chain({
+        targets: halo,
+        tweens: [
+          { alpha: peak, delay: layer.delay, duration: 120, ease: "Quad.easeOut" },
+          { alpha: peak, duration: 180 + 220 * intensity },
+          { alpha: 0, duration: lightDuration * 0.6, ease: "Quad.easeIn" },
+        ],
+      });
+    }
+    if (calm) return;
+
+    // 2. Ondes d'impulsion en cascade.
+    const ringColors = [fruitColor, accent, light];
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const ring = track(this.add.circle(centerX, centerY, fruitRadius, 0xffffff, 0).setStrokeStyle((5 + 3 * intensity) * scale, ringColors[index % ringColors.length], 0.95).setDepth(5), 1600);
+      this.tweens.add({ targets: ring, scale: (reach * 0.5) / fruitRadius, alpha: 0, delay: index * 110, duration: 700 + 250 * intensity, ease: "Quad.easeOut" });
+    }
+
+    // 3. Liens de lumière entre le centre du combo et chaque fruit détruit.
+    const links = track(this.add.graphics().setDepth(5), 600);
+    links.lineStyle((3 + 3 * intensity) * scale, light, 0.9);
+    for (const point of points) links.lineBetween(centerX, centerY, point.x, point.y);
+    this.tweens.add({ targets: links, alpha: 0, duration: 420, ease: "Quad.easeIn" });
+
+    // 4. Gerbe d'étincelles, plus fournie et plus rapide avec le combo.
+    const sparks = track(this.add.particles(centerX, centerY, "turbo-spark", { lifespan: 700 + 500 * intensity, speed: { min: 90, max: 220 + 380 * intensity }, scale: { start: 0.55 + 0.35 * intensity, end: 0 }, alpha: { start: 1, end: 0 }, gravityY: 90, tint: [fruitColor, accent, light, 0xffffff], emitting: false }).setDepth(6), 1500);
+    sparks.explode(Math.round(20 + 40 * intensity));
+
+    // 5. Légère secousse, à peine perceptible pour deux fruits.
+    this.cameras.main.shake(120 + 140 * intensity, 0.002 + 0.004 * intensity);
+  }
+
   private registerIntrusion(fruit: FruitActor): boolean {
     this.intrusions += 1;
-    this.playSequence([170, 130], 0.11);
+    this.audio?.play("intrusion");
     if (this.intrusions >= INTRUSION_LIMITS[this.levelIndex]) {
       this.failLevel();
       return true;
@@ -678,7 +774,7 @@ export class TurboPulseScene extends Phaser.Scene {
     this.failureAction = resolution.action;
     this.expertAttemptUsed = resolution.attemptUsed;
     this.feedback = "La ligne de défense a été franchie.";
-    this.playSequence([220, 174, 130], 0.14);
+    this.audio?.play("levelFailed");
     this.emitSnapshot();
   }
 
@@ -769,31 +865,9 @@ export class TurboPulseScene extends Phaser.Scene {
       this.completionTimer = undefined;
       this.status = this.levelIndex === TURBO_LEVELS.length - 1 ? "mastered" : "level-complete";
       this.feedback = this.status === "mastered" ? "Les sept niveaux sont maîtrisés !" : `Niveau ${this.levelIndex + 1} terminé !`;
-      this.playSequence([523, 659, 784, 1047], 0.09);
+      this.audio?.play("levelComplete");
       this.emitSnapshot();
     });
-  }
-
-  private playTone(frequency: number, duration: number, volume: number, type: OscillatorType = "sine", delay = 0) {
-    if (this.muted) return;
-    const context = (this.sound as Phaser.Sound.WebAudioSoundManager).context;
-    if (!context) return;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const start = context.currentTime + delay;
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, start);
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(start);
-    oscillator.stop(start + duration + 0.04);
-  }
-
-  private playSequence(notes: number[], delay: number) {
-    notes.forEach((note, index) => this.playTone(note, 0.14, 0.055, "triangle", index * delay));
   }
 
   private emitSnapshot() {
@@ -818,8 +892,8 @@ export class TurboPulseScene extends Phaser.Scene {
   }
 }
 
-export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotListener): TurboPulseController {
-  const scene = new TurboPulseScene(onSnapshot);
+export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotListener, audio?: TurboPulseSoundOutput): TurboPulseController {
+  const scene = new TurboPulseScene(onSnapshot, audio);
   // Un grand écran doit révéler une vraie surface de jeu plus grande, pas
   // agrandir par étirement une scène 960×540 figée : la taille initiale suit
   // la place réellement disponible dans le conteneur (mesurée ici), et
@@ -852,6 +926,7 @@ export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotLis
     scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER, min: { width: MIN_WORLD_WIDTH, height: MIN_WORLD_HEIGHT } },
     render: { antialias: true, roundPixels: true },
     input: { activePointers: 2 },
+    audio: { noAudio: true },
   });
   return {
     destroy: () => game.destroy(true),

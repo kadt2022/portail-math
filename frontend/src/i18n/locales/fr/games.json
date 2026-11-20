@@ -11,7 +11,11 @@
     "galleryTitle": "Tous les jeux",
     "noResult": "Aucun jeu ne porte ce nom. Essaie un autre mot !",
     "resultCount_one": "{{count}} jeu",
-    "resultCount_other": "{{count}} jeux"
+    "resultCount_other": "{{count}} jeux",
+    "recommended": "À voir aussi",
+    "aboutGame": "À propos de {{name}}",
+    "headerSearchLabel": "Rechercher un jeu",
+    "headerSearchPlaceholder": "Rechercher un jeu"
   },
   "bar": {
     "label": "Navigation des jeux",
@@ -97,41 +101,20 @@
         "replay": "Revoir le tutoriel"
       },
       "hint": {
-        "button": "Indice",
-        "aria": "Demander un indice",
         "move": "Indice : le {{value}} va en ligne {{row}}, colonne {{col}}.",
         "center": "Tout est en place : ramène la case vide au centre, puis pose la carte.",
         "done": "Bravo, la grille est terminée !"
       },
       "screen": {
-        "label": "Jeu Les Tuiles magiques",
-        "enter": "Passer en plein écran",
-        "exit": "Quitter le plein écran",
-        "enterShort": "Plein écran",
-        "exitShort": "Réduire",
-        "closeShort": "Fermer",
-        "close": "Fermer le jeu et retrouver les autres jeux",
-        "leave": "Quitter",
-        "rotate": "Tourne ton téléphone en mode paysage pour un plateau plus grand."
+        "label": "Jeu Les Tuiles magiques"
       },
       "actions": {
-        "restart": "Recommencer",
-        "restartAria": "Recommencer avec une nouvelle grille",
         "newGrid": "Nouvelle grille",
         "nextLevel": "Niveau suivant",
-        "backToGames": "Retour aux jeux"
-      },
-      "player": {
-        "controls": "Commandes du jeu",
-        "play": "Jouer",
-        "pause": "Pause",
-        "resume": "Reprendre",
-        "pausedTitle": "Jeu en pause"
+        "backToGames": "Retour aux jeux",
+        "restartAria": "Recommencer avec une nouvelle grille"
       },
       "howTo": {
-        "button": "Comment jouer",
-        "title": "Comment jouer",
-        "close": "Fermer les instructions",
         "step1Title": "Observe les sommes",
         "step1": "Chaque ligne et chaque colonne doit donner le résultat indiqué.",
         "step2Title": "Déplace les tuiles",
@@ -211,7 +194,17 @@
         "ruby": "Rubis royal",
         "gold": "Or royal"
       },
-      "rankLabel": "Rang {{rank}}"
+      "rankLabel": "Rang {{rank}}",
+      "end": {
+        "failTitle": "Oups ! Réessaie",
+        "winTitle": "Niveau réussi !",
+        "score": "Score : {{score}}",
+        "retry": "Réessayer",
+        "next": "Continuer",
+        "attemptsLeft_one": "Encore 1 tentative",
+        "attemptsLeft_other": "Encore {{count}} tentatives",
+        "noAttemptLeft": "Plus de tentative : retour au niveau 1"
+      }
     },
     "tagline": "Vise, calcule, enchaîne"
   },
@@ -252,5 +245,49 @@
   "card": {
     "playAria": "Jouer à {{name}}",
     "soonAria": "{{name}} : bientôt disponible"
+  },
+  "player": {
+    "controls": "Commandes du jeu",
+    "play": "Jouer",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "pausedTitle": "Jeu en pause",
+    "restart": "Recommencer",
+    "restartAria": "Recommencer la partie",
+    "hint": "Indice",
+    "hintAria": "Demander un indice",
+    "screen": {
+      "enter": "Passer en plein écran",
+      "exit": "Quitter le plein écran",
+      "enterShort": "Plein écran",
+      "exitShort": "Réduire",
+      "closeShort": "Fermer",
+      "close": "Fermer le jeu et retrouver les autres jeux",
+      "leave": "Quitter"
+    },
+    "howTo": {
+      "button": "Comment jouer",
+      "title": "Comment jouer",
+      "close": "Fermer les instructions"
+    },
+    "orientation": {
+      "playPortrait": "Passer en portrait",
+      "playLandscape": "Passer en paysage",
+      "portraitShort": "Portrait",
+      "landscapeShort": "Paysage",
+      "rotateNote": "Tourne ton téléphone pour jouer en paysage."
+    },
+    "sound": {
+      "on": "Son activé",
+      "off": "Son coupé"
+    }
+  },
+  "meta": {
+    "subject": {
+      "maths": "Maths"
+    },
+    "level": {
+      "primary": "Primaire"
+    }
   }
 }

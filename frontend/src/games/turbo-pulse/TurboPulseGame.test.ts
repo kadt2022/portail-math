@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
-import { CANNON_IMAGE_SCALE, mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot } from "./TurboPulseGame";
+import { CANNON_IMAGE_SCALE, comboPulseIntensity, mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot, type TurboPulseSoundOutput } from "./TurboPulseGame";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
@@ -86,11 +86,11 @@ async function mountScene(): Promise<{ scene: TurboPulseScene; snapshots: TurboP
  * sur un petit écran (ex. téléphone Android en paysage), sans perturber les
  * nombreux tests qui supposent l'échelle de référence 1 (960×540).
  */
-async function mountSceneAtSize(width: number, height: number): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
+async function mountSceneAtSize(width: number, height: number, audio?: TurboPulseSoundOutput): Promise<{ scene: TurboPulseScene; snapshots: TurboPulseSnapshot[] }> {
   const parent = document.createElement("div");
   document.body.appendChild(parent);
   const snapshots: TurboPulseSnapshot[] = [];
-  const scene = new TurboPulseScene((snapshot) => snapshots.push(snapshot));
+  const scene = new TurboPulseScene((snapshot) => snapshots.push(snapshot), audio);
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
@@ -910,5 +910,114 @@ describe("montage du jeu Turbo Pulse", () => {
     expect(canvas.height).toBeGreaterThanOrEqual(270);
 
     controller.destroy();
+  });
+});
+
+describe("impulsion de combo", () => {
+  it("rien pour un fruit seul, une impulsion dès deux fruits, de plus en plus forte jusqu'à cinq, sans dépasser le maximum", () => {
+    expect(comboPulseIntensity(0)).toBe(0);
+    expect(comboPulseIntensity(1)).toBe(0);
+    const levels = [2, 3, 4, 5].map(comboPulseIntensity);
+    expect(levels[0]).toBeGreaterThan(0);
+    for (let index = 1; index < levels.length; index += 1) {
+      expect(levels[index]).toBeGreaterThan(levels[index - 1]);
+    }
+    expect(comboPulseIntensity(5)).toBe(1);
+    expect(comboPulseIntensity(12)).toBe(1);
+  });
+});
+
+describe("sons de Turbo Pulse", () => {
+  let nativeImage: typeof Image;
+
+  // Même préparation que la scène : jsdom ne charge pas les images, on débloque le démarrage de Phaser.
+  beforeAll(() => {
+    nativeImage = globalThis.Image;
+    class InstantImage extends nativeImage {
+      constructor() {
+        super();
+        setTimeout(() => this.dispatchEvent(new Event("load")), 0);
+      }
+    }
+    globalThis.Image = InstantImage as unknown as typeof Image;
+  });
+
+  afterAll(() => {
+    globalThis.Image = nativeImage;
+  });
+
+  afterEach(() => {
+    games.splice(0).forEach((game) => game.destroy(true));
+  });
+
+  function soundSpy(muted = false) {
+    const played: { effect: string; intensity?: number; count?: number }[] = [];
+    const mutedCalls: boolean[] = [];
+    const output: TurboPulseSoundOutput = {
+      muted,
+      play: (effect, options) => {
+        played.push({ effect, intensity: options?.intensity, count: options?.count });
+      },
+      setMuted: (value) => {
+        mutedCalls.push(value);
+      },
+    };
+    return { output, played, mutedCalls };
+  }
+
+  it("chaque événement déclenche son effet au moment où il se produit : tir, explosion, combo, erreur, intrusion, échec", async () => {
+    const audio = soundSpy();
+    const { scene } = await mountSceneAtSize(960, 540, audio.output);
+    const internals = internalsOf(scene);
+    audio.played.length = 0;
+
+    // Délai minimal entre deux tirs (règle du jeu) : on le considère écoulé.
+    (internals as unknown as { lastFireAt: number }).lastFireAt = Number.NEGATIVE_INFINITY;
+    internals.aimAt(700, 200);
+    internals.fire();
+    expect(audio.played.map((sound) => sound.effect)).toEqual(["shot"]);
+
+    audio.played.length = 0;
+    const target = internals.fruits.find((fruit) => fruit.spec.number === internals.operation.result)!;
+    const sameColour = internals.fruits.filter((fruit) => fruit.spec.variant === target.spec.variant).length;
+    internals.correctHit(target);
+    // Une seule explosion sonore par tir ; le scintillement du combo s'y ajoute dès deux boules détruites.
+    expect(audio.played.filter((sound) => sound.effect === "explosion")).toHaveLength(1);
+    expect(audio.played.some((sound) => sound.effect === "combo")).toBe(sameColour >= 2);
+
+    audio.played.length = 0;
+    internals.wrongHit(internals.fruits[0] ?? fakeFruit(999));
+    expect(audio.played.map((sound) => sound.effect)).toEqual(["wrong"]);
+
+    audio.played.length = 0;
+    for (let count = 0; count < 5; count += 1) internals.registerIntrusion(internals.fruits[0] ?? fakeFruit(999));
+    expect(audio.played.filter((sound) => sound.effect === "intrusion")).toHaveLength(5);
+    expect(audio.played.at(-1)?.effect).toBe("levelFailed");
+  });
+
+  it("explosion plus ample et combo plus fort quand le tir détruit plus de boules", async () => {
+    const audio = soundSpy();
+    const { scene } = await mountSceneAtSize(960, 540, audio.output);
+    const internals = internalsOf(scene);
+    const result = internals.operation.result;
+    // Trois boules de la même couleur, dont la bonne réponse.
+    internals.fruits = [fakeFruit(result), fakeFruit(result + 1), fakeFruit(result + 2)];
+    audio.played.length = 0;
+    internals.correctHit(internals.fruits[0]);
+    const explosion = audio.played.find((sound) => sound.effect === "explosion")!;
+    const combo = audio.played.find((sound) => sound.effect === "combo")!;
+    expect(explosion.intensity).toBeCloseTo(0.55 + 0.45 * comboPulseIntensity(3));
+    // L'explosion connaît le nombre de boules détruites : elle grandit avec lui.
+    expect(explosion.count).toBe(3);
+    expect(combo.intensity).toBeCloseTo(comboPulseIntensity(3));
+  });
+
+  it("le bouton Son passe par la commande générale, et un choix « son coupé » mémorisé est repris au démarrage", async () => {
+    const audio = soundSpy(true);
+    const { scene, snapshots } = await mountSceneAtSize(960, 540, audio.output);
+    expect(lastSnapshot(snapshots).muted).toBe(true);
+    scene.toggleMuted();
+    expect(audio.mutedCalls).toEqual([false]);
+    expect(lastSnapshot(snapshots).muted).toBe(false);
   });
 });

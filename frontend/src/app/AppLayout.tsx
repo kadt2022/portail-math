@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { GamesHeaderSearch } from "../games/GamesHeaderSearch";
 import { useSyncDocumentLanguage } from "../i18n/useSyncDocumentLanguage";
 import { CourseNavigation } from "./CourseNavigation";
 import { Sidebar } from "./Sidebar";
@@ -119,7 +120,8 @@ export function AppLayout() {
           </span>
         </Link>
 
-        <CourseNavigation />
+        {/* Page Jeux : une grande recherche centrale remplace les liens de cours (toujours dans le menu principal ☰). */}
+        {space === "games" ? <GamesHeaderSearch /> : <CourseNavigation />}
 
         <LanguageSwitcher />
 

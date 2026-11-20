@@ -27,6 +27,8 @@ const { gameMock, mountTurboPulseGameMock } = vi.hoisted(() => {
 
 vi.mock("./TurboPulseGame", () => ({
   mountTurboPulseGame: mountTurboPulseGameMock,
+  MIN_WORLD_WIDTH: 480,
+  MIN_WORLD_HEIGHT: 270,
 }));
 
 const snapshot: TurboPulseSnapshot = {
@@ -64,6 +66,31 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.destroy).toHaveBeenCalledOnce();
   });
 
+  it("cadre plus petit que la scène minimale : la scène garde sa taille et elle est réduite pour tenir entière (canon visible)", () => {
+    const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(360);
+    const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(216);
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    const host = screen.getByRole("img", { name: /Scène interactive Turbo Pulse/ });
+    // 360 / 480 = 0,75 et 216 / 270 = 0,8 : la plus forte réduction l'emporte, la scène fait 480 × 288 avant réduction.
+    expect(host.style.getPropertyValue("--scene-scale")).toBe("0.75");
+    expect(host.style.width).toBe("480px");
+    expect(host.style.height).toBe("288px");
+    expect(gameMock.refreshLayout).toHaveBeenCalled();
+    width.mockRestore();
+    height.mockRestore();
+  });
+
+  it("cadre assez grand : aucune réduction", () => {
+    const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(960);
+    const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(540);
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    const host = screen.getByRole("img", { name: /Scène interactive Turbo Pulse/ });
+    expect(host.style.getPropertyValue("--scene-scale")).toBe("");
+    expect(host.style.width).toBe("");
+    width.mockRestore();
+    height.mockRestore();
+  });
+
   it("relie les commandes tactiles de 48 px au contrôleur du jeu", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
@@ -73,20 +100,46 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.restartRun).toHaveBeenCalledOnce();
   });
 
-  it("offre la barre de commandes standard : Jouer, Pause, Recommencer, Son et Quitter", () => {
+  it("offre la barre de commandes standard : Pause/Jouer, Recommencer, Son, Plein écran et Fermer (pas de Portrait sur ordinateur)", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     const bar = screen.getByRole("toolbar", { name: "Commandes du jeu" });
-    for (const name of ["Jouer", "Pause", "Recommencer la partie", "Son activé", "Quitter le plein écran", "Quitter"]) {
+    for (const name of ["Pause", "Recommencer la partie", "Son activé", "Passer en plein écran", "Fermer le jeu et retrouver les autres jeux"]) {
       expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
     }
   });
 
-  it("explique exactement l’échec Ultra High et les trois tentatives", () => {
+  it("échec : une petite carte, le résultat, les tentatives restantes si elles comptent, et une action", async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    act(() => gameMock.listener?.({ ...snapshot, score: 42, levelIndex: 5, levelName: "X High", intrusions: 1, intrusionLimit: 2, status: "failed", expertAttemptUsed: 1, failureAction: "retry" }));
+    const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
+    // Échec : pas de score ; sur un niveau expert, les tentatives restantes (et rien d'autre).
+    expect(within(panel).getByText("Encore 2 tentatives")).toBeInTheDocument();
+    // Aucun long paragraphe : juste le titre, le score et un seul bouton.
+    expect(within(panel).getAllByRole("button")).toHaveLength(1);
+    expect(within(panel).queryByText(/franchi entièrement/)).not.toBeInTheDocument();
+    expect(within(panel).queryByText(/Tentative/)).not.toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: "Réessayer" }));
+    expect(gameMock.retryLevel).toHaveBeenCalledOnce();
+  });
+
+  it("échec sur un niveau ordinaire : seulement le résultat et « Réessayer », sans compteur de tentatives", () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 0, intrusions: 5, status: "failed", expertAttemptUsed: null, failureAction: "retry" }));
+    const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
+    expect(within(panel).queryByText(/tentative/i)).not.toBeInTheDocument();
+    expect(within(panel).queryByText(/Score/)).not.toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: "Réessayer" })).toBeInTheDocument();
+  });
+
+  it("échec après la dernière tentative experte : le bouton annonce le retour au niveau 1 (mécanisme du moteur conservé)", async () => {
+    const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, levelName: "Ultra High", intrusions: 1, intrusionLimit: 1, status: "failed", expertAttemptUsed: 3, failureAction: "restart-run" }));
-    expect(screen.getByRole("heading", { name: "Niveau 7 — Ultra High échoué" })).toBeInTheDocument();
-    expect(screen.getByText("À Ultra High, aucune intrusion n’est autorisée.")).toBeInTheDocument();
-    expect(screen.getByText("3 tentatives terminées. Le parcours reprend au niveau 1.")).toBeInTheDocument();
+    const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
+    expect(within(panel).getByText("Plus de tentative : retour au niveau 1")).toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: "Recommencer au niveau 1" }));
+    expect(gameMock.retryLevel).toHaveBeenCalledOnce();
   });
 
   it("met le jeu en pause sans perte d’état puis reprend exactement où il en était", async () => {
@@ -97,41 +150,37 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.togglePause).toHaveBeenCalledOnce();
 
     act(() => gameMock.listener?.({ ...snapshot, score: 7, paused: true }));
-    const pausePanel = screen.getByRole("dialog", { name: "Jeu en pause" });
+    // Voile de pause standard du lecteur : le même pour tous les jeux.
+    expect(screen.getByText("Jeu en pause")).toBeInTheDocument();
 
-    await user.click(within(pausePanel).getByRole("button", { name: "Continuer" }));
+    await user.click(screen.getByRole("button", { name: "Reprendre" }));
     expect(gameMock.togglePause).toHaveBeenCalledTimes(2);
 
     act(() => gameMock.listener?.({ ...snapshot, score: 7, paused: false }));
-    expect(screen.queryByRole("heading", { name: "Jeu en pause" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Jeu en pause")).not.toBeInTheDocument();
     expect(screen.getByText("🏆 7")).toBeInTheDocument();
   });
 
-  it("désactive Jouer et Pause pendant un panneau d’échec ou de réussite", () => {
+  it("désactive le bouton de lecture pendant un panneau d’échec ou de réussite", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, status: "failed", intrusions: 1 }));
-    expect(screen.getByRole("button", { name: "Pause" })).toBeDisabled();
+    // Panneau de fin : la partie ne tourne plus, le bouton de lecture (« Jouer ») est désactivé.
     expect(screen.getByRole("button", { name: "Jouer" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Pause" })).not.toBeInTheDocument();
   });
 
-  it("signale une seule intrusion et une tentative encore disponible sur un échec expert non épuisé", () => {
+  it("victoire : une petite fenêtre « Niveau réussi ! », le score et « Continuer »", async () => {
+    const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
-    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 5, levelName: "X High", intrusions: 1, intrusionLimit: 2, status: "failed", expertAttemptUsed: 1, failureAction: "retry" }));
-
-    expect(screen.getByText("1 fruit a franchi entièrement la ligne de défense.")).toBeInTheDocument();
-    expect(screen.getByText("Tentative 1 sur 3 terminée. La prochaine sera la tentative 2 sur 3.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Recommencer le niveau 6" })).toBeInTheDocument();
+    act(() => gameMock.listener?.({ ...snapshot, score: 120, levelIndex: 0, status: "level-complete" }));
+    const panel = screen.getByRole("dialog", { name: "Niveau réussi !" });
+    expect(within(panel).getByText("Score : 120")).toBeInTheDocument();
+    expect(within(panel).getAllByRole("button")).toHaveLength(1);
+    await user.click(within(panel).getByRole("button", { name: "Continuer" }));
+    expect(gameMock.nextLevel).toHaveBeenCalledOnce();
   });
 
-  it("propose de jouer le niveau suivant avec son aperçu une fois un niveau non final terminé", () => {
-    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
-    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 0, status: "level-complete" }));
-
-    expect(screen.getByRole("heading", { name: "Niveau 1 terminé !" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "▶ Jouer le niveau 2" })).toBeInTheDocument();
-  });
-
-  it("célèbre la maîtrise complète sans aperçu de niveau suivant", () => {
+  it("célèbre la maîtrise complète dans la même petite fenêtre", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
 
@@ -153,7 +202,7 @@ describe("page Turbo Pulse", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Quitter" }));
+    await user.click(screen.getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
 
     expect(await screen.findByText("Retour au catalogue")).toBeInTheDocument();
   });
@@ -167,18 +216,29 @@ describe("page Turbo Pulse", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
 
-    // La page autonome s'ouvre en plein écran : le bouton propose d'en sortir.
+    // La page autonome s'ouvre en affichage normal ; en plein écran, la barre disparaît et seul « Quitter » reste.
+    await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
+    expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("État de la partie")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
-    expect(screen.getByRole("button", { name: "Plein écran" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Plein écran" }));
-    expect(screen.getByRole("button", { name: "Quitter le plein écran" })).toBeInTheDocument();
 
-    // Le moteur n'est ni recréé ni dupliqué ; le panneau des scores et le bouton Recommencer restent visibles.
+    // Le moteur n'est ni recréé ni dupliqué ; le panneau des scores et la barre complète sont revenus.
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
     expect(gameMock.destroy).not.toHaveBeenCalled();
     expect(gameMock.refreshLayout).toHaveBeenCalled();
     expect(screen.getByLabelText("État de la partie")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Recommencer la partie" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Passer en portrait" })).not.toBeInTheDocument();
+  });
+
+  it("téléphone : le portrait garde la même partie, sans recréer Phaser", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: !query.includes("orientation"), media: query, addEventListener: () => undefined, removeEventListener: () => undefined }));
+    const user = userEvent.setup();
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await user.click(screen.getByRole("button", { name: "Passer en portrait" }));
+    expect(screen.getByRole("region", { name: "Turbo Pulse" })).toHaveAttribute("data-orientation", "portrait");
+    expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
   });
 
   it("met la partie en pause quand le lecteur n'est plus visible", () => {

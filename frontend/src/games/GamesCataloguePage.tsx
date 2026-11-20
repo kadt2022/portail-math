@@ -1,18 +1,21 @@
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
-import { availableCategories, featuredGame, playableGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
+import { availableCategories, featuredGame, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
+import { GrilleMagiqueGame, preloadEmbeddedGame, TurboPulsePlayer } from "./embedded-games";
 import { FeaturedGame } from "./FeaturedGame";
+import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
+import { GameInfo } from "./GameInfo";
+import { GameWatchLayout } from "./player/GameWatchLayout";
+import { RecommendedGameCard } from "./RecommendedGameCard";
 import { galleryPlacements, maxCardsPerRow } from "./gallery-layout";
+import { useGamesQuery } from "./useGamesQuery";
 import { useImmersiveDevice } from "./useImmersiveDevice";
 import styles from "./GamesCataloguePage.module.css";
 
-// Le jeu intégré ne se charge qu’à son ouverture : le catalogue reste léger.
-const GrilleMagiqueGame = lazy(() => import("./grille-magique/GrilleMagiqueGame").then((m) => ({ default: m.GrilleMagiqueGame })));
-const TurboPulsePlayer = lazy(() => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })));
 
 type Stage = "closed" | "inline" | "immersive";
 
@@ -26,7 +29,8 @@ export function GamesCataloguePage() {
   // La clé de navigation change à chaque sélection de « Jeux » (même depuis la page des jeux) : l'arrivée de Léo rejoue.
   const { key: visitKey } = useLocation();
   const [category, setCategory] = useState<GameCategoryId | "all">("all");
-  const [query, setQuery] = useState("");
+  // La recherche vit dans l'adresse (?q=) : la grande barre de l'en-tête et la recherche du téléphone partagent la même valeur.
+  const [query, setQuery] = useGamesQuery();
 
   // Sur téléphone, la recherche et les filtres sont rangés dans la barre basse : un seul panneau ouvert à la fois.
   const [panel, setPanel] = useState<MobilePanel>(null);
@@ -35,8 +39,10 @@ export function GamesCataloguePage() {
   const searchId = "games-search";
   const filtersId = "games-filters";
 
-  // Jeu intégré à la page (Les Tuiles magiques) : sur ordinateur il se joue dans la page, avec un plein écran au choix ;
-  // sur téléphone il s’ouvre directement en plein écran immersif. Une fois ouvert, il reste monté (partie conservée) jusqu’au départ de la page.
+  // Jeu intégré à la page (Turbo Pulse, Les Tuiles magiques). Sur ordinateur, il s'ouvre dans le lecteur de la page. Sur téléphone,
+  // le lecteur occupe tout l'écran dès l'ouverture, avec sa barre, et l'écran passe en paysage : le navigateur ne permet de tourner
+  // l'écran qu'en plein écran natif, demandé ici dans le geste du clic (après, il serait refusé). Le bouton Plein écran ne fait
+  // ensuite que masquer la barre. Une fois ouvert, le jeu reste monté (partie conservée) jusqu’au départ de la page.
   const immersiveDevice = useImmersiveDevice();
   const [stage, setStage] = useState<Stage>("closed");
   // Jeu ouvert (id du catalogue) et jeux déjà montés : un jeu fermé reste monté (partie conservée), en pause.
@@ -47,13 +53,40 @@ export function GamesCataloguePage() {
   const openEmbedded = useCallback((game: GameCatalogueEntry) => {
     setOpenGameId(game.id);
     setMountedIds((ids) => (ids.includes(game.id) ? ids : [...ids, game.id]));
-    setStage(immersiveDevice ? "immersive" : "inline");
+    if (immersiveDevice && !fullscreenElement()) {
+      void enterNativeFullscreen(document.documentElement, true);
+    }
+    setStage("inline");
   }, [immersiveDevice]);
-  const closeEmbedded = useCallback(() => setStage("closed"), []);
+  const closeEmbedded = useCallback(() => {
+    // Téléphone : on rend la page et l'orientation libre.
+    if (fullscreenElement()) void exitNativeFullscreen();
+    setStage("closed");
+  }, []);
   const changeFullscreen = useCallback((next: boolean) => setStage(next ? "immersive" : "inline"), []);
   useEffect(() => {
-    if (stage === "inline") stageRef.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    if (stage !== "inline") return;
+    // Défilement immédiat (sans glissement animé) : le lecteur apparaît en place, sans impression de changement de page.
+    const scroll = () => stageRef.current?.scrollIntoView?.({ block: "start" });
+    // Retour du plein écran natif : on attend qu'il soit vraiment quitté, sinon la position visée est celle du lecteur plein écran.
+    if (!fullscreenElement()) {
+      scroll();
+      return;
+    }
+    document.addEventListener("fullscreenchange", scroll, { once: true });
+    document.addEventListener("webkitfullscreenchange", scroll, { once: true });
+    return () => {
+      document.removeEventListener("fullscreenchange", scroll);
+      document.removeEventListener("webkitfullscreenchange", scroll);
+    };
   }, [stage]);
+
+  // Jeu ouvert et jeux recommandés à côté du lecteur : ils ne sont pas répétés dans « Autres jeux du portail ».
+  const open = stage !== "closed";
+  // Téléphone : le lecteur ouvert occupe tout l'écran (barre comprise) ; la page derrière est inerte.
+  const covered = open && immersiveDevice;
+  const openGame = open ? playableGames.find((game) => game.id === openGameId) : undefined;
+  const recommended = useMemo(() => (openGame ? recommendedGames(openGame, 3) : []), [openGame]);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [maxPerRow, setMaxPerRow] = useState(3);
@@ -68,12 +101,12 @@ export function GamesCataloguePage() {
     const ordered = [...others.slice(0, -1), ...lead, ...others.slice(-1)];
     return ordered.filter(
       (game) =>
-        // Le jeu ouvert dans la page n’est plus proposé en dessous : on y voit les autres jeux.
-        !(game.embed && stage !== "closed" && game.id === openGameId) &&
+        // Le jeu ouvert et les jeux recommandés ne sont pas répétés en dessous.
+        !(open && (game.id === openGameId || recommended.some((item) => item.id === game.id))) &&
         (category === "all" || game.categoryId === category) &&
         normalize(t(game.nameKey)).includes(needle),
     );
-  }, [category, query, t, stage, openGameId]);
+  }, [category, query, t, open, openGameId, recommended]);
 
   // La composition suit la largeur réelle de la galerie (et non celle de la fenêtre : le menu vertical
   // en retire une partie). Sans ResizeObserver, la valeur par défaut reste utilisable.
@@ -115,13 +148,14 @@ export function GamesCataloguePage() {
   const placements = galleryPlacements(visibleGames.length, maxPerRow);
 
   return (
-    <div ref={pageRef} className={styles.page}>
+    <div ref={pageRef} className={`${styles.page}${open ? ` ${styles.pagePlaying}` : ""}`}>
       {/* En plein écran immersif, le reste de la page est inerte : pas de focus ni de lecture d’écran derrière le jeu. */}
-      <div className={styles.contents} inert={immersive}>
-      <header className={styles.header}>
-        <div>
+      <div className={styles.contents} inert={immersive || covered}>
+      {/* Mode lecteur : le titre et le sous-titre s'effacent (le titre reste lu par les lecteurs d'écran), le lecteur monte sous le menu. */}
+      <header className={open ? styles.headerPlaying : styles.header}>
+        <div className={open ? styles.srOnly : undefined}>
           <h1 className={styles.title}>{t("cataloguePage.title")}</h1>
-          <p className={styles.subtitle}>{t("cataloguePage.subtitle")}</p>
+          {open ? null : <p className={styles.subtitle}>{t("cataloguePage.subtitle")}</p>}
         </div>
         <div id={searchId} className={`${styles.search}${panel === "search" ? ` ${styles.panelOpen}` : ""}`} role="search">
           <input
@@ -136,38 +170,67 @@ export function GamesCataloguePage() {
       </header>
       </div>
 
-      {mountedIds.map((id) => {
-        const shown = id === openGameId && stage !== "closed";
-        return (
-          <div key={id} ref={shown ? stageRef : undefined} className={styles.stage} hidden={!shown}>
-            <Suspense fallback={<p className={styles.stageLoading}>{t("cataloguePage.loading")}</p>}>
-              {id === "turbo-pulse" ? (
-                <TurboPulsePlayer
-                  fullscreen={shown && immersive}
-                  active={shown}
-                  mobileImmersive={shown && immersive && immersiveDevice}
-                  onFullscreenChange={changeFullscreen}
-                  onClose={immersive && !immersiveDevice ? undefined : closeEmbedded}
-                />
-              ) : (
-                <GrilleMagiqueGame
-                  fullscreen={shown && immersive}
-                  active={shown}
-                  tutorial="auto"
-                  mobileImmersive={shown && immersive && immersiveDevice}
-                  onFullscreenChange={changeFullscreen}
-                  onClose={immersive && !immersiveDevice ? undefined : closeEmbedded}
-                />
-              )}
-            </Suspense>
+      <GameWatchLayout
+        open={open}
+        asideInert={immersive || covered}
+        asideLabel={t("cataloguePage.recommended")}
+        aside={
+          openGame ? (
+            <>
+              <h2 className={styles.recommendedTitle}>{t("cataloguePage.recommended")}</h2>
+              {recommended.map((game) => (
+                <RecommendedGameCard key={game.id} game={game} onOpen={game.embed ? openEmbedded : undefined} onIntent={game.embed ? preloadEmbeddedGame : undefined} />
+              ))}
+            </>
+          ) : undefined
+        }
+      >
+        {mountedIds.map((id) => {
+          const shown = id === openGameId && stage !== "closed";
+          return (
+            <div key={id} ref={shown ? stageRef : undefined} className={`${styles.stage}${shown && covered ? ` ${styles.stageCover}` : ""}`} hidden={!shown}>
+              {/* Téléchargement du jeu : un état discret DANS le cadre du lecteur, à sa taille, pour que la page ne bouge pas. */}
+              <Suspense
+                fallback={
+                  <div className={styles.playerLoading} role="status">
+                    <span className={styles.playerSpinner} aria-hidden="true" />
+                    {t("cataloguePage.loading")}
+                  </div>
+                }
+              >
+                {id === "turbo-pulse" ? (
+                  <TurboPulsePlayer
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : (
+                  <GrilleMagiqueGame
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    tutorial="auto"
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                )}
+              </Suspense>
+            </div>
+          );
+        })}
+        {openGame ? (
+          <div className={styles.contents} inert={immersive || covered}>
+            <GameInfo game={openGame} />
           </div>
-        );
-      })}
+        ) : null}
+      </GameWatchLayout>
 
-      <div className={styles.contents} inert={immersive}>
+      <div className={styles.contents} inert={immersive || covered}>
       {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} /> : null}
 
-      {stage !== "closed" ? <h2 className={styles.otherGames}>{t("cataloguePage.otherGames")}</h2> : null}
+      {open && visibleGames.length > 0 ? <h2 className={styles.otherGames}>{t("cataloguePage.otherGames")}</h2> : null}
       <div id={filtersId} className={`${styles.chips}${panel === "filters" ? ` ${styles.panelOpen}` : ""}`} role="group" aria-label={t("cataloguePage.filterLabel")}>
         <div className={styles.sheetHead}>
           <strong>{t("bar.panelTitle")}</strong>
@@ -197,7 +260,7 @@ export function GamesCataloguePage() {
       {visibleGames.length > 0 ? (
         <div ref={gridRef} className={styles.grid}>
           {visibleGames.map((game, index) => (
-            <GameCard key={game.id} game={game} placement={placements[index]} onOpen={openEmbedded} />
+            <GameCard key={game.id} game={game} placement={placements[index]} onOpen={openEmbedded} onIntent={game.embed ? preloadEmbeddedGame : undefined} />
           ))}
         </div>
       ) : (
