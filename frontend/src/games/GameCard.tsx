@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
@@ -18,7 +18,6 @@ interface GameCardProps {
 // la carte entière, le titre et l'accroche sont posés sur une bande en bas.
 export function GameCard({ game, placement, onOpen }: GameCardProps) {
   const { t } = useTranslation("games");
-  const navigate = useNavigate();
   const name = t(game.nameKey);
   const style: React.CSSProperties | undefined = placement
     ? {
@@ -26,30 +25,6 @@ export function GameCard({ game, placement, onOpen }: GameCardProps) {
         aspectRatio: placement.ratio,
       }
     : undefined;
-
-  // Turbo Pulse doit s'ouvrir immédiatement en plein écran paysage au clic.
-  // C'est le seul endroit où requestFullscreen() peut être appelé depuis une
-  // action utilisateur directe (clic). Dès que fullscreen est accordé,
-  // naviguer vers la page de jeu.
-  const launchTurboPulseFullscreen = useCallback(
-    async (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (game.id !== "turbo-pulse") return;
-      e.preventDefault();
-      const root = document.documentElement;
-      try {
-        await root.requestFullscreen?.();
-        try {
-          await screen.orientation?.lock?.("landscape");
-        } catch {
-          // Verrouillage refusé ou non supporté : continuer sans lui.
-        }
-      } catch {
-        // Fullscreen refusé : continuer avec fallback responsive.
-      }
-      navigate(game.href);
-    },
-    [game, navigate],
-  );
 
   // Clic simple : le jeu s’ouvre dans la page. Clic avec modificateur (nouvel onglet) : le lien normal s’applique.
   const openInPage = useCallback(
@@ -87,7 +62,7 @@ export function GameCard({ game, placement, onOpen }: GameCardProps) {
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : game.embed ? openInPage : undefined}>
+      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined}>
         {content}
       </Link>
     );

@@ -43,7 +43,6 @@ import {
   type Operation,
   type TurboPulseVisualMetrics,
 } from "./turbo-pulse-engine";
-import { worldForLevel } from "./turbo-pulse-worlds";
 
 // MIN_WORLD_WIDTH/HEIGHT ne sont PAS appliqués côté logique de jeu (voir
 // mountTurboPulseGame) : ils sont passés à Phaser via scale.minWidth/
@@ -65,6 +64,8 @@ const AIM_MAX_ANGLE = 0.12;
 // d'affichage de référence, cannonScale applique ensuite le bornage petit écran
 // par-dessus (voir applyCannonMetrics). Exportée pour les tests, qui vérifient
 // que cannonBase/cannonArm.scaleX suit toujours metrics.scale.
+// Énergie et ligne de défense : toujours dorées (identité Turbo Pulse), quel que soit le monde.
+const GOLD_ENERGY = 0xffc83d;
 export const CANNON_IMAGE_SCALE = 1 / ART_SCALE;
 // Centre de la plaque d'opération sous le canon (échelle 1, depuis le pivot).
 const CANNON_PLATE_OFFSET_Y = 62;
@@ -400,7 +401,7 @@ export class TurboPulseScene extends Phaser.Scene {
     // plus que les éléments qui doivent rester nets : zone de défense, fruits,
     // canon, projectiles. La ligne de défense prend la couleur d'énergie du
     // monde (voir turbo-pulse-worlds.ts), pour rester assortie au décor.
-    const accent = worldForLevel(this.levelIndex).accent;
+    const accent = GOLD_ENERGY;
     graphics.fillStyle(0x06151f, 0.7);
     graphics.fillRect(0, 0, DEFENSE_X, height);
     graphics.fillStyle(accent, 0.1);
@@ -552,14 +553,14 @@ export class TurboPulseScene extends Phaser.Scene {
     this.cannonArm?.setRotation(this.aimAngle);
     const guideStart = (CANNON_MUZZLE_DISTANCE + 16) * cannonScale;
     const guideEnd = (CANNON_MUZZLE_DISTANCE + 118) * cannonScale;
-    this.aimGuide?.clear().lineStyle(3, worldForLevel(this.levelIndex).accent, 0.4).lineBetween(cannonX + Math.cos(this.aimAngle) * guideStart, this.cannonY + Math.sin(this.aimAngle) * guideStart, cannonX + Math.cos(this.aimAngle) * guideEnd, this.cannonY + Math.sin(this.aimAngle) * guideEnd);
+    this.aimGuide?.clear().lineStyle(3, GOLD_ENERGY, 0.4).lineBetween(cannonX + Math.cos(this.aimAngle) * guideStart, this.cannonY + Math.sin(this.aimAngle) * guideStart, cannonX + Math.cos(this.aimAngle) * guideEnd, this.cannonY + Math.sin(this.aimAngle) * guideEnd);
   }
 
   private fire() {
     if (this.time.now - this.lastFireAt < 130) return;
     this.lastFireAt = this.time.now;
     const { cannonX, cannonScale } = this.metrics;
-    const accent = worldForLevel(this.levelIndex).accent;
+    const accent = GOLD_ENERGY;
     const muzzle = CANNON_MUZZLE_DISTANCE * cannonScale;
     const muzzleX = cannonX + Math.cos(this.aimAngle) * muzzle;
     const muzzleY = this.cannonY + Math.sin(this.aimAngle) * muzzle;
@@ -581,7 +582,7 @@ export class TurboPulseScene extends Phaser.Scene {
 
   // Étincelle de la traînée : naît sur la trajectoire du tir, rétrécit et s'éteint.
   private spawnTrailSpark(x: number, y: number) {
-    const accent = worldForLevel(this.levelIndex).accent;
+    const accent = GOLD_ENERGY;
     const size = ENERGY_GLOW_SIZE * 0.5 * this.metrics.cannonScale;
     const spark = this.add.image(x, y, ENERGY_GLOW_KEY).setDisplaySize(size, size).setTint(accent).setAlpha(0.7).setBlendMode(Phaser.BlendModes.ADD).setDepth(3);
     this.tweens.add({ targets: spark, scale: spark.scale * 0.25, alpha: 0, duration: 240, onComplete: () => spark.destroy() });

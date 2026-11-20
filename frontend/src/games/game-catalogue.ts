@@ -78,6 +78,7 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/turbo-pulse",
     availability: "react",
     categoryId: "calculation",
+    embed: true,
     thumbnail: turboPulseThumb,
   },
   {

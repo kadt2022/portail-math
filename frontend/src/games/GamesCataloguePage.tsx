@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
-import { availableCategories, featuredGame, playableGames, type GameCategoryId } from "./game-catalogue";
+import { availableCategories, featuredGame, playableGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
 import { FeaturedGame } from "./FeaturedGame";
 import { GameCard } from "./GameCard";
 import { galleryPlacements, maxCardsPerRow } from "./gallery-layout";
@@ -12,6 +12,7 @@ import styles from "./GamesCataloguePage.module.css";
 
 // Le jeu intégré ne se charge qu’à son ouverture : le catalogue reste léger.
 const GrilleMagiqueGame = lazy(() => import("./grille-magique/GrilleMagiqueGame").then((m) => ({ default: m.GrilleMagiqueGame })));
+const TurboPulsePlayer = lazy(() => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })));
 
 type Stage = "closed" | "inline" | "immersive";
 
@@ -38,11 +39,14 @@ export function GamesCataloguePage() {
   // sur téléphone il s’ouvre directement en plein écran immersif. Une fois ouvert, il reste monté (partie conservée) jusqu’au départ de la page.
   const immersiveDevice = useImmersiveDevice();
   const [stage, setStage] = useState<Stage>("closed");
-  const [stageMounted, setStageMounted] = useState(false);
+  // Jeu ouvert (id du catalogue) et jeux déjà montés : un jeu fermé reste monté (partie conservée), en pause.
+  const [openGameId, setOpenGameId] = useState<string | null>(null);
+  const [mountedIds, setMountedIds] = useState<string[]>([]);
   const stageRef = useRef<HTMLDivElement>(null);
   const immersive = stage === "immersive";
-  const openEmbedded = useCallback(() => {
-    setStageMounted(true);
+  const openEmbedded = useCallback((game: GameCatalogueEntry) => {
+    setOpenGameId(game.id);
+    setMountedIds((ids) => (ids.includes(game.id) ? ids : [...ids, game.id]));
     setStage(immersiveDevice ? "immersive" : "inline");
   }, [immersiveDevice]);
   const closeEmbedded = useCallback(() => setStage("closed"), []);
@@ -65,11 +69,11 @@ export function GamesCataloguePage() {
     return ordered.filter(
       (game) =>
         // Le jeu ouvert dans la page n’est plus proposé en dessous : on y voit les autres jeux.
-        !(game.embed && stage !== "closed") &&
+        !(game.embed && stage !== "closed" && game.id === openGameId) &&
         (category === "all" || game.categoryId === category) &&
         normalize(t(game.nameKey)).includes(needle),
     );
-  }, [category, query, t, stage]);
+  }, [category, query, t, stage, openGameId]);
 
   // La composition suit la largeur réelle de la galerie (et non celle de la fenêtre : le menu vertical
   // en retire une partie). Sans ResizeObserver, la valeur par défaut reste utilisable.
@@ -132,20 +136,33 @@ export function GamesCataloguePage() {
       </header>
       </div>
 
-      {stageMounted ? (
-        <div ref={stageRef} className={styles.stage} hidden={stage === "closed"}>
-          <Suspense fallback={<p className={styles.stageLoading}>{t("cataloguePage.loading")}</p>}>
-            <GrilleMagiqueGame
-              fullscreen={immersive}
-              active={stage !== "closed"}
-              tutorial="auto"
-              mobileImmersive={immersive && immersiveDevice}
-              onFullscreenChange={changeFullscreen}
-              onClose={immersive && !immersiveDevice ? undefined : closeEmbedded}
-            />
-          </Suspense>
-        </div>
-      ) : null}
+      {mountedIds.map((id) => {
+        const shown = id === openGameId && stage !== "closed";
+        return (
+          <div key={id} ref={shown ? stageRef : undefined} className={styles.stage} hidden={!shown}>
+            <Suspense fallback={<p className={styles.stageLoading}>{t("cataloguePage.loading")}</p>}>
+              {id === "turbo-pulse" ? (
+                <TurboPulsePlayer
+                  fullscreen={shown && immersive}
+                  active={shown}
+                  mobileImmersive={shown && immersive && immersiveDevice}
+                  onFullscreenChange={changeFullscreen}
+                  onClose={immersive && !immersiveDevice ? undefined : closeEmbedded}
+                />
+              ) : (
+                <GrilleMagiqueGame
+                  fullscreen={shown && immersive}
+                  active={shown}
+                  tutorial="auto"
+                  mobileImmersive={shown && immersive && immersiveDevice}
+                  onFullscreenChange={changeFullscreen}
+                  onClose={immersive && !immersiveDevice ? undefined : closeEmbedded}
+                />
+              )}
+            </Suspense>
+          </div>
+        );
+      })}
 
       <div className={styles.contents} inert={immersive}>
       {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} /> : null}

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TurboPulseSnapshot } from "./TurboPulseGame";
 import { TurboPulsePage } from "./TurboPulsePage";
+import { TurboPulsePlayer } from "./TurboPulsePlayer";
 
 const { gameMock, mountTurboPulseGameMock } = vi.hoisted(() => {
   const gameMock = {
@@ -149,43 +150,34 @@ describe("page Turbo Pulse", () => {
     expect(await screen.findByText("Retour au catalogue")).toBeInTheDocument();
   });
 
-  it("passe en plein écran sans recréer Phaser ni dupliquer le canvas, puis revient à l’état précédent", async () => {
-    Object.defineProperty(document, "fullscreenEnabled", { value: true, configurable: true });
+  it("bascule entre plein écran et affichage normal sans recréer Phaser ni dupliquer le canvas", async () => {
     const requestFullscreen = vi.fn().mockResolvedValue(undefined);
     Element.prototype.requestFullscreen = requestFullscreen;
-    const exitFullscreen = vi.fn().mockResolvedValue(undefined);
-    document.exitFullscreen = exitFullscreen;
+    document.exitFullscreen = vi.fn().mockResolvedValue(undefined);
 
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
 
+    // La page autonome s'ouvre en plein écran : le bouton propose d'en sortir.
+    await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
+    expect(screen.getByRole("button", { name: "Plein écran" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Plein écran" }));
-    expect(requestFullscreen).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Quitter le plein écran" })).toBeInTheDocument();
 
-    const pageElement = document.querySelector("main");
-    Object.defineProperty(document, "fullscreenElement", { value: pageElement, configurable: true });
-    act(() => document.dispatchEvent(new Event("fullscreenchange")));
-
-    // Le moteur n'est ni recréé ni dupliqué : un seul montage depuis le début,
-    // et le viewport Phaser est simplement réappliqué.
+    // Le moteur n'est ni recréé ni dupliqué ; le panneau des scores et le bouton Recommencer restent visibles.
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
     expect(gameMock.destroy).not.toHaveBeenCalled();
     expect(gameMock.refreshLayout).toHaveBeenCalled();
-
-    // En plein écran, le header et la statusBar restent visibles pour la jouabilité.
     expect(screen.getByLabelText("État de la partie")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Quitter le plein écran" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Recommencer" })).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
-    expect(exitFullscreen).toHaveBeenCalledOnce();
-
-    Object.defineProperty(document, "fullscreenElement", { value: null, configurable: true });
-    act(() => document.dispatchEvent(new Event("fullscreenchange")));
-
-    expect(screen.getByLabelText("État de la partie")).toBeInTheDocument();
-    expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
-    expect(gameMock.destroy).not.toHaveBeenCalled();
+  it("met la partie en pause quand le lecteur n'est plus visible", () => {
+    const view = render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    act(() => gameMock.listener?.(snapshot));
+    view.rerender(<MemoryRouter><TurboPulsePlayer active={false} /></MemoryRouter>);
+    expect(gameMock.togglePause).toHaveBeenCalledOnce();
   });
 
   afterEach(() => {

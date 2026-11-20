@@ -98,8 +98,8 @@ function goldGradient(ctx: Ctx, y0: number, y1: number): CanvasGradient {
 function drawCannonBase(ctx: Ctx): void {
   // Lueur d'énergie posée au sol.
   const glow = ctx.createRadialGradient(110, 132, 6, 110, 132, 108);
-  glow.addColorStop(0, "rgba(111, 226, 255, 0.55)");
-  glow.addColorStop(1, "rgba(111, 226, 255, 0)");
+  glow.addColorStop(0, "rgba(255, 200, 70, 0.55)");
+  glow.addColorStop(1, "rgba(255, 200, 70, 0)");
   ctx.fillStyle = glow;
   ctx.beginPath();
   ctx.ellipse(110, 134, 108, 30, 0, 0, Math.PI * 2);
@@ -107,9 +107,9 @@ function drawCannonBase(ctx: Ctx): void {
 
   // Plateforme.
   const plate = ctx.createLinearGradient(0, 106, 0, 154);
-  plate.addColorStop(0, "#7d9bc4");
-  plate.addColorStop(0.5, "#33497a");
-  plate.addColorStop(1, "#0f1c3b");
+  plate.addColorStop(0, "#e9c88a");
+  plate.addColorStop(0.5, "#8a5a1c");
+  plate.addColorStop(1, "#2a1706");
   ctx.beginPath();
   ctx.ellipse(110, 130, 92, 24, 0, 0, Math.PI * 2);
   ctx.fillStyle = plate;
@@ -120,20 +120,20 @@ function drawCannonBase(ctx: Ctx): void {
 
   // Anneau lumineux.
   ctx.save();
-  ctx.shadowColor = "rgba(111, 226, 255, 0.95)";
+  ctx.shadowColor = "rgba(255, 200, 70, 0.95)";
   ctx.shadowBlur = 8;
   ctx.beginPath();
   ctx.ellipse(110, 129, 72, 17, 0, 0, Math.PI * 2);
   ctx.lineWidth = 3;
-  ctx.strokeStyle = "rgba(143, 236, 255, 0.95)";
+  ctx.strokeStyle = "rgba(255, 224, 130, 0.95)";
   ctx.stroke();
   ctx.restore();
 
   // Piédestal.
   const stand = ctx.createLinearGradient(58, 0, 162, 0);
-  stand.addColorStop(0, "#14275a");
-  stand.addColorStop(0.5, "#4274d8");
-  stand.addColorStop(1, "#14275a");
+  stand.addColorStop(0, "#5a3a10");
+  stand.addColorStop(0.5, "#ffd45e");
+  stand.addColorStop(1, "#5a3a10");
   ctx.beginPath();
   ctx.moveTo(60, 126);
   ctx.lineTo(82, 82);
@@ -165,8 +165,8 @@ function drawCannonArm(ctx: Ctx): void {
 
   // Culasse, derrière le corps.
   const tail = ctx.createLinearGradient(0, py - 17, 0, py + 17);
-  tail.addColorStop(0, "#3b5aa8");
-  tail.addColorStop(1, "#0e1836");
+  tail.addColorStop(0, "#c98a2a");
+  tail.addColorStop(1, "#3a2208");
   roundRectPath(ctx, 24, py - 17, 56, 34, 9);
   ctx.fillStyle = tail;
   ctx.fill();
@@ -176,10 +176,10 @@ function drawCannonArm(ctx: Ctx): void {
 
   // Tube.
   const tube = ctx.createLinearGradient(0, py - 22, 0, py + 22);
-  tube.addColorStop(0, "#d4f1ff");
-  tube.addColorStop(0.25, "#5aa4ff");
-  tube.addColorStop(0.62, "#2a4fb5");
-  tube.addColorStop(1, "#0f2260");
+  tube.addColorStop(0, "#fff3c2");
+  tube.addColorStop(0.25, "#ffd24a");
+  tube.addColorStop(0.62, "#c4801c");
+  tube.addColorStop(1, "#5a3408");
   ctx.beginPath();
   ctx.moveTo(px, py - 22);
   ctx.lineTo(178, py - 17);
@@ -191,9 +191,9 @@ function drawCannonArm(ctx: Ctx): void {
 
   // Rainures d'énergie le long du tube.
   ctx.save();
-  ctx.shadowColor = "rgba(111, 226, 255, 0.9)";
+  ctx.shadowColor = "rgba(255, 200, 70, 0.9)";
   ctx.shadowBlur = 5;
-  ctx.strokeStyle = "rgba(160, 240, 255, 0.85)";
+  ctx.strokeStyle = "rgba(255, 228, 140, 0.85)";
   ctx.lineWidth = 2;
   for (const offset of [-8, 8]) {
     ctx.beginPath();
@@ -214,14 +214,14 @@ function drawCannonArm(ctx: Ctx): void {
   roundRectPath(ctx, 172, py - 27, 22, 54, 8);
   ctx.fillStyle = goldGradient(ctx, py - 27, py + 27);
   ctx.fill();
-  ctx.fillStyle = "#06122e";
+  ctx.fillStyle = "#1c0f03";
   ctx.beginPath();
   ctx.ellipse(190, py, 5, 16, 0, 0, Math.PI * 2);
   ctx.fill();
   const flare = ctx.createRadialGradient(194, py, 1, 194, py, 24);
-  flare.addColorStop(0, "rgba(220, 250, 255, 0.95)");
-  flare.addColorStop(0.4, "rgba(111, 226, 255, 0.5)");
-  flare.addColorStop(1, "rgba(111, 226, 255, 0)");
+  flare.addColorStop(0, "rgba(255, 250, 220, 0.95)");
+  flare.addColorStop(0.4, "rgba(255, 200, 70, 0.5)");
+  flare.addColorStop(1, "rgba(255, 200, 70, 0)");
   ctx.fillStyle = flare;
   ctx.beginPath();
   ctx.arc(194, py, 24, 0, Math.PI * 2);
@@ -229,9 +229,9 @@ function drawCannonArm(ctx: Ctx): void {
 
   // Corps hexagonal.
   const body = ctx.createRadialGradient(px - 12, py - 14, 4, px, py, 46);
-  body.addColorStop(0, "#7ea4ff");
-  body.addColorStop(0.5, "#2c52c4");
-  body.addColorStop(1, "#101f66");
+  body.addColorStop(0, "#ffe27a");
+  body.addColorStop(0.5, "#d08a1f");
+  body.addColorStop(1, "#5a3408");
   hexagonPath(ctx, px, py, 40);
   ctx.fillStyle = body;
   ctx.fill();
@@ -239,10 +239,10 @@ function drawCannonArm(ctx: Ctx): void {
   ctx.strokeStyle = goldGradient(ctx, py - 40, py + 40);
   ctx.stroke();
   hexagonPath(ctx, px, py, 29);
-  ctx.fillStyle = "rgba(4, 16, 58, 0.55)";
+  ctx.fillStyle = "rgba(40, 20, 2, 0.55)";
   ctx.fill();
   ctx.lineWidth = 2.5;
-  ctx.strokeStyle = "rgba(143, 236, 255, 0.85)";
+  ctx.strokeStyle = "rgba(255, 224, 130, 0.85)";
   ctx.stroke();
 
   // Éclair.
