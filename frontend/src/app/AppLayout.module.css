@@ -412,3 +412,82 @@
 @media (min-width: 900px) {
   .main { padding-right: 24px; padding-left: 24px; }
 }
+
+/* Habillage « Games » : appliqué au seul catalogue /jeux. Les jetons --pm-* redéfinis ici
+   recolorent aussi les menus déroulants de l'en-tête, sans toucher le thème global. */
+.gamesTheme {
+  --pm-surface: #171926;
+  --pm-surface-warm: #1f2233;
+  --pm-ink: #f2f4ff;
+  --pm-ink-soft: #b7c0ee;
+  --pm-line: rgb(255 255 255 / 16%);
+  --pm-brand: #ff8a73;
+  --pm-accent-dark: #ff8a73;
+  background:
+    radial-gradient(900px 420px at 85% -5%, rgb(94 74 255 / 12%), transparent 60%),
+    radial-gradient(700px 360px at 8% 105%, rgb(11 122 133 / 8%), transparent 60%),
+    #0b0c14;
+  color: #fff;
+}
+
+.gamesTheme .header {
+  --pm-header-language-active-bg: #fd5e53;
+  --pm-header-language-active-ink: #14213d;
+  border-bottom-color: rgb(255 255 255 / 10%);
+  background: linear-gradient(110deg, #0a0b12 0%, #12141f 60%, #1b1d2e 100%);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 45%);
+}
+
+.gamesTheme .brandMark {
+  border-color: #fd5e53;
+  border-right-color: transparent;
+}
+
+.gamesTheme .footer {
+  margin-top: 0;
+  border-top-color: rgb(255 255 255 / 10%);
+  background: linear-gradient(135deg, #0a0b12 0%, #10111b 100%);
+}
+
+/* Habillage « Bibliothèque » : noir comme l'espace des jeux, touches dorées. Limité au catalogue /bibliotheque. */
+.libraryTheme {
+  --pm-surface: #171926;
+  --pm-surface-warm: #1f2233;
+  --pm-ink: #f2f4ff;
+  --pm-ink-soft: #aab4e6;
+  --pm-brand: #ff8a73;
+  --pm-line: rgb(255 255 255 / 14%);
+  --pm-accent: #fd5e53;
+  --pm-accent-dark: #ff8a73;
+  color: #f2f4ff;
+  background:
+    radial-gradient(900px 420px at 85% -5%, rgb(94 74 255 / 12%), transparent 60%),
+    radial-gradient(700px 360px at 8% 105%, rgb(11 122 133 / 8%), transparent 60%),
+    #0b0c14;
+}
+
+.libraryTheme .header {
+  --pm-header-language-active-bg: #fd5e53;
+  --pm-header-language-active-ink: #14213d;
+  border-bottom-color: rgb(255 255 255 / 10%);
+  background: linear-gradient(110deg, #0a0b12 0%, #12141f 60%, #1b1d2e 100%);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 45%);
+}
+
+.libraryTheme .brandMark {
+  border-color: #fd5e53;
+  border-right-color: transparent;
+}
+
+.libraryTheme .footer {
+  border-top-color: rgb(255 255 255 / 10%);
+  background: linear-gradient(135deg, #0a0b12 0%, #10111b 100%);
+}
+
+/* Jeux et Bibliothèque sur téléphone : la barre basse fixe ne doit pas masquer le pied de page. */
+@media (max-width: 680px) {
+  .libraryTheme .footer,
+  .gamesTheme .footer {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}

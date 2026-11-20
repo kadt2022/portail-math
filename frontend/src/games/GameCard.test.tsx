@@ -25,57 +25,50 @@ describe("GameCard", () => {
     vi.restoreAllMocks();
   });
 
-  it("tente le plein écran et le verrouillage paysage avant de naviguer vers Turbo Pulse", async () => {
+  it("ouvre Turbo Pulse dans la page, sans plein écran ni navigation, comme les Tuiles magiques", async () => {
     const requestFullscreen = vi.fn().mockResolvedValue(undefined);
     document.documentElement.requestFullscreen = requestFullscreen;
-    const lock = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(window, "screen", { value: { orientation: { lock } }, configurable: true });
+    const onOpen = vi.fn();
 
     const user = userEvent.setup();
-    renderCard(turboPulse);
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<GameCard game={turboPulse} onOpen={onOpen} />} />
+          <Route path={turboPulse.href} element={<p>Destination atteinte : {turboPulse.href}</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
-    expect(requestFullscreen).toHaveBeenCalledOnce();
-    expect(lock).toHaveBeenCalledWith("landscape");
-    expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
+    expect(onOpen).toHaveBeenCalledWith(turboPulse);
+    expect(requestFullscreen).not.toHaveBeenCalled();
+    expect(screen.queryByText(`Destination atteinte : ${turboPulse.href}`)).not.toBeInTheDocument();
   });
 
-  it("navigue quand même si le verrouillage d'orientation est refusé", async () => {
-    const requestFullscreen = vi.fn().mockResolvedValue(undefined);
-    document.documentElement.requestFullscreen = requestFullscreen;
-    const lock = vi.fn().mockRejectedValue(new Error("non supporté"));
-    Object.defineProperty(window, "screen", { value: { orientation: { lock } }, configurable: true });
-
+  it("signale l'intention de jouer (survol, focus, toucher) avant le clic, pour précharger le jeu", async () => {
+    const onIntent = vi.fn();
     const user = userEvent.setup();
-    renderCard(turboPulse);
-
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
-
-    expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
+    render(
+      <MemoryRouter>
+        <GameCard game={turboPulse} onOpen={() => undefined} onIntent={onIntent} />
+      </MemoryRouter>,
+    );
+    const link = screen.getByRole("link", { name: /Jouer à/ });
+    await user.hover(link);
+    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
+    onIntent.mockClear();
+    await user.tab();
+    expect(link).toHaveFocus();
+    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
   });
 
-  it("navigue quand même si le plein écran est refusé par le navigateur", async () => {
-    const requestFullscreen = vi.fn().mockRejectedValue(new Error("refusé"));
-    document.documentElement.requestFullscreen = requestFullscreen;
-
+  it("garde l'adresse du jeu comme vrai lien quand rien n'ouvre le jeu sur place", async () => {
     const user = userEvent.setup();
     renderCard(turboPulse);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
-
-    expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
-  });
-
-  it("navigue quand même si l'API plein écran est absente du navigateur", async () => {
-    // Pas de requestFullscreen sur documentElement (navigateur sans support) :
-    // l'appel optionnel (?.()) ne doit jamais bloquer la navigation.
-    Reflect.deleteProperty(document.documentElement, "requestFullscreen");
-
-    const user = userEvent.setup();
-    renderCard(turboPulse);
-
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(await screen.findByText(`Destination atteinte : ${turboPulse.href}`)).toBeInTheDocument();
   });
@@ -87,7 +80,7 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     renderCard(grilleMagique);
 
-    await user.click(screen.getByRole("link", { name: "Jouer" }));
+    await user.click(screen.getByRole("link", { name: /Jouer à/ }));
 
     expect(requestFullscreen).not.toHaveBeenCalled();
     expect(await screen.findByText(`Destination atteinte : ${grilleMagique.href}`)).toBeInTheDocument();

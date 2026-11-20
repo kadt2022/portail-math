@@ -1,281 +1,292 @@
-.page { padding: clamp(32px, 5vw, 64px) 0 72px; }
-.heading { max-width: 760px; }
+/* Bibliothèque : fond noir comme l'espace des jeux, accents or (habillage fourni par le portail sur cette page seulement). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+  padding: clamp(18px, 3vw, 32px) 0 56px;
+}
+
+/* En-tête compact, comme celui de la page des jeux : titre, sous-titre, Yamba, recherche. */
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
 
 .titleBlock {
-  position: relative;
-  padding-left: 22px;
-}
-
-.titleBlock::before {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 0;
-  width: 4px;
-  border-radius: 999px;
-  background: var(--pm-accent);
-  content: "";
-}
-
-.eyebrow,
-.sectionHeading p,
-.collection {
-  margin: 0;
-  color: var(--pm-accent-dark);
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .heading h1 {
-  margin: 8px 0 0;
-  color: var(--pm-brand-dark);
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.08;
-}
-
-.catalogue { margin-top: clamp(36px, 6vw, 64px); }
-
-.sectionHeading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.sectionHeading h2 {
-  margin: 5px 0 0;
-  color: var(--pm-brand-dark);
-  font-size: clamp(24px, 3vw, 34px);
-}
-
-.bookGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
-}
-
-.book {
-  display: flex;
-  min-width: 0;
-  overflow: hidden;
-  flex-direction: column;
-  border: 1px solid var(--pm-line);
-  border-radius: 24px 8px 24px 8px;
-  background: var(--pm-surface);
-  box-shadow: var(--pm-shadow-sm);
-}
-
-.coverWrap {
-  position: relative;
-  padding: 24px 24px 0;
-  background:
-    radial-gradient(circle at 90% 8%, rgb(226 118 43 / 12%), transparent 30%),
-    var(--pm-surface-warm);
-}
-
-.cover {
-  display: block;
-  width: min(100%, 230px);
-  margin: 0 auto;
-  aspect-ratio: 595 / 842;
-  object-fit: cover;
-  border-radius: 14px 5px 14px 5px;
-  box-shadow: 0 16px 34px rgb(15 51 43 / 20%);
-}
-
-.freeBadge {
-  position: absolute;
-  right: 14px;
-  bottom: 16px;
-  padding: 7px 10px;
-  border-radius: 10px 4px 10px 4px;
-  background: var(--pm-accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.bookDetails {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  padding: 22px;
-  flex-direction: column;
-}
-
-.bookDetails h3 {
-  margin: 8px 0 12px;
-  color: var(--pm-brand-dark);
-  font-size: clamp(23px, 2.2vw, 30px);
-  line-height: 1.08;
-}
-
-.description {
-  display: -webkit-box;
-  overflow: hidden;
   margin: 0;
-  color: var(--pm-ink-soft);
-  font-size: 14px;
-  line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  color: #f2f4ff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 3.4vw, 34px);
+  line-height: 1.1;
 }
 
-.metadata {
-  /* Ancre des libellés masqués (dt, position absolue) : sans elle, ils se repèrent sur la page entière,
-     échappent au conteneur de défilement du portail et ajoutent une seconde barre de défilement. */
-  position: relative;
+.subtitle {
+  margin: 4px 0 0;
+  color: #aab4e6;
+  font-size: clamp(14px, 1.4vw, 16px);
+}
+
+.guide {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 480px;
+}
+
+.search {
+  flex: 0 1 260px;
+  margin-left: auto;
+}
+
+.search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 94%);
+  color: #14213d;
+  font: inherit;
+}
+
+.search input::placeholder {
+  color: #5a6488;
+}
+
+.search input:focus-visible {
+  border-color: transparent;
+  outline: 3px solid rgb(255 255 255 / 45%);
+  outline-offset: 2px;
+}
+
+.filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin: 20px 0 0;
-}
-
-.metadata > div {
-  padding: 7px 9px;
-  border-radius: 10px;
-  background: var(--pm-surface-warm);
-}
-
-.metadata dt {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
-.metadata dd {
-  margin: 0;
-  color: var(--pm-brand-dark);
-  font-size: 12px;
-  font-weight: 850;
-}
-
-.actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 22px;
-}
-
-.actions a {
-  display: inline-flex;
-  min-height: 44px;
-  padding: 9px 12px;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  border: 2px solid var(--pm-brand);
-  border-radius: 12px 4px 12px 4px;
-  font-size: 13px;
-  font-weight: 850;
-  text-decoration: none;
 }
 
-.readButton { background: var(--pm-brand); color: #fff; }
-
-.actions a:hover,
-.actions a:focus-visible {
-  transform: translateY(-1px);
-  box-shadow: var(--pm-shadow-sm);
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: 6px;
+  padding-left: 14px;
+  border-left: 1px solid rgb(255 255 255 / 18%);
 }
 
-.readerNote {
-  margin: 10px 0 0;
-  color: var(--pm-ink-soft);
-  font-size: 11px;
+.groupLabel {
+  color: #aab4e6;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: transparent;
+  color: #f2f4ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.chip:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.chip:focus-visible {
+  outline-color: #fd5e53;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: #fd5e53;
+  background: #fd5e53;
+  color: #14213d;
+}
+
+.catalogue {
+  min-width: 0;
+}
+
+.count {
+  margin: 0 0 14px;
+  color: #aab4e6;
+  font-size: 14px;
 }
 
 .status {
   margin: 0 0 14px;
-  color: var(--pm-ink-soft);
-  font-size: 13px;
+  color: #aab4e6;
+  font-size: 14px;
 }
 
-@media (max-width: 1180px) {
-  .bookGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.empty {
+  margin: 0;
+  padding: 28px;
+  border: 1px dashed rgb(255 255 255 / 25%);
+  border-radius: 18px;
+  color: #aab4e6;
+  text-align: center;
+}
+
+/* Rangées équilibrées (voir LibraryPage.tsx) : chaque rangée remplit toute la largeur, comme la galerie des jeux. */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.row {
+  display: grid;
+  gap: 40px;
+  /* Les livres se répartissent sur toute la largeur : écarts réguliers, marges latérales réduites. */
+  justify-content: space-evenly;
 }
 
 @media (max-width: 680px) {
-  .page { padding: clamp(20px, 3vw, 32px) 0 36px; }
-
-  .titleBlock { padding-left: 12px; }
-  .titleBlock::before { width: 3px; }
-
-  .heading h1 { font-size: clamp(24px, 3vw, 32px); margin-top: 6px; }
-
-  .catalogue { margin-top: clamp(20px, 4vw, 32px); }
-
-  .sectionHeading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
+  .heading {
+    border-radius: 18px;
   }
 
-  .sectionHeading h2 { font-size: clamp(18px, 2.5vw, 24px); }
-
-  .bookGrid { grid-template-columns: 1fr; gap: 16px; }
-
-  .book {
-    display: flex;
-    flex-direction: column;
+  .group {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 
-  .coverWrap {
-    padding: 16px 16px 0;
-  }
-
-  .cover {
-    width: min(60%, 190px);
-  }
-
-  .bookDetails {
-    padding: 16px;
-    gap: 8px;
-  }
-
-  .bookDetails h3 {
-    font-size: clamp(18px, 5vw, 22px);
-    margin: 0 0 8px;
-    line-height: 1.2;
-  }
-
-  .collection { font-size: 10px; }
-
-  .description {
-    font-size: 14px;
-    line-height: 1.5;
-    -webkit-line-clamp: unset;
-    margin: 0;
-  }
-
-  .readerNote { display: none; }
-
-  .metadata {
-    margin: 12px 0 0;
-    gap: 5px;
-  }
-
-  .metadata > div {
-    padding: 5px 7px;
-    font-size: 11px;
-  }
-
-  .actions {
+  .filters {
     gap: 6px;
-    padding-top: 10px;
-    margin-top: auto;
   }
 
-  .actions a {
-    min-height: 40px;
-    padding: 8px 10px;
-    font-size: 12px;
+  .chip {
+    min-height: 44px;
   }
+
+  .gallery,
+  .row {
+    gap: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}
+
+/* La bulle de Yamba est blanche par défaut : on la passe en verre sombre pour rester lisible sur fond noir. */
+.guide [class*="bubble"] {
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(255 255 255 / 8%);
+  color: #dfe6ff;
+}
+
+.guide [class*="bubble"]::before {
+  background: rgb(255 255 255 / 8%);
+}
+
+/* Panneau de filtres et fond : réservés au téléphone (voir le bloc @media plus bas). */
+@media (min-width: 681px) {
+  .sheetHead,
+  .sheetShow,
+  .scrim {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Recherche et filtres quittent l'écran : ils s'ouvrent depuis la barre basse. */
+  .search,
+  .filters {
+    display: none;
+  }
+
+  .search.panelOpen {
+    position: fixed;
+    right: 12px;
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    z-index: 41;
+    display: block;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 20px;
+    background: #14162a;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 50%);
+  }
+
+  .filters.panelOpen {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    display: flex;
+    max-height: 70svh;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    border-radius: 24px 24px 0 0;
+    background: #14162a;
+    box-shadow: 0 -12px 40px rgb(0 0 0 / 60%);
+  }
+
+  .sheetHead {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    color: #f2f4ff;
+    font-size: 18px;
+  }
+
+  .sheetClose {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: #aab4ff;
+    font: inherit;
+    font-weight: 700;
+  }
+
+  .sheetShow {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: #fd5e53;
+    color: #14213d;
+    font: inherit;
+    font-weight: 800;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    display: block;
+    background: rgb(5 6 14 / 60%);
+  }
+
 }

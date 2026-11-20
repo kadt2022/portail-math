@@ -14,9 +14,10 @@ interface SidebarProps {
   onExpand: () => void;
   onNavigate: () => void;
   navId: string;
+  theme?: "games" | "library";
 }
 
-export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: SidebarProps) {
+export function Sidebar({ open, collapsed, onExpand, onNavigate, navId, theme }: SidebarProps) {
   const { t } = useTranslation("common");
   const location = useLocation();
   const primaryActive = location.pathname.startsWith("/apprentissages/primaire/");
@@ -74,7 +75,7 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
         onClick={onNavigate}
       />
 
-      <aside id={navId} className={`${styles.sidebar}${collapsed ? ` ${styles.collapsed}` : ""}`}>
+      <aside id={navId} className={`${styles.sidebar}${collapsed ? ` ${styles.collapsed}` : ""}${theme === "games" ? ` ${styles.sidebarGames}` : ""}${theme === "library" ? ` ${styles.sidebarLibrary}` : ""}`}>
         <nav className={styles.nav} aria-label={t("mainNavigation")}>
           {renderPortalLink(dashboardLink)}
 
@@ -202,6 +203,12 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId }: Sideba
               ) : null}
             </div>
           </div>
+
+          {theme === "games" ? (
+            <div className={styles.navSection} role="group" aria-label={t("nav.exetat")}>
+              {navigationLinks.filter((link) => link.to === "/exetat").map((link) => renderPortalLink(link))}
+            </div>
+          ) : null}
 
           <div className={styles.navSection} role="group" aria-label={t("navGroups.resources")}>
             <p className={styles.navSectionTitle} aria-hidden="true">{t("navGroups.resources")}</p>

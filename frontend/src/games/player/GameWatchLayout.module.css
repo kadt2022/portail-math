@@ -1,0 +1,42 @@
+.watch {
+  display: block;
+  min-width: 0;
+}
+
+.watch[hidden] {
+  display: none;
+}
+
+.main {
+  display: grid;
+  min-width: 0;
+  gap: 14px;
+}
+
+.aside {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 10px;
+}
+
+/* Ordinateur : lecteur à gauche (environ 72 %), recommandations à droite (environ 28 %). */
+@media (min-width: 981px) {
+  .withAside {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(260px, 28%, 400px);
+    align-items: start;
+    gap: clamp(14px, 1.6vw, 22px);
+  }
+
+  .withAside[hidden] {
+    display: none;
+  }
+}
+
+/* Écran étroit : une seule colonne, les recommandations viennent après le lecteur, à la verticale. */
+@media (max-width: 980px) {
+  .withAside .aside {
+    margin-top: 16px;
+  }
+}

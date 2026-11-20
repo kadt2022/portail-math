@@ -1,97 +1,86 @@
 import { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
+import type { CardPlacement } from "./gallery-layout";
 import styles from "./GameCard.module.css";
-import { FluxForgeScene, GrilleMagiqueScene, NewGameScene, TrainScene, TurboPulseCardScene } from "./GameScenes";
 
 interface GameCardProps {
   game: GameCatalogueEntry;
+  /** Place dans la galerie (colonnes et proportions) ; sans elle, la carte prend sa taille naturelle. */
+  placement?: CardPlacement;
+  /** Jeux intégrés à la page : le clic ouvre le jeu sur place au lieu de changer de page (l’adresse reste un vrai lien). */
+  onOpen?: (game: GameCatalogueEntry) => void;
+  /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
+  onIntent?: (gameId: string) => void;
 }
 
-function CardVisual({ game }: GameCardProps) {
-  if (game.imageSrc) {
-    const className = game.imageFit === "contain" ? `${styles.photo} ${styles.photoContain}` : styles.photo;
-    return <img className={className} src={game.imageSrc} alt="" loading="lazy" />;
-  }
-  if (game.sceneId === "train") {
-    return <TrainScene />;
-  }
-  if (game.sceneId === "grille-magique") {
-    return <GrilleMagiqueScene />;
-  }
-  if (game.sceneId === "turbo-pulse") {
-    return <TurboPulseCardScene />;
-  }
-  if (game.sceneId === "flux-forge") {
-    return <FluxForgeScene />;
-  }
-  return <NewGameScene />;
-}
-
-export function GameCard({ game }: GameCardProps) {
+// Toute la carte est le lien : pas de bouton « Jouer » séparé. L'illustration occupe
+// la carte entière, le titre et l'accroche sont posés sur une bande en bas.
+export function GameCard({ game, placement, onOpen, onIntent }: GameCardProps) {
   const { t } = useTranslation("games");
-  const navigate = useNavigate();
-  const isComingSoon = game.availability === "coming-soon";
-  const isReactRoute = game.availability === "react";
   const name = t(game.nameKey);
-  const ctaLabel = t(game.ctaLabelKey);
-
-  // Turbo Pulse doit s'ouvrir immédiatement en plein écran paysage au clic.
-  // C'est le seul endroit où requestFullscreen() peut être appelé depuis une
-  // action utilisateur directe (clic). Dès que fullscreen est accordé,
-  // naviguer vers la page de jeu.
-  const launchTurboPulseFullscreen = useCallback(
-    async (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (game.id !== "turbo-pulse") return;
-      e.preventDefault();
-      const root = document.documentElement;
-      try {
-        await root.requestFullscreen?.();
-        try {
-          await screen.orientation?.lock?.("landscape");
-        } catch {
-          // Verrouillage refusé ou non supporté : continuer sans lui.
-        }
-      } catch {
-        // Fullscreen refusé : continuer avec fallback responsive.
+  const style: React.CSSProperties | undefined = placement
+    ? {
+        gridColumn: placement.start ? `${placement.start} / span ${placement.span}` : `span ${placement.span}`,
+        aspectRatio: placement.ratio,
       }
-      navigate(game.href);
+    : undefined;
+
+  // Clic simple : le jeu s’ouvre dans la page. Clic avec modificateur (nouvel onglet) : le lien normal s’applique.
+  const openInPage = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!onOpen || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      onOpen(game);
     },
-    [game, navigate],
+    [game, onOpen],
   );
 
+  const content = (
+    <>
+      {game.thumbnail ? (
+        <img
+          className={styles.image}
+          src={game.thumbnail}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={640}
+          height={400}
+          style={game.focus ? { objectPosition: game.focus } : undefined}
+        />
+      ) : null}
+      {game.overlay ? <img className={styles.overlay} src={game.overlay} alt="" loading="lazy" decoding="async" width={400} height={428} /> : null}
+      <span className={styles.category}>{t(`categories.${game.categoryId}`)}</span>
+      <span className={styles.bar}>
+        <span className={styles.name}>{name}</span>
+        <span className={styles.tagline}>{t(game.taglineKey)}</span>
+      </span>
+    </>
+  );
+  const label = t("card.playAria", { name });
+  const intent = onIntent ? () => onIntent(game.id) : undefined;
+
+  if (game.availability === "react") {
+    return (
+      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} onPointerEnter={intent} onPointerDown={intent} onFocus={intent}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <article className={styles.card}>
-      <div className={styles.illustration}>
-        <CardVisual game={game} />
-        {isComingSoon ? <span className={styles.badge}>{t("badge.new")}</span> : null}
-      </div>
-      <div className={styles.body}>
-        <h3 className={styles.name}>{name}</h3>
-        <p className={styles.description}>{t(game.descriptionKey)}</p>
-        {isComingSoon ? (
-          <span className={styles.ctaDisabled} aria-disabled="true">
-            {ctaLabel}
-          </span>
-        ) : isReactRoute ? (
-          <Link className={styles.cta} to={game.href} onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : undefined}>
-            {ctaLabel}
-          </Link>
-        ) : (
-          <a
-            className={styles.cta}
-            href={game.href}
-            onClick={game.id === "turbo-pulse" ? launchTurboPulseFullscreen : undefined}
-            data-game-direct-launch
-            data-game-title={name}
-            data-game-mark={game.id === "multiplication-train" ? "🚂" : game.id === "flux-forge" ? "🏗️" : "🏞️"}
-          >
-            {ctaLabel}
-          </a>
-        )}
-      </div>
-    </article>
+    <a
+      className={styles.card} style={style}
+      href={game.href}
+      aria-label={label}
+      data-game-direct-launch
+      data-game-title={name}
+      data-game-mark={game.id === "multiplication-train" ? "🚂" : game.id === "flux-forge" ? "🏗️" : "🏞️"}
+    >
+      {content}
+    </a>
   );
 }

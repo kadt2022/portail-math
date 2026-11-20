@@ -55,7 +55,7 @@ describe("Conduire avec Léo dans les jeux", () => {
     expect(entry).toBeDefined();
     expect(entry?.availability).toBe("react");
     expect(entry?.href).toBe("/jeux/conduire-avec-leo");
-    expect(entry?.imageFit).toBe("contain");
+    expect(entry?.featured).toBe(true);
     expect(fr.leoDriving.name).toBe("Conduire avec Léo");
     expect(en.leoDriving.name).toBe("Driving with Léo");
   });

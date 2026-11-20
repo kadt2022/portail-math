@@ -1,7 +1,31 @@
 {
   "cataloguePage": {
-    "eyebrow": "Catalogue",
-    "title": "Games"
+    "title": "Games",
+    "subtitle": "Discover, play and learn with our educational games",
+    "searchLabel": "Search for a game",
+    "searchPlaceholder": "Search for a game",
+    "filterLabel": "Filter by universe",
+    "all": "All games",
+    "loading": "Loading the game…",
+    "otherGames": "Other games from the portal",
+    "galleryTitle": "All games",
+    "noResult": "No game has this name. Try another word!",
+    "resultCount_one": "{{count}} game",
+    "resultCount_other": "{{count}} games",
+    "recommended": "Up next",
+    "aboutGame": "About {{name}}",
+    "headerSearchLabel": "Search all games",
+    "headerSearchPlaceholder": "Search all games"
+  },
+  "bar": {
+    "label": "Games navigation",
+    "home": "Home",
+    "search": "Search",
+    "filters": "Filters",
+    "myGames": "My games",
+    "panelTitle": "Filters",
+    "close": "Close",
+    "show": "Show games"
   },
   "badge": {
     "new": "New"
@@ -9,17 +33,20 @@
   "multiplicationTrain": {
     "name": "The Multiplication Train",
     "description": "Learn the 2 and 5 times tables while driving your train forward.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Ride the times tables"
   },
   "fractionRiver": {
     "name": "The Fraction River",
     "description": "Cross the river by picking the right fractions.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Cross the river"
   },
   "fluxForge": {
     "name": "Flux Forge",
     "description": "Become a little engineer and build the village's cabin.",
-    "cta": "Play"
+    "cta": "Play",
+    "tagline": "Build the village"
   },
   "grilleMagique": {
     "name": "The Magic Tiles",
@@ -59,17 +86,52 @@
         "rowIncorrect": "Row {{index}} is incorrect.",
         "colIncorrect": "Column {{index}} is incorrect."
       },
+      "tutorial": {
+        "progress": "Step {{current}} of {{total}}",
+        "reveal": "Tap the magic card to reveal it.",
+        "rows": "Each row must give the result shown on the right.",
+        "cols": "Each column must give the result shown below.",
+        "moveFirst": "Tap this tile to slide it into the empty cell.",
+        "move": "Well done! Tap the next tile to slide it into the empty cell.",
+        "replan": "No problem, we adapt! Here is the next tile to tap.",
+        "place": "Perfect! The empty cell is in the centre: tap the magic card to place it.",
+        "victory": "Well done! You solved your first game!",
+        "next": "I understand",
+        "skip": "Skip the tutorial",
+        "replay": "Replay the tutorial"
+      },
+      "hint": {
+        "move": "Hint: the {{value}} goes in row {{row}}, column {{col}}.",
+        "center": "Everything is in place: bring the empty cell back to the centre, then place the card.",
+        "done": "Well done, the grid is complete!"
+      },
+      "screen": {
+        "label": "Magic Tiles game"
+      },
       "actions": {
         "newGrid": "New grid",
         "nextLevel": "Next level",
-        "backToGames": "Back to games"
+        "backToGames": "Back to games",
+        "restartAria": "Restart with a new grid"
+      },
+      "howTo": {
+        "step1Title": "Look at the sums",
+        "step1": "Every row and every column must give the result shown.",
+        "step2Title": "Move the tiles",
+        "step2": "Slide tiles into the empty space to arrange the numbers.",
+        "step3Title": "Place the magic card",
+        "step3": "Bring the empty space to the centre, then place the magic card.",
+        "step4Title": "Check and win",
+        "step4": "When every sum is correct, finish the level and earn stars."
       }
-    }
+    },
+    "tagline": "Slide the tiles"
   },
   "leoDriving": {
     "name": "Driving with Léo",
     "description": "Take Léo's wheel, obey the traffic lights and deliver pizzas all over town.",
-    "cta": "Take the wheel"
+    "cta": "Take the wheel",
+    "tagline": "Deliver pizzas across town"
   },
   "turboPulse": {
     "name": "Turbo Pulse",
@@ -87,9 +149,6 @@
       "solve": "Solve",
       "currentOperation": "Current equation: {{operation}}",
       "canvasLabel": "Interactive Turbo Pulse scene. Aim the piston and hit a fruit carrying the correct answer.",
-      "missionTitle": "Maths mission",
-      "instructions": "Aim at a fruit carrying the correct answer. Every fruit of the same colour will explode with it.",
-      "touchHint": "Slide your finger to aim, then touch the scene to fire. The answer stays hidden until a correct hit.",
       "failure": {
         "eyebrow": "Defence breached",
         "title": "Level {{level}} — {{name}} failed",
@@ -101,12 +160,9 @@
         "exhausted": "All 3 attempts are over. The run restarts at level 1."
       },
       "success": {
-        "eyebrow": "Station secured",
         "title": "Level {{level}} complete!",
-        "message": "12 equations solved, every fruit destroyed and the final explosion shown in full.",
-        "next": "Level {{level}} — {{name}}",
-        "masteredTitle": "Turbo Pulse mastered!",
-        "masteredMessage": "You cleared all 7 levels and solved {{count}} equations."
+        "masteredTitle": "Golden Knight",
+        "knightRank": "Level 7 — Royal Gold"
       },
       "paused": {
         "title": "Game paused",
@@ -124,14 +180,39 @@
         "pause": "Pause",
         "resume": "Resume",
         "fullscreenOn": "Fullscreen",
-        "fullscreenOff": "Exit fullscreen"
+        "fullscreenOff": "Exit fullscreen",
+        "play": "Play",
+        "restartAria": "Restart the game"
+      },
+      "controlsLabel": "Game controls",
+      "ranks": {
+        "steel": "Steel",
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "emerald": "Emerald",
+        "sapphire": "Sapphire",
+        "ruby": "Royal Ruby",
+        "gold": "Royal Gold"
+      },
+      "rankLabel": "{{rank}} rank",
+      "end": {
+        "failTitle": "Oops! Try again",
+        "winTitle": "Level complete!",
+        "score": "Score: {{score}}",
+        "retry": "Try again",
+        "next": "Continue",
+        "attemptsLeft_one": "1 try left",
+        "attemptsLeft_other": "{{count}} tries left",
+        "noAttemptLeft": "No tries left: back to level 1"
       }
-    }
+    },
+    "tagline": "Aim, calculate, chain combos"
   },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",
-    "cta": "Coming soon"
+    "cta": "Coming soon",
+    "tagline": "Coming soon"
   },
   "comingSoonPage": {
     "eyebrow": "New educational game",
@@ -147,6 +228,66 @@
     "shapeBuilder": {
       "name": "The Shape Builder",
       "description": "Assemble shapes to discover geometry."
+    }
+  },
+  "categories": {
+    "driving": "Driving",
+    "calculation": "Math challenges",
+    "logic": "Logic",
+    "discovery": "Discovery"
+  },
+  "featured": {
+    "label": "Featured",
+    "educational": "Educational game",
+    "cta": "Play",
+    "aria": "Play {{name}}"
+  },
+  "card": {
+    "playAria": "Play {{name}}",
+    "soonAria": "{{name}}: coming soon"
+  },
+  "player": {
+    "controls": "Game controls",
+    "play": "Play",
+    "pause": "Pause",
+    "resume": "Resume",
+    "pausedTitle": "Game paused",
+    "restart": "Restart",
+    "restartAria": "Restart the game",
+    "hint": "Hint",
+    "hintAria": "Ask for a hint",
+    "screen": {
+      "enter": "Enter full screen",
+      "exit": "Exit full screen",
+      "enterShort": "Full screen",
+      "exitShort": "Shrink",
+      "closeShort": "Close",
+      "close": "Close the game and see the other games",
+      "leave": "Exit"
+    },
+    "howTo": {
+      "button": "How to play",
+      "title": "How to play",
+      "close": "Close the instructions"
+    },
+    "orientation": {
+      "playPortrait": "Switch to portrait",
+      "playLandscape": "Switch to landscape",
+      "portraitShort": "Portrait",
+      "landscapeShort": "Landscape",
+      "rotateNote": "Turn your phone sideways to play in landscape."
+    },
+    "sound": {
+      "on": "Sound on",
+      "off": "Sound off"
+    }
+  },
+  "meta": {
+    "subject": {
+      "maths": "Maths"
+    },
+    "level": {
+      "primary": "Primary school"
     }
   }
 }
