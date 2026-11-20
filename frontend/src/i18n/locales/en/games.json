@@ -200,16 +200,6 @@
         "play": "Play",
         "restartAria": "Restart the game"
       },
-      "galaxy": "Kimbo Galaxy",
-      "worlds": {
-        "zion": "Planet Zion",
-        "verdalia": "Planet Verdalia",
-        "aqualis": "Planet Aqualis",
-        "solara": "Planet Solara",
-        "glacia": "Planet Glacia",
-        "pyra": "Planet Pyra",
-        "ultima": "Planet Ultima"
-      },
       "controlsLabel": "Game controls"
     },
     "tagline": "Aim, calculate, chain combos"

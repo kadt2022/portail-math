@@ -200,16 +200,6 @@
         "play": "Jouer",
         "restartAria": "Recommencer la partie"
       },
-      "galaxy": "Galaxie Kimbo",
-      "worlds": {
-        "zion": "Planète Zion",
-        "verdalia": "Planète Verdalia",
-        "aqualis": "Planète Aqualis",
-        "solara": "Planète Solara",
-        "glacia": "Planète Glacia",
-        "pyra": "Planète Pyra",
-        "ultima": "Planète Ultima"
-      },
       "controlsLabel": "Commandes du jeu"
     },
     "tagline": "Vise, calcule, enchaîne"

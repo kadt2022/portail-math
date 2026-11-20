@@ -129,7 +129,6 @@ describe("page Turbo Pulse", () => {
 
     expect(screen.getByRole("heading", { name: "Niveau 1 terminé !" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "▶ Jouer le niveau 2" })).toBeInTheDocument();
-    expect(screen.getByText("Planète Verdalia")).toBeInTheDocument();
   });
 
   it("célèbre la maîtrise complète sans aperçu de niveau suivant", () => {

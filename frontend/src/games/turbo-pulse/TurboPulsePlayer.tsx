@@ -9,7 +9,6 @@ import {
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "../fullscreen";
 import { useInertOutside } from "../useInertOutside";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
-import { worldForLevel } from "./turbo-pulse-worlds";
 import styles from "./TurboPulsePlayer.module.css";
 
 // import() dynamique (pas un import statique) : Vite ne télécharge le décor
@@ -105,7 +104,6 @@ function FailurePanel({ snapshot, onRetry }: { snapshot: TurboPulseSnapshot; onR
 function SuccessPanel({ snapshot, onNext }: { snapshot: TurboPulseSnapshot; onNext: () => void }) {
   const { t } = useTranslation("games");
   const mastered = snapshot.status === "mastered";
-  const nextWorld = worldForLevel(Math.min(snapshot.levelIndex + 1, TURBO_LEVELS.length - 1));
   return (
     <div className={styles.goldBackdrop} role="presentation">
       <section className={styles.goldCard} role="dialog" aria-modal="true" aria-labelledby="turbo-success-title">
@@ -123,7 +121,6 @@ function SuccessPanel({ snapshot, onNext }: { snapshot: TurboPulseSnapshot; onNe
             ? t("turboPulse.game.success.masteredTitle")
             : t("turboPulse.game.success.title", { level: snapshot.levelIndex + 1 })}
         </h2>
-        {!mastered ? <p className={styles.goldWorld}>{t(`turboPulse.game.worlds.${nextWorld.id}`)}</p> : null}
         <button type="button" className={styles.goldAction} onClick={onNext}>
           {mastered ? t("turboPulse.game.actions.playAgain") : t("turboPulse.game.actions.nextLevel", { level: snapshot.levelIndex + 2 })}
         </button>
@@ -278,7 +275,6 @@ export function TurboPulsePlayer({
     if (!active && running && !snapshot.paused) controllerRef.current?.togglePause();
   }, [active, snapshot.status, snapshot.paused]);
 
-  const world = worldForLevel(snapshot.levelIndex);
   const progress = Math.min(100, (snapshot.solved / CALCULATIONS_PER_LEVEL) * 100);
   const isSuccess = snapshot.status === "level-complete" || snapshot.status === "mastered";
   const canPause = snapshot.status === "playing" || snapshot.status === "clearing";
@@ -291,7 +287,6 @@ export function TurboPulsePlayer({
     <main
       ref={pageRef}
       className={fullscreen ? `${styles.page} ${styles.fullscreen}` : styles.page}
-      style={{ "--turbo-world": world.accentCss } as CSSProperties}
       aria-labelledby="turbo-pulse-title"
     >
       <header className={styles.topbar}>
@@ -305,13 +300,6 @@ export function TurboPulsePlayer({
       </header>
 
       <section className={styles.statusBar} aria-label={t("turboPulse.game.statusLabel")}>
-        <div className={styles.worldHeader}>
-          <span className={styles.planet} aria-hidden="true" />
-          <div>
-            <strong>{t(`turboPulse.game.worlds.${world.id}`)}</strong>
-            <span>{t("turboPulse.game.galaxy")}</span>
-          </div>
-        </div>
         <div className={styles.levelBlock}>
           <span>{t("turboPulse.game.level", { level: snapshot.levelIndex + 1 })}</span>
           <strong>{snapshot.levelName}</strong>

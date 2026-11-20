@@ -398,8 +398,7 @@ export class TurboPulseScene extends Phaser.Scene {
     // recalcul à chaque frame d'un shader WebGL sur une grosse image statique.
     // Ce canvas Phaser reste transparent (mountTurboPulseGame) et ne dessine
     // plus que les éléments qui doivent rester nets : zone de défense, fruits,
-    // canon, projectiles. La ligne de défense prend la couleur d'énergie du
-    // monde (voir turbo-pulse-worlds.ts), pour rester assortie au décor.
+    // canon, projectiles. La ligne de défense est dorée, comme l'énergie.
     const accent = GOLD_ENERGY;
     graphics.fillStyle(0x06151f, 0.7);
     graphics.fillRect(0, 0, DEFENSE_X, height);
