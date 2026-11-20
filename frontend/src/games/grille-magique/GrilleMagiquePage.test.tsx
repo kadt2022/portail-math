@@ -194,15 +194,13 @@ describe("Les Tuiles magiques", () => {
     expect(screen.getByRole("link", { name: "Retour aux jeux" })).toHaveAttribute("href", "/jeux");
   });
 
-  it("page autonome sur téléphone : « Quitter » ramène à l'affichage normal de la page", async () => {
-    vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener: () => undefined, removeEventListener: () => undefined }));
+  it("page autonome : « Quitter » ramène du plein écran à l'affichage normal de la page", async () => {
     const user = userEvent.setup();
     renderGame();
     await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
     const region = screen.getByRole("region", { name: "Jeu Les Tuiles magiques" });
     expect(region.className).toMatch(/fullscreen/);
-    await user.click(screen.getByRole("button", { name: "Quitter" }));
+    await user.click(screen.getByRole("button", { name: "Quitter le plein écran" }));
     expect(region.className).not.toMatch(/fullscreen/);
-    vi.unstubAllGlobals();
   });
 });

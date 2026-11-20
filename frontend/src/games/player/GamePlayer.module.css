@@ -1,0 +1,730 @@
+/* Lecteur standard des jeux, sur le principe d'un lecteur vidéo : une bande compacte en haut (titre et compteurs), la scène du jeu
+   qui occupe toute la surface utile, et des commandes discrètes en bas, posées sur un dégradé sombre semi-transparent.
+   Taille standard : la scène est en 16/9 et prend la largeur que la page lui donne ; le plein écran l'agrandit à la fenêtre.
+   Les commandes restent toujours visibles, posées sur le bas de l'image : elles ne gênent pas la visée, car les jeux qui passent
+   dessous (Turbo Pulse) ne font jamais descendre leurs cibles dans cette bande. */
+
+.root {
+  --accent: #7c5cff;
+  /* Hauteur réservée en bas pour les jeux dont la scène ne passe pas sous les commandes (mesurée par le composant). */
+  --controls-inset: 0px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #fff;
+  container-type: inline-size;
+  text-align: left;
+  isolation: isolate;
+  /* Fond standard : nuit violette. Un jeu peut poser son propre décor par-dessus (prop backdrop). */
+  background: linear-gradient(160deg, #1b1050, #0f0a2e);
+}
+
+.root:focus {
+  outline: none;
+}
+
+/* Présentation immersive : toute la fenêtre, zones de sécurité des appareils respectées (encoche, barre d'accueil). */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100vw;
+  height: 100dvh;
+  /* Les marges de sécurité (encoche, barre d'accueil) sont prises DANS la hauteur de l'écran : sans cela, elles s'ajoutent à
+     100dvh et poussent la barre de commandes sous le bas de l'écran (iPhone en portrait). */
+  box-sizing: border-box;
+  border-radius: 0;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
+.root:fullscreen {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Bande du haut : titre, zone propre au jeu, compteurs. Compacte, en une seule ligne quand la place le permet. */
+.bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 14px;
+  padding: 8px clamp(10px, 2cqw, 22px);
+  background: linear-gradient(180deg, rgb(18 11 52 / 96%), rgb(14 9 42 / 92%));
+}
+
+.title {
+  margin: 0;
+  background: linear-gradient(180deg, #fff6c7, #ffc93c 60%, #f08a1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(18px, 3.2cqw, 30px);
+  font-weight: 900;
+  line-height: 1.05;
+  filter: drop-shadow(0 2px 0 rgb(70 20 90 / 70%));
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.statItem {
+  display: flex;
+  min-width: 58px;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 10px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 6%);
+}
+
+.statItem dt {
+  margin: 0;
+  color: #c9bbff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.statItem dd {
+  margin: 0;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Corps : la scène du jeu. Il garde le rapport 16/9 de la scène (plafonné en hauteur) et il est lui-même un conteneur de taille :
+   le jeu s'ajuste à l'espace réellement disponible. */
+.body {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 220px;
+  max-height: min(74svh, 720px);
+  aspect-ratio: 16 / 9;
+  padding-bottom: var(--controls-inset);
+  container-type: size;
+}
+
+.screen .body {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.stage {
+  width: 100%;
+  height: 100%;
+}
+
+/* Barre de commandes : un seul panneau horizontal qui fait corps avec le bas du lecteur. Fond sombre semi-transparent, fine
+   bordure en haut, coins arrondis uniquement aux extrémités basses (ceux du cadre), hauteur compacte et uniforme. */
+.controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+  box-sizing: border-box;
+  padding: 6px clamp(8px, 1.4cqw, 14px);
+  border-top: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 0 0 24px 24px;
+  background: rgb(10 7 32 / 74%);
+  backdrop-filter: blur(8px);
+}
+
+
+/* Sépare le groupe de lecture (à gauche) des outils (à droite). */
+.ctlSeparator {
+  flex: 1;
+  min-width: 8px;
+}
+
+.ctl {
+  position: relative;
+  display: inline-flex;
+  height: 40px;
+  min-width: 40px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 clamp(10px, 1.3cqw, 14px);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 7%);
+  color: #eceaf7;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(13px, 1.3cqw, 14px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 100ms ease;
+}
+
+.ctl svg {
+  flex: none;
+}
+
+.ctl:hover:not(:disabled) {
+  border-color: rgb(255 255 255 / 34%);
+  background: rgb(255 255 255 / 18%);
+  color: #fff;
+}
+
+.ctl:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.ctl:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.ctl:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Bouton de lecture (Jouer / Pause) : le seul rempli de la couleur d'accent. */
+.ctlPrimary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.ctlPrimary:hover:not(:disabled) {
+  border-color: #9a82ff;
+  background: #8d71ff;
+}
+
+/* Bouton à état d'un jeu (ex. le son activé) : légèrement éclairé. */
+.ctl[aria-pressed="true"] {
+  border-color: rgb(255 255 255 / 34%);
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+}
+
+.ctlExit:hover:not(:disabled) {
+  border-color: rgb(255 120 130 / 70%);
+  background: rgb(220 60 80 / 28%);
+  color: #ffd9de;
+}
+
+/* Voile de pause posé sur la scène : le chronomètre du jeu est arrêté et la scène ne répond plus. */
+.pauseVeil {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgb(12 8 38 / 72%);
+  backdrop-filter: blur(5px);
+}
+
+.pauseTitle {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(16px, 3cqmin, 28px);
+  font-weight: 600;
+}
+
+.pauseResume {
+  min-height: 46px;
+  padding: 0 24px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pauseResume:hover {
+  background: #8d71ff;
+}
+
+.pauseResume:active {
+  transform: scale(0.96);
+}
+
+.pauseResume:focus-visible,
+.howToButton:focus-visible,
+.howToClose:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Instructions : un panneau compact, ouvert depuis le bouton « ? ». */
+.howToButton {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.howToButton:hover,
+.howToButton[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.howTo {
+  position: absolute;
+  top: 56px;
+  right: clamp(8px, 2cqw, 22px);
+  z-index: 30;
+  width: min(380px, calc(100% - 20px));
+  max-height: calc(100% - 140px);
+  padding: 12px 14px 14px;
+  overflow-y: auto;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 12px;
+  background: #15103a;
+  box-shadow: 0 10px 28px rgb(6 2 30 / 65%);
+}
+
+.howToHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.howToTitle {
+  margin: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.howToClose {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.howToList {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.howToItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #efe9ff;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.howToItem strong {
+  display: block;
+  color: #fff;
+}
+
+.howToText {
+  display: block;
+}
+
+.howToNumber {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Plein écran : la seule commande du lecteur, « ✕ Quitter », compacte, en haut à droite, au-dessus de l'en-tête. L'en-tête lui
+   laisse sa place (voir .fullscreen .bar) : elle ne masque ni le score ni les compteurs. */
+.fullscreenExit {
+  position: absolute;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  z-index: 40;
+  display: inline-flex;
+  height: 38px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px 0 10px;
+  border: 1px solid rgb(255 255 255 / 26%);
+  border-radius: 999px;
+  background: rgb(10 7 32 / 72%);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 30%);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: background 140ms ease, border-color 140ms ease, transform 100ms ease;
+}
+
+.fullscreenExit svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fullscreenExit:hover {
+  border-color: rgb(255 120 130 / 70%);
+  background: rgb(150 40 60 / 72%);
+}
+
+.fullscreenExit:active {
+  transform: scale(0.96);
+}
+
+.fullscreenExit:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.fullscreen .bar {
+  padding-right: calc(130px + env(safe-area-inset-right, 0px));
+}
+
+/* Téléphone tenu droit alors que le paysage est choisi et que le navigateur refuse de tourner l’écran (iPhone) : la scène garde
+   la forme paysage, centrée, et une courte indication invite à tourner le téléphone, sans bloquer le jeu. */
+.rotateNote {
+  display: none;
+  margin: 0;
+  padding: 8px 12px;
+  color: #d9d2f5;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (orientation: portrait) {
+  .screen.landscape .rotateNote {
+    display: block;
+  }
+}
+
+/* Orientation portrait, affichage normal : c'est tout le lecteur (en-tête, scène, barre) qui devient vertical, centré dans la
+   page ; la scène y prend la forme 3/4, dans la limite de la hauteur de l'écran. */
+.portrait:not(.screen) {
+  /* Place réservée sous la scène portrait pour la barre posée dessus (ordinateur) ; 0 sur téléphone, où la barre est dessous. */
+  --portrait-reserve: var(--controls-height, 0px);
+  /* Hauteur maximale de la scène : tout le lecteur (menu du portail, en-tête du lecteur, barre) tient dans l'écran. */
+  --portrait-scene-max: min(100svh - 260px, 820px);
+
+  width: min(100%, calc(var(--portrait-scene-max) * 3 / 4));
+  margin-inline: auto;
+}
+
+.portrait .body {
+  display: grid;
+  place-items: center;
+  aspect-ratio: auto;
+  height: calc(100cqw * 4 / 3 + var(--portrait-reserve, 0px));
+  max-height: calc(var(--portrait-scene-max, 820px) + var(--portrait-reserve, 0px));
+  /* La scène portrait, plus étroite, s'arrête toujours au-dessus de la barre (sa marge sous le canon serait trop petite). */
+  padding-bottom: var(--portrait-reserve, 0px);
+}
+
+.portrait .stage {
+  width: min(100cqw, 100cqh * 3 / 4);
+  height: min(100cqh, 100cqw * 4 / 3);
+}
+
+/* Plein écran : la scène occupe tout l'espace quand l'écran a la forme choisie. Sinon (verrouillage refusé, ordinateur), elle garde
+   la forme de l'orientation choisie, la plus grande possible, centrée : l'interface s'adapte, sans simuler une rotation. */
+.screen.portrait .body,
+.screen.landscape .body {
+  display: grid;
+  place-items: center;
+  aspect-ratio: auto;
+  max-height: none;
+}
+
+.screen .stage {
+  width: 100%;
+  height: 100%;
+}
+
+@media (orientation: landscape) {
+  .screen.portrait .stage {
+    width: min(100cqw, 100cqh * 3 / 4);
+    height: 100cqh;
+  }
+}
+
+@media (orientation: portrait) {
+  .screen.landscape .stage {
+    width: 100cqw;
+    height: min(100cqh, 100cqw * 9 / 16);
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Écran étroit : le titre cède la place aux commandes mais reste lu par les lecteurs d'écran ; les boutons deviennent des icônes
+   (sauf la sortie). */
+@container (max-width: 900px) {
+  .title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .ctl span {
+    display: none;
+  }
+
+  .ctlExit span {
+    display: inline;
+  }
+
+  .ctl {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 12px;
+  }
+}
+
+/* Largeur moyenne (téléphone en paysage) : compteurs resserrés pour tenir sur une seule ligne. */
+@container (max-width: 760px) {
+  .bar {
+    gap: 4px 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .statItem {
+    min-width: 0;
+    padding: 1px 7px;
+  }
+
+  .statItem dt {
+    font-size: 9px;
+  }
+
+  .statItem dd {
+    font-size: 15px;
+  }
+}
+
+/* Peu de hauteur (téléphone en paysage) : bande et barre resserrées. */
+@media (max-height: 480px) {
+  .bar {
+    gap: 4px 6px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .stats {
+    gap: 4px;
+  }
+
+  .statItem {
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .statItem dt {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+
+  .statItem dd {
+    font-size: 15px;
+  }
+
+  .controls {
+    min-height: 50px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .ctl {
+    height: 42px;
+  }
+
+  .howTo {
+    top: 40px;
+  }
+}
+
+/* Portrait (téléphone tenu droit) : bande sur deux lignes ; suggestion de tourner l'appareil en plein écran. */
+@media (max-aspect-ratio: 1/1) {
+  .bar {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .stats {
+    order: 3;
+    width: 100%;
+  }
+}
+
+/* Téléphones et tablettes tactiles (téléphone : jusqu’à 680 px, ou tactile jusqu’à 1100 px) : la barre de commandes n'est plus posée sur l'image.
+   Elle devient une bande indépendante, sous la scène, sur toute la largeur du lecteur : fond sombre propre, fine bordure de
+   séparation, hauteur compacte. La scène s'arrête au-dessus d'elle (elle n'est ni recouverte ni déformée) et la barre descend
+   sous la barre d'accueil iOS / la navigation gestuelle Android, sans qu'aucun bouton ne passe dessous. */
+@media (max-width: 680px), (pointer: coarse) and (max-width: 1100px) {
+  .root {
+    border-radius: 16px;
+  }
+
+  .screen {
+    border-radius: 0;
+    padding-bottom: 0;
+  }
+
+  /* Lecteur qui occupe l’écran avec sa barre (téléphone) : la barre descend sous la barre d’accueil / la navigation gestuelle. */
+  .screen .controls {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .root .body {
+    padding-bottom: 0;
+  }
+
+  /* La barre est sous la scène : rien à réserver en portrait. */
+  .portrait:not(.screen) {
+    --portrait-reserve: 0px;
+  }
+
+  .controls {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: none;
+    gap: 4px;
+    width: 100%;
+    min-height: 56px;
+    padding: 6px 8px;
+    border-top: 1px solid rgb(255 255 255 / 16%);
+    border-radius: 0;
+    background: rgb(8 6 24 / 94%);
+    backdrop-filter: none;
+    box-shadow: 0 -6px 14px rgb(0 0 0 / 28%);
+  }
+
+
+  /* Cibles tactiles confortables (44 px au moins), icônes seules : toutes les commandes tiennent sur une ligne. */
+  .ctl {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 10px;
+    border-radius: 10px;
+  }
+
+  .ctlSeparator {
+    min-width: 4px;
+  }
+
+}
+
+/* Lecteur très étroit (téléphone en portrait) : la sortie passe elle aussi en icône seule, pour ne rien couper, et la scène dans
+   la page devient verticale (en 16/9, elle serait trop basse pour un plateau). Le plein écran, lui, garde toute la hauteur. */
+@container (max-width: 480px) {
+  /* Plein écran étroit : « Quitter » passe en icône seule. */
+  .fullscreenExit span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .fullscreenExit {
+    width: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .fullscreen .bar {
+    padding-right: calc(58px + env(safe-area-inset-right, 0px));
+  }
+
+  .ctlExit span {
+    display: none;
+  }
+
+  .ctl {
+    min-width: 44px;
+    padding: 0 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctl {
+    transition: none;
+  }
+
+  .fullscreenExit {
+    transition: none;
+  }
+}

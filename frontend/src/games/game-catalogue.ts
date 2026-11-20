@@ -46,6 +46,9 @@ export interface GameCatalogueEntry {
   categoryId: GameCategoryId;
   /** Jeu qui se joue directement dans la page « Jeux » (sans changer de page) ; son adresse reste valable pour un accès direct. */
   embed?: boolean;
+  /** Matière et niveau scolaire (clés du namespace "games"), affichés sous le lecteur : absents, rien n'est affiché. */
+  subjectKey?: string;
+  levelKey?: string;
   /** Jeu mis en avant par la bannière « À la une » (un seul à la fois). */
   featured?: boolean;
   thumbnail?: string;
@@ -78,6 +81,9 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     href: "/jeux/turbo-pulse",
     availability: "react",
     categoryId: "calculation",
+    embed: true,
+    subjectKey: "meta.subject.maths",
+    levelKey: "meta.level.primary",
     thumbnail: turboPulseThumb,
   },
   {
@@ -109,6 +115,8 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     availability: "react",
     categoryId: "logic",
     embed: true,
+    subjectKey: "meta.subject.maths",
+    levelKey: "meta.level.primary",
     thumbnail: tuilesMagiquesThumb,
   },
   {
@@ -163,3 +171,14 @@ export const featuredGame = playableGames.find((game) => game.featured);
 export const availableCategories = gameCategories.filter((category) =>
   playableGames.some((game) => game.categoryId === category.id),
 );
+
+/**
+ * Jeux recommandés à côté du lecteur : d'abord ceux de la même catégorie, puis les autres, dans l'ordre du catalogue.
+ * Le jeu ouvert n'y figure jamais ; la page ne les affiche pas une seconde fois dans « Autres jeux du portail ».
+ */
+export function recommendedGames(current: GameCatalogueEntry | undefined, count = 3): GameCatalogueEntry[] {
+  const others = playableGames.filter((game) => game.id !== current?.id);
+  const sameCategory = others.filter((game) => game.categoryId === current?.categoryId);
+  const rest = others.filter((game) => game.categoryId !== current?.categoryId);
+  return [...sameCategory, ...rest].slice(0, count);
+}

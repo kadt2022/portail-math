@@ -1,47 +1,6 @@
 /* Les Tuiles magiques : nuit étoilée, tuiles en pierres précieuses, cadre doré. Tout se dimensionne d'après la taille réelle du jeu
    (container queries) : même rendu dans la page (ordinateur), en plein écran, en paysage ou en portrait sur téléphone. */
 
-.root:focus {
-  outline: none;
-}
-
-.root {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  /* Dans la page : un jeu large, jamais plus haut que l'écran. */
-  aspect-ratio: 16 / 9;
-  max-height: min(80svh, 760px);
-  min-height: 300px;
-  overflow: hidden;
-  border-radius: 24px;
-  color: #fff;
-  container-type: size;
-  text-align: left;
-  isolation: isolate;
-}
-
-/* Présentation immersive : toute la fenêtre, zones de sécurité des appareils respectées (encoche, barre d'accueil). */
-.fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  width: 100vw;
-  height: 100dvh;
-  max-height: none;
-  min-height: 0;
-  aspect-ratio: auto;
-  border-radius: 0;
-  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-}
-
-.root:fullscreen {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-}
-
 /* Ciel : nuit violette, lueurs colorées et petites étoiles qui scintillent doucement. */
 .sky {
   position: absolute;
@@ -86,29 +45,6 @@
   to {
     opacity: 1;
   }
-}
-
-/* Barre : titre, difficulté, temps / déplacements / score / niveau, commandes. */
-.bar {
-  display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 14px;
-  padding: clamp(6px, 1.6cqh, 14px) clamp(10px, 2cqw, 22px);
-}
-
-.title {
-  margin: 0;
-  background: linear-gradient(180deg, #fff6c7, #ffc93c 60%, #f08a1c);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-size: clamp(18px, 3.4cqw, 34px);
-  font-weight: 900;
-  line-height: 1.05;
-  filter: drop-shadow(0 2px 0 rgb(70 20 90 / 70%));
 }
 
 .difficultyGroup {
@@ -159,71 +95,6 @@
   background: linear-gradient(145deg, #e0b8ff, #9b5cff 60%, #5b25b8);
 }
 
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.statItem {
-  display: flex;
-  min-width: 58px;
-  flex-direction: column;
-  align-items: center;
-  padding: 3px 10px;
-  border: 1px solid rgb(255 255 255 / 14%);
-  border-radius: 10px;
-  background: rgb(255 255 255 / 6%);
-}
-
-.statItem dt {
-  margin: 0;
-  color: #c9bbff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.statItem dd {
-  margin: 0;
-  color: #fff;
-  font-size: 17px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.tools {
-  display: flex;
-  gap: 6px;
-  margin-left: auto;
-}
-
-.tool {
-  display: inline-flex;
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 12px;
-  border: 2px solid #f5c542;
-  border-radius: 999px;
-  background: rgb(30 14 90 / 80%);
-  color: #fff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.tool:hover {
-  background: rgb(80 40 170 / 85%);
-}
-
-.tool:focus-visible,
 .card:focus-visible,
 .difficultyButton:focus-visible,
 .difficultyButtonActive:focus-visible,
@@ -233,21 +104,11 @@
   outline-offset: 3px;
 }
 
-.exit {
-  border-color: #ff7a8a;
-}
-
-/* Corps : le plateau, puis le panneau latéral (carte magique, consigne, retour d’information). Le corps est lui-même un conteneur
-   de taille : le plateau s’ajuste à l’espace réellement disponible sous la barre, quelle que soit sa hauteur. */
-.body {
-  min-height: 0;
-  flex: 1;
-  container-type: size;
-}
-
+/* Scène : le plateau, puis le panneau latéral (carte magique, consigne, retour d’information). Elle se place dans le corps du lecteur,
+   qui est un conteneur de taille : le plateau s’ajuste à l’espace réellement disponible, quelle que soit sa hauteur. */
 .play {
   /* Unité de taille : une tuile. Tout le plateau en dépend. */
-  --u: min(calc((100cqh - 20px) / 6.15), calc(47cqw / 6.4));
+  --u: min(calc((100cqh - 20px) / 6.15), calc(58cqw / 6.4));
 
   display: flex;
   width: 100%;
@@ -259,6 +120,7 @@
 }
 
 .boardFrame {
+  position: relative;
   flex: none;
   padding: calc(var(--u) * 0.1);
   border-radius: calc(var(--u) * 0.62);
@@ -549,22 +411,6 @@
   font-weight: 900;
 }
 
-.rotateHint {
-  position: absolute;
-  right: 12px;
-  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  left: 12px;
-  display: none;
-  margin: 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgb(20 10 70 / 80%);
-  color: #ffe9a6;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: center;
-}
-
 .srOnly {
   position: absolute;
   width: 1px;
@@ -577,75 +423,20 @@
   border: 0;
 }
 
-/* Écran étroit pour la barre : le titre cède la place aux commandes, les libellés des boutons deviennent des icônes. */
-@container (max-width: 900px) {
-  .play {
-    --u: min(calc((100cqh - 20px) / 6.15), calc(58cqw / 6.4));
-  }
-
-  .title {
-    display: none;
-  }
-
-  .tool span {
-    display: none;
-  }
-
-  .exit span {
-    display: inline;
-  }
-
-  .tool {
-    padding: 0 10px;
-  }
-}
-
-/* Largeur moyenne (téléphone en paysage) : pastilles, compteurs et commandes resserrés pour tenir sur une seule ligne. */
+/* Largeur moyenne (téléphone en paysage) : pastilles de difficulté resserrées. */
 @container (max-width: 760px) {
-  .bar {
-    gap: 4px 8px;
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-
   .difficultyButton,
   .difficultyButtonActive {
     min-height: 32px;
     padding: 0 10px 0 7px;
     font-size: 13px;
   }
-
-  .statItem {
-    min-width: 0;
-    padding: 1px 7px;
-  }
-
-  .statItem dt {
-    font-size: 9px;
-  }
-
-  .statItem dd {
-    font-size: 15px;
-  }
-
-  .tool {
-    min-width: 40px;
-    min-height: 40px;
-    padding: 0 8px;
-    font-size: 13px;
-  }
 }
 
-/* Peu de hauteur (téléphone en paysage) : barre et panneau latéral resserrés, consigne masquée. */
+/* Peu de hauteur (téléphone en paysage) : pastilles et panneau latéral resserrés, consigne masquée. */
 @container (max-height: 480px) {
   .instructions {
     display: none;
-  }
-
-  .bar {
-    gap: 4px 6px;
-    padding-top: 4px;
-    padding-bottom: 4px;
   }
 
   .difficultyButton,
@@ -654,45 +445,10 @@
     padding: 0 9px 0 6px;
     font-size: 13px;
   }
-
-  .stats {
-    gap: 4px;
-  }
-
-  .statItem {
-    padding: 1px 6px;
-    border-radius: 10px;
-  }
-
-  .statItem dt {
-    font-size: 8px;
-    letter-spacing: 0;
-  }
-
-  .statItem dd {
-    font-size: 15px;
-  }
-
-  .tool {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 0 7px;
-    font-size: 13px;
-  }
 }
 
-/* Portrait (téléphone tenu droit) : barre sur deux lignes, plateau pleine largeur, carte et retour dessous. */
+/* Portrait (téléphone tenu droit) : plateau pleine largeur, carte et retour dessous. */
 @container (max-aspect-ratio: 1/1) {
-  .bar {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .stats {
-    order: 3;
-    width: 100%;
-  }
-
   .play {
     --u: min(calc(92cqw / 6.4), calc((100cqh - 180px) / 6.15));
 
@@ -701,6 +457,8 @@
     gap: 12px;
     padding-top: 6px;
     overflow-y: auto;
+    /* Laisse la place à la suggestion de rotation affichée par le lecteur en plein écran. */
+    padding-bottom: 44px;
   }
 
   .side {
@@ -713,18 +471,6 @@
 
   .instructions {
     display: none;
-  }
-}
-
-/* Portrait en plein écran sur téléphone : suggérer la rotation sans l'imposer. */
-@container (max-aspect-ratio: 1/1) {
-  .rotateHint {
-    display: block;
-    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .play {
-    padding-bottom: 44px;
   }
 }
 
@@ -1050,319 +796,5 @@
 
   .wave {
     display: none;
-  }
-}
-
-/* ---- Lecteur de jeu : personnage, barre de commandes en relief, pause, instructions ---- */
-
-.boardFrame {
-  position: relative;
-}
-
-/* Personnage de référence à gauche du plateau (masqué quand la place manque : téléphone, petite hauteur). */
-.character {
-  flex: none;
-  width: calc(var(--u) * 2.3);
-  aspect-ratio: 1;
-  padding: calc(var(--u) * 0.07);
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fff1b3, #e5a92e 40%, #fff3bd 58%, #b9791c);
-  box-shadow: 0 calc(var(--u) * 0.2) calc(var(--u) * 0.5) rgb(10 4 40 / 55%), 0 0 calc(var(--u) * 0.9) rgb(255 200 80 / 35%);
-}
-
-.characterImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 20%;
-  user-select: none;
-}
-
-/* Barre de commandes : style lecteur professionnel. Fond sombre uniforme collé au bas du cadre, boutons sobres, une seule couleur d'accent. */
-.controls {
-  position: relative;
-  display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 8px clamp(10px, 1.8cqw, 20px);
-  border-top: 1px solid rgb(255 255 255 / 12%);
-  background: rgb(12 8 38 / 88%);
-  backdrop-filter: blur(6px);
-}
-
-/* Sépare le groupe de lecture (à gauche) des outils (à droite). */
-.ctlSeparator {
-  flex: 1;
-  min-width: 8px;
-}
-
-.ctl {
-  --accent: #7c5cff;
-
-  position: relative;
-  display: inline-flex;
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 clamp(10px, 1.4cqw, 16px);
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: 10px;
-  background: rgb(255 255 255 / 7%);
-  color: #eceaf7;
-  cursor: pointer;
-  font: inherit;
-  font-size: clamp(13px, 1.4cqw, 15px);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 100ms ease;
-}
-
-.ctl svg {
-  flex: none;
-}
-
-.ctl:hover:not(:disabled) {
-  border-color: rgb(255 255 255 / 30%);
-  background: rgb(255 255 255 / 14%);
-  color: #fff;
-}
-
-.ctl:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.ctl:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
-.ctl:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-/* État courant (Jouer ou Pause) : rempli de la couleur d'accent ; l'autre reste neutre. */
-.ctl[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
-}
-
-.ctlExit:hover:not(:disabled) {
-  border-color: rgb(255 120 130 / 70%);
-  background: rgb(220 60 80 / 28%);
-  color: #ffd9de;
-}
-
-/* Voile de pause posé sur le plateau : le chronomètre est arrêté et les tuiles ne répondent plus. */
-.pauseVeil {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border-radius: inherit;
-  background: rgb(12 8 38 / 72%);
-  backdrop-filter: blur(5px);
-}
-
-.pauseTitle {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(16px, calc(var(--u) * 0.4), 28px);
-  font-weight: 600;
-}
-
-.pauseResume {
-  min-height: 46px;
-  padding: 0 24px;
-  border: 1px solid #7c5cff;
-  border-radius: 10px;
-  background: #7c5cff;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.pauseResume:hover {
-  background: #8d71ff;
-}
-
-.pauseResume:active {
-  transform: scale(0.96);
-}
-
-.pauseResume:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
-}
-
-/* Instructions : quatre étapes dans un panneau compact, ouvert depuis le bouton « ? ». */
-.howToButton {
-  display: inline-flex;
-  width: 38px;
-  height: 38px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid rgb(255 255 255 / 22%);
-  border-radius: 10px;
-  background: rgb(255 255 255 / 8%);
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.howToButton:hover,
-.howToButton[aria-expanded="true"] {
-  border-color: #7c5cff;
-  background: #7c5cff;
-}
-
-.howToButton:focus-visible,
-.howToClose:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
-}
-
-.howTo {
-  position: absolute;
-  top: clamp(44px, 9cqh, 64px);
-  right: clamp(8px, 2cqw, 22px);
-  z-index: 7;
-  width: min(380px, calc(100% - 20px));
-  max-height: calc(100% - 90px);
-  padding: 12px 14px 14px;
-  overflow-y: auto;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 12px;
-  background: #15103a;
-  box-shadow: 0 10px 28px rgb(6 2 30 / 65%);
-}
-
-.howToHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.howToTitle {
-  margin: 0;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.howToClose {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 14%);
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.howToList {
-  display: grid;
-  gap: 8px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.howToItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  color: #efe9ff;
-  font-size: 14px;
-  line-height: 1.3;
-}
-
-.howToItem strong {
-  display: block;
-  color: #fff;
-}
-
-.howToText {
-  display: block;
-}
-
-.howToNumber {
-  display: inline-flex;
-  width: 26px;
-  height: 26px;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: #7c5cff;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-/* Écran étroit ou peu haut (téléphone) : plus de personnage, boutons réduits à leur icône, sauf la sortie. */
-@container (max-width: 900px) {
-  .character {
-    display: none;
-  }
-
-  .ctl span {
-    display: none;
-  }
-
-  .ctlExit span {
-    display: inline;
-  }
-
-  .ctl {
-    min-width: 52px;
-    min-height: 48px;
-    padding: 0 12px;
-  }
-}
-
-@container (max-height: 480px) {
-  .character {
-    display: none;
-  }
-
-  .controls {
-    margin-bottom: 4px;
-    padding-top: 3px;
-    padding-bottom: 6px;
-  }
-
-  .ctl {
-    min-height: 42px;
-  }
-
-  .howTo {
-    top: 40px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ctl {
-    transition: none;
   }
 }

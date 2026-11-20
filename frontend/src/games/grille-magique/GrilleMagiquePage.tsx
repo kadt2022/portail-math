@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { useImmersiveDevice } from "../useImmersiveDevice";
 import { GrilleMagiqueGame } from "./GrilleMagiqueGame";
 import styles from "./GrilleMagiquePage.module.css";
 
@@ -11,7 +10,6 @@ import styles from "./GrilleMagiquePage.module.css";
 export function GrilleMagiquePage() {
   const { t } = useTranslation("games");
   const [fullscreen, setFullscreen] = useState(false);
-  const immersiveDevice = useImmersiveDevice();
 
   return (
     <div className={styles.page}>
@@ -21,9 +19,6 @@ export function GrilleMagiquePage() {
         tutorial="auto"
         fullscreen={fullscreen}
         onFullscreenChange={setFullscreen}
-        // Sur téléphone, « quitter » le plein écran ramène à la page de jeu (affichage normal).
-        mobileImmersive={immersiveDevice && fullscreen}
-        onClose={immersiveDevice && fullscreen ? () => setFullscreen(false) : undefined}
       />
       <Link className={styles.backLink} to="/jeux">
         {t("grilleMagique.game.actions.backToGames")}

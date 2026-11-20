@@ -204,6 +204,12 @@ export function Sidebar({ open, collapsed, onExpand, onNavigate, navId, theme }:
             </div>
           </div>
 
+          {theme === "games" ? (
+            <div className={styles.navSection} role="group" aria-label={t("nav.exetat")}>
+              {navigationLinks.filter((link) => link.to === "/exetat").map((link) => renderPortalLink(link))}
+            </div>
+          ) : null}
+
           <div className={styles.navSection} role="group" aria-label={t("navGroups.resources")}>
             <p className={styles.navSectionTitle} aria-hidden="true">{t("navGroups.resources")}</p>
             {resourceLinks.map((link) => renderPortalLink(link))}

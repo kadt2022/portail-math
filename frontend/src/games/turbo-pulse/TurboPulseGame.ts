@@ -1,13 +1,20 @@
 import Phaser from "phaser";
 
-import cannonArmUrl0 from "../../assets/turbo-pulse/cannon-arm-0.png";
-import cannonArmUrl1 from "../../assets/turbo-pulse/cannon-arm-1.png";
-import cannonArmUrl2 from "../../assets/turbo-pulse/cannon-arm-2.png";
-import cannonArmUrl3 from "../../assets/turbo-pulse/cannon-arm-3.png";
-import cannonArmUrl4 from "../../assets/turbo-pulse/cannon-arm-4.png";
-import cannonArmUrl5 from "../../assets/turbo-pulse/cannon-arm-5.png";
-import cannonArmUrl6 from "../../assets/turbo-pulse/cannon-arm-6.png";
-import cannonBaseUrl from "../../assets/turbo-pulse/cannon-base.png";
+import {
+  ART_SCALE,
+  CANNON_ARM,
+  CANNON_BASE,
+  CANNON_MUZZLE_DISTANCE,
+  ENERGY_CORE_KEY,
+  ENERGY_CORE_SIZE,
+  ENERGY_GLOW_KEY,
+  ENERGY_GLOW_SIZE,
+  ensureCannonTextures,
+  ensureEnergyTextures,
+  ensureFruitTexture,
+  FRUIT_BADGE_SIZE,
+} from "./turbo-pulse-art";
+import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
@@ -20,7 +27,6 @@ import {
   fruitSpawnYRange,
   getTurboPulseVisualMetrics,
   hasFullyCrossedDefense,
-  HUD_SAFE_TOP,
   INTRUSION_LIMITS,
   MAX_FRUITS,
   operationForResult,
@@ -41,50 +47,46 @@ import {
 // Un clamp maison ici (sur worldWidth/worldHeight seuls) laisserait le
 // canvas continuer à rétrécir en dessous pendant que la logique de jeu
 // croirait le monde plus grand qu'il ne l'est réellement à l'écran.
-const MIN_WORLD_WIDTH = 480;
-const MIN_WORLD_HEIGHT = 270;
+export const MIN_WORLD_WIDTH = 480;
+export const MIN_WORLD_HEIGHT = 270;
 const DEFENSE_X = 72;
 const SHOT_SPEED = 620;
 
-// Bornes de visée du canon : reprises telles quelles dans aimAt() (clamp) ET
-// dans la génération de CANNON_ARM_FRAME_ANGLES ci-dessous — seule source de
-// vérité pour que le dernier angle de visée corresponde toujours exactement
-// à la dernière image pré-rendue, jamais à un angle jamais exporté.
+// Bornes de visée du canon : reprises dans aimAt() (clamp).
 const AIM_MIN_ANGLE = -Math.PI + 0.04;
 const AIM_MAX_ANGLE = 0.12;
 
-// cannon-base.png / cannon-arm-N.png : rendus Babylon.js hors-runtime
-// (atelier de prototypage séparé, jamais exécuté dans le jeu — Phaser reste
-// le seul moteur runtime). Toutes les images partagent exactement la même
-// caméra orthographique et la même résolution : le pivot (centre de la
-// rotule) tombe donc au même endroit dans toutes, mesuré une fois pour
-// toutes sur les rendus exportés.
-const CANNON_PIVOT_ORIGIN_X = 0.5;
-const CANNON_PIVOT_ORIGIN_Y = 0.4473;
-// Un seul sprite tourné en 2D dans Phaser reste géométriquement correct
-// (rotation pure d'une projection orthographique) mais l'ÉCLAIRAGE reste
-// figé sur l'orientation d'origine : une fois tourné vers la verticale, les
-// reflets/ombres restent ceux d'un tube resté "couché" dans la lumière fixe
-// de la scène Babylon — d'où un rendu toujours "oblique/faux" en jeu, quel
-// que soit l'angle visé. cannon-arm-0..6.png sont donc 7 rendus DISTINCTS,
-// chacun avec le bras réellement pivoté en 3D (autour de l'axe pivot→caméra
-// — qui laisse le pivot immobile à l'écran, donc un pivot Phaser identique
-// pour les 7) avant capture, pour un éclairage recalculé à chaque angle.
-// aimAt() choisit l'image la plus proche de aimAngle et n'applique plus
-// qu'une petite rotation résiduelle (voir CANNON_ARM_FRAME_ANGLES) pour
-// combler l'écart jusqu'à la frame suivante.
-const CANNON_ARM_FRAME_COUNT = 7;
-const CANNON_ARM_FRAME_ANGLES: readonly number[] = Array.from({ length: CANNON_ARM_FRAME_COUNT }, (_, index) =>
-  AIM_MIN_ANGLE + (AIM_MAX_ANGLE - AIM_MIN_ANGLE) * (index / (CANNON_ARM_FRAME_COUNT - 1)),
-);
-const CANNON_ARM_FRAME_KEYS: readonly string[] = Array.from({ length: CANNON_ARM_FRAME_COUNT }, (_, index) => `cannon-arm-${index}`);
-// Quatrième passage "volume" : le tube fin (v3) lisait encore comme un
-// jouet timide une fois composé dans la scène. Le modèle Babylon a été
-// nettement raccourci/épaissi (silhouette flak/anti-aérienne, ailettes,
-// bouche évasée) et cette échelle relevée en plus, pour une vraie présence
-// à l'écran. Exportée pour les tests, qui vérifient que
-// cannonBase/cannonArm.scaleX suit toujours metrics.scale.
-export const CANNON_IMAGE_SCALE = 0.145;
+// Le canon est dessiné en vectoriel (voir turbo-pulse-art.ts), à ART_SCALE fois
+// l'échelle de référence : CANNON_IMAGE_SCALE ramène ces textures à leur taille
+// d'affichage de référence, cannonScale applique ensuite le bornage petit écran
+// par-dessus (voir applyCannonMetrics). Exportée pour les tests, qui vérifient
+// que cannonBase/cannonArm.scaleX suit toujours metrics.scale.
+// Durée de l'animation de fin de niveau, avant l'écran de victoire.
+const VICTORY_DURATION_MS = 1700;
+export const CANNON_IMAGE_SCALE = 1 / ART_SCALE;
+// Centre de la plaque d'opération sous le canon (échelle 1, depuis le pivot).
+const CANNON_PLATE_OFFSET_Y = 62;
+// Cadence des étincelles de la traînée du tir.
+const TRAIL_INTERVAL = 0.028;
+
+/**
+ * Force de l'impulsion de combo (0 à 1) selon le nombre de fruits détruits d'un seul tir : rien pour un fruit seul, une impulsion
+ * nette dès deux, puis de plus en plus grande, lumineuse et rapide jusqu'à cinq fruits et au-delà.
+ */
+export function comboPulseIntensity(destroyedCount: number): number {
+  if (destroyedCount < 2) return 0;
+  return Math.min(1, (destroyedCount - 1) / 4);
+}
+
+/**
+ * Sortie sonore du moteur (fournie par le lecteur, voir GameAudio) : le moteur annonce chaque événement au moment exact où il
+ * se produit ; la musique d'ambiance, elle, est gérée à part et n'est jamais interrompue par un effet.
+ */
+export interface TurboPulseSoundOutput {
+  play(effect: "shot" | "explosion" | "levelStart" | "combo" | "wrong" | "intrusion" | "levelComplete" | "levelFailed", options?: { intensity?: number; count?: number }): void;
+  setMuted(muted: boolean): void;
+  readonly muted: boolean;
+}
 
 export type TurboPulseStatus = "playing" | "clearing" | "level-complete" | "failed" | "mastered";
 
@@ -133,6 +135,8 @@ interface ShotActor {
   life: number;
   result: number;
   token: number;
+  /** Temps restant avant la prochaine étincelle de traînée. */
+  trail: number;
 }
 
 type SnapshotListener = (snapshot: TurboPulseSnapshot) => void;
@@ -147,14 +151,10 @@ export class TurboPulseScene extends Phaser.Scene {
   private shots: ShotActor[] = [];
   private cannonBase?: Phaser.GameObjects.Image;
   private cannonArm?: Phaser.GameObjects.Image;
-  // Index de la frame cannon-arm-N actuellement affichée (voir
-  // CANNON_ARM_FRAME_ANGLES) : évite un setTexture() à chaque frame de jeu
-  // quand la visée reste dans la plage couverte par la même image.
-  private cannonArmFrameIndex = -1;
+  private cannonPlate?: Phaser.GameObjects.Image;
   private cannonBadge?: Phaser.GameObjects.Text;
   private aimGuide?: Phaser.GameObjects.Graphics;
   private worldGraphics?: Phaser.GameObjects.Graphics;
-  private stationLabel?: Phaser.GameObjects.Text;
   // Taille réelle du monde de jeu : suit la place disponible (voir
   // handleResize), jamais figée à 960×540. cannonY, fruitYRange et metrics
   // (tailles visuelles/hitboxes bornées, voir getTurboPulseVisualMetrics) en
@@ -187,15 +187,14 @@ export class TurboPulseScene extends Phaser.Scene {
   private paused = false;
   private completionTimer?: Phaser.Time.TimerEvent;
 
-  constructor(onSnapshot: SnapshotListener) {
+  private readonly audio?: TurboPulseSoundOutput;
+
+  constructor(onSnapshot: SnapshotListener, audio?: TurboPulseSoundOutput) {
     super({ key: "turbo-pulse" });
     this.onSnapshot = onSnapshot;
-  }
-
-  preload() {
-    this.load.image("cannon-base", cannonBaseUrl);
-    const armUrls = [cannonArmUrl0, cannonArmUrl1, cannonArmUrl2, cannonArmUrl3, cannonArmUrl4, cannonArmUrl5, cannonArmUrl6];
-    CANNON_ARM_FRAME_KEYS.forEach((key, index) => this.load.image(key, armUrls[index]));
+    this.audio = audio;
+    // Choix « son coupé » mémorisé par le lecteur : le jeu démarre dans le même état.
+    this.muted = audio?.muted ?? false;
   }
 
   create() {
@@ -215,6 +214,8 @@ export class TurboPulseScene extends Phaser.Scene {
     spark.fillStyle(0xffffff, 1).fillCircle(6, 6, 6);
     spark.generateTexture("turbo-spark", 12, 12);
     spark.destroy();
+    // Canon, tir et plaque : dessinés une fois en vectoriel (turbo-pulse-art.ts).
+    ensureEnergyTextures(this);
     this.drawWorld();
     this.createCannon();
     // Phaser ne surveille nativement que le redimensionnement de la fenêtre,
@@ -274,6 +275,11 @@ export class TurboPulseScene extends Phaser.Scene {
       shot.view.x += shot.vx * seconds;
       shot.view.y += shot.vy * seconds;
       shot.life -= seconds;
+      shot.trail -= seconds;
+      if (shot.trail <= 0) {
+        shot.trail = TRAIL_INTERVAL;
+        this.spawnTrailSpark(shot.view.x, shot.view.y);
+      }
       if (shot.life <= 0 || shot.view.x < -80 || shot.view.x > this.worldWidth + 80 || shot.view.y < -80 || shot.view.y > this.worldHeight + 80) {
         shot.view.destroy();
         shots.splice(index, 1);
@@ -323,7 +329,8 @@ export class TurboPulseScene extends Phaser.Scene {
 
   toggleMuted = () => {
     this.muted = !this.muted;
-    this.sound.mute = this.muted;
+    // Commande générale : musique et effets coupés ensemble.
+    this.audio?.setMuted(this.muted);
     this.emitSnapshot();
   };
 
@@ -362,18 +369,20 @@ export class TurboPulseScene extends Phaser.Scene {
   };
 
   // Repositionne/redimensionne le canon existant sur l'échelle visuelle
-  // courante (this.metrics), sans recharger ni retoucher les images :
-  // CANNON_IMAGE_SCALE ramène d'abord les sprites 2048×2048 à l'encombrement
-  // de référence, cannonScale applique ensuite le bornage petit écran par
-  // dessus (les deux facteurs se multiplient, .setScale() n'étant jamais
-  // cumulatif d'un appel à l'autre). cannonBadge est un texte autonome : sa
+  // courante (this.metrics), sans rien redessiner : CANNON_IMAGE_SCALE ramène
+  // d'abord les textures (cuites à ART_SCALE) à l'encombrement de référence,
+  // cannonScale applique ensuite le bornage petit écran par dessus (les deux
+  // facteurs se multiplient, .setScale() n'étant jamais cumulatif d'un appel à
+  // l'autre). cannonBadge est un texte autonome posé sur la plaque dorée : sa
   // taille de police est ajustée explicitement pour rester nette.
   private applyCannonMetrics() {
     const { cannonX, cannonScale, cannonBadgeFontSize } = this.metrics;
     const cannonDisplayScale = CANNON_IMAGE_SCALE * cannonScale;
+    const plateY = this.cannonY + CANNON_PLATE_OFFSET_Y * cannonScale;
     this.cannonBase?.setPosition(cannonX, this.cannonY).setScale(cannonDisplayScale);
     this.cannonArm?.setPosition(cannonX, this.cannonY).setScale(cannonDisplayScale);
-    this.cannonBadge?.setPosition(cannonX, this.cannonY + 54 * cannonScale).setFontSize(cannonBadgeFontSize);
+    this.cannonPlate?.setPosition(cannonX, plateY).setScale(cannonDisplayScale);
+    this.cannonBadge?.setPosition(cannonX, plateY).setFontSize(cannonBadgeFontSize);
   }
 
   // Phaser ne surveille nativement que le redimensionnement de la FENÊTRE,
@@ -392,8 +401,12 @@ export class TurboPulseScene extends Phaser.Scene {
   // ou pendant un démontage React) au moment où le ResizeObserver externe
   // déclenche cet appel — un plantage silencieux ici ne doit jamais se
   // reproduire au prochain redimensionnement.
+  // Remesure forcée : Phaser relit la taille réelle de son conteneur et recalcule la scène, même s'il croit que rien n'a changé
+  // (une taille transitoire, par exemple celle de l'écran de verrouillage pendant la veille, a pu être mémorisée entre-temps).
   refreshLayout = () => {
-    if (this.scale?.getParentBounds()) this.scale.refresh();
+    if (!this.scale) return;
+    this.scale.getParentBounds();
+    this.scale.refresh();
   };
 
   // Décor purement visuel : ni les positions de collision (défense, canon)
@@ -404,41 +417,49 @@ export class TurboPulseScene extends Phaser.Scene {
   private drawWorld() {
     const graphics = this.worldGraphics ?? (this.worldGraphics = this.add.graphics());
     graphics.clear();
-    const width = this.worldWidth;
     const height = this.worldHeight;
-    // Facteurs de proportion par rapport au décor de référence (960×540) :
-    // ce sont les POSITIONS du décor qui suivent la taille du monde. Les
-    // fruits/canon/textes suivent séparément l'échelle visuelle bornée
-    // (this.metrics, voir getTurboPulseVisualMetrics) — jamais ces sx/sy
-    // directement, qui ne sont pas bornés et grandiraient sans limite sur
-    // un très grand écran.
-    const sx = width / REFERENCE_WORLD_WIDTH;
-    const sy = height / REFERENCE_WORLD_HEIGHT;
-
-    // Le décor illustré vit désormais dans un calque CSS/DOM séparé, derrière
-    // ce canvas (voir .background dans TurboPulsePage.module.css) : le flou
-    // "façon cinéma" y est appliqué une fois par le compositeur du
-    // navigateur, sans recalcul à chaque frame d'un shader WebGL sur une
-    // grosse image statique. Ce canvas Phaser reste transparent
-    // (mountTurboPulseGame) et ne dessine plus que les éléments qui doivent
-    // rester nets : bandeau HUD, zone de défense, fruits, canon, projectiles.
-    graphics.fillStyle(0x0a2630, 0.5);
-    graphics.fillRoundedRect(10, 8, width - 20, HUD_SAFE_TOP - 16, 16);
-    graphics.lineStyle(2, 0xffd36b, 0.22);
-    graphics.strokeRoundedRect(10, 8, width - 20, HUD_SAFE_TOP - 16, 16);
-
-    graphics.fillStyle(0x0a2630, 0.78);
+    // Le décor illustré vit dans un calque CSS/DOM séparé, derrière ce canvas
+    // (voir .background dans TurboPulsePage.module.css) : le flou "façon
+    // cinéma" y est appliqué une fois par le compositeur du navigateur, sans
+    // recalcul à chaque frame d'un shader WebGL sur une grosse image statique.
+    // Ce canvas Phaser reste transparent (mountTurboPulseGame) et ne dessine
+    // plus que les éléments qui doivent rester nets : zone de défense, fruits,
+    // canon, projectiles. La ligne de défense est dorée, comme l'énergie.
+    const accent = this.rank.accent;
+    graphics.fillStyle(0x06151f, 0.7);
     graphics.fillRect(0, 0, DEFENSE_X, height);
-    graphics.fillStyle(0xffd36b, 0.18);
-    graphics.fillRect(DEFENSE_X, 0, 26, height);
-    graphics.lineStyle(4, 0xffd36b, 0.9);
-    graphics.lineBetween(DEFENSE_X, 42, DEFENSE_X, height - 28);
+    graphics.fillStyle(accent, 0.1);
+    graphics.fillRect(DEFENSE_X, 0, 30, height);
+    graphics.fillStyle(accent, 0.18);
+    graphics.fillRect(DEFENSE_X, 0, 10, height);
+    graphics.lineStyle(5, accent, 0.28);
+    graphics.lineBetween(DEFENSE_X, 36, DEFENSE_X, height - 24);
+    graphics.lineStyle(3, 0xffd36b, 0.95);
+    graphics.lineBetween(DEFENSE_X, 40, DEFENSE_X, height - 28);
+    graphics.fillStyle(accent, 0.85);
     for (let y = 48; y < height - 30; y += 36) graphics.fillTriangle(DEFENSE_X - 8, y, DEFENSE_X + 8, y + 12, DEFENSE_X - 8, y + 24);
+  }
 
-    if (!this.stationLabel) {
-      this.stationLabel = this.add.text(0, 0, "STATION JARDIN • TURBO PULSE", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "13px", fontStyle: "bold", color: "#9bd7b1" }).setOrigin(0.5);
-    }
-    this.stationLabel.setPosition(710 * sx, 500 * sy);
+  // Rang du niveau en cours : couleur des boules, du canon, des tirs et des particules.
+  private get rank(): TurboPulseRank {
+    return rankForLevel(this.levelIndex);
+  }
+
+  private fruitColor(spec: FruitSpec): number {
+    return this.rank.palette[spec.variant];
+  }
+
+  private ensureRankTextures() {
+    return ensureCannonTextures(this, this.rank);
+  }
+
+  // Le canon change de rang avec le niveau : mêmes images, textures recolorées (cuites une seule fois par rang).
+  private applyRankTextures() {
+    if (!this.cannonBase) return;
+    const keys = this.ensureRankTextures();
+    this.cannonBase.setTexture(keys.base);
+    this.cannonArm?.setTexture(keys.arm);
+    this.cannonPlate?.setTexture(keys.plate);
   }
 
   private createCannon() {
@@ -447,17 +468,20 @@ export class TurboPulseScene extends Phaser.Scene {
     // dépend jamais de la taille du monde.
     this.add.text(20, 70, "🛡\nDÉFENSE", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "15px", fontStyle: "bold", align: "center", color: "#fff7dc" }).setAngle(-90).setOrigin(0.5);
 
-    // cannon-base/cannon-arm-N : sprites Babylon.js pré-rendus (voir constantes
-    // CANNON_* ci-dessus). Origine posée sur le pivot exact (mesuré au même
-    // endroit dans toutes les images) : applyCannonMetrics() les repositionne/
-    // redimensionne ensuite via .setScale(), sans jamais les redessiner.
-    this.cannonArmFrameIndex = this.nearestCannonArmFrame(this.aimAngle);
-    this.cannonBase = this.add.image(this.metrics.cannonX, this.cannonY, "cannon-base").setOrigin(CANNON_PIVOT_ORIGIN_X, CANNON_PIVOT_ORIGIN_Y);
+    // Base, bras et plaque : textures vectorielles (voir turbo-pulse-art.ts).
+    // L'origine est posée sur le pivot (centre du corps hexagonal), identique
+    // pour la base et le bras : applyCannonMetrics() les repositionne et les
+    // redimensionne ensuite via .setScale(), sans jamais les redessiner. Le bras
+    // est dessiné canon vers la droite : sa rotation est donc l'angle de visée.
+    const { cannonX } = this.metrics;
+    this.cannonBase = this.add.image(cannonX, this.cannonY, this.ensureRankTextures().base).setOrigin(CANNON_BASE.pivotX / CANNON_BASE.width, CANNON_BASE.pivotY / CANNON_BASE.height).setDepth(0);
     this.cannonArm = this.add
-      .image(this.metrics.cannonX, this.cannonY, CANNON_ARM_FRAME_KEYS[this.cannonArmFrameIndex])
-      .setOrigin(CANNON_PIVOT_ORIGIN_X, CANNON_PIVOT_ORIGIN_Y)
-      .setRotation(this.aimAngle - CANNON_ARM_FRAME_ANGLES[this.cannonArmFrameIndex]);
-    this.cannonBadge = this.add.text(this.metrics.cannonX, this.cannonY + 54, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#102c3c", backgroundColor: "#fff7dc", padding: { x: 14, y: 7 } }).setOrigin(0.5).setDepth(5);
+      .image(cannonX, this.cannonY, this.ensureRankTextures().arm)
+      .setOrigin(CANNON_ARM.pivotX / CANNON_ARM.width, CANNON_ARM.pivotY / CANNON_ARM.height)
+      .setRotation(this.aimAngle)
+      .setDepth(1);
+    this.cannonPlate = this.add.image(cannonX, this.cannonY, this.ensureRankTextures().plate).setDepth(4);
+    this.cannonBadge = this.add.text(cannonX, this.cannonY, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#3b2606" }).setOrigin(0.5).setDepth(5);
     this.aimGuide = this.add.graphics().setDepth(2);
     this.applyCannonMetrics();
   }
@@ -466,6 +490,8 @@ export class TurboPulseScene extends Phaser.Scene {
     this.completionTimer?.remove(false);
     this.clearActors();
     this.levelIndex = index;
+    this.applyRankTextures();
+    this.drawWorld();
     this.solved = 0;
     this.intrusions = 0;
     this.status = "playing";
@@ -481,7 +507,7 @@ export class TurboPulseScene extends Phaser.Scene {
     this.setTarget(starting[0].number);
     this.scheduleNextArrival(this.time.now);
     this.feedback = `Niveau ${index + 1} — ${TURBO_LEVELS[index].name}`;
-    this.playSequence(index >= 5 ? [330, 440, 554] : [392, 523], 0.08);
+    this.audio?.play("levelStart", { intensity: index >= 5 ? 1 : 0.3 });
     this.emitSnapshot();
   }
 
@@ -499,13 +525,15 @@ export class TurboPulseScene extends Phaser.Scene {
     // l'échelle deux fois (une fois via sa propre taille de police, une
     // fois via la transformation du conteneur parent) — au lieu de rester
     // net, le texte flouterait sur petit écran.
-    const { fruitRadius, scale, emojiFontSize, numberFontSize, numberFontSizeLarge, labelFontSize } = this.metrics;
-    const halo = this.add.circle(0, 0, fruitRadius + 7 * scale, spec.color, 1).setStrokeStyle(3, 0xffffff, 0.74);
-    const plate = this.add.circle(0, 0, fruitRadius, 0xfff3cf, 1).setStrokeStyle(2, 0x16324a, 0.55);
-    const emoji = this.add.text(0, -11 * scale, spec.emoji, { fontFamily: "Segoe UI Emoji, sans-serif", fontSize: `${emojiFontSize}px` }).setOrigin(0.5);
-    const value = this.add.text(0, 15 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
-    const label = this.add.text(0, 39 * scale, spec.variantLabel.toUpperCase(), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${labelFontSize}px`, fontStyle: "bold", color: "#ffffff", backgroundColor: "#102c3c", padding: { x: 5, y: 2 } }).setOrigin(0.5);
-    const view = this.add.container(x, y, [halo, plate, emoji, value, label]).setDepth(3);
+    const { scale, numberFontSize, numberFontSizeLarge } = this.metrics;
+    // Badge (halo, anneau de couleur, pastille et fruit dessiné) : texture cuite
+    // une fois par famille et par couleur (voir ensureFruitTexture), jamais par
+    // fruit. Le nombre et l'étiquette restent des textes Phaser, pour rester
+    // nets et lisibles quel que soit leur contenu.
+    const textureKey = ensureFruitTexture(this, spec.family, spec.variant, this.fruitColor(spec));
+    const badge = this.add.image(0, 0, textureKey).setDisplaySize(FRUIT_BADGE_SIZE * scale, FRUIT_BADGE_SIZE * scale);
+    const value = this.add.text(0, 17 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
+    const view = this.add.container(x, y, [badge, value]).setDepth(3);
     // Amplitude et phase de l'ondulation visuelle du fruit : aucun enjeu de
     // sécurité (ni jeton, ni tirage déterminant une règle de jeu), Math.random
     // reste donc approprié malgré l'alerte générique de Sonar sur ce générateur.
@@ -560,41 +588,45 @@ export class TurboPulseScene extends Phaser.Scene {
     if (!this.fruits.some((fruit) => fruit.spec.number === this.operation.result)) this.setTarget(chooseTargetResult(this.fruits.map((fruit) => fruit.spec)));
   }
 
-  // Index de CANNON_ARM_FRAME_ANGLES le plus proche d'un angle donné : les
-  // frames sont uniformément réparties sur [AIM_MIN_ANGLE, AIM_MAX_ANGLE],
-  // donc un calcul direct (sans boucle de comparaison) suffit.
-  private nearestCannonArmFrame(angle: number): number {
-    const t = (angle - AIM_MIN_ANGLE) / (AIM_MAX_ANGLE - AIM_MIN_ANGLE);
-    return Phaser.Math.Clamp(Math.round(t * (CANNON_ARM_FRAME_COUNT - 1)), 0, CANNON_ARM_FRAME_COUNT - 1);
-  }
-
   private aimAt(x: number, y: number) {
     const { cannonX, cannonScale } = this.metrics;
     this.aimAngle = Phaser.Math.Clamp(Math.atan2(y - this.cannonY, x - cannonX), AIM_MIN_ANGLE, AIM_MAX_ANGLE);
-    // Un seul sprite pivoté en 2D "ment" visuellement dès qu'on s'éloigne de
-    // son angle de rendu d'origine (éclairage figé, voir CANNON_ARM_FRAME_*
-    // ci-dessus) : on choisit donc l'image la plus proche de aimAngle, puis
-    // on ne comble plus qu'un petit écart résiduel par rotation 2D — jamais
-    // la totalité de la course de visée comme avant.
-    const frameIndex = this.nearestCannonArmFrame(this.aimAngle);
-    if (frameIndex !== this.cannonArmFrameIndex) {
-      this.cannonArmFrameIndex = frameIndex;
-      this.cannonArm?.setTexture(CANNON_ARM_FRAME_KEYS[frameIndex]);
-    }
-    this.cannonArm?.setRotation(this.aimAngle - CANNON_ARM_FRAME_ANGLES[frameIndex]);
-    this.aimGuide?.clear().lineStyle(3, 0xffffff, 0.28).lineBetween(cannonX + Math.cos(this.aimAngle) * 112 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 112 * cannonScale, cannonX + Math.cos(this.aimAngle) * 215 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 215 * cannonScale);
+    this.cannonArm?.setRotation(this.aimAngle);
+    const guideStart = (CANNON_MUZZLE_DISTANCE + 16) * cannonScale;
+    const guideEnd = (CANNON_MUZZLE_DISTANCE + 118) * cannonScale;
+    this.aimGuide?.clear().lineStyle(3, this.rank.accent, 0.4).lineBetween(cannonX + Math.cos(this.aimAngle) * guideStart, this.cannonY + Math.sin(this.aimAngle) * guideStart, cannonX + Math.cos(this.aimAngle) * guideEnd, this.cannonY + Math.sin(this.aimAngle) * guideEnd);
   }
 
   private fire() {
     if (this.time.now - this.lastFireAt < 130) return;
     this.lastFireAt = this.time.now;
-    const { cannonX, cannonScale, projectileFontSize } = this.metrics;
-    const operationText = formatOperation(this.operation).replaceAll(" ", "");
-    const body = this.add.rectangle(0, 0, 82 * cannonScale, 38 * cannonScale, 0xe5f1f4, 1).setStrokeStyle(4, 0xffc857).setOrigin(0.5);
-    const label = this.add.text(0, 0, operationText, { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${projectileFontSize}px`, fontStyle: "bold", color: "#102c3c" }).setOrigin(0.5);
-    const view = this.add.container(cannonX + Math.cos(this.aimAngle) * 112 * cannonScale, this.cannonY + Math.sin(this.aimAngle) * 112 * cannonScale, [body, label]).setRotation(this.aimAngle).setDepth(4);
-    this.shots.push({ view, vx: Math.cos(this.aimAngle) * SHOT_SPEED, vy: Math.sin(this.aimAngle) * SHOT_SPEED, life: 2.4, result: this.operation.result, token: this.operationToken });
-    this.playTone(230, 0.06, 0.04, "square");
+    const { cannonX, cannonScale } = this.metrics;
+    const accent = this.rank.accent;
+    const muzzle = CANNON_MUZZLE_DISTANCE * cannonScale;
+    const muzzleX = cannonX + Math.cos(this.aimAngle) * muzzle;
+    const muzzleY = this.cannonY + Math.sin(this.aimAngle) * muzzle;
+    // Boule d'énergie : un halo teinté à la couleur du monde autour d'un cœur blanc.
+    const glow = this.add.image(0, 0, ENERGY_GLOW_KEY).setDisplaySize(ENERGY_GLOW_SIZE * 0.95 * cannonScale, ENERGY_GLOW_SIZE * 0.95 * cannonScale).setTint(accent).setBlendMode(Phaser.BlendModes.ADD);
+    const core = this.add.image(0, 0, ENERGY_CORE_KEY).setDisplaySize(ENERGY_CORE_SIZE * 0.95 * cannonScale, ENERGY_CORE_SIZE * 0.95 * cannonScale);
+    const view = this.add.container(muzzleX, muzzleY, [glow, core]).setDepth(4);
+    this.shots.push({ view, vx: Math.cos(this.aimAngle) * SHOT_SPEED, vy: Math.sin(this.aimAngle) * SHOT_SPEED, life: 2.4, result: this.operation.result, token: this.operationToken, trail: 0 });
+    this.flashMuzzle(muzzleX, muzzleY, accent);
+    this.audio?.play("shot");
+  }
+
+  // Éclat bref à la bouche du canon au moment du tir.
+  private flashMuzzle(x: number, y: number, accent: number) {
+    const size = ENERGY_GLOW_SIZE * this.metrics.cannonScale;
+    const flash = this.add.image(x, y, ENERGY_GLOW_KEY).setDisplaySize(size * 0.6, size * 0.6).setTint(accent).setBlendMode(Phaser.BlendModes.ADD).setDepth(4);
+    this.tweens.add({ targets: flash, scale: flash.scale * 1.9, alpha: 0, duration: 160, ease: "Quad.easeOut", onComplete: () => flash.destroy() });
+  }
+
+  // Étincelle de la traînée : naît sur la trajectoire du tir, rétrécit et s'éteint.
+  private spawnTrailSpark(x: number, y: number) {
+    const accent = this.rank.accent;
+    const size = ENERGY_GLOW_SIZE * 0.5 * this.metrics.cannonScale;
+    const spark = this.add.image(x, y, ENERGY_GLOW_KEY).setDisplaySize(size, size).setTint(accent).setAlpha(0.7).setBlendMode(Phaser.BlendModes.ADD).setDepth(3);
+    this.tweens.add({ targets: spark, scale: spark.scale * 0.25, alpha: 0, duration: 240, onComplete: () => spark.destroy() });
   }
 
   private correctHit(selected: FruitActor) {
@@ -603,12 +635,17 @@ export class TurboPulseScene extends Phaser.Scene {
     const destroyed = this.fruits.filter((fruit) => ids.has(fruit.spec.id));
     this.fruits = this.fruits.filter((fruit) => !ids.has(fruit.spec.id));
     destroyed.forEach((fruit, index) => this.explodeFruit(fruit, index === 0));
+    // Une seule explosion sonore par tir, proportionnelle au nombre de boules détruites, puis le scintillement du combo dès deux boules.
+    const comboIntensity = comboPulseIntensity(destroyed.length);
+    this.audio?.play("explosion", { intensity: 0.55 + 0.45 * comboIntensity, count: destroyed.length });
+    if (destroyed.length >= 2) this.audio?.play("combo", { intensity: comboIntensity });
+    // Deux fruits ou plus d'un coup : grande impulsion lumineuse, proportionnelle au combo (effet visuel seul, le score ne change pas).
+    if (destroyed.length >= 2) this.comboPulse(destroyed.map((fruit) => ({ x: fruit.view.x, y: fruit.view.y, color: this.fruitColor(fruit.spec) })));
     this.score += destroyed.length;
     this.streak += 1;
     this.totalSolved += 1;
     if (this.status === "playing") this.solved += 1;
     this.feedback = destroyed.length > 1 ? `Combo ${selected.spec.variantLabel} ×${destroyed.length} !` : `${formatOperation(this.operation)} = ${this.operation.result}`;
-    this.playSequence(destroyed.length >= 3 ? [440, 587, 784] : destroyed.length === 2 ? [480, 700] : [520], 0.065);
 
     if (this.status === "playing" && this.solved >= CALCULATIONS_PER_LEVEL) {
       this.solved = CALCULATIONS_PER_LEVEL;
@@ -617,7 +654,7 @@ export class TurboPulseScene extends Phaser.Scene {
       this.feedback = this.fruits.length > 0 ? `Objectif atteint : encore ${this.fruits.length} fruit${this.fruits.length > 1 ? "s" : ""} à détruire` : "Niveau nettoyé !";
     }
 
-    if (this.fruits.length === 0 && this.status === "clearing") this.scheduleCompletion();
+    if (this.fruits.length === 0 && this.status === "clearing") this.scheduleCompletion(selected.view.x, selected.view.y);
     else this.setTarget(chooseTargetResult(this.fruits.map((fruit) => fruit.spec)));
     this.emitSnapshot();
   }
@@ -627,7 +664,7 @@ export class TurboPulseScene extends Phaser.Scene {
     fruit.view.x += 24;
     this.feedback = "Presque ! Recalcule : la valeur visée n’est pas la réponse.";
     this.tweens.add({ targets: fruit.view, scale: 1.12, yoyo: true, duration: 100 });
-    this.playTone(145, 0.14, 0.05, "sawtooth");
+    this.audio?.play("wrong");
     this.emitSnapshot();
   }
 
@@ -637,17 +674,86 @@ export class TurboPulseScene extends Phaser.Scene {
       speed: { min: 80, max: selected ? 260 : 190 },
       scale: { start: 0.55, end: 0 },
       quantity: selected ? 24 : 15,
-      tint: [fruit.spec.color, 0xffc857, 0xffffff],
+      tint: [this.fruitColor(fruit.spec), this.rank.accent, 0xffffff],
       emitting: false,
     });
     particles.explode(selected ? 28 : 18);
+    // Onde de choc : un anneau de la couleur du fruit qui s'élargit et s'éteint.
+    const ring = this.add.circle(fruit.view.x, fruit.view.y, this.metrics.fruitRadius, 0xffffff, 0).setStrokeStyle(4, this.fruitColor(fruit.spec), 0.9).setDepth(4);
+    this.tweens.add({ targets: ring, scale: selected ? 2.6 : 1.9, alpha: 0, duration: 380, ease: "Quad.easeOut", onComplete: () => ring.destroy() });
     this.time.delayedCall(560, () => particles.destroy());
     this.tweens.add({ targets: fruit.view, scale: 1.65, alpha: 0, angle: 25, duration: 330, ease: "Back.easeIn", onComplete: () => fruit.view.destroy() });
   }
 
+  // Impulsion de combo : un dégradé de lumière (couleur du fruit, couleur du rang, cœur blanc) s'ouvre depuis le centre du combo,
+  // des ondes se propagent en cascade (une par fruit en plus du premier), des liens de lumière relient les fruits détruits et une
+  // gerbe d'étincelles jaillit. Tout grandit avec le nombre de fruits (comboPulseIntensity). En mouvement réduit : seulement la
+  // lumière, plus douce, sans ondes ni secousse. Mélange normal (pas additif) : le canvas du jeu est transparent au-dessus du décor,
+  // un mélange additif y resterait presque invisible.
+  private comboPulse(points: { x: number; y: number; color: number }[]) {
+    const intensity = comboPulseIntensity(points.length);
+    if (intensity === 0) return;
+    const calm = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const centerX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+    const centerY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+    const fruitColor = points[0].color;
+    const accent = this.rank.accent;
+    const light = Number.parseInt(this.rank.lightCss.slice(1), 16);
+    const reach = Math.hypot(this.worldWidth, this.worldHeight) * (0.35 + 0.45 * intensity);
+    const { fruitRadius, scale } = this.metrics;
+    const track = <T extends Phaser.GameObjects.GameObject>(object: T, lifetime: number): T => {
+      this.time.delayedCall(lifetime, () => object.destroy());
+      return object;
+    };
+
+    // 1. Dégradé de lumière : trois halos superposés qui s'ouvrent et s'éteignent.
+    const layers = [
+      { tint: fruitColor, size: 1, alpha: 0.5 + 0.35 * intensity, delay: 0 },
+      { tint: accent, size: 0.7, alpha: 0.45 + 0.3 * intensity, delay: 60 },
+      { tint: 0xffffff, size: 0.35, alpha: 0.55 + 0.3 * intensity, delay: 0 },
+    ];
+    const lightDuration = calm ? 700 : 650 + 500 * intensity;
+    for (const layer of layers) {
+      const start = reach * layer.size * 0.15;
+      const halo = track(this.add.image(centerX, centerY, ENERGY_GLOW_KEY).setTint(layer.tint).setDepth(5).setAlpha(0).setDisplaySize(start, start), lightDuration + layer.delay + 200);
+      // La lumière s'allume vite, reste un instant à son plus fort, puis s'éteint en s'élargissant.
+      const peak = calm ? layer.alpha * 0.6 : layer.alpha;
+      this.tweens.add({ targets: halo, scale: halo.scaleX * 6.5, delay: layer.delay, duration: lightDuration, ease: "Cubic.easeOut" });
+      this.tweens.chain({
+        targets: halo,
+        tweens: [
+          { alpha: peak, delay: layer.delay, duration: 120, ease: "Quad.easeOut" },
+          { alpha: peak, duration: 180 + 220 * intensity },
+          { alpha: 0, duration: lightDuration * 0.6, ease: "Quad.easeIn" },
+        ],
+      });
+    }
+    if (calm) return;
+
+    // 2. Ondes d'impulsion en cascade.
+    const ringColors = [fruitColor, accent, light];
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const ring = track(this.add.circle(centerX, centerY, fruitRadius, 0xffffff, 0).setStrokeStyle((5 + 3 * intensity) * scale, ringColors[index % ringColors.length], 0.95).setDepth(5), 1600);
+      this.tweens.add({ targets: ring, scale: (reach * 0.5) / fruitRadius, alpha: 0, delay: index * 110, duration: 700 + 250 * intensity, ease: "Quad.easeOut" });
+    }
+
+    // 3. Liens de lumière entre le centre du combo et chaque fruit détruit.
+    const links = track(this.add.graphics().setDepth(5), 600);
+    links.lineStyle((3 + 3 * intensity) * scale, light, 0.9);
+    for (const point of points) links.lineBetween(centerX, centerY, point.x, point.y);
+    this.tweens.add({ targets: links, alpha: 0, duration: 420, ease: "Quad.easeIn" });
+
+    // 4. Gerbe d'étincelles, plus fournie et plus rapide avec le combo.
+    const sparks = track(this.add.particles(centerX, centerY, "turbo-spark", { lifespan: 700 + 500 * intensity, speed: { min: 90, max: 220 + 380 * intensity }, scale: { start: 0.55 + 0.35 * intensity, end: 0 }, alpha: { start: 1, end: 0 }, gravityY: 90, tint: [fruitColor, accent, light, 0xffffff], emitting: false }).setDepth(6), 1500);
+    sparks.explode(Math.round(20 + 40 * intensity));
+
+    // 5. Légère secousse, à peine perceptible pour deux fruits.
+    this.cameras.main.shake(120 + 140 * intensity, 0.002 + 0.004 * intensity);
+  }
+
   private registerIntrusion(fruit: FruitActor): boolean {
     this.intrusions += 1;
-    this.playSequence([170, 130], 0.11);
+    this.audio?.play("intrusion");
     if (this.intrusions >= INTRUSION_LIMITS[this.levelIndex]) {
       this.failLevel();
       return true;
@@ -672,43 +778,100 @@ export class TurboPulseScene extends Phaser.Scene {
     this.failureAction = resolution.action;
     this.expertAttemptUsed = resolution.attemptUsed;
     this.feedback = "La ligne de défense a été franchie.";
-    this.playSequence([220, 174, 130], 0.14);
+    this.audio?.play("levelFailed");
     this.emitSnapshot();
   }
 
-  private scheduleCompletion() {
+  // Animation de fin de niveau, aux couleurs du rang : le dernier fruit se fissure et libère sa lumière,
+  // une impulsion circulaire se propage, des particules apparaissent, un halo royal se forme au centre.
+  // Douce par construction : aucun clignotement, des alphas modérés, des mouvements de plus de 300 ms.
+  // L'emblème et le titre sont portés par le panneau de victoire (voir TurboPulsePlayer).
+  private playVictory(x: number, y: number) {
+    const rank = this.rank;
+    const final = this.levelIndex === TURBO_LEVELS.length - 1;
+    const light = Number.parseInt(rank.lightCss.slice(1), 16);
+    const centerX = this.worldWidth / 2;
+    const centerY = this.worldHeight * 0.46;
+    const calm = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const { fruitRadius } = this.metrics;
+    const track = <T extends Phaser.GameObjects.GameObject>(object: T, lifetime: number): T => {
+      this.time.delayedCall(lifetime, () => object.destroy());
+      return object;
+    };
+
+    // Halo royal au centre de l'écran : seul effet conservé en mode « réduire les animations ».
+    const haloSize = Math.min(this.worldWidth, this.worldHeight * 1.7) * (final ? 0.95 : 0.7);
+    const halo = track(this.add.image(centerX, centerY, ENERGY_GLOW_KEY).setTint(rank.accent).setBlendMode(Phaser.BlendModes.ADD).setDepth(6).setAlpha(0).setDisplaySize(haloSize * 0.4, haloSize * 0.4), VICTORY_DURATION_MS + 700);
+    this.tweens.add({ targets: halo, alpha: final ? 0.55 : 0.42, displayWidth: haloSize, displayHeight: haloSize, duration: 900, delay: 300, ease: "Sine.easeOut" });
+    this.tweens.add({ targets: halo, alpha: 0, duration: 500, delay: VICTORY_DURATION_MS - 300, ease: "Sine.easeIn" });
+    if (calm) return;
+
+    // 1. Fissures et lumière intérieure du dernier fruit.
+    const cracks = track(this.add.graphics().setDepth(5), 700);
+    cracks.lineStyle(2.5, 0xffffff, 0.95);
+    for (let index = 0; index < 7; index += 1) {
+      const angle = (index / 7) * Math.PI * 2 + 0.3;
+      let px = x;
+      let py = y;
+      cracks.beginPath().moveTo(px, py);
+      for (let step = 1; step <= 3; step += 1) {
+        const jitter = (step % 2 === 0 ? 0.28 : -0.28);
+        px = x + Math.cos(angle + jitter) * fruitRadius * 0.4 * step;
+        py = y + Math.sin(angle + jitter) * fruitRadius * 0.4 * step;
+        cracks.lineTo(px, py);
+      }
+      cracks.strokePath();
+    }
+    this.tweens.add({ targets: cracks, alpha: 0, duration: 650, ease: "Quad.easeIn" });
+    const inner = track(this.add.image(x, y, ENERGY_GLOW_KEY).setTint(light).setBlendMode(Phaser.BlendModes.ADD).setDepth(5).setDisplaySize(fruitRadius * 1.4, fruitRadius * 1.4), 800);
+    this.tweens.add({ targets: inner, displayWidth: fruitRadius * 5, displayHeight: fruitRadius * 5, alpha: 0, duration: 700, ease: "Quad.easeOut" });
+
+    // 2. Impulsion circulaire qui traverse la scène.
+    const reach = (Math.hypot(this.worldWidth, this.worldHeight) * 1.05) / fruitRadius;
+    [{ color: rank.accent, delay: 0, width: 5 }, { color: light, delay: 180, width: 3 }].forEach(({ color, delay, width }) => {
+      const ring = track(this.add.circle(x, y, fruitRadius, 0xffffff, 0).setStrokeStyle(width, color, 0.8).setDepth(5).setAlpha(0), 1500);
+      this.tweens.add({ targets: ring, alpha: 0.8, duration: 80, delay });
+      this.tweens.add({ targets: ring, scale: reach * 0.6, duration: 1100, delay, ease: "Cubic.easeOut" });
+      this.tweens.add({ targets: ring, alpha: 0, duration: 700, delay: delay + 400 });
+    });
+
+    // 3. Particules de la couleur du rang, puis une seconde gerbe douce depuis le centre.
+    const burst = track(this.add.particles(x, y, "turbo-spark", { lifespan: 900, speed: { min: 120, max: 340 }, scale: { start: 0.6, end: 0 }, tint: [rank.accent, light, 0xffffff], emitting: false }).setDepth(6), 1300);
+    burst.explode(36);
+    this.time.delayedCall(450, () => {
+      const glow = track(this.add.particles(centerX, centerY, "turbo-spark", { lifespan: 1100, speed: { min: 40, max: 170 }, scale: { start: 0.5, end: 0 }, alpha: { start: 0.9, end: 0 }, tint: [rank.accent, light], emitting: false }).setDepth(6), 1500);
+      glow.explode(26);
+    });
+
+    // Niveau 7 : rayonnement doré qui tourne lentement et pluie d'or. La couronne et le titre sont dans le panneau.
+    if (final) {
+      const rays = track(this.add.graphics({ x: centerX, y: centerY }).setDepth(5).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0), VICTORY_DURATION_MS + 900);
+      const length = Math.hypot(this.worldWidth, this.worldHeight);
+      rays.fillStyle(rank.accent, 0.2);
+      for (let index = 0; index < 14; index += 1) {
+        const angle = (index / 14) * Math.PI * 2;
+        rays.fillTriangle(0, 0, Math.cos(angle) * length, Math.sin(angle) * length, Math.cos(angle + 0.13) * length, Math.sin(angle + 0.13) * length);
+      }
+      this.tweens.add({ targets: rays, alpha: 1, duration: 800, delay: 300 });
+      this.tweens.add({ targets: rays, angle: 28, duration: VICTORY_DURATION_MS + 900, ease: "Sine.easeInOut" });
+      this.tweens.add({ targets: rays, alpha: 0, duration: 600, delay: VICTORY_DURATION_MS + 200 });
+      const rain = track(this.add.particles(0, -10, "turbo-spark", { x: { min: 0, max: this.worldWidth }, lifespan: 2200, speedY: { min: 90, max: 190 }, speedX: { min: -20, max: 20 }, scale: { start: 0.42, end: 0.05 }, tint: [rank.accent, light, 0xffe9a0], frequency: 55, quantity: 1 }).setDepth(6), 2600);
+      this.time.delayedCall(1900, () => rain.stop());
+    }
+  }
+
+  private scheduleCompletion(x = this.worldWidth * 0.5, y = this.worldHeight * 0.4) {
     if (this.completionTimer || (this.status !== "clearing" && this.status !== "playing")) return;
     this.feedback = "Niveau nettoyé !";
     this.emitSnapshot();
-    this.completionTimer = this.time.delayedCall(1000, () => {
+    this.playVictory(x, y);
+    this.completionTimer = this.time.delayedCall(VICTORY_DURATION_MS, () => {
       this.completionTimer = undefined;
       this.status = this.levelIndex === TURBO_LEVELS.length - 1 ? "mastered" : "level-complete";
       this.feedback = this.status === "mastered" ? "Les sept niveaux sont maîtrisés !" : `Niveau ${this.levelIndex + 1} terminé !`;
-      this.playSequence([523, 659, 784, 1047], 0.09);
+      this.audio?.play("levelComplete");
       this.emitSnapshot();
     });
-  }
-
-  private playTone(frequency: number, duration: number, volume: number, type: OscillatorType = "sine", delay = 0) {
-    if (this.muted) return;
-    const context = (this.sound as Phaser.Sound.WebAudioSoundManager).context;
-    if (!context) return;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const start = context.currentTime + delay;
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, start);
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(start);
-    oscillator.stop(start + duration + 0.04);
-  }
-
-  private playSequence(notes: number[], delay: number) {
-    notes.forEach((note, index) => this.playTone(note, 0.14, 0.055, "triangle", index * delay));
   }
 
   private emitSnapshot() {
@@ -733,8 +896,8 @@ export class TurboPulseScene extends Phaser.Scene {
   }
 }
 
-export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotListener): TurboPulseController {
-  const scene = new TurboPulseScene(onSnapshot);
+export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotListener, audio?: TurboPulseSoundOutput): TurboPulseController {
+  const scene = new TurboPulseScene(onSnapshot, audio);
   // Un grand écran doit révéler une vraie surface de jeu plus grande, pas
   // agrandir par étirement une scène 960×540 figée : la taille initiale suit
   // la place réellement disponible dans le conteneur (mesurée ici), et
@@ -767,6 +930,7 @@ export function mountTurboPulseGame(parent: HTMLElement, onSnapshot: SnapshotLis
     scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER, min: { width: MIN_WORLD_WIDTH, height: MIN_WORLD_HEIGHT } },
     render: { antialias: true, roundPixels: true },
     input: { activePointers: 2 },
+    audio: { noAudio: true },
   });
   return {
     destroy: () => game.destroy(true),

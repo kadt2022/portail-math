@@ -41,10 +41,10 @@ export const FRUIT_RADIUS = 31;
 export const FRUIT_HIT_MARGIN = 22;
 export const CANNON_X = 178;
 // Distance fixe (à l'échelle 1) entre le bas du monde de référence et le
-// centre du canon (540 - 465) : réduite avec le reste du canon sur petit
+// centre du canon (540 - 442, plaque d'opération incluse) : réduite avec le reste du canon sur petit
 // écran pour rester ancré près du bas sans dévorer une part disproportionnée
 // d'un monde déjà réduit.
-export const CANNON_BOTTOM_MARGIN = 75;
+export const CANNON_BOTTOM_MARGIN = 98;
 
 export function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
@@ -140,12 +140,12 @@ interface FruitFamily {
 }
 
 export const FRUIT_FAMILIES: readonly FruitFamily[] = [
-  { family: "tomato", label: "tomate", emoji: "🍅", variants: [{ key: "red", label: "rouge", color: 0xe94f4f }, { key: "green", label: "verte", color: 0x62a84f }] },
-  { family: "apple", label: "pomme", emoji: "🍎", variants: [{ key: "red", label: "rouge", color: 0xd94343 }, { key: "green", label: "verte", color: 0x79b94f }] },
-  { family: "avocado", label: "avocat", emoji: "🥑", variants: [{ key: "green", label: "vert", color: 0x69a84f }, { key: "yellow", label: "jaune", color: 0xd8c24a }] },
-  { family: "grape", label: "raisin", emoji: "🍇", variants: [{ key: "purple", label: "violet", color: 0x845ec2 }, { key: "green", label: "vert", color: 0x8bbf55 }] },
-  { family: "orange", label: "orange", emoji: "🍊", variants: [{ key: "orange", label: "orange", color: 0xf08b32 }, { key: "yellow", label: "jaune", color: 0xe7c83f }] },
-  { family: "berry", label: "fraise", emoji: "🍓", variants: [{ key: "red", label: "rouge", color: 0xe95464 }, { key: "pink", label: "rose", color: 0xe98aa7 }] },
+  { family: "tomato", label: "tomate", emoji: "🍅", variants: [{ key: "red", label: "rouge", color: 0xd1142f }, { key: "green", label: "verte", color: 0x5ee3c2 }] },
+  { family: "apple", label: "pomme", emoji: "🍎", variants: [{ key: "red", label: "rouge", color: 0xd1142f }, { key: "green", label: "verte", color: 0x5ee3c2 }] },
+  { family: "avocado", label: "avocat", emoji: "🥑", variants: [{ key: "green", label: "vert", color: 0x5ee3c2 }, { key: "yellow", label: "or", color: 0xffc936 }] },
+  { family: "grape", label: "raisin", emoji: "🍇", variants: [{ key: "purple", label: "bleu", color: 0x1f3f9e }, { key: "green", label: "vert", color: 0x5ee3c2 }] },
+  { family: "orange", label: "orange", emoji: "🍊", variants: [{ key: "orange", label: "bronze", color: 0xc27a3c }, { key: "yellow", label: "or", color: 0xffc936 }] },
+  { family: "berry", label: "fraise", emoji: "🍓", variants: [{ key: "red", label: "rouge", color: 0xd1142f }, { key: "pink", label: "magenta", color: 0xe0279b }] },
 ] as const;
 
 export interface FruitSpec {

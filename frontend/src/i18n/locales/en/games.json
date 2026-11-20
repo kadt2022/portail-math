@@ -11,7 +11,11 @@
     "galleryTitle": "All games",
     "noResult": "No game has this name. Try another word!",
     "resultCount_one": "{{count}} game",
-    "resultCount_other": "{{count}} games"
+    "resultCount_other": "{{count}} games",
+    "recommended": "Up next",
+    "aboutGame": "About {{name}}",
+    "headerSearchLabel": "Search all games",
+    "headerSearchPlaceholder": "Search all games"
   },
   "bar": {
     "label": "Games navigation",
@@ -97,41 +101,20 @@
         "replay": "Replay the tutorial"
       },
       "hint": {
-        "button": "Hint",
-        "aria": "Ask for a hint",
         "move": "Hint: the {{value}} goes in row {{row}}, column {{col}}.",
         "center": "Everything is in place: bring the empty cell back to the centre, then place the card.",
         "done": "Well done, the grid is complete!"
       },
       "screen": {
-        "label": "Magic Tiles game",
-        "enter": "Enter full screen",
-        "exit": "Exit full screen",
-        "enterShort": "Full screen",
-        "exitShort": "Shrink",
-        "closeShort": "Close",
-        "close": "Close the game and see the other games",
-        "leave": "Leave",
-        "rotate": "Turn your phone sideways for a bigger board."
+        "label": "Magic Tiles game"
       },
       "actions": {
-        "restart": "Restart",
-        "restartAria": "Restart with a new grid",
         "newGrid": "New grid",
         "nextLevel": "Next level",
-        "backToGames": "Back to games"
-      },
-      "player": {
-        "controls": "Game controls",
-        "play": "Play",
-        "pause": "Pause",
-        "resume": "Resume",
-        "pausedTitle": "Game paused"
+        "backToGames": "Back to games",
+        "restartAria": "Restart with a new grid"
       },
       "howTo": {
-        "button": "How to play",
-        "title": "How to play",
-        "close": "Close the instructions",
         "step1Title": "Look at the sums",
         "step1": "Every row and every column must give the result shown.",
         "step2Title": "Move the tiles",
@@ -166,9 +149,6 @@
       "solve": "Solve",
       "currentOperation": "Current equation: {{operation}}",
       "canvasLabel": "Interactive Turbo Pulse scene. Aim the piston and hit a fruit carrying the correct answer.",
-      "missionTitle": "Maths mission",
-      "instructions": "Aim at a fruit carrying the correct answer. Every fruit of the same colour will explode with it.",
-      "touchHint": "Slide your finger to aim, then touch the scene to fire. The answer stays hidden until a correct hit.",
       "failure": {
         "eyebrow": "Defence breached",
         "title": "Level {{level}} — {{name}} failed",
@@ -180,12 +160,9 @@
         "exhausted": "All 3 attempts are over. The run restarts at level 1."
       },
       "success": {
-        "eyebrow": "Station secured",
         "title": "Level {{level}} complete!",
-        "message": "12 equations solved, every fruit destroyed and the final explosion shown in full.",
-        "next": "Level {{level}} — {{name}}",
-        "masteredTitle": "Turbo Pulse mastered!",
-        "masteredMessage": "You cleared all 7 levels and solved {{count}} equations."
+        "masteredTitle": "Golden Knight",
+        "knightRank": "Level 7 — Royal Gold"
       },
       "paused": {
         "title": "Game paused",
@@ -203,7 +180,30 @@
         "pause": "Pause",
         "resume": "Resume",
         "fullscreenOn": "Fullscreen",
-        "fullscreenOff": "Exit fullscreen"
+        "fullscreenOff": "Exit fullscreen",
+        "play": "Play",
+        "restartAria": "Restart the game"
+      },
+      "controlsLabel": "Game controls",
+      "ranks": {
+        "steel": "Steel",
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "emerald": "Emerald",
+        "sapphire": "Sapphire",
+        "ruby": "Royal Ruby",
+        "gold": "Royal Gold"
+      },
+      "rankLabel": "{{rank}} rank",
+      "end": {
+        "failTitle": "Oops! Try again",
+        "winTitle": "Level complete!",
+        "score": "Score: {{score}}",
+        "retry": "Try again",
+        "next": "Continue",
+        "attemptsLeft_one": "1 try left",
+        "attemptsLeft_other": "{{count}} tries left",
+        "noAttemptLeft": "No tries left: back to level 1"
       }
     },
     "tagline": "Aim, calculate, chain combos"
@@ -245,5 +245,49 @@
   "card": {
     "playAria": "Play {{name}}",
     "soonAria": "{{name}}: coming soon"
+  },
+  "player": {
+    "controls": "Game controls",
+    "play": "Play",
+    "pause": "Pause",
+    "resume": "Resume",
+    "pausedTitle": "Game paused",
+    "restart": "Restart",
+    "restartAria": "Restart the game",
+    "hint": "Hint",
+    "hintAria": "Ask for a hint",
+    "screen": {
+      "enter": "Enter full screen",
+      "exit": "Exit full screen",
+      "enterShort": "Full screen",
+      "exitShort": "Shrink",
+      "closeShort": "Close",
+      "close": "Close the game and see the other games",
+      "leave": "Exit"
+    },
+    "howTo": {
+      "button": "How to play",
+      "title": "How to play",
+      "close": "Close the instructions"
+    },
+    "orientation": {
+      "playPortrait": "Switch to portrait",
+      "playLandscape": "Switch to landscape",
+      "portraitShort": "Portrait",
+      "landscapeShort": "Landscape",
+      "rotateNote": "Turn your phone sideways to play in landscape."
+    },
+    "sound": {
+      "on": "Sound on",
+      "off": "Sound off"
+    }
+  },
+  "meta": {
+    "subject": {
+      "maths": "Maths"
+    },
+    "level": {
+      "primary": "Primary school"
+    }
   }
 }
