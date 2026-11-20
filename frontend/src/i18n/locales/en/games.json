@@ -178,7 +178,8 @@
       },
       "success": {
         "title": "Level {{level}} complete!",
-        "masteredTitle": "Turbo Pulse mastered!"
+        "masteredTitle": "Golden Knight",
+        "knightRank": "Level 7 — Royal Gold"
       },
       "paused": {
         "title": "Game paused",
@@ -200,7 +201,17 @@
         "play": "Play",
         "restartAria": "Restart the game"
       },
-      "controlsLabel": "Game controls"
+      "controlsLabel": "Game controls",
+      "ranks": {
+        "steel": "Steel",
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "emerald": "Emerald",
+        "sapphire": "Sapphire",
+        "ruby": "Royal Ruby",
+        "gold": "Royal Gold"
+      },
+      "rankLabel": "{{rank}} rank"
     },
     "tagline": "Aim, calculate, chain combos"
   },

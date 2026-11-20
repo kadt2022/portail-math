@@ -3,11 +3,8 @@ import Phaser from "phaser";
 import {
   ART_SCALE,
   CANNON_ARM,
-  CANNON_ARM_KEY,
   CANNON_BASE,
-  CANNON_BASE_KEY,
   CANNON_MUZZLE_DISTANCE,
-  CANNON_PLATE_KEY,
   ENERGY_CORE_KEY,
   ENERGY_CORE_SIZE,
   ENERGY_GLOW_KEY,
@@ -17,6 +14,7 @@ import {
   ensureFruitTexture,
   FRUIT_BADGE_SIZE,
 } from "./turbo-pulse-art";
+import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
@@ -63,8 +61,8 @@ const AIM_MAX_ANGLE = 0.12;
 // d'affichage de référence, cannonScale applique ensuite le bornage petit écran
 // par-dessus (voir applyCannonMetrics). Exportée pour les tests, qui vérifient
 // que cannonBase/cannonArm.scaleX suit toujours metrics.scale.
-// Énergie et ligne de défense : toujours dorées (identité Turbo Pulse), quel que soit le monde.
-const GOLD_ENERGY = 0xffc83d;
+// Durée de l'animation de fin de niveau, avant l'écran de victoire.
+const VICTORY_DURATION_MS = 1700;
 export const CANNON_IMAGE_SCALE = 1 / ART_SCALE;
 // Centre de la plaque d'opération sous le canon (échelle 1, depuis le pivot).
 const CANNON_PLATE_OFFSET_Y = 62;
@@ -193,7 +191,6 @@ export class TurboPulseScene extends Phaser.Scene {
     spark.generateTexture("turbo-spark", 12, 12);
     spark.destroy();
     // Canon, tir et plaque : dessinés une fois en vectoriel (turbo-pulse-art.ts).
-    ensureCannonTextures(this);
     ensureEnergyTextures(this);
     this.drawWorld();
     this.createCannon();
@@ -399,7 +396,7 @@ export class TurboPulseScene extends Phaser.Scene {
     // Ce canvas Phaser reste transparent (mountTurboPulseGame) et ne dessine
     // plus que les éléments qui doivent rester nets : zone de défense, fruits,
     // canon, projectiles. La ligne de défense est dorée, comme l'énergie.
-    const accent = GOLD_ENERGY;
+    const accent = this.rank.accent;
     graphics.fillStyle(0x06151f, 0.7);
     graphics.fillRect(0, 0, DEFENSE_X, height);
     graphics.fillStyle(accent, 0.1);
@@ -414,6 +411,28 @@ export class TurboPulseScene extends Phaser.Scene {
     for (let y = 48; y < height - 30; y += 36) graphics.fillTriangle(DEFENSE_X - 8, y, DEFENSE_X + 8, y + 12, DEFENSE_X - 8, y + 24);
   }
 
+  // Rang du niveau en cours : couleur des boules, du canon, des tirs et des particules.
+  private get rank(): TurboPulseRank {
+    return rankForLevel(this.levelIndex);
+  }
+
+  private fruitColor(spec: FruitSpec): number {
+    return this.rank.palette[spec.variant];
+  }
+
+  private ensureRankTextures() {
+    return ensureCannonTextures(this, this.rank);
+  }
+
+  // Le canon change de rang avec le niveau : mêmes images, textures recolorées (cuites une seule fois par rang).
+  private applyRankTextures() {
+    if (!this.cannonBase) return;
+    const keys = this.ensureRankTextures();
+    this.cannonBase.setTexture(keys.base);
+    this.cannonArm?.setTexture(keys.arm);
+    this.cannonPlate?.setTexture(keys.plate);
+  }
+
   private createCannon() {
     // "DÉFENSE" est ancré dans un coin fixe (près de la zone de défense, elle
     // aussi à marge fixe) : contrairement au reste du décor, sa position ne
@@ -426,13 +445,13 @@ export class TurboPulseScene extends Phaser.Scene {
     // redimensionne ensuite via .setScale(), sans jamais les redessiner. Le bras
     // est dessiné canon vers la droite : sa rotation est donc l'angle de visée.
     const { cannonX } = this.metrics;
-    this.cannonBase = this.add.image(cannonX, this.cannonY, CANNON_BASE_KEY).setOrigin(CANNON_BASE.pivotX / CANNON_BASE.width, CANNON_BASE.pivotY / CANNON_BASE.height).setDepth(0);
+    this.cannonBase = this.add.image(cannonX, this.cannonY, this.ensureRankTextures().base).setOrigin(CANNON_BASE.pivotX / CANNON_BASE.width, CANNON_BASE.pivotY / CANNON_BASE.height).setDepth(0);
     this.cannonArm = this.add
-      .image(cannonX, this.cannonY, CANNON_ARM_KEY)
+      .image(cannonX, this.cannonY, this.ensureRankTextures().arm)
       .setOrigin(CANNON_ARM.pivotX / CANNON_ARM.width, CANNON_ARM.pivotY / CANNON_ARM.height)
       .setRotation(this.aimAngle)
       .setDepth(1);
-    this.cannonPlate = this.add.image(cannonX, this.cannonY, CANNON_PLATE_KEY).setDepth(4);
+    this.cannonPlate = this.add.image(cannonX, this.cannonY, this.ensureRankTextures().plate).setDepth(4);
     this.cannonBadge = this.add.text(cannonX, this.cannonY, "", { fontFamily: "Trebuchet MS, sans-serif", fontSize: "20px", fontStyle: "bold", color: "#3b2606" }).setOrigin(0.5).setDepth(5);
     this.aimGuide = this.add.graphics().setDepth(2);
     this.applyCannonMetrics();
@@ -442,6 +461,7 @@ export class TurboPulseScene extends Phaser.Scene {
     this.completionTimer?.remove(false);
     this.clearActors();
     this.levelIndex = index;
+    this.applyRankTextures();
     this.drawWorld();
     this.solved = 0;
     this.intrusions = 0;
@@ -481,7 +501,7 @@ export class TurboPulseScene extends Phaser.Scene {
     // une fois par famille et par couleur (voir ensureFruitTexture), jamais par
     // fruit. Le nombre et l'étiquette restent des textes Phaser, pour rester
     // nets et lisibles quel que soit leur contenu.
-    const textureKey = ensureFruitTexture(this, spec.family, spec.variant, spec.color);
+    const textureKey = ensureFruitTexture(this, spec.family, spec.variant, this.fruitColor(spec));
     const badge = this.add.image(0, 0, textureKey).setDisplaySize(FRUIT_BADGE_SIZE * scale, FRUIT_BADGE_SIZE * scale);
     const value = this.add.text(0, 17 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
     const view = this.add.container(x, y, [badge, value]).setDepth(3);
@@ -545,14 +565,14 @@ export class TurboPulseScene extends Phaser.Scene {
     this.cannonArm?.setRotation(this.aimAngle);
     const guideStart = (CANNON_MUZZLE_DISTANCE + 16) * cannonScale;
     const guideEnd = (CANNON_MUZZLE_DISTANCE + 118) * cannonScale;
-    this.aimGuide?.clear().lineStyle(3, GOLD_ENERGY, 0.4).lineBetween(cannonX + Math.cos(this.aimAngle) * guideStart, this.cannonY + Math.sin(this.aimAngle) * guideStart, cannonX + Math.cos(this.aimAngle) * guideEnd, this.cannonY + Math.sin(this.aimAngle) * guideEnd);
+    this.aimGuide?.clear().lineStyle(3, this.rank.accent, 0.4).lineBetween(cannonX + Math.cos(this.aimAngle) * guideStart, this.cannonY + Math.sin(this.aimAngle) * guideStart, cannonX + Math.cos(this.aimAngle) * guideEnd, this.cannonY + Math.sin(this.aimAngle) * guideEnd);
   }
 
   private fire() {
     if (this.time.now - this.lastFireAt < 130) return;
     this.lastFireAt = this.time.now;
     const { cannonX, cannonScale } = this.metrics;
-    const accent = GOLD_ENERGY;
+    const accent = this.rank.accent;
     const muzzle = CANNON_MUZZLE_DISTANCE * cannonScale;
     const muzzleX = cannonX + Math.cos(this.aimAngle) * muzzle;
     const muzzleY = this.cannonY + Math.sin(this.aimAngle) * muzzle;
@@ -574,7 +594,7 @@ export class TurboPulseScene extends Phaser.Scene {
 
   // Étincelle de la traînée : naît sur la trajectoire du tir, rétrécit et s'éteint.
   private spawnTrailSpark(x: number, y: number) {
-    const accent = GOLD_ENERGY;
+    const accent = this.rank.accent;
     const size = ENERGY_GLOW_SIZE * 0.5 * this.metrics.cannonScale;
     const spark = this.add.image(x, y, ENERGY_GLOW_KEY).setDisplaySize(size, size).setTint(accent).setAlpha(0.7).setBlendMode(Phaser.BlendModes.ADD).setDepth(3);
     this.tweens.add({ targets: spark, scale: spark.scale * 0.25, alpha: 0, duration: 240, onComplete: () => spark.destroy() });
@@ -600,7 +620,7 @@ export class TurboPulseScene extends Phaser.Scene {
       this.feedback = this.fruits.length > 0 ? `Objectif atteint : encore ${this.fruits.length} fruit${this.fruits.length > 1 ? "s" : ""} à détruire` : "Niveau nettoyé !";
     }
 
-    if (this.fruits.length === 0 && this.status === "clearing") this.scheduleCompletion();
+    if (this.fruits.length === 0 && this.status === "clearing") this.scheduleCompletion(selected.view.x, selected.view.y);
     else this.setTarget(chooseTargetResult(this.fruits.map((fruit) => fruit.spec)));
     this.emitSnapshot();
   }
@@ -620,12 +640,12 @@ export class TurboPulseScene extends Phaser.Scene {
       speed: { min: 80, max: selected ? 260 : 190 },
       scale: { start: 0.55, end: 0 },
       quantity: selected ? 24 : 15,
-      tint: [fruit.spec.color, 0xffc857, 0xffffff],
+      tint: [this.fruitColor(fruit.spec), this.rank.accent, 0xffffff],
       emitting: false,
     });
     particles.explode(selected ? 28 : 18);
     // Onde de choc : un anneau de la couleur du fruit qui s'élargit et s'éteint.
-    const ring = this.add.circle(fruit.view.x, fruit.view.y, this.metrics.fruitRadius, 0xffffff, 0).setStrokeStyle(4, fruit.spec.color, 0.9).setDepth(4);
+    const ring = this.add.circle(fruit.view.x, fruit.view.y, this.metrics.fruitRadius, 0xffffff, 0).setStrokeStyle(4, this.fruitColor(fruit.spec), 0.9).setDepth(4);
     this.tweens.add({ targets: ring, scale: selected ? 2.6 : 1.9, alpha: 0, duration: 380, ease: "Quad.easeOut", onComplete: () => ring.destroy() });
     this.time.delayedCall(560, () => particles.destroy());
     this.tweens.add({ targets: fruit.view, scale: 1.65, alpha: 0, angle: 25, duration: 330, ease: "Back.easeIn", onComplete: () => fruit.view.destroy() });
@@ -662,11 +682,90 @@ export class TurboPulseScene extends Phaser.Scene {
     this.emitSnapshot();
   }
 
-  private scheduleCompletion() {
+  // Animation de fin de niveau, aux couleurs du rang : le dernier fruit se fissure et libère sa lumière,
+  // une impulsion circulaire se propage, des particules apparaissent, un halo royal se forme au centre.
+  // Douce par construction : aucun clignotement, des alphas modérés, des mouvements de plus de 300 ms.
+  // L'emblème et le titre sont portés par le panneau de victoire (voir TurboPulsePlayer).
+  private playVictory(x: number, y: number) {
+    const rank = this.rank;
+    const final = this.levelIndex === TURBO_LEVELS.length - 1;
+    const light = Number.parseInt(rank.lightCss.slice(1), 16);
+    const centerX = this.worldWidth / 2;
+    const centerY = this.worldHeight * 0.46;
+    const calm = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const { fruitRadius } = this.metrics;
+    const track = <T extends Phaser.GameObjects.GameObject>(object: T, lifetime: number): T => {
+      this.time.delayedCall(lifetime, () => object.destroy());
+      return object;
+    };
+
+    // Halo royal au centre de l'écran : seul effet conservé en mode « réduire les animations ».
+    const haloSize = Math.min(this.worldWidth, this.worldHeight * 1.7) * (final ? 0.95 : 0.7);
+    const halo = track(this.add.image(centerX, centerY, ENERGY_GLOW_KEY).setTint(rank.accent).setBlendMode(Phaser.BlendModes.ADD).setDepth(6).setAlpha(0).setDisplaySize(haloSize * 0.4, haloSize * 0.4), VICTORY_DURATION_MS + 700);
+    this.tweens.add({ targets: halo, alpha: final ? 0.55 : 0.42, displayWidth: haloSize, displayHeight: haloSize, duration: 900, delay: 300, ease: "Sine.easeOut" });
+    this.tweens.add({ targets: halo, alpha: 0, duration: 500, delay: VICTORY_DURATION_MS - 300, ease: "Sine.easeIn" });
+    if (calm) return;
+
+    // 1. Fissures et lumière intérieure du dernier fruit.
+    const cracks = track(this.add.graphics().setDepth(5), 700);
+    cracks.lineStyle(2.5, 0xffffff, 0.95);
+    for (let index = 0; index < 7; index += 1) {
+      const angle = (index / 7) * Math.PI * 2 + 0.3;
+      let px = x;
+      let py = y;
+      cracks.beginPath().moveTo(px, py);
+      for (let step = 1; step <= 3; step += 1) {
+        const jitter = (step % 2 === 0 ? 0.28 : -0.28);
+        px = x + Math.cos(angle + jitter) * fruitRadius * 0.4 * step;
+        py = y + Math.sin(angle + jitter) * fruitRadius * 0.4 * step;
+        cracks.lineTo(px, py);
+      }
+      cracks.strokePath();
+    }
+    this.tweens.add({ targets: cracks, alpha: 0, duration: 650, ease: "Quad.easeIn" });
+    const inner = track(this.add.image(x, y, ENERGY_GLOW_KEY).setTint(light).setBlendMode(Phaser.BlendModes.ADD).setDepth(5).setDisplaySize(fruitRadius * 1.4, fruitRadius * 1.4), 800);
+    this.tweens.add({ targets: inner, displayWidth: fruitRadius * 5, displayHeight: fruitRadius * 5, alpha: 0, duration: 700, ease: "Quad.easeOut" });
+
+    // 2. Impulsion circulaire qui traverse la scène.
+    const reach = (Math.hypot(this.worldWidth, this.worldHeight) * 1.05) / fruitRadius;
+    [{ color: rank.accent, delay: 0, width: 5 }, { color: light, delay: 180, width: 3 }].forEach(({ color, delay, width }) => {
+      const ring = track(this.add.circle(x, y, fruitRadius, 0xffffff, 0).setStrokeStyle(width, color, 0.8).setDepth(5).setAlpha(0), 1500);
+      this.tweens.add({ targets: ring, alpha: 0.8, duration: 80, delay });
+      this.tweens.add({ targets: ring, scale: reach * 0.6, duration: 1100, delay, ease: "Cubic.easeOut" });
+      this.tweens.add({ targets: ring, alpha: 0, duration: 700, delay: delay + 400 });
+    });
+
+    // 3. Particules de la couleur du rang, puis une seconde gerbe douce depuis le centre.
+    const burst = track(this.add.particles(x, y, "turbo-spark", { lifespan: 900, speed: { min: 120, max: 340 }, scale: { start: 0.6, end: 0 }, tint: [rank.accent, light, 0xffffff], emitting: false }).setDepth(6), 1300);
+    burst.explode(36);
+    this.time.delayedCall(450, () => {
+      const glow = track(this.add.particles(centerX, centerY, "turbo-spark", { lifespan: 1100, speed: { min: 40, max: 170 }, scale: { start: 0.5, end: 0 }, alpha: { start: 0.9, end: 0 }, tint: [rank.accent, light], emitting: false }).setDepth(6), 1500);
+      glow.explode(26);
+    });
+
+    // Niveau 7 : rayonnement doré qui tourne lentement et pluie d'or. La couronne et le titre sont dans le panneau.
+    if (final) {
+      const rays = track(this.add.graphics({ x: centerX, y: centerY }).setDepth(5).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0), VICTORY_DURATION_MS + 900);
+      const length = Math.hypot(this.worldWidth, this.worldHeight);
+      rays.fillStyle(rank.accent, 0.2);
+      for (let index = 0; index < 14; index += 1) {
+        const angle = (index / 14) * Math.PI * 2;
+        rays.fillTriangle(0, 0, Math.cos(angle) * length, Math.sin(angle) * length, Math.cos(angle + 0.13) * length, Math.sin(angle + 0.13) * length);
+      }
+      this.tweens.add({ targets: rays, alpha: 1, duration: 800, delay: 300 });
+      this.tweens.add({ targets: rays, angle: 28, duration: VICTORY_DURATION_MS + 900, ease: "Sine.easeInOut" });
+      this.tweens.add({ targets: rays, alpha: 0, duration: 600, delay: VICTORY_DURATION_MS + 200 });
+      const rain = track(this.add.particles(0, -10, "turbo-spark", { x: { min: 0, max: this.worldWidth }, lifespan: 2200, speedY: { min: 90, max: 190 }, speedX: { min: -20, max: 20 }, scale: { start: 0.42, end: 0.05 }, tint: [rank.accent, light, 0xffe9a0], frequency: 55, quantity: 1 }).setDepth(6), 2600);
+      this.time.delayedCall(1900, () => rain.stop());
+    }
+  }
+
+  private scheduleCompletion(x = this.worldWidth * 0.5, y = this.worldHeight * 0.4) {
     if (this.completionTimer || (this.status !== "clearing" && this.status !== "playing")) return;
     this.feedback = "Niveau nettoyé !";
     this.emitSnapshot();
-    this.completionTimer = this.time.delayedCall(1000, () => {
+    this.playVictory(x, y);
+    this.completionTimer = this.time.delayedCall(VICTORY_DURATION_MS, () => {
       this.completionTimer = undefined;
       this.status = this.levelIndex === TURBO_LEVELS.length - 1 ? "mastered" : "level-complete";
       this.feedback = this.status === "mastered" ? "Les sept niveaux sont maîtrisés !" : `Niveau ${this.levelIndex + 1} terminé !`;

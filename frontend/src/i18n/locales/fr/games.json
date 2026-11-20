@@ -178,7 +178,8 @@
       },
       "success": {
         "title": "Niveau {{level}} terminé !",
-        "masteredTitle": "Turbo Pulse maîtrisé !"
+        "masteredTitle": "Chevalier d'Or",
+        "knightRank": "Niveau 7 — Or royal"
       },
       "paused": {
         "title": "Jeu en pause",
@@ -200,7 +201,17 @@
         "play": "Jouer",
         "restartAria": "Recommencer la partie"
       },
-      "controlsLabel": "Commandes du jeu"
+      "controlsLabel": "Commandes du jeu",
+      "ranks": {
+        "steel": "Acier",
+        "bronze": "Bronze",
+        "silver": "Argent",
+        "emerald": "Émeraude",
+        "sapphire": "Saphir",
+        "ruby": "Rubis royal",
+        "gold": "Or royal"
+      },
+      "rankLabel": "Rang {{rank}}"
     },
     "tagline": "Vise, calcule, enchaîne"
   },

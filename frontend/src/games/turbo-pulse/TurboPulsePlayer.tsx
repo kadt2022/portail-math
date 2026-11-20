@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -8,6 +8,7 @@ import {
 } from "./TurboPulseGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "../fullscreen";
 import { useInertOutside } from "../useInertOutside";
+import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
 import styles from "./TurboPulsePlayer.module.css";
 
@@ -99,28 +100,49 @@ function FailurePanel({ snapshot, onRetry }: { snapshot: TurboPulseSnapshot; onR
   );
 }
 
-// Passage de niveau : tout en or, presque sans texte. Les étoiles (ou le trophée
-// à la fin du parcours), un titre court, le monde qui suit et un seul bouton.
+// Emblème du rang : un écu à facettes aux couleurs du rang ; l'Or royal reçoit en plus une couronne.
+function RankEmblem({ rank, size }: { rank: TurboPulseRank; size: number }) {
+  const gradient = useId();
+  const crowned = rank.id === "gold";
+  return (
+    <svg className={styles.emblem} viewBox={crowned ? "0 -16 64 88" : "0 0 64 72"} width={size} height={(size * (crowned ? 88 : 72)) / 64} aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id={gradient} x1="0.1" y1="0" x2="0.7" y2="1">
+          <stop offset="0" stopColor={rank.lightCss} />
+          <stop offset="0.5" stopColor={rank.accentCss} />
+          <stop offset="1" stopColor={rank.darkCss} />
+        </linearGradient>
+      </defs>
+      {crowned ? <path d="M16 -2 20 -14 28 -6 32 -16 36 -6 44 -14 48 -2Z" fill={`url(#${gradient})`} stroke={rank.lightCss} strokeWidth="1.5" strokeLinejoin="round" /> : null}
+      <path d="M32 4 58 14v22c0 16-11 27-26 32C17 63 6 52 6 36V14Z" fill={`url(#${gradient})`} stroke={rank.lightCss} strokeWidth="2.2" strokeLinejoin="round" />
+      <path d="M32 16 48 36 32 58 16 36Z" fill={rank.darkCss} fillOpacity="0.5" stroke={rank.lightCss} strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M32 16 48 36H16Z" fill="#fff" fillOpacity="0.28" />
+      <path d="M32 16 32 58M16 36H48" stroke={rank.lightCss} strokeOpacity="0.6" strokeWidth="1" />
+    </svg>
+  );
+}
+
+// Passage de niveau : l'emblème du rang atteint, un titre court et un seul bouton.
+// Au niveau 7, le titre « Chevalier d'Or » couronne le parcours.
 function SuccessPanel({ snapshot, onNext }: { snapshot: TurboPulseSnapshot; onNext: () => void }) {
   const { t } = useTranslation("games");
   const mastered = snapshot.status === "mastered";
+  const rank = rankForLevel(snapshot.levelIndex);
   return (
     <div className={styles.goldBackdrop} role="presentation">
       <section className={styles.goldCard} role="dialog" aria-modal="true" aria-labelledby="turbo-success-title">
-        {mastered ? (
-          <span className={styles.goldTrophy} aria-hidden="true">🏆</span>
-        ) : (
-          <div className={styles.goldStars} aria-hidden="true">
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-          </div>
-        )}
+        <RankEmblem rank={rank} size={mastered ? 96 : 78} />
+        <div className={styles.goldStars} aria-hidden="true">
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+        </div>
         <h2 id="turbo-success-title">
           {mastered
             ? t("turboPulse.game.success.masteredTitle")
             : t("turboPulse.game.success.title", { level: snapshot.levelIndex + 1 })}
         </h2>
+        <p className={styles.goldRank}>{mastered ? t("turboPulse.game.success.knightRank") : t("turboPulse.game.rankLabel", { rank: t(`turboPulse.game.ranks.${rank.id}`) })}</p>
         <button type="button" className={styles.goldAction} onClick={onNext}>
           {mastered ? t("turboPulse.game.actions.playAgain") : t("turboPulse.game.actions.nextLevel", { level: snapshot.levelIndex + 2 })}
         </button>
@@ -275,6 +297,7 @@ export function TurboPulsePlayer({
     if (!active && running && !snapshot.paused) controllerRef.current?.togglePause();
   }, [active, snapshot.status, snapshot.paused]);
 
+  const rank = rankForLevel(snapshot.levelIndex);
   const progress = Math.min(100, (snapshot.solved / CALCULATIONS_PER_LEVEL) * 100);
   const isSuccess = snapshot.status === "level-complete" || snapshot.status === "mastered";
   const canPause = snapshot.status === "playing" || snapshot.status === "clearing";
@@ -287,6 +310,7 @@ export function TurboPulsePlayer({
     <main
       ref={pageRef}
       className={fullscreen ? `${styles.page} ${styles.fullscreen}` : styles.page}
+      style={{ "--rank": rank.accentCss, "--rank-light": rank.lightCss, "--rank-dark": rank.darkCss } as CSSProperties}
       aria-labelledby="turbo-pulse-title"
     >
       <header className={styles.topbar}>
@@ -300,6 +324,10 @@ export function TurboPulsePlayer({
       </header>
 
       <section className={styles.statusBar} aria-label={t("turboPulse.game.statusLabel")}>
+        <div className={styles.rankBadge}>
+          <RankEmblem rank={rank} size={30} />
+          <strong>{t(`turboPulse.game.ranks.${rank.id}`)}</strong>
+        </div>
         <div className={styles.levelBlock}>
           <span>{t("turboPulse.game.level", { level: snapshot.levelIndex + 1 })}</span>
           <strong>{snapshot.levelName}</strong>

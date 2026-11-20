@@ -135,7 +135,7 @@ describe("page Turbo Pulse", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
 
-    expect(screen.getByRole("heading", { name: "Turbo Pulse maîtrisé !" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Chevalier d'Or" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rejouer depuis le niveau 1" })).toBeInTheDocument();
   });
 

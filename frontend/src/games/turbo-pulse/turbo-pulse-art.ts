@@ -1,6 +1,7 @@
 import type Phaser from "phaser";
 
 import { FRUIT_RADIUS, type FruitColor } from "./turbo-pulse-engine";
+import { type TurboPulseRank, tintCssColor } from "./turbo-pulse-ranks";
 
 // Dessin vectoriel (canvas 2D) du canon, du tir et des fruits de Turbo Pulse.
 // Chaque élément est « cuit » une seule fois en texture Phaser, puis réutilisé :
@@ -283,10 +284,50 @@ function drawCannonPlate(ctx: Ctx): void {
   ctx.stroke();
 }
 
-export function ensureCannonTextures(scene: Phaser.Scene): void {
-  bake(scene, CANNON_BASE_KEY, CANNON_BASE.width, CANNON_BASE.height, drawCannonBase);
-  bake(scene, CANNON_ARM_KEY, CANNON_ARM.width, CANNON_ARM.height, drawCannonArm);
-  bake(scene, CANNON_PLATE_KEY, CANNON_PLATE.width, CANNON_PLATE.height, drawCannonPlate);
+export interface CannonTextureKeys {
+  base: string;
+  arm: string;
+  plate: string;
+}
+
+export function cannonTextureKeys(rank: TurboPulseRank): CannonTextureKeys {
+  return { base: `${CANNON_BASE_KEY}-${rank.id}`, arm: `${CANNON_ARM_KEY}-${rank.id}`, plate: `${CANNON_PLATE_KEY}-${rank.id}` };
+}
+
+// Le canon est dessiné une seule fois en or ; chaque rang le reçoit recoloré à la cuisson (jamais à l'image).
+function rankedContext(ctx: Ctx, rank: TurboPulseRank): Ctx {
+  if (!rank.tint) return ctx;
+  const tint = (value: unknown) => (typeof value === "string" ? tintCssColor(value, rank) : value);
+  const gradientMakers = new Set(["createLinearGradient", "createRadialGradient"]);
+  return new Proxy(ctx, {
+    get(target, property) {
+      const value = Reflect.get(target, property, target);
+      if (typeof value !== "function") return value;
+      if (typeof property === "string" && gradientMakers.has(property)) {
+        return (...args: unknown[]) => {
+          const gradient = (value as (...a: unknown[]) => CanvasGradient).apply(target, args);
+          const add = gradient.addColorStop.bind(gradient);
+          gradient.addColorStop = (offset: number, color: string) => add(offset, tintCssColor(color, rank));
+          return gradient;
+        };
+      }
+      return value.bind(target);
+    },
+    set(target, property, value) {
+      const colored = property === "fillStyle" || property === "strokeStyle" || property === "shadowColor";
+      Reflect.set(target, property, colored ? tint(value) : value, target);
+      return true;
+    },
+  });
+}
+
+/** Prépare (une seule fois par rang) les trois textures du canon et renvoie leurs clés. */
+export function ensureCannonTextures(scene: Phaser.Scene, rank: TurboPulseRank): CannonTextureKeys {
+  const keys = cannonTextureKeys(rank);
+  bake(scene, keys.base, CANNON_BASE.width, CANNON_BASE.height, (ctx) => drawCannonBase(rankedContext(ctx, rank)));
+  bake(scene, keys.arm, CANNON_ARM.width, CANNON_ARM.height, (ctx) => drawCannonArm(rankedContext(ctx, rank)));
+  bake(scene, keys.plate, CANNON_PLATE.width, CANNON_PLATE.height, (ctx) => drawCannonPlate(rankedContext(ctx, rank)));
+  return keys;
 }
 
 // --- Tir : boule d'énergie --------------------------------------------------------
@@ -556,8 +597,8 @@ export function paintFruit(ctx: Ctx, family: string, color: number, variant: Fru
   (FRUIT_PAINTERS[family] ?? drawTomato)(ctx, color, variant);
 }
 
-export function fruitTextureKey(family: string, variant: FruitColor): string {
-  return `turbo-fruit-${family}-${variant}`;
+export function fruitTextureKey(family: string, variant: FruitColor, color: number): string {
+  return `turbo-fruit-${family}-${variant}-${color.toString(16)}`;
 }
 
 // Boule 3D : sphère métallique (reflet, ombre, lumière de rebond, liseré biseauté) dont la couleur est
@@ -653,7 +694,7 @@ function drawFruitBadge(ctx: Ctx, family: string, color: number, variant: FruitC
 
 /** Prépare (une seule fois) la texture du badge d'un fruit et renvoie sa clé. */
 export function ensureFruitTexture(scene: Phaser.Scene, family: string, variant: FruitColor, color: number): string {
-  const key = fruitTextureKey(family, variant);
+  const key = fruitTextureKey(family, variant, color);
   bake(scene, key, FRUIT_BADGE_SIZE, FRUIT_BADGE_SIZE, (ctx) => drawFruitBadge(ctx, family, color, variant));
   return key;
 }
