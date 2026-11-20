@@ -12,8 +12,8 @@ import styles from "./TurboPulsePage.module.css";
 
 // import() dynamique (pas un import statique) : Vite ne télécharge le décor
 // d'un niveau que lorsqu'il est effectivement atteint, au lieu de charger les
-// 7 fonds dès l'arrivée sur le jeu. Un seul décor n'existe pas encore pour le
-// niveau 7 (Ultra High) : il réutilise celui du niveau 6 en attendant.
+// 7 fonds dès l'arrivée sur le jeu. Un monde par niveau, dans la galaxie
+// Kimbo : Zion, Verdalia, Aqualis, Solara, Glacia, Pyra puis Ultima.
 const LEVEL_BACKGROUND_MODULES = [
   () => import("../../assets/turbo-pulse/niv001.webp"),
   () => import("../../assets/turbo-pulse/niv002.webp"),
@@ -21,7 +21,7 @@ const LEVEL_BACKGROUND_MODULES = [
   () => import("../../assets/turbo-pulse/niv004.webp"),
   () => import("../../assets/turbo-pulse/niv005.webp"),
   () => import("../../assets/turbo-pulse/niv006.webp"),
-  () => import("../../assets/turbo-pulse/niv006.webp"),
+  () => import("../../assets/turbo-pulse/niv007.webp"),
 ] as const;
 
 const INITIAL_SNAPSHOT: TurboPulseSnapshot = {
