@@ -68,9 +68,17 @@ describe("page Turbo Pulse", () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     await user.click(screen.getByRole("button", { name: "Son activé" }));
-    await user.click(screen.getByRole("button", { name: "Recommencer" }));
+    await user.click(screen.getByRole("button", { name: "Recommencer la partie" }));
     expect(gameMock.toggleMuted).toHaveBeenCalledOnce();
     expect(gameMock.restartRun).toHaveBeenCalledOnce();
+  });
+
+  it("offre la barre de commandes standard : Jouer, Pause, Recommencer, Son et Quitter", () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    const bar = screen.getByRole("toolbar", { name: "Commandes du jeu" });
+    for (const name of ["Jouer", "Pause", "Recommencer la partie", "Son activé", "Quitter le plein écran", "Quitter"]) {
+      expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
+    }
   });
 
   it("explique exactement l’échec Ultra High et les trois tentatives", () => {
@@ -99,10 +107,11 @@ describe("page Turbo Pulse", () => {
     expect(screen.getByText("🏆 7")).toBeInTheDocument();
   });
 
-  it("ne propose pas de mettre en pause pendant un panneau d’échec ou de réussite", () => {
+  it("désactive Jouer et Pause pendant un panneau d’échec ou de réussite", () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     act(() => gameMock.listener?.({ ...snapshot, status: "failed", intrusions: 1 }));
-    expect(screen.queryByRole("button", { name: "Pause" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pause" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Jouer" })).toBeDisabled();
   });
 
   it("signale une seule intrusion et une tentative encore disponible sur un échec expert non épuisé", () => {
@@ -170,7 +179,7 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.destroy).not.toHaveBeenCalled();
     expect(gameMock.refreshLayout).toHaveBeenCalled();
     expect(screen.getByLabelText("État de la partie")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Recommencer" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Recommencer la partie" })).toBeInTheDocument();
   });
 
   it("met la partie en pause quand le lecteur n'est plus visible", () => {

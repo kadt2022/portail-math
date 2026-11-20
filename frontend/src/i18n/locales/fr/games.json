@@ -166,9 +166,6 @@
       "solve": "À résoudre",
       "currentOperation": "Calcul actuel : {{operation}}",
       "canvasLabel": "Scène interactive Turbo Pulse. Oriente le piston et touche un fruit portant la bonne réponse.",
-      "missionTitle": "Mission calcul",
-      "instructions": "Vise un fruit portant la bonne réponse. Tous les fruits de sa couleur exploseront avec lui.",
-      "touchHint": "Glisse le doigt pour viser, puis touche la scène pour tirer. La réponse reste cachée jusqu’au bon impact.",
       "failure": {
         "eyebrow": "Défense franchie",
         "title": "Niveau {{level}} — {{name}} échoué",
@@ -199,7 +196,9 @@
         "pause": "Pause",
         "resume": "Continuer",
         "fullscreenOn": "Plein écran",
-        "fullscreenOff": "Quitter le plein écran"
+        "fullscreenOff": "Quitter le plein écran",
+        "play": "Jouer",
+        "restartAria": "Recommencer la partie"
       },
       "galaxy": "Galaxie Kimbo",
       "worlds": {
@@ -210,7 +209,8 @@
         "glacia": "Planète Glacia",
         "pyra": "Planète Pyra",
         "ultima": "Planète Ultima"
-      }
+      },
+      "controlsLabel": "Commandes du jeu"
     },
     "tagline": "Vise, calcule, enchaîne"
   },

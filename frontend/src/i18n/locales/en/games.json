@@ -166,9 +166,6 @@
       "solve": "Solve",
       "currentOperation": "Current equation: {{operation}}",
       "canvasLabel": "Interactive Turbo Pulse scene. Aim the piston and hit a fruit carrying the correct answer.",
-      "missionTitle": "Maths mission",
-      "instructions": "Aim at a fruit carrying the correct answer. Every fruit of the same colour will explode with it.",
-      "touchHint": "Slide your finger to aim, then touch the scene to fire. The answer stays hidden until a correct hit.",
       "failure": {
         "eyebrow": "Defence breached",
         "title": "Level {{level}} — {{name}} failed",
@@ -199,7 +196,9 @@
         "pause": "Pause",
         "resume": "Resume",
         "fullscreenOn": "Fullscreen",
-        "fullscreenOff": "Exit fullscreen"
+        "fullscreenOff": "Exit fullscreen",
+        "play": "Play",
+        "restartAria": "Restart the game"
       },
       "galaxy": "Kimbo Galaxy",
       "worlds": {
@@ -210,7 +209,8 @@
         "glacia": "Planet Glacia",
         "pyra": "Planet Pyra",
         "ultima": "Planet Ultima"
-      }
+      },
+      "controlsLabel": "Game controls"
     },
     "tagline": "Aim, calculate, chain combos"
   },

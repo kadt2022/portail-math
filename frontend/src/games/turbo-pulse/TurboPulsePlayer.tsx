@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -132,6 +132,31 @@ function SuccessPanel({ snapshot, onNext }: { snapshot: TurboPulseSnapshot; onNe
   );
 }
 
+function Icon({ children }: { children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {children}
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M8 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 8 4.5Z" />
+    </svg>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
+      <rect x="5" y="4" width="5" height="16" rx="1.6" />
+      <rect x="14" y="4" width="5" height="16" rx="1.6" />
+    </svg>
+  );
+}
+
 export interface TurboPulsePlayerProps {
   /** Présentation immersive : le jeu occupe toute la fenêtre (plein écran natif quand le navigateur le permet). */
   fullscreen?: boolean;
@@ -258,25 +283,6 @@ export function TurboPulsePlayer({
   const isSuccess = snapshot.status === "level-complete" || snapshot.status === "mastered";
   const canPause = snapshot.status === "playing" || snapshot.status === "clearing";
 
-  const pauseButton = canPause ? (
-    <button
-      type="button"
-      className={styles.pauseButton}
-      aria-pressed={snapshot.paused}
-      onClick={() => controllerRef.current?.togglePause()}
-    >
-      <span aria-hidden="true">{snapshot.paused ? "▶" : "⏸"}</span>
-      <span>{snapshot.paused ? t("turboPulse.game.actions.resume") : t("turboPulse.game.actions.pause")}</span>
-    </button>
-  ) : null;
-
-  const fullscreenButton = onFullscreenChange && !mobileImmersive ? (
-    <button type="button" className={styles.fullscreenButton} aria-pressed={fullscreen} onClick={() => onFullscreenChange(!fullscreen)}>
-      <span aria-hidden="true">⛶</span>
-      <span>{fullscreen ? t("turboPulse.game.actions.fullscreenOff") : t("turboPulse.game.actions.fullscreenOn")}</span>
-    </button>
-  ) : null;
-
   // En plein écran, le header, la barre d'informations, la mission et l'aide
   // tactile ne sont pas seulement masqués en CSS mais réellement absents du
   // DOM : rien ne doit rester interactif hors du jeu, et .playArea (donc le
@@ -289,26 +295,12 @@ export function TurboPulsePlayer({
       aria-labelledby="turbo-pulse-title"
     >
       <header className={styles.topbar}>
-        {onClose ? (
-          <button type="button" className={styles.exitButton} onClick={onClose}>
-            <span aria-hidden="true">✕</span>
-            <span>{t("turboPulse.game.actions.exit")}</span>
-          </button>
-        ) : <span />}
         <div className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">⚡</span>
           <div>
             <h1 id="turbo-pulse-title">{t("turboPulse.game.title")}</h1>
             <p>{t("turboPulse.game.subtitle")}</p>
           </div>
-        </div>
-        <div className={styles.topbarActions}>
-          {pauseButton}
-          {fullscreenButton}
-          <button type="button" className={styles.soundButton} aria-pressed={!snapshot.muted} onClick={() => controllerRef.current?.toggleMuted()}>
-            <span aria-hidden="true">{snapshot.muted ? "🔇" : "🔊"}</span>
-            <span>{snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")}</span>
-          </button>
         </div>
       </header>
 
@@ -360,25 +352,49 @@ export function TurboPulsePlayer({
           {snapshot.status === "failed" ? <FailurePanel snapshot={snapshot} onRetry={() => controllerRef.current?.retryLevel()} /> : null}
           {isSuccess ? <SuccessPanel snapshot={snapshot} onNext={() => controllerRef.current?.nextLevel()} /> : null}
         </div>
-        <aside className={styles.mission} aria-label={t("turboPulse.game.missionTitle")}>
-          <span className={styles.missionIcon} aria-hidden="true">🎯</span>
-          <div>
-            <strong>{t("turboPulse.game.missionTitle")}</strong>
-            <p>{t("turboPulse.game.instructions")}</p>
-          </div>
-          <button type="button" className={styles.restartButton} onClick={() => controllerRef.current?.restartRun()}>
-            <span aria-hidden="true">↻</span>
-            {t("turboPulse.game.actions.restart")}
-          </button>
-        </aside>
       </section>
 
-      {!fullscreen ? (
-        <footer className={styles.footerHint}>
-          <span aria-hidden="true">☝️</span>
-          <span>{t("turboPulse.game.touchHint")}</span>
-        </footer>
-      ) : null}
+      <div className={styles.controls} role="toolbar" aria-label={t("turboPulse.game.controlsLabel")}>
+        <button type="button" className={styles.ctl} aria-pressed={canPause && !snapshot.paused} disabled={!canPause} onClick={() => snapshot.paused && controllerRef.current?.togglePause()}>
+          <PlayIcon />
+          <span>{t("turboPulse.game.actions.play")}</span>
+        </button>
+        <button type="button" className={styles.ctl} aria-pressed={canPause && snapshot.paused} disabled={!canPause} onClick={() => !snapshot.paused && controllerRef.current?.togglePause()}>
+          <PauseIcon />
+          <span>{t("turboPulse.game.actions.pause")}</span>
+        </button>
+        <button type="button" className={styles.ctl} aria-label={t("turboPulse.game.actions.restartAria")} onClick={() => controllerRef.current?.restartRun()}>
+          <Icon>
+            <path d="M3 12a9 9 0 1 0 3-6.7" />
+            <path d="M3 4v5h5" />
+          </Icon>
+          <span>{t("turboPulse.game.actions.restart")}</span>
+        </button>
+        <span className={styles.ctlSeparator} aria-hidden="true" />
+        <button type="button" className={styles.ctl} aria-pressed={!snapshot.muted} aria-label={snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")} onClick={() => controllerRef.current?.toggleMuted()}>
+          <Icon>
+            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+            {snapshot.muted ? <path d="m16 9 5 6M21 9l-5 6" /> : <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />}
+          </Icon>
+          <span>{snapshot.muted ? t("turboPulse.game.actions.soundOff") : t("turboPulse.game.actions.soundOn")}</span>
+        </button>
+        {onFullscreenChange && !mobileImmersive ? (
+          <button type="button" className={styles.ctl} aria-label={fullscreen ? t("turboPulse.game.actions.fullscreenOff") : t("turboPulse.game.actions.fullscreenOn")} onClick={() => onFullscreenChange(!fullscreen)}>
+            <Icon>
+              {fullscreen ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /> : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
+            </Icon>
+            <span>{fullscreen ? t("turboPulse.game.actions.fullscreenOff") : t("turboPulse.game.actions.fullscreenOn")}</span>
+          </button>
+        ) : null}
+        {onClose ? (
+          <button type="button" className={`${styles.ctl} ${styles.ctlExit}`} aria-label={t("turboPulse.game.actions.exit")} onClick={onClose}>
+            <Icon>
+              <path d="M6 6l12 12M18 6 6 18" />
+            </Icon>
+            <span className={styles.ctlKeep}>{t("turboPulse.game.actions.exit")}</span>
+          </button>
+        ) : null}
+      </div>
       <p className={styles.srOnly} aria-live="polite">{snapshot.feedback}</p>
     </main>
   );
