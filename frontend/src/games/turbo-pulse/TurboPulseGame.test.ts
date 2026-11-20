@@ -4,6 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { CANNON_IMAGE_SCALE, mountTurboPulseGame, TurboPulseScene, type TurboPulseSnapshot } from "./TurboPulseGame";
 import {
   CALCULATIONS_PER_LEVEL,
+  CANNON_BOTTOM_MARGIN,
   CANNON_X,
   FRUIT_RADIUS,
   getTurboPulseVisualMetrics,
@@ -600,17 +601,17 @@ describe("scène Turbo Pulse", () => {
 
     expect(internals.worldWidth).toBe(960);
     expect(internals.worldHeight).toBe(540);
-    expect(internals.cannonY).toBe(540 - 75);
+    expect(internals.cannonY).toBe(540 - CANNON_BOTTOM_MARGIN);
 
     scene.scale.resize(1920, 1080);
 
     expect(internals.worldWidth).toBe(1920);
     expect(internals.worldHeight).toBe(1080);
-    expect(internals.cannonY).toBe(1080 - 75);
+    expect(internals.cannonY).toBe(1080 - CANNON_BOTTOM_MARGIN);
     // Le canon suit la nouvelle hauteur (près du bas), sans se déplacer en X
     // (marge fixe depuis le bord gauche).
-    expect(internals.cannonArm!.y).toBe(1080 - 75);
-    expect(internals.cannonBase!.y).toBe(1080 - 75);
+    expect(internals.cannonArm!.y).toBe(1080 - CANNON_BOTTOM_MARGIN);
+    expect(internals.cannonBase!.y).toBe(1080 - CANNON_BOTTOM_MARGIN);
     // Aucun reset : ni le niveau, ni le score, ni les fruits en jeu.
     expect(internals.levelIndex).toBe(niveauAvant);
     expect(snapshots[snapshots.length - 1].score).toBe(scoreAvant);
@@ -644,7 +645,7 @@ describe("scène Turbo Pulse", () => {
 
     expect(internals.worldWidth).toBe(960);
     expect(internals.worldHeight).toBe(540);
-    expect(internals.cannonY).toBe(540 - 75);
+    expect(internals.cannonY).toBe(540 - CANNON_BOTTOM_MARGIN);
     expect(internals.fruits).toHaveLength(fruitsAvant);
     expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
   });

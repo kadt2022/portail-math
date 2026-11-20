@@ -180,12 +180,8 @@
         "exhausted": "3 tentatives terminées. Le parcours reprend au niveau 1."
       },
       "success": {
-        "eyebrow": "Station sécurisée",
         "title": "Niveau {{level}} terminé !",
-        "message": "12 calculs réussis, tous les fruits détruits et la dernière explosion entièrement visible.",
-        "next": "Niveau {{level}} — {{name}}",
-        "masteredTitle": "Turbo Pulse maîtrisé !",
-        "masteredMessage": "Tu as traversé les 7 niveaux et résolu {{count}} calculs."
+        "masteredTitle": "Turbo Pulse maîtrisé !"
       },
       "paused": {
         "title": "Jeu en pause",
@@ -204,6 +200,16 @@
         "resume": "Continuer",
         "fullscreenOn": "Plein écran",
         "fullscreenOff": "Quitter le plein écran"
+      },
+      "galaxy": "Galaxie Kimbo",
+      "worlds": {
+        "zion": "Planète Zion",
+        "verdalia": "Planète Verdalia",
+        "aqualis": "Planète Aqualis",
+        "solara": "Planète Solara",
+        "glacia": "Planète Glacia",
+        "pyra": "Planète Pyra",
+        "ultima": "Planète Ultima"
       }
     },
     "tagline": "Vise, calcule, enchaîne"

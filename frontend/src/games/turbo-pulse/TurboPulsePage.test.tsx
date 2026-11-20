@@ -119,7 +119,7 @@ describe("page Turbo Pulse", () => {
 
     expect(screen.getByRole("heading", { name: "Niveau 1 terminé !" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "▶ Jouer le niveau 2" })).toBeInTheDocument();
-    expect(screen.getByText("Niveau 2 — Low")).toBeInTheDocument();
+    expect(screen.getByText("Planète Verdalia")).toBeInTheDocument();
   });
 
   it("célèbre la maîtrise complète sans aperçu de niveau suivant", () => {
@@ -127,7 +127,6 @@ describe("page Turbo Pulse", () => {
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
 
     expect(screen.getByRole("heading", { name: "Turbo Pulse maîtrisé !" })).toBeInTheDocument();
-    expect(screen.getByText("Tu as traversé les 7 niveaux et résolu 84 calculs.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rejouer depuis le niveau 1" })).toBeInTheDocument();
   });
 

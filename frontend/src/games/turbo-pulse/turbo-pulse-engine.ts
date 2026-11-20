@@ -41,10 +41,10 @@ export const FRUIT_RADIUS = 31;
 export const FRUIT_HIT_MARGIN = 22;
 export const CANNON_X = 178;
 // Distance fixe (à l'échelle 1) entre le bas du monde de référence et le
-// centre du canon (540 - 465) : réduite avec le reste du canon sur petit
+// centre du canon (540 - 442, plaque d'opération incluse) : réduite avec le reste du canon sur petit
 // écran pour rester ancré près du bas sans dévorer une part disproportionnée
 // d'un monde déjà réduit.
-export const CANNON_BOTTOM_MARGIN = 75;
+export const CANNON_BOTTOM_MARGIN = 98;
 
 export function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));

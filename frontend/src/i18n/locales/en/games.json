@@ -180,12 +180,8 @@
         "exhausted": "All 3 attempts are over. The run restarts at level 1."
       },
       "success": {
-        "eyebrow": "Station secured",
         "title": "Level {{level}} complete!",
-        "message": "12 equations solved, every fruit destroyed and the final explosion shown in full.",
-        "next": "Level {{level}} — {{name}}",
-        "masteredTitle": "Turbo Pulse mastered!",
-        "masteredMessage": "You cleared all 7 levels and solved {{count}} equations."
+        "masteredTitle": "Turbo Pulse mastered!"
       },
       "paused": {
         "title": "Game paused",
@@ -204,6 +200,16 @@
         "resume": "Resume",
         "fullscreenOn": "Fullscreen",
         "fullscreenOff": "Exit fullscreen"
+      },
+      "galaxy": "Kimbo Galaxy",
+      "worlds": {
+        "zion": "Planet Zion",
+        "verdalia": "Planet Verdalia",
+        "aqualis": "Planet Aqualis",
+        "solara": "Planet Solara",
+        "glacia": "Planet Glacia",
+        "pyra": "Planet Pyra",
+        "ultima": "Planet Ultima"
       }
     },
     "tagline": "Aim, calculate, chain combos"
