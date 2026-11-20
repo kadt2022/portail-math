@@ -178,9 +178,13 @@ export function TurboPulsePlayer({
   useEffect(() => {
     let cancelled = false;
     const index = Math.min(snapshot.levelIndex, LEVEL_BACKGROUND_MODULES.length - 1);
-    LEVEL_BACKGROUND_MODULES[index]().then((module) => {
-      if (!cancelled) setBackgroundUrl(module.default);
-    });
+    LEVEL_BACKGROUND_MODULES[index]()
+      .then((module) => {
+        if (!cancelled) setBackgroundUrl(module.default);
+      })
+      .catch(() => {
+        // Décor indisponible (réseau coupé) : la partie continue sur le décor déjà affiché ou le fond de secours du cadre.
+      });
     return () => {
       cancelled = true;
     };
