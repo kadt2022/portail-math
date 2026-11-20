@@ -560,52 +560,94 @@ export function fruitTextureKey(family: string, variant: FruitColor): string {
   return `turbo-fruit-${family}-${variant}`;
 }
 
+// Boule 3D : sphère métallique (reflet, ombre, lumière de rebond, liseré biseauté) dont la couleur est
+// celle de la famille de couleur du fruit ; une pastille tintée en son centre porte le fruit et le nombre.
 function drawFruitBadge(ctx: Ctx, family: string, color: number, variant: FruitColor): void {
   const center = FRUIT_BADGE_SIZE / 2;
+  const sphere = FRUIT_RADIUS + FRUIT_HALO_MARGIN - 3;
+  const lens = FRUIT_RADIUS - 5;
   ctx.save();
   ctx.translate(center, center);
 
-  // Halo diffus de la couleur du fruit.
-  const halo = ctx.createRadialGradient(0, 0, FRUIT_RADIUS * 0.8, 0, 0, FRUIT_RADIUS + FRUIT_HALO_MARGIN);
-  halo.addColorStop(0, rgba(color, 0.55));
+  // Halo de la couleur.
+  const halo = ctx.createRadialGradient(0, 0, sphere * 0.7, 0, 0, FRUIT_RADIUS + FRUIT_HALO_MARGIN);
+  halo.addColorStop(0, rgba(color, 0.6));
   halo.addColorStop(1, rgba(color, 0));
   ctx.fillStyle = halo;
   ctx.beginPath();
   ctx.arc(0, 0, FRUIT_RADIUS + FRUIT_HALO_MARGIN, 0, Math.PI * 2);
   ctx.fill();
 
-  // Anneau de couleur : c'est lui qui dit « ce fruit appartient à la famille rouge, verte… ».
-  const ring = ctx.createLinearGradient(0, -FRUIT_RADIUS - 7, 0, FRUIT_RADIUS + 7);
-  ring.addColorStop(0, rgba(lighten(color, 0.45)));
-  ring.addColorStop(0.5, rgba(color));
-  ring.addColorStop(1, rgba(darken(color, 0.3)));
+  // Corps de la sphère : lumière en haut à gauche, ombre en bas à droite.
+  const body = ctx.createRadialGradient(-sphere * 0.38, -sphere * 0.45, sphere * 0.05, 0, 0, sphere);
+  body.addColorStop(0, rgba(lighten(color, 0.8)));
+  body.addColorStop(0.22, rgba(lighten(color, 0.35)));
+  body.addColorStop(0.55, rgba(color));
+  body.addColorStop(0.88, rgba(darken(color, 0.4)));
+  body.addColorStop(1, rgba(darken(color, 0.68)));
   ctx.beginPath();
-  ctx.arc(0, 0, FRUIT_RADIUS + 7, 0, Math.PI * 2);
-  ctx.fillStyle = ring;
+  ctx.arc(0, 0, sphere, 0, Math.PI * 2);
+  ctx.fillStyle = body;
   ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+
+  // Lumière de rebond (bas de la sphère) : donne le volume.
+  const bounce = ctx.createRadialGradient(sphere * 0.15, sphere * 0.95, 1, sphere * 0.15, sphere * 0.95, sphere * 0.75);
+  bounce.addColorStop(0, rgba(lighten(color, 0.55), 0.55));
+  bounce.addColorStop(1, rgba(lighten(color, 0.55), 0));
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, sphere, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = bounce;
+  ctx.fillRect(-sphere, -sphere, sphere * 2, sphere * 2);
+  ctx.restore();
+
+  // Liseré métallique biseauté.
+  const rim = ctx.createLinearGradient(-sphere, -sphere, sphere, sphere);
+  rim.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+  rim.addColorStop(0.45, rgba(lighten(color, 0.4), 0.55));
+  rim.addColorStop(1, rgba(darken(color, 0.55), 0.9));
+  ctx.lineWidth = 2.4;
+  ctx.strokeStyle = rim;
+  ctx.beginPath();
+  ctx.arc(0, 0, sphere - 1.2, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Pastille claire qui porte le fruit et le nombre.
-  const plate = ctx.createRadialGradient(-8, -10, 3, 0, 0, FRUIT_RADIUS + 2);
-  plate.addColorStop(0, "#ffffff");
-  plate.addColorStop(0.6, "#fff6d9");
-  plate.addColorStop(1, "#ecd9a8");
+  // Pastille centrale : verre clair teinté, creusée dans la sphère.
+  const dish = ctx.createRadialGradient(-lens * 0.3, -lens * 0.4, 2, 0, 0, lens);
+  dish.addColorStop(0, "#ffffff");
+  dish.addColorStop(0.65, rgba(mix(0xfff6dc, color, 0.12)));
+  dish.addColorStop(1, rgba(mix(0xe9d6a4, color, 0.38)));
   ctx.beginPath();
-  ctx.arc(0, 0, FRUIT_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = plate;
+  ctx.arc(0, 0, lens, 0, Math.PI * 2);
+  ctx.fillStyle = dish;
   ctx.fill();
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = "rgba(22, 50, 74, 0.35)";
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = rgba(darken(color, 0.55), 0.85);
   ctx.stroke();
 
   // Le fruit, dans la moitié haute ; le nombre (texte Phaser) occupe la moitié basse.
   ctx.save();
-  ctx.translate(0, -10);
-  ctx.scale(0.86, 0.86);
+  ctx.translate(0, -9);
+  ctx.scale(0.72, 0.72);
   paintFruit(ctx, family, color, variant);
   ctx.restore();
+
+  // Reflet brillant sur l'anneau, en haut à gauche (jamais sur le nombre).
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, sphere - 2, 0, Math.PI * 2);
+  ctx.arc(0, 0, lens + 1, 0, Math.PI * 2, true);
+  ctx.clip("evenodd");
+  const gloss = ctx.createLinearGradient(-sphere * 0.7, -sphere * 0.8, -sphere * 0.1, -sphere * 0.2);
+  gloss.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+  gloss.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = gloss;
+  ctx.beginPath();
+  ctx.ellipse(-sphere * 0.42, -sphere * 0.58, sphere * 0.48, sphere * 0.2, -Math.PI / 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
   ctx.restore();
 }
 
