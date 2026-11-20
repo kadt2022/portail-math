@@ -16,7 +16,6 @@ import {
   ensureEnergyTextures,
   ensureFruitTexture,
   FRUIT_BADGE_SIZE,
-  fruitLabelColor,
 } from "./turbo-pulse-art";
 import {
   CALCULATIONS_PER_LEVEL,
@@ -478,21 +477,15 @@ export class TurboPulseScene extends Phaser.Scene {
     // l'échelle deux fois (une fois via sa propre taille de police, une
     // fois via la transformation du conteneur parent) — au lieu de rester
     // net, le texte flouterait sur petit écran.
-    const { scale, numberFontSize, numberFontSizeLarge, labelFontSize } = this.metrics;
+    const { scale, numberFontSize, numberFontSizeLarge } = this.metrics;
     // Badge (halo, anneau de couleur, pastille et fruit dessiné) : texture cuite
     // une fois par famille et par couleur (voir ensureFruitTexture), jamais par
     // fruit. Le nombre et l'étiquette restent des textes Phaser, pour rester
     // nets et lisibles quel que soit leur contenu.
     const textureKey = ensureFruitTexture(this, spec.family, spec.variant, spec.color);
     const badge = this.add.image(0, 0, textureKey).setDisplaySize(FRUIT_BADGE_SIZE * scale, FRUIT_BADGE_SIZE * scale);
-    const value = this.add.text(0, 15 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
-    const label = this.add.text(0, 39 * scale, spec.variantLabel.toUpperCase(), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${labelFontSize}px`, fontStyle: "bold", color: "#ffffff" }).setOrigin(0.5);
-    const pillWidth = label.width + 12 * scale;
-    const pillHeight = label.height + 4 * scale;
-    const pill = this.add.graphics();
-    pill.fillStyle(fruitLabelColor(spec.color), 0.96).fillRoundedRect(-pillWidth / 2, 39 * scale - pillHeight / 2, pillWidth, pillHeight, pillHeight / 2);
-    pill.lineStyle(1.5, 0xffffff, 0.8).strokeRoundedRect(-pillWidth / 2, 39 * scale - pillHeight / 2, pillWidth, pillHeight, pillHeight / 2);
-    const view = this.add.container(x, y, [badge, value, pill, label]).setDepth(3);
+    const value = this.add.text(0, 17 * scale, String(spec.number), { fontFamily: "Trebuchet MS, sans-serif", fontSize: `${spec.number >= 100 ? numberFontSizeLarge : numberFontSize}px`, fontStyle: "bold", color: "#102c3c", stroke: "#ffffff", strokeThickness: 4 }).setOrigin(0.5);
+    const view = this.add.container(x, y, [badge, value]).setDepth(3);
     // Amplitude et phase de l'ondulation visuelle du fruit : aucun enjeu de
     // sécurité (ni jeton, ni tirage déterminant une règle de jeu), Math.random
     // reste donc approprié malgré l'alerte générique de Sonar sur ce générateur.
