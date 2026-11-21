@@ -5,12 +5,19 @@ import { mountLeoLivreurGame, type LeoLivreurController, type LeoLivreurSnapshot
 import { ALL_CONTROLS, HoldButton, HornButton, INITIAL_SNAPSHOT, instructionFor } from "../../prototypes/leo-livreur/LeoLivreurPrototypePage";
 import leoStyles from "../../prototypes/leo-livreur/LeoLivreurPrototypePage.module.css";
 import { drivingLayout } from "../../prototypes/leo-livreur/leoDrivingLayout";
+import { DeliverButton, LeoMissionOverlay, missionDashboard, missionInstruction } from "../../prototypes/leo-livreur/LeoMissionLayer";
+import { useLeoMission } from "../../prototypes/leo-livreur/useLeoMission";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { onViewportSettled } from "../viewport-events";
 import styles from "./LeoDrivingPlayer.module.css";
 
 /** Largeur de lecteur sous laquelle direction, consigne et pédales ne tiennent plus sur une seule ligne. */
 const NARROW_STAGE_WIDTH = 640;
+/**
+ * Hauteur de scène sous laquelle une fenêtre de la mission ne tient plus (pavé tactile compris) : elle recouvre alors
+ * aussi le panneau de conduite, inactif pendant la question. La barre du lecteur et le tableau de bord restent dégagés.
+ */
+const MIN_MISSION_SCENE_HEIGHT = 280;
 
 export interface LeoDrivingPlayerProps {
   /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
@@ -43,6 +50,11 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const [soundOn, setSoundOn] = useState(false);
   // Taille des boutons de conduite : d'après la place réelle du lecteur, pas celle de la fenêtre.
   const [stageSize, setStageSize] = useState({ width: 960, height: 540 });
+  // Hauteur réelle de la scène : trop basse, les fenêtres de la mission recouvrent aussi le panneau de conduite (inactif).
+  const [sceneHeight, setSceneHeight] = useState(540);
+  // Mission : tournées, stock, questions et bilans (voir leoMission).
+  const mission = useLeoMission(controller, snapshot);
+  const dashboard = missionDashboard(mission.state, snapshot);
 
   useEffect(() => {
     if (!hostRef.current) return;
@@ -53,6 +65,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     const stage = stageRef.current;
     const measure = () => {
       if (stage) setStageSize({ width: stage.clientWidth, height: stage.clientHeight });
+      setSceneHeight(host.clientHeight);
       controllerRef.current?.refreshLayout();
     };
     const observer = new ResizeObserver(measure);
@@ -99,9 +112,10 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
 
   // Appelé directement par le clic : c'est ce geste qui autorise le navigateur à jouer du son.
   const toggleSound = () => setSoundOn(controller?.setSound(!soundOn) ?? false);
+  // Recommencer : nouvelle partie depuis le restaurant (la scène repart du départ, odomètre à zéro).
   const restart = () => {
     releaseAll();
-    controller?.reset();
+    mission.replay();
     setPaused(false);
   };
 
@@ -121,8 +135,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     "--scene-max": stageSize.width < stageSize.height ? `${drivingLayout({ width: stageSize.width, height: stageSize.height, coarsePointer: false }).sceneMaxHeight ?? 0}px` : "none",
   } as CSSProperties;
 
-  const canStart = snapshot.phase === "INTRO";
-  const canDeliver = snapshot.phase === "ARRIVED";
+  const canStart = mission.state.stage === "welcome" && snapshot.phase === "INTRO";
   const signal =
     snapshot.signalDistance !== null && snapshot.signalState ? (
       <span className={leoStyles.statSignal} data-state={snapshot.signalState} role="status" aria-live="polite">
@@ -139,9 +152,10 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
       titleIsHeading={pageHeading}
       headerCenter={signal}
       stats={[
-        { label: t("leoDriving.player.pizzas"), value: snapshot.cargo },
+        { label: t("leoDriving.player.pizzas"), value: dashboard.pizzas },
+        { label: t("leoDriving.player.travelled"), value: dashboard.travelled },
+        { label: t("leoDriving.player.remaining"), value: dashboard.remaining },
         { label: t("leoDriving.player.speed"), value: `${snapshot.speedKmh} km/h` },
-        { label: snapshot.targetLabel, value: `${snapshot.distanceToHouse} m` },
       ]}
       paused={paused}
       onPlay={play}
@@ -170,6 +184,11 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     >
       <div ref={stageRef} className={styles.stage} style={stageStyle} data-format={layout.format}>
         <div ref={hostRef} className={styles.scene} data-zone="scene" />
+        <LeoMissionOverlay
+          mission={mission}
+          snapshot={snapshot}
+          className={sceneHeight < MIN_MISSION_SCENE_HEIGHT ? styles.missionOverStage : styles.missionInScene}
+        />
         <section className={`${leoStyles.controlsPanel} ${styles.controls}`} aria-label={t("leoDriving.player.controls")}>
           <div className={`${leoStyles.panelLeft} ${styles.left}`} aria-label={t("leoDriving.player.steering")}>
             <HoldButton control="left" label="Gauche" icon="←" controller={controller} variant="touch" />
@@ -177,16 +196,12 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
           </div>
           <div className={`${leoStyles.panelInfo} ${styles.info}`} role="status" data-assets={snapshot.assets}>
             <div className={leoStyles.panelText}>
-              <strong>Prochaine livraison : {snapshot.targetLabel}</strong>
-              <span>{instructionFor(snapshot, paused)}</span>
+              <strong>Livraison en cours : {dashboard.destination}</strong>
+              <span>{instructionFor(snapshot, paused, missionInstruction(mission.state, snapshot))}</span>
             </div>
-            {canDeliver ? (
-              <button type="button" className={leoStyles.panelAction} onClick={() => controller?.deliver()}>
-                Livrer la pizza
-              </button>
-            ) : null}
+            <DeliverButton mission={mission} />
             {canStart && snapshot.assets === "ready" ? (
-              <button type="button" className={leoStyles.panelAction} onClick={() => controller?.startMission()}>
+              <button type="button" className={leoStyles.panelAction} onClick={mission.start}>
                 Commencer
               </button>
             ) : null}

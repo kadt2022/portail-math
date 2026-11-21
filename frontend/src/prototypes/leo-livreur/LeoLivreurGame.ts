@@ -31,7 +31,7 @@ import pedestrianChildUrl from "./assets/leo-pedestrian-child-walk-v1.webp";
 import pedestrianDepthFrontUrl from "./assets/leo-pedestrian-depth-front-walk-v1.webp";
 import pedestrianDepthBackUrl from "./assets/leo-pedestrian-depth-back-walk-v1.webp";
 import { cameraProfile, CITY_FADE, CITY_REF, cityLayout } from "./leoCityLayout";
-import { BOULEVARD_FADE, BOULEVARD_REF, boulevardLayout, boulevardSignals } from "./leoBoulevardLayout";
+import { BOULEVARD_FADE, BOULEVARD_REF, boulevardLayout, boulevardSignals, type BoulevardSignal } from "./leoBoulevardLayout";
 import {
   boulevardDepthPedestrians,
   boulevardPedestrians,
@@ -59,9 +59,8 @@ import {
 } from "./leoTrafficLight";
 import { updateLeoMotion, type LeoMotionInput, type LeoMotionState } from "./leoDriving";
 import {
-  canDeliver,
   DESTINATIONS,
-  destinationForDelivery,
+  isInsideDestination,
   laneAt,
   type LeoDestination,
   MAIN_LANE_Y,
@@ -70,7 +69,6 @@ import {
   ROAD_HALF_WIDTH,
   ROAD_WIDTH,
   ROAD_Y,
-  ROUTE_LENGTH_METERS,
   START_POSITION,
   suburbHousesBetween,
   VEHICLE_LENGTH,
@@ -78,8 +76,17 @@ import {
   vehicleCorners,
   WORLD_HEIGHT,
   WORLD_WIDTH,
-  distanceTo,
 } from "./leoGeometry";
+import {
+  advanceOdometer,
+  createOdometer,
+  destinationProgress,
+  MAIN_ROAD_NETWORK,
+  moveOdometerAnchor,
+  type DestinationStatus,
+  type OdometerState,
+} from "./leoRoute";
+import { isControlEnabled, STEERING_CONTROLS_ENABLED } from "./leoControls";
 import { WORLD_ZONE_WIDTH, zoneForWorldX, zonesToKeep } from "./leoWorldZones";
 import {
   framedViewRange,
@@ -100,7 +107,7 @@ import {
   wheelDiscSourceRadius,
   type VehicleSpec,
 } from "./leoVehicleCatalog";
-import { LeoSound, passerPitch } from "./leoAudio";
+import { LeoSound, passerPitch, type LeoCue } from "./leoAudio";
 import { kmhToPx, pxToKmh, pxToMeters } from "./leoUnits";
 import {
   BUNDLE_TEXTURES,
@@ -113,7 +120,8 @@ import {
 import { DensityGovernor, initialLaneCap, laneY, TrafficManager, trafficWheelPose, vehicleBounds } from "./leoTraffic";
 import { vehicleViewForHeading, type LeoVehicleSprite } from "./leoVehicleView";
 
-export type LeoLivreurPhase = "INTRO" | "DRIVING" | "ARRIVED";
+/** INTRO : avant le départ ; ARRIVED : arrêté dans la zone de livraison ; TASK : conduite neutralisée (remise, question). */
+export type LeoLivreurPhase = "INTRO" | "DRIVING" | "ARRIVED" | "TASK";
 export type LeoLivreurControl = "left" | "right" | "forward" | "brake" | "reverse";
 
 export interface LeoLivreurSnapshot {
@@ -122,14 +130,14 @@ export interface LeoLivreurSnapshot {
   speedKmh: number;
   heading: number;
   steering: number;
-  cargo: number;
-  targetCargo: number;
-  /** Distance réelle jusqu’au point de livraison, en mètres. */
-  distanceToHouse: number;
+  /** Destination active (adresse de livraison). */
   targetLabel: string;
-  /** Distance réellement parcourue, en mètres. */
+  /** Distance restante par la route jusqu'à l'entrée de la zone de livraison, en mètres ; 0 dans la zone et après. */
+  remainingMeters: number;
+  /** Destination devant Léo, atteinte (zone de livraison), ou entièrement dépassée. */
+  destinationStatus: DestinationStatus;
+  /** Odomètre : distance réellement parcourue par Léo, en mètres (en avant comme en arrière). */
   travelledMeters: number;
-  routeLengthMeters: number;
   /** Feu de la Zone 3 et message pédagogique en cours (null hors de la ville). */
   signalState: LightState | null;
   signalMessage: string | null;
@@ -150,7 +158,18 @@ export interface LeoLivreurController {
   destroy(): void;
   refreshLayout(): void;
   startMission(): void;
-  deliver(): void;
+  /** Maison à atteindre : la distance restante et les repères de livraison la suivent. */
+  setDestination(destination: LeoDestination): void;
+  /** Neutralise la conduite (restaurant, remise, question) : Léo est arrêté, les commandes relâchées. */
+  lockDriving(): void;
+  /** Rend la conduite à l'enfant. */
+  resumeDriving(): void;
+  /** Remise des pizzas devant la destination ; résolue à la fin de l'animation (figée pendant une pause). */
+  handOver(): Promise<void>;
+  /** Retour automatique au restaurant entre deux tournées : rien n'est ajouté à l'odomètre. */
+  returnToRestaurant(): void;
+  /** Signal sonore de la mission (silencieux si le son est coupé). */
+  cue(kind: LeoCue): void;
   reset(): void;
   setControl(control: LeoLivreurControl, active: boolean): void;
   turn(direction: "left" | "right"): void;
@@ -306,8 +325,13 @@ export class LeoLivreurScene extends Phaser.Scene {
   private trafficViews: TrafficView[] = [];
   private governor = new DensityGovernor(initialLaneCap(900), { min: 1, max: MAX_LANE_CAP });
   private fixedLaneCap: number | null = null;
-  /** Distance parcourue en px du monde (convertie en mètres à l affichage). */
-  private travelledPx = 0;
+  /** Odomètre : déplacement réel cumulé, en px du monde (voir leoRoute). */
+  private odometer: OdometerState = createOdometer(START_POSITION.x, START_POSITION.y);
+  /** Maison à atteindre, et ses repères : zone d'arrêt sur la chaussée et panneau « Livraison ». */
+  private destination: LeoDestination = DESTINATIONS[0];
+  private destinationMarker?: Phaser.GameObjects.Container;
+  /** Distances affichées, au pas de 10 m : la scène republie dès que l'une d'elles change. */
+  private distanceKey = "";
   /** Contrôleur de feux commun : il ne rend jamais le vert à des mouvements incompatibles. */
   private readonly intersection = new IntersectionController();
   /** Même contrôleur que la zone 3, dédié aux trois carrefours du boulevard. */
@@ -315,8 +339,11 @@ export class LeoLivreurScene extends Phaser.Scene {
   private lightGraphics?: Phaser.GameObjects.Graphics;
   private mainHeads?: Phaser.GameObjects.Graphics;
   private mainHeadDrawn: LightState | null = null;
-  private boulevardHeads?: Phaser.GameObjects.Graphics;
-  private boulevardHeadDrawn: LightState | null = null;
+  /**
+   * Têtes des feux du boulevard, une par zone chargée : chacune ne dessine que les feux de sa zone et se retire à sa
+   * destruction. Décharger une zone ne fige donc jamais les feux d'une autre zone encore visible.
+   */
+  private readonly boulevardHeads = new Map<Phaser.GameObjects.Graphics, { signals: BoulevardSignal[]; drawn: LightState | null }>();
   private readonly cross = new CrossTrafficManager({ capacity: CROSS_CAPACITY, specs: CROSS_SPECS });
   private crossViews?: CrossViews;
   // Rue des Jardins : une berline de face qui avance en profondeur, sans virage (expérience).
@@ -357,7 +384,6 @@ export class LeoLivreurScene extends Phaser.Scene {
   private wheelSpin = 0;
   private steeringPulseDirection: "left" | "right" | null = null;
   private steeringPulseUntil = 0;
-  private deliveredCount = 0;
   private controls: Record<LeoLivreurControl, boolean> = {
     left: false,
     right: false,
@@ -425,6 +451,9 @@ export class LeoLivreurScene extends Phaser.Scene {
       for (const spec of [LEO_SPEC_RIGHT, LEO_SPEC_LEFT, ...TRAFFIC_SPECS, ...ACTIVE_CROSS_SPECS]) this.createWheelTextures(spec);
     }
     this.drawWorld();
+    this.createRestaurant();
+    this.destinationMarker = this.add.container(0, 0).setDepth(2);
+    this.placeDestinationMarker();
     this.carShadow = this.add.ellipse(this.motion.x, this.motion.y + VEHICLE_WIDTH / 2 - 4, VEHICLE_LENGTH, 26, 0x3b241c, 0.3).setDepth(8);
     this.car = this.add.container(this.motion.x, this.motion.y).setDepth(10);
     this.body = this.add.container(0, 0);
@@ -449,6 +478,7 @@ export class LeoLivreurScene extends Phaser.Scene {
       const startX = Number(new URLSearchParams(window.location.search).get("startx"));
       if (Number.isFinite(startX) && startX > 0) {
         this.motion = { ...this.motion, x: startX };
+        this.odometer = moveOdometerAnchor(this.odometer, startX, this.motion.y);
         this.syncCar();
       }
     }
@@ -915,7 +945,8 @@ export class LeoLivreurScene extends Phaser.Scene {
     // La vitesse s'adapte au trafic : libre = pleine vitesse, véhicule devant = on s'aligne dessus.
     this.traffic.leoSpeedCap(this.motion));
     const moved = Math.hypot(this.motion.x - previousX, this.motion.y - previousY);
-    this.travelledPx += moved;
+    // Odomètre : déplacement réel seulement (le rebond contre un obstacle ne compte pas, voir leoRoute).
+    this.odometer = advanceOdometer(this.odometer, this.motion.x, this.motion.y);
     this.detectCollision(previousSpeed, moved, seconds);
     // Δθ = Δdistance / r, signé : négatif en marche arrière, nul à l'arrêt.
     this.wheelSpin += rollAngle(this.motion.speed * seconds, vehicleDisplay(LEO_SPEC_RIGHT).wheels[0].rollRadius);
@@ -924,7 +955,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     if (this.canDeliverNow()) {
       this.phase = "ARRIVED";
       this.publish();
-    } else if (previousSpeed !== this.motion.speed) {
+    } else if (previousSpeed !== this.motion.speed || this.distanceKey !== this.currentDistanceKey()) {
       this.publish();
     }
   }
@@ -979,17 +1010,83 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   startMission() {
-    if (this.phase !== "INTRO") return;
+    if (this.phase !== "INTRO" && this.phase !== "TASK") return;
     this.phase = "DRIVING";
     this.publish();
   }
 
-  deliver() {
-    // Livraison possible uniquement arrêté dans la zone de la destination en cours.
-    if (this.phase !== "ARRIVED" || !this.canDeliverNow()) return;
-    this.deliveredCount += 1;
-    this.phase = "DRIVING";
+  resumeDriving() {
+    this.startMission();
+  }
+
+  setDestination(destination: LeoDestination) {
+    this.destination = destination;
+    this.placeDestinationMarker();
+    if (this.phase === "ARRIVED" && !this.canDeliverNow()) this.phase = "DRIVING";
     this.publish();
+  }
+
+  /** Conduite neutralisée : plus aucune commande n'agit, Léo reste immobile tant que la mission ne la rend pas. */
+  lockDriving() {
+    this.controls = { left: false, right: false, forward: false, brake: false, reverse: false };
+    this.steeringPulseUntil = 0;
+    this.horn(false);
+    this.motion = { ...this.motion, speed: 0 };
+    this.phase = "TASK";
+    this.publish();
+  }
+
+  /** Léo porte la boîte jusqu'au jardin, le client remercie. Animation brève, portée par la boucle du jeu (pause comprise). */
+  handOver(): Promise<void> {
+    const destination = this.destination;
+    this.leoSound.cue("deliver");
+    return new Promise((resolve) => {
+      const gardenY = bridgeLayout().deckBottom + 70;
+      const box = this.add.graphics().setDepth(12).setPosition(this.motion.x, this.motion.y - 30);
+      box.fillStyle(0xc98a3d, 1).fillRoundedRect(-20, -15, 40, 30, 4);
+      box.lineStyle(2, 0x7a4a1a, 1).strokeRoundedRect(-20, -15, 40, 30, 4);
+      box.fillStyle(0xe03b2f, 1).fillCircle(0, 0, 7);
+      this.tweens.add({
+        targets: box,
+        x: destination.house.x,
+        y: gardenY,
+        duration: 650,
+        ease: "Sine.easeInOut",
+        onComplete: () => {
+          box.destroy();
+          const thanks = this.add
+            .text(destination.house.x, gardenY - 30, "Merci, Léo !", { ...HOUSE_SIGN_STYLE, fontSize: "26px" })
+            .setOrigin(0.5)
+            .setDepth(12);
+          this.tweens.add({
+            targets: thanks,
+            y: gardenY - 60,
+            alpha: 0,
+            delay: 600,
+            duration: 400,
+            onComplete: () => {
+              thanks.destroy();
+              resolve();
+            },
+          });
+        },
+      });
+    });
+  }
+
+  /** Retour au restaurant sans conduire : position de départ, odomètre inchangé (ce trajet n'a pas été roulé). */
+  returnToRestaurant() {
+    this.motion = { x: START_POSITION.x, y: START_POSITION.y, speed: 0, heading: 0, steeringAngle: 0 };
+    this.odometer = moveOdometerAnchor(this.odometer, this.motion.x, this.motion.y);
+    this.wheelSpin = 0;
+    this.lookDir = 1;
+    this.traffic.reset();
+    this.syncCar();
+    this.publish();
+  }
+
+  cue(kind: LeoCue) {
+    this.leoSound.cue(kind);
   }
 
   reset() {
@@ -1004,8 +1101,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.wheelSpin = 0;
     this.steeringPulseDirection = null;
     this.steeringPulseUntil = 0;
-    this.deliveredCount = 0;
-    this.travelledPx = 0;
+    this.odometer = createOdometer(START_POSITION.x, START_POSITION.y);
     this.traffic.reset();
     this.cross.reset();
     this.depthTraffic.reset();
@@ -1023,10 +1119,12 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   setControl(control: LeoLivreurControl, active: boolean) {
-    this.controls[control] = active;
+    // Commande désactivée (direction en V1) : toujours relâchée, quel que soit l'appel (bouton, clavier, contrôleur).
+    this.controls[control] = active && isControlEnabled(control);
   }
 
   turn(direction: "left" | "right") {
+    if (!STEERING_CONTROLS_ENABLED) return;
     if (this.phase === "ARRIVED") this.phase = "DRIVING";
     if (this.phase !== "DRIVING") return;
     // Un clic très court doit tout de même produire une frame de braquage.
@@ -1042,14 +1140,17 @@ export class LeoLivreurScene extends Phaser.Scene {
     const bind = (event: string, control: LeoLivreurControl, active: boolean) => {
       keyboard.on(event, () => this.setControl(control, active));
     };
-    bind("keydown-LEFT", "left", true);
-    bind("keyup-LEFT", "left", false);
-    bind("keydown-A", "left", true);
-    bind("keyup-A", "left", false);
-    bind("keydown-RIGHT", "right", true);
-    bind("keyup-RIGHT", "right", false);
-    bind("keydown-D", "right", true);
-    bind("keyup-D", "right", false);
+    // Direction désactivée en V1 (voir leoControls) : ses touches ne sont pas branchées.
+    if (STEERING_CONTROLS_ENABLED) {
+      bind("keydown-LEFT", "left", true);
+      bind("keyup-LEFT", "left", false);
+      bind("keydown-A", "left", true);
+      bind("keyup-A", "left", false);
+      bind("keydown-RIGHT", "right", true);
+      bind("keyup-RIGHT", "right", false);
+      bind("keydown-D", "right", true);
+      bind("keyup-D", "right", false);
+    }
     bind("keydown-UP", "forward", true);
     bind("keyup-UP", "forward", false);
     bind("keydown-W", "forward", true);
@@ -1073,15 +1174,72 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   private currentDestination() {
-    return destinationForDelivery(this.deliveredCount);
+    return this.destination;
   }
 
+  /** Livraison possible uniquement à l'arrêt complet, dans la zone de la maison en cours (jamais devant une autre). */
   private canDeliverNow() {
-    return canDeliver(this.motion.x, this.motion.y, this.motion.speed, this.deliveredCount);
+    return this.motion.speed === 0 && isInsideDestination(this.motion.x, this.motion.y, this.destination);
+  }
+
+  /** Position de la destination le long de la route (voir leoRoute.destinationProgress). */
+  private progress() {
+    return destinationProgress(MAIN_ROAD_NETWORK, this.motion, this.destination, VEHICLE_LENGTH);
+  }
+
+  /** Distance jusqu'à l'entrée de la zone de livraison ; 0 dans la zone et une fois la maison dépassée. */
+  private remainingMeters() {
+    return Math.round(pxToMeters(this.progress().remainingPx));
+  }
+
+  private travelledMeters() {
+    return Math.round(pxToMeters(this.odometer.total));
+  }
+
+  private currentDistanceKey() {
+    // Le restant passe au mètre près dans les 100 derniers mètres (voir formatRemaining).
+    const remaining = this.remainingMeters();
+    // L'état de la destination fait partie de la clé : un dépassement est publié à l'image même où il a lieu.
+    return `${Math.floor(this.travelledMeters() / 10)}|${remaining < 100 ? remaining : Math.floor(remaining / 10)}|${this.progress().status}`;
+  }
+
+  /** Pizzeria au départ : un panneau dessiné (aucune image à télécharger). */
+  private createRestaurant() {
+    const sign = this.add.container(START_POSITION.x - 110, ROAD_Y - ROAD_HALF_WIDTH - 6).setDepth(2);
+    const board = this.add.graphics();
+    board.fillStyle(0x5b3a24, 1).fillRect(-5, -96, 10, 96);
+    board.fillStyle(0xfff4cf, 1).fillRoundedRect(-104, -170, 208, 78, 14);
+    board.lineStyle(4, 0xc0392b, 1).strokeRoundedRect(-104, -170, 208, 78, 14);
+    board.fillStyle(0xf2c14e, 1).fillCircle(-66, -131, 25);
+    board.lineStyle(3, 0xc98a3d, 1).strokeCircle(-66, -131, 25);
+    board.fillStyle(0xd94b3a, 1).fillCircle(-74, -138, 5).fillCircle(-57, -124, 5).fillCircle(-62, -143, 4).fillCircle(-76, -122, 4);
+    sign.add([board, this.add.text(18, -131, "Pizzeria\nde Léo", { ...HOUSE_SIGN_STYLE, fontSize: "22px", color: "#c0392b" }).setOrigin(0.5)]);
+  }
+
+  /** Repères de la destination : zone d'arrêt verte sur la voie de Léo et panneau « Livraison » devant la maison. */
+  private placeDestinationMarker() {
+    const marker = this.destinationMarker;
+    if (!marker) return;
+    marker.removeAll(true);
+    const { stop, radius, house, id } = this.destination;
+    const zone = this.add.graphics();
+    const laneTop = stop.y - ROAD_HALF_WIDTH / 2 + 6;
+    zone.fillStyle(0x2ee06b, 0.2).fillRoundedRect(stop.x - radius, laneTop, radius * 2, ROAD_HALF_WIDTH - 12, 10);
+    zone.lineStyle(3, 0x1f9e4d, 0.9).strokeRoundedRect(stop.x - radius, laneTop, radius * 2, ROAD_HALF_WIDTH - 12, 10);
+    // Panneau posé sur le trottoir, pointe vers la maison : il ne cache ni la maison ni la plaque de son numéro.
+    const panelY = bridgeLayout().deckBottom - 30;
+    zone.fillStyle(0x1f9e4d, 1).fillRoundedRect(house.x - 92, panelY - 22, 184, 44, 12);
+    zone.lineStyle(3, 0xffffff, 1).strokeRoundedRect(house.x - 92, panelY - 22, 184, 44, 12);
+    zone.fillStyle(0x1f9e4d, 1).fillTriangle(house.x - 10, panelY + 22, house.x + 10, panelY + 22, house.x, panelY + 36);
+    const label = this.add
+      .text(house.x, panelY, `LIVRAISON ${id.replace("house-", "")}`, { ...HOUSE_SIGN_STYLE, fontSize: "20px", color: "#ffffff", stroke: "#14532d" })
+      .setOrigin(0.5);
+    marker.add([zone, label]);
   }
 
   private publish() {
     const destination = this.currentDestination();
+    this.distanceKey = this.currentDistanceKey();
     const failed = this.assets.failed().length > 0;
     const loading = this.assetsTotal !== null || this.assetsWaiting || this.assets.state("common") !== "ready";
     this.onSnapshot({
@@ -1092,12 +1250,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       speedKmh: Math.round(pxToKmh(Math.abs(this.motion.speed))),
       heading: this.motion.heading,
       steering: Math.round(Phaser.Math.RadToDeg(this.motion.steeringAngle)),
-      cargo: Math.max(0, DESTINATIONS.length - this.deliveredCount % DESTINATIONS.length),
-      targetCargo: DESTINATIONS.length,
-      distanceToHouse: Math.round(pxToMeters(distanceTo(this.motion.x, this.motion.y, destination.stop))),
       targetLabel: destination.label,
-      travelledMeters: Math.round(pxToMeters(this.travelledPx)),
-      routeLengthMeters: ROUTE_LENGTH_METERS,
+      remainingMeters: this.remainingMeters(),
+      destinationStatus: this.progress().status,
+      travelledMeters: this.travelledMeters(),
       signalState: this.signalReadoutValue ? this.signalReadoutValue.state : this.signalMessage !== null || this.inCityLight() ? this.intersection.state.main : null,
       signalMessage: this.signalMessage,
       signalDistance: this.signalReadoutValue?.distance ?? null,
@@ -1211,11 +1367,16 @@ export class LeoLivreurScene extends Phaser.Scene {
 
   /** Les têtes dessinées sur le panorama de zone 4 sont recouvertes par leur état réel. */
   private drawBoulevardHeads(state: LightState) {
-    const g = this.boulevardHeads;
-    if (!g || !g.active || this.boulevardHeadDrawn === state) return;
-    this.boulevardHeadDrawn = state;
-    g.clear();
-    for (const signal of boulevardSignals()) {
+    for (const [g, heads] of this.boulevardHeads) {
+      if (!g.active || heads.drawn === state) continue;
+      heads.drawn = state;
+      g.clear();
+      this.drawBoulevardHeadsOn(g, heads.signals, state);
+    }
+  }
+
+  private drawBoulevardHeadsOn(g: Phaser.GameObjects.Graphics, signals: BoulevardSignal[], state: LightState) {
+    for (const signal of signals) {
       const w = 42;
       const h = 88;
       g.fillStyle(0x1d2430, 1).fillRoundedRect(signal.x - w / 2, signal.y - h / 2, w, h, 8);
@@ -1517,9 +1678,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       lines.fillStyle(0xffffff, 0.95).fillRect(signal.stopLineWest, roadTop + 4, 8, ROAD_HALF_WIDTH - 12);
     }
     objects.push(lines);
-    this.boulevardHeads = this.add.graphics().setDepth(3);
-    this.boulevardHeadDrawn = null;
-    objects.push(this.boulevardHeads);
+    const heads = this.add.graphics().setDepth(3);
+    this.boulevardHeads.set(heads, { signals, drawn: null });
+    heads.once(Phaser.GameObjects.Events.DESTROY, () => this.boulevardHeads.delete(heads));
+    objects.push(heads);
     this.drawBoulevardHeads(this.boulevardIntersection.state.main);
   }
 
@@ -1549,7 +1711,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     const signX = x + direction * plot.displayWidth * 0.33;
     const signY = top + height * 0.254;
     container.add([
-      this.add.rectangle(signX, signY, 26, 20, 0xfff4cf).setStrokeStyle(2, 0x2d5270),
+      this.add.rectangle(signX, signY, address >= 100 ? 40 : 26, 20, 0xfff4cf).setStrokeStyle(2, 0x2d5270),
       this.add.text(signX, signY, String(address), { ...HOUSE_SIGN_STYLE, fontSize: "16px" }).setOrigin(0.5),
     ]);
   }
@@ -1964,7 +2126,12 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
       game.scale.resize(size.width, size.height);
     },
     startMission: () => scene.startMission(),
-    deliver: () => scene.deliver(),
+    setDestination: (destination) => scene.setDestination(destination),
+    lockDriving: () => scene.lockDriving(),
+    resumeDriving: () => scene.resumeDriving(),
+    handOver: () => scene.handOver(),
+    returnToRestaurant: () => scene.returnToRestaurant(),
+    cue: (kind) => scene.cue(kind),
     reset: () => scene.reset(),
     setControl: (control, active) => scene.setControl(control, active),
     turn: (direction) => scene.turn(direction),

@@ -1,0 +1,131 @@
+/*
+  Fenêtre de la mission : carte pédagogique flottante. Elle suit la place réelle de la scène (requêtes de conteneur),
+  jamais celle de la fenêtre du navigateur : même rendu dans la page prototype et dans le lecteur du portail.
+*/
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  /* Voile léger : le décor reste bien visible autour de la carte. */
+  background: rgb(23 50 77 / 16%);
+  touch-action: manipulation;
+  container-type: size;
+}
+
+.card {
+  --navy: #17324d;
+  --line: rgb(59 36 28 / 14%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "main"
+    "side";
+  gap: 12px;
+  width: min(540px, 90%);
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fffdf7 0%, #fff6e4 100%);
+  color: var(--navy);
+  font-size: 16px;
+  line-height: 1.35;
+  box-shadow: 0 18px 40px rgb(23 50 77 / 22%), 0 3px 8px rgb(23 50 77 / 12%);
+  animation: appear 180ms ease-out;
+}
+
+/* Le focus entre dans la carte à l'ouverture sans l'encadrer : l'anneau visible est porté par chaque bouton. */
+.card:focus,
+.card:focus-visible {
+  outline: none;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+}
+
+.header {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--navy);
+}
+
+.main {
+  grid-area: main;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+
+.side {
+  grid-area: side;
+  min-width: 0;
+}
+
+/*
+  Place en largeur : énoncé à gauche, pavé à droite sur toute la hauteur. La carte reste basse (environ 300 px), même
+  avec la méthode guidée, et le décor reste visible autour.
+*/
+@container (min-width: 600px) {
+  .card {
+    grid-template-columns: minmax(0, 1fr) 210px;
+    grid-template-areas:
+      "head side"
+      "main side";
+    grid-template-rows: auto 1fr;
+    column-gap: 18px;
+    row-gap: 10px;
+    width: 560px;
+  }
+}
+
+/* Scène basse (téléphone couché) : marges et titre resserrés, sans toucher à la taille des touches. */
+@container (max-height: 360px) {
+  .card {
+    row-gap: 6px;
+    padding: 8px 12px 10px;
+    font-size: 15px;
+  }
+
+  .header h2 {
+    font-size: 16px;
+  }
+}
+
+/* Étroit et bas (téléphone tenu droit) : deux colonnes serrées, touches toujours tactiles. */
+@container (max-height: 360px) and (max-width: 599px) {
+  .card {
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 1fr);
+    grid-template-areas:
+      "head side"
+      "main side";
+    grid-template-rows: auto 1fr;
+    column-gap: 10px;
+    width: 100%;
+  }
+}

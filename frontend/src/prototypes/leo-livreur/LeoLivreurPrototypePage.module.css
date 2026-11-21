@@ -532,3 +532,26 @@
   .gameHost { height: 400px; min-height: 400px; }
   .hud { justify-content: flex-start; font-size: 15px; }
 }
+
+/* Fenêtres de la mission en conduite : posées sur la seule zone de la scène, jamais sur le tableau de bord ni les commandes.
+   Lignes explicites : la fenêtre partage la cellule de la scène sans décaler les autres zones. */
+.drivingScreen > .dashboard { grid-row: 1; grid-column: 1; }
+.drivingScreen > .gameViewport { grid-row: 2; grid-column: 1; }
+.drivingScreen > .controlsPanel { grid-row: 3; grid-column: 1; }
+
+.drivingScreen > .missionInScene {
+  position: relative;
+  inset: auto;
+  grid-row: 2;
+  grid-column: 1;
+}
+
+/* Commande désactivée (direction en V1) : visible à sa place, grisée, sans effet d'appui. */
+.touchButton:disabled,
+.control:disabled {
+  opacity: 0.4;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

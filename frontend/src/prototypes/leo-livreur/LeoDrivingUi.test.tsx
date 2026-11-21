@@ -13,7 +13,12 @@ const { controllerMock, mountMock } = vi.hoisted(() => {
     destroy: vi.fn(),
     refreshLayout: vi.fn(),
     startMission: vi.fn(),
-    deliver: vi.fn(),
+    setDestination: vi.fn(),
+    lockDriving: vi.fn(),
+    resumeDriving: vi.fn(),
+    handOver: vi.fn(async () => undefined),
+    returnToRestaurant: vi.fn(),
+    cue: vi.fn(),
     reset: vi.fn(),
     setControl: vi.fn(),
     turn: vi.fn(),
@@ -64,16 +69,14 @@ const driving: LeoLivreurSnapshot = {
   speedKmh: 48,
   heading: 0,
   steering: 0,
-  cargo: 12,
-  targetCargo: 12,
-  distanceToHouse: 37,
-  targetLabel: "Maison 2",
+  remainingMeters: 370,
+  destinationStatus: "ahead",
+  targetLabel: "98, avenue des Manguiers",
   signalState: "RED",
   signalMessage: null,
   signalDistance: 25,
   signalPrepare: true,
-  travelledMeters: 300,
-  routeLengthMeters: Number.POSITIVE_INFINITY,
+  travelledMeters: 1350,
   assets: "ready",
   assetsLoaded: null,
   assetsTotal: null,
@@ -132,7 +135,10 @@ describe("page : écran de conduite", () => {
     render(<LeoLivreurPrototypePage />);
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Commencer la mission" }));
-    expect(controllerMock.startMission).toHaveBeenCalledTimes(1);
+    // La pizzeria s'ouvre d'abord (commandes et chargement) : la conduite reste neutralisée jusqu'au départ.
+    expect(screen.getByRole("dialog", { name: "Tournée 1 — Préparation" })).toBeInTheDocument();
+    expect(controllerMock.lockDriving).toHaveBeenCalled();
+    expect(controllerMock.resumeDriving).not.toHaveBeenCalled();
     expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
     expect(mountMock).toHaveBeenCalledTimes(1);
     expect(document.documentElement.style.overflow).toBe("hidden");
@@ -141,7 +147,11 @@ describe("page : écran de conduite", () => {
   it("sépare les zones : tableau de bord, scène seule dans son cadre, panneau de commandes frère de la scène", () => {
     enter();
     const screenEl = screen.getByRole("region", { name: "Prototype de conduite de Léo" });
-    const zones = [...screenEl.children];
+    // Les écrans de la mission (ici la pizzeria) se posent au-dessus des trois zones, sans en prendre la place.
+    const layers = [...screenEl.children];
+    const missionLayer = layers.filter((element) => element.querySelector('[role="dialog"]'));
+    expect(missionLayer).toHaveLength(1);
+    const zones = layers.filter((element) => !missionLayer.includes(element));
     expect(zones).toHaveLength(3);
     expect(zones[0]).toHaveAttribute("aria-label", "Tableau de bord");
     expect(zones[1]).toHaveAttribute("data-zone", "scene");
@@ -153,33 +163,59 @@ describe("page : écran de conduite", () => {
     expect((screenEl as HTMLElement).style.getPropertyValue("--scene-max")).toMatch(/px$/);
   });
 
-  it("affiche pizzas, vitesse, distance et feu dans le tableau de bord, la consigne dans le panneau", () => {
+  it("affiche pizzas, vitesse, distances parcourue et restante, et feu dans le tableau de bord, la consigne dans le panneau", () => {
     enter();
     act(() => controllerMock.listener?.(driving));
     const dashboard = screen.getByLabelText("Tableau de bord");
-    expect(within(dashboard).getByText("12")).toBeInTheDocument();
+    expect(within(dashboard).getByText("0")).toBeInTheDocument();
     expect(within(dashboard).getByText("48")).toBeInTheDocument();
-    expect(within(dashboard).getByText("37 m")).toBeInTheDocument();
+    expect(within(dashboard).getByText("1,35 km")).toBeInTheDocument();
+    expect(within(dashboard).getByText("0,37 km")).toBeInTheDocument();
     expect(within(dashboard).getByText("25 m")).toBeInTheDocument();
     const panel = screen.getByRole("region", { name: "Commandes de conduite" });
-    expect(within(panel).getByText("Prochaine livraison : Maison 2")).toBeInTheDocument();
+    expect(within(panel).getByText("Livraison en cours : 98, avenue des Manguiers")).toBeInTheDocument();
     expect(within(panel).getByText("Feu rouge à 25 m : prépare-toi à freiner.")).toBeInTheDocument();
   });
 
-  it("permet des appuis prolongés et simultanés (Avancer + Gauche) et les relâche séparément", () => {
+  it("permet des appuis prolongés et simultanés (Avancer + Freiner) et les relâche séparément", () => {
     enter();
     controllerMock.setControl.mockClear();
-    const forward = within(screen.getByLabelText("Pédales")).getByRole("button", { name: "Avancer (maintenir)" });
-    const left = within(screen.getByLabelText("Direction")).getByRole("button", { name: "Gauche (maintenir)" });
+    const pedals = within(screen.getByLabelText("Pédales"));
+    const forward = pedals.getByRole("button", { name: "Avancer (maintenir)" });
+    const brake = pedals.getByRole("button", { name: "Freiner (maintenir)" });
     fireEvent.pointerDown(forward, { pointerId: 1 });
-    fireEvent.pointerDown(left, { pointerId: 2 });
+    fireEvent.pointerDown(brake, { pointerId: 2 });
     expect(controllerMock.setControl).toHaveBeenCalledWith("forward", true);
-    expect(controllerMock.setControl).toHaveBeenCalledWith("left", true);
-    fireEvent.pointerUp(left, { pointerId: 2 });
-    expect(controllerMock.setControl).toHaveBeenLastCalledWith("left", false);
+    expect(controllerMock.setControl).toHaveBeenCalledWith("brake", true);
+    fireEvent.pointerUp(brake, { pointerId: 2 });
+    expect(controllerMock.setControl).toHaveBeenLastCalledWith("brake", false);
     expect(forward).toHaveAttribute("data-pressed", "true");
     fireEvent.pointerCancel(forward, { pointerId: 1 });
     expect(controllerMock.setControl).toHaveBeenLastCalledWith("forward", false);
+  });
+
+  it("désactive la direction (gauche, droite) : boutons visibles mais inertes, au toucher, à la souris et au clic", () => {
+    enter();
+    controllerMock.setControl.mockClear();
+    controllerMock.turn.mockClear();
+    const steering = within(screen.getByLabelText("Direction"));
+    for (const name of ["Gauche (maintenir)", "Droite (maintenir)"]) {
+      const button = steering.getByRole("button", { name });
+      expect(button).toBeVisible();
+      expect(button).toBeDisabled();
+      fireEvent.pointerDown(button, { pointerId: 3, pointerType: "touch" });
+      fireEvent.pointerDown(button, { pointerId: 4, pointerType: "mouse" });
+      fireEvent.click(button);
+      fireEvent.pointerUp(button, { pointerId: 3 });
+      expect(button).toHaveAttribute("data-pressed", "false");
+    }
+    expect(controllerMock.setControl).not.toHaveBeenCalledWith("left", true);
+    expect(controllerMock.setControl).not.toHaveBeenCalledWith("right", true);
+    expect(controllerMock.turn).not.toHaveBeenCalled();
+    // Les pédales restent actives.
+    expect(within(screen.getByLabelText("Pédales")).getByRole("button", { name: "Avancer (maintenir)" })).toBeEnabled();
+    // Grisés par le style des boutons désactivés.
+    expect(css).toMatch(/\.touchButton:disabled,\n\.control:disabled \{[^}]*opacity: 0\.4;/);
   });
 
   it("coupe le son au départ ; le bouton Son l'active depuis le clic, puis le coupe", () => {
@@ -288,15 +324,10 @@ describe("page : écran de conduite", () => {
     expect(screen.getByText(/flèches ou W A S D/)).toBeInTheDocument();
   });
 
-  it("propose de livrer la pizza depuis le panneau quand Léo est arrêté devant la maison", () => {
-    enter();
-    act(() => controllerMock.listener?.({ ...driving, phase: "ARRIVED", signalState: null, signalDistance: null }));
-    fireEvent.click(screen.getByRole("button", { name: "Livrer la pizza" }));
-    expect(controllerMock.deliver).toHaveBeenCalledTimes(1);
-  });
 
   it("affiche le chargement réel des images au démarrage, sans bouton Commencer tant que tout n'est pas prêt", () => {
-    enter();
+    // Entrée directe en conduite (« Conduire avec Léo ») : le bouton Commencer attend la fin du chargement.
+    render(<LeoLivreurPrototypePage startInDrivingMode />);
     const panel = screen.getByRole("region", { name: "Commandes de conduite" });
     expect(within(panel).getByText(`Chargement du jeu : 0 / ${BUNDLE_TEXTURES.common.length} images…`)).toBeInTheDocument();
     expect(within(panel).queryByRole("button", { name: "Commencer" })).not.toBeInTheDocument();

@@ -1,0 +1,179 @@
+/* Contenu des fenêtres de la mission : commandes, question, retours, résultats et actions. */
+.orders {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orders li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 3px 10px;
+  border: 1px solid rgb(59 36 28 / 8%);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+}
+
+.orderAddress {
+  flex: 1;
+  min-width: 0;
+}
+
+.orders strong {
+  flex: none;
+  color: #c0392b;
+}
+
+.question {
+  display: grid;
+  gap: 8px;
+}
+
+.prompt {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.feedback:empty {
+  display: none;
+}
+
+.help {
+  margin: 0;
+  padding: 6px 10px;
+  border-left: 4px solid #f2a516;
+  border-radius: 8px;
+  background: #fff1cf;
+  font-size: 15px;
+}
+
+.help ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+/* Scène basse : retours et commandes resserrés. */
+@container (max-height: 360px) {
+  .help {
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .prompt {
+    font-size: 15px;
+  }
+
+  .orders li {
+    min-height: 28px;
+    font-size: 14px;
+  }
+}
+
+.text {
+  margin: 0;
+}
+
+.success {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #dff7e6;
+  color: #14532d;
+  font-weight: 700;
+}
+
+.actions {
+  display: grid;
+  gap: 8px;
+  align-content: end;
+  height: 100%;
+}
+
+.primary {
+  min-height: 46px;
+  padding: 6px 16px;
+  border: 1px solid #08584d;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #12907e 0%, #0b7a6b 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #08584d;
+}
+
+.primary:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.primary:focus-visible {
+  outline: 3px solid #f2a516;
+  outline-offset: 2px;
+}
+
+.summary {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+}
+
+.summary dt {
+  font-weight: 700;
+}
+
+.summary dd {
+  margin: 0;
+  text-align: right;
+}
+
+.note {
+  margin: 0;
+  color: #4a5d70;
+  font-size: 13px;
+}
+
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stars svg {
+  fill: #e5e1d6;
+  stroke: #b8b2a4;
+  stroke-width: 1.2;
+}
+
+.stars svg[data-filled="true"] {
+  fill: #f2b705;
+  stroke: #8a5a00;
+}
+
+/* Intitulé d'une partie du bilan (Conduite, Mathématiques). */
+.section {
+  margin: 2px 0 0;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a5d70;
+}

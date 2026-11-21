@@ -136,6 +136,8 @@
       "label": "Drive with Léo game",
       "pizzas": "Pizzas",
       "speed": "Speed",
+      "travelled": "Travelled",
+      "remaining": "Remaining",
       "restart": "Restart the delivery from the restaurant",
       "controls": "Driving controls",
       "steering": "Steering",

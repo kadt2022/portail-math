@@ -3,10 +3,13 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, onTes
 
 import { LeoLivreurScene, mountLeoLivreurGame, renderPixelRatio, type LeoLivreurSnapshot } from "./LeoLivreurGame";
 import { BRIDGE_END_X, BRIDGE_START_X, cityLayout } from "./leoCityLayout";
-import { DESTINATIONS, MAIN_LANE_Y, START_POSITION } from "./leoGeometry";
+import { DESTINATIONS, MAIN_LANE_Y, ROAD_Y, START_POSITION } from "./leoGeometry";
+import { MISSION_ADDRESSES } from "./leoMission";
 import type { LeoSound } from "./leoAudio";
-import { kmhToPx } from "./leoUnits";
+import { kmhToPx, pxToMeters } from "./leoUnits";
 import { MAX_AUTO_RETRIES } from "./leoZoneAssets";
+import { boulevardSignals } from "./leoBoulevardLayout";
+import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 
 /**
  * Scène réelle dans un vrai moteur Phaser (rendu canvas simulé par vitest-canvas-mock). Les images sont « reçues »
@@ -21,6 +24,9 @@ interface Internals {
   sprites: Record<string, Phaser.GameObjects.Image | undefined>;
   trafficViews: Array<{ spec: unknown }>;
   phase: string;
+  sceneryZones: Map<number, unknown>;
+  boulevardHeads: Map<Phaser.GameObjects.Graphics, { signals: Array<{ x: number }>; drawn: string | null }>;
+  drawBoulevardHeads(state: string): void;
 }
 
 /** Fichiers dont le téléchargement échoue (motif sur l'URL), et combien de fois. */
@@ -39,6 +45,7 @@ function spySound() {
     hornOff: vi.fn(),
     passBy: vi.fn(() => true),
     crash: vi.fn(() => "accrochage"),
+    cue: vi.fn(() => true),
     destroy: vi.fn(),
   };
 }
@@ -89,7 +96,8 @@ function teleport(internals: Internals, x: number, y = MAIN_LANE_Y) {
   internals.motion = { ...internals.motion, x, y, speed: 0, heading: 0, steeringAngle: 0 };
 }
 
-describe("scène de conduite de Léo", () => {
+// Vraie scène Phaser pas à pas : lente quand toute la suite tourne en parallèle, d'où une marge au-delà des 5 s par défaut.
+describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
   let nativeImage: typeof Image;
 
   beforeAll(() => {
@@ -133,7 +141,8 @@ describe("scène de conduite de Léo", () => {
     expect(internals.assets.state("city")).toBe("absent");
     expect(last().assets).toBe("ready");
     expect(last().phase).toBe("INTRO");
-    expect(last().cargo).toBe(DESTINATIONS.length);
+    expect(last().targetLabel).toBe(DESTINATIONS[0].label);
+    expect(last().travelledMeters).toBe(0);
     // Avant Commencer, les commandes ne font pas avancer Léo.
     const { scene } = { scene: internals as unknown as LeoLivreurScene };
     scene.setControl("forward", true);
@@ -189,20 +198,165 @@ describe("scène de conduite de Léo", () => {
     expect(internals.motion.speed).toBe(0);
   });
 
-  it("livre la pizza arrêté devant la maison, puis vise la suivante", async () => {
-    const { scene, internals, last, step, started } = await mountScene();
-    await stepUntil(step, started);
-    scene.startMission();
-    teleport(internals, DESTINATIONS[0].stop.x);
-    // Une livraison n'est possible qu'à l'arrêt dans la zone : ARRIVED, puis Livrer.
-    await stepUntil(step, () => last().phase === "ARRIVED");
-    scene.deliver();
-    expect(last().phase).toBe("DRIVING");
-    expect(last().cargo).toBe(DESTINATIONS.length - 1);
-    expect(last().targetLabel).toBe(DESTINATIONS[1].label);
-    // Livrer ailleurs que devant la maison est sans effet.
-    scene.deliver();
-    expect(last().cargo).toBe(DESTINATIONS.length - 1);
+  describe("mission : destination, compteurs et livraison", () => {
+    const [h1, h2] = MISSION_ADDRESSES.map(({ destination }) => destination);
+
+    it("compte jusqu'à l'entrée de la zone, 0 dans la zone, et n'arrive que devant la bonne maison, à l'arrêt", async () => {
+      const { scene, internals, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.setDestination(h1);
+      expect(last().targetLabel).toBe(MISSION_ADDRESSES[0].label);
+      expect(last().destinationStatus).toBe("ahead");
+      expect(last().remainingMeters).toBe(Math.round(pxToMeters(h1.stop.x - h1.radius - START_POSITION.x)));
+      scene.startMission();
+      // Arrêté dans la zone de H1 : arrivée, distance restante à zéro ; entrer dans la zone ne livre rien.
+      teleport(internals, h1.stop.x - 40);
+      await stepUntil(step, () => internals.assets.state("city") !== "loading" && !internals.assetsWaiting && last().phase === "ARRIVED", 800);
+      expect(last().remainingMeters).toBe(0);
+      expect(last().destinationStatus).toBe("zone");
+      // Léo repart : l'arrivée est perdue ; tant que l'arrière est dans la zone, rien n'est « devant ».
+      scene.setControl("forward", true);
+      await stepUntil(step, () => last().phase === "DRIVING" && internals.motion.x > h1.stop.x + h1.radius);
+      expect(last().remainingMeters).toBe(0);
+      // Zone entièrement franchie : la maison est dépassée, jamais présentée comme encore devant.
+      await stepUntil(step, () => last().destinationStatus === "passed");
+      scene.setControl("forward", false);
+      expect(last().remainingMeters).toBe(0);
+      // Arrêté devant une autre maison (H2) : pas d'arrivée pour H1.
+      teleport(internals, h2.stop.x);
+      await step(20);
+      expect(last().phase).toBe("DRIVING");
+    });
+
+    it("signale le dépassement d'un seul bond, sans image intermédiaire dans la zone, et garde l'odomètre", async () => {
+      const { scene, internals, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.setDestination(h1);
+      scene.startMission();
+      scene.setControl("forward", true);
+      await step(60);
+      scene.setControl("forward", false);
+      const travelled = last().travelledMeters;
+      expect(last().destinationStatus).toBe("ahead");
+      teleport(internals, h1.stop.x + 1_000);
+      await stepUntil(step, () => internals.assets.state("city") !== "loading" && !internals.assetsWaiting, 800);
+      await step(1);
+      expect(last().destinationStatus).toBe("passed");
+      expect(last().remainingMeters).toBe(0);
+      // Nouvelle destination : le compteur repart vers elle, l'odomètre n'est jamais remis à zéro.
+      scene.setDestination(h2);
+      expect(last().destinationStatus).toBe("ahead");
+      expect(last().remainingMeters).toBe(Math.round(pxToMeters(h2.stop.x - h2.radius - internals.motion.x)));
+      expect(last().travelledMeters).toBeGreaterThanOrEqual(travelled);
+    });
+
+    it("direction désactivée : ni le clavier, ni setControl, ni turn ne braquent ; Avancer et Freiner restent actifs", async () => {
+      const { scene, internals, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.startMission();
+      const keyboard = scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin;
+      scene.setControl("forward", true);
+      for (const key of ["LEFT", "A", "RIGHT", "D"]) keyboard.emit(`keydown-${key}`);
+      scene.setControl("left", true);
+      scene.setControl("right", true);
+      scene.turn("left");
+      scene.turn("right");
+      await step(90);
+      expect(internals.motion.speed).toBeGreaterThan(0);
+      expect(internals.motion.steeringAngle).toBe(0);
+      expect(internals.motion.heading).toBe(0);
+      expect(internals.motion.y).toBe(MAIN_LANE_Y);
+      scene.setControl("forward", false);
+      scene.setControl("brake", true);
+      await step(200);
+      expect(internals.motion.speed).toBe(0);
+    });
+
+    it("odomètre : avance en marche avant comme en marche arrière, jamais à l'arrêt", async () => {
+      const { scene, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.startMission();
+      scene.setControl("forward", true);
+      await step(120);
+      scene.setControl("forward", false);
+      scene.setControl("brake", true);
+      await step(200);
+      scene.setControl("brake", false);
+      const forward = last().travelledMeters;
+      expect(forward).toBeGreaterThan(5);
+      await step(120);
+      expect(last().travelledMeters).toBe(forward);
+      scene.setControl("reverse", true);
+      await step(120);
+      scene.setControl("reverse", false);
+      expect(last().travelledMeters).toBeGreaterThan(forward);
+    });
+
+    it("odomètre : Léo qui pousse contre le bord de la route ne compte aucun kilomètre fictif", async () => {
+      const { scene, internals, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.startMission();
+      // Léo tourné vers le trottoir, pédale enfoncée : il bute et rebondit sur place.
+      internals.motion = { ...internals.motion, x: 3_000, y: ROAD_Y, heading: Math.PI / 2, speed: 0, steeringAngle: 0 };
+      scene.setControl("forward", true);
+      await step(40);
+      const pushed = last().travelledMeters;
+      await step(150);
+      expect(last().travelledMeters - pushed).toBeLessThanOrEqual(1);
+      scene.setControl("forward", false);
+    });
+
+    it("neutralise la conduite pendant la livraison, puis la rend", async () => {
+      const { scene, internals, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.startMission();
+      scene.setControl("forward", true);
+      await step(30);
+      scene.lockDriving();
+      expect(last().phase).toBe("TASK");
+      expect(internals.motion.speed).toBe(0);
+      const x = internals.motion.x;
+      scene.setControl("forward", true);
+      scene.turn("left");
+      await step(60);
+      expect(internals.motion.x).toBe(x);
+      scene.resumeDriving();
+      expect(last().phase).toBe("DRIVING");
+      await step(30);
+      expect(internals.motion.x).toBeGreaterThan(x);
+    });
+
+    it("joue la remise des pizzas (son compris) et ne la termine qu'avec la boucle du jeu", async () => {
+      const sound = spySound();
+      const { scene, internals, step, started } = await mountScene(sound);
+      await stepUntil(step, started);
+      scene.setDestination(h1);
+      teleport(internals, h1.stop.x);
+      scene.lockDriving();
+      let done = false;
+      void scene.handOver().then(() => { done = true; });
+      expect(sound.cue).toHaveBeenCalledWith("deliver");
+      await step(10);
+      expect(done).toBe(false);
+      await stepUntil(step, () => done, 400);
+    });
+
+    it("rentre au restaurant sans ajouter le trajet à l'odomètre", async () => {
+      const { scene, internals, last, step, started } = await mountScene();
+      await stepUntil(step, started);
+      scene.startMission();
+      scene.setControl("forward", true);
+      await step(120);
+      scene.setControl("forward", false);
+      scene.lockDriving();
+      const travelled = last().travelledMeters;
+      scene.returnToRestaurant();
+      await step(10);
+      expect(internals.motion.x).toBe(START_POSITION.x);
+      expect(last().travelledMeters).toBe(travelled);
+      scene.reset();
+      expect(last().travelledMeters).toBe(0);
+    });
   });
 
   it("met Léo en attente devant le pont, télécharge pont puis ville, et libère tout en s'éloignant", async () => {
@@ -339,6 +493,38 @@ describe("scène de conduite de Léo", () => {
     expect(closeness).toBeLessThanOrEqual(1);
   });
 
+  it("garde vivants les feux du boulevard d'une zone quand une zone voisine est déchargée", async () => {
+    const { scene, internals, step, started } = await mountScene();
+    await stepUntil(step, started);
+    scene.startMission();
+    const zoneOf = (x: number) => Math.floor(x / WORLD_ZONE_WIDTH);
+    const signals = boulevardSignals();
+    const westZone = zoneOf(signals[0].x);
+    const eastZone = zoneOf(signals[signals.length - 1].x);
+    expect(eastZone).toBe(westZone + 1);
+    // Zone est chargée d'abord, puis la zone ouest recréée en reculant : c'est l'ordre qui figeait les feux.
+    teleport(internals, signals[signals.length - 1].x + 1500);
+    await stepUntil(step, () => internals.assets.state("city") === "ready" && !internals.assetsWaiting && internals.sceneryZones.has(eastZone) && !internals.sceneryZones.has(westZone));
+    teleport(internals, eastZone * WORLD_ZONE_WIDTH - 200);
+    await stepUntil(step, () => internals.sceneryZones.has(westZone) && internals.sceneryZones.has(eastZone));
+    expect(internals.boulevardHeads.size).toBe(2);
+    // Chaque zone ne dessine que ses propres feux.
+    const owned = [...internals.boulevardHeads.values()].flatMap(({ signals: own }) => own.map(({ x }) => x));
+    expect(owned.sort((a, b) => a - b)).toEqual(signals.map(({ x }) => x));
+    // On repart vers l'est : la zone ouest est déchargée, ses feux disparaissent avec elle.
+    teleport(internals, signals[signals.length - 1].x + 1500);
+    await stepUntil(step, () => !internals.sceneryZones.has(westZone));
+    expect(internals.boulevardHeads.size).toBe(1);
+    const [[graphics, heads]] = [...internals.boulevardHeads];
+    expect(graphics.active).toBe(true);
+    expect(heads.signals.every(({ x }) => zoneOf(x) === eastZone)).toBe(true);
+    // Les feux restants suivent toujours le cycle du carrefour.
+    for (const state of ["RED", "GREEN"]) {
+      internals.drawBoulevardHeads(state);
+      expect(heads.drawn).toBe(state);
+    }
+  });
+
   it("propose un mode diagnostic (départ avancé, empreintes, rectangle de contrôle)", async () => {
     window.history.replaceState(null, "", "/?debug&startx=2000&lanecap=2");
     const { scene, internals, step, started } = await mountScene();
@@ -406,7 +592,12 @@ describe("scène de conduite de Léo", () => {
       controller.turn("right");
       controller.setPaused(true);
       controller.setPaused(false);
-      controller.deliver();
+      controller.setDestination(DESTINATIONS[1]);
+      controller.lockDriving();
+      void controller.handOver();
+      controller.resumeDriving();
+      controller.returnToRestaurant();
+      controller.cue("correct");
       controller.retryAssets();
       // Sans son dans ce navigateur de test : le son reste coupé, le klaxon ne fait rien, sans erreur.
       expect(controller.setSound(true)).toBe(false);
