@@ -6,9 +6,13 @@ import {
   type LeoLivreurController,
   type LeoLivreurSnapshot,
 } from "./LeoLivreurGame";
+import { isControlEnabled } from "./leoControls";
 import { drivingLayout, type DrivingViewport } from "./leoDrivingLayout";
-import { DESTINATIONS, ROUTE_LENGTH_METERS, START_POSITION } from "./leoGeometry";
+import { START_POSITION } from "./leoGeometry";
+import { MISSION_ADDRESSES, type MissionState } from "./leoMission";
+import { DeliverButton, LeoMissionOverlay, missionDashboard, missionInstruction } from "./LeoMissionLayer";
 import { pxToMeters } from "./leoUnits";
+import { useLeoMission } from "./useLeoMission";
 import { BUNDLE_TEXTURES } from "./leoZoneAssets";
 import styles from "./LeoLivreurPrototypePage.module.css";
 
@@ -17,16 +21,15 @@ export const INITIAL_SNAPSHOT: LeoLivreurSnapshot = {
   speedKmh: 0,
   heading: 0,
   steering: 0,
-  cargo: DESTINATIONS.length,
-  targetCargo: DESTINATIONS.length,
-  distanceToHouse: Math.round(pxToMeters(DESTINATIONS[0].stop.x - START_POSITION.x)),
-  targetLabel: "Maison 1",
+  targetLabel: MISSION_ADDRESSES[0].label,
+  // Jusqu'à l'entrée de la zone de livraison de la première maison.
+  remainingMeters: Math.round(pxToMeters(MISSION_ADDRESSES[0].destination.stop.x - MISSION_ADDRESSES[0].destination.radius - START_POSITION.x)),
+  destinationStatus: "ahead",
   signalState: null,
   signalMessage: null,
   signalDistance: null,
   signalPrepare: false,
   travelledMeters: 0,
-  routeLengthMeters: ROUTE_LENGTH_METERS,
   assets: "loading",
   assetsLoaded: 0,
   assetsTotal: BUNDLE_TEXTURES.common.length,
@@ -36,6 +39,7 @@ const PHASE_LABELS: Record<LeoLivreurSnapshot["phase"], string> = {
   INTRO: "Préparation de la mission",
   DRIVING: "Conduite en cours",
   ARRIVED: "Arrêt réussi devant la maison",
+  TASK: "Livraison en cours",
 };
 
 export const ALL_CONTROLS: readonly LeoLivreurControl[] = ["left", "right", "forward", "brake", "reverse"];
@@ -91,6 +95,8 @@ export function HoldButton({
   variant?: "panel" | "touch";
 }) {
   const [pressed, setPressed] = useState(false);
+  // Commande désactivée (direction en V1, voir leoControls) : bouton visible mais inerte, nativement désactivé.
+  const enabled = isControlEnabled(control);
   const press = () => {
     setPressed(true);
     controller?.setControl(control, true);
@@ -107,6 +113,7 @@ export function HoldButton({
   };
   const handlePress = (event: PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (!enabled) return;
     // La commande s'active d'abord ; la capture (garder le doigt même s'il glisse hors du bouton) est un plus,
     // jamais une condition : certains navigateurs la refusent pour un pointeur déjà relâché.
     press();
@@ -124,6 +131,8 @@ export function HoldButton({
       className={className}
       data-control={control}
       data-pressed={pressed ? "true" : "false"}
+      disabled={!enabled}
+      title={enabled ? undefined : "Direction désactivée pour le moment"}
       onPointerDown={handlePress}
       onPointerUp={release}
       onPointerCancel={release}
@@ -227,8 +236,10 @@ function Dashboard({
   onSound,
   onPause,
   onQuit,
+  mission,
 }: {
   snapshot: LeoLivreurSnapshot;
+  mission: MissionState;
   paused: boolean;
   compact: boolean;
   soundOn: boolean;
@@ -236,12 +247,14 @@ function Dashboard({
   onPause: () => void;
   onQuit: () => void;
 }) {
+  const dashboard = missionDashboard(mission, snapshot);
   return (
     <header className={styles.dashboard} aria-label="Tableau de bord">
       {compact ? null : <span className={styles.brand}>Léo le livreur</span>}
-      <span className={styles.stat}><strong>{snapshot.cargo}</strong> pizzas</span>
+      <span className={styles.stat}><strong>{dashboard.pizzas}</strong> pizzas</span>
       <span className={styles.stat}><strong>{snapshot.speedKmh}</strong> km/h</span>
-      <span className={styles.stat}>{snapshot.targetLabel} : <strong>{snapshot.distanceToHouse} m</strong></span>
+      <span className={styles.stat}>Parcouru : <strong>{dashboard.travelled}</strong></span>
+      <span className={styles.stat}>Reste : <strong>{dashboard.remaining}</strong></span>
       {snapshot.signalDistance !== null && snapshot.signalState ? (
         <span className={styles.statSignal} data-state={snapshot.signalState} role="status" aria-live="polite">
           <span className={styles.lamp} aria-hidden="true" />
@@ -272,7 +285,8 @@ export function assetsMessage(snapshot: LeoLivreurSnapshot) {
   return "Chargement de la suite du parcours… Léo attend un instant.";
 }
 
-export function instructionFor(snapshot: LeoLivreurSnapshot, paused: boolean) {
+/** Consigne du panneau : chargement, pause et feux d'abord ; sinon celle de la mission (`mission`). */
+export function instructionFor(snapshot: LeoLivreurSnapshot, paused: boolean, mission: string) {
   const loading = assetsMessage(snapshot);
   if (loading) return loading;
   if (paused) return "Jeu en pause. Appuie sur Reprendre pour continuer.";
@@ -280,9 +294,7 @@ export function instructionFor(snapshot: LeoLivreurSnapshot, paused: boolean) {
   if (snapshot.signalState === "RED" && snapshot.signalPrepare && snapshot.signalDistance !== null) {
     return `Feu rouge à ${snapshot.signalDistance} m : prépare-toi à freiner.`;
   }
-  if (snapshot.phase === "INTRO") return "Les pizzas sont chargées. Appuie sur Commencer.";
-  if (snapshot.phase === "ARRIVED") return `Tu es arrêté devant ${snapshot.targetLabel}.`;
-  return "Suis la chaussée principale et freine pour t’arrêter.";
+  return mission;
 }
 
 export interface LeoLivreurPageProps {
@@ -302,6 +314,8 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
   const [soundOn, setSoundOn] = useState(false);
   const viewport = useViewport();
   const layout = drivingLayout(viewport);
+  const mission = useLeoMission(controller, snapshot);
+  const dashboard = missionDashboard(mission.state, snapshot);
 
   useEffect(() => {
     if (!hostRef.current) return;
@@ -367,10 +381,10 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
     return () => window.removeEventListener("keydown", onKey);
   }, [immersive, exitDriving]);
 
-  const canStart = snapshot.phase === "INTRO";
-  const canDeliver = snapshot.phase === "ARRIVED";
+  const canStart = mission.state.stage === "welcome" && snapshot.phase === "INTRO";
+  const canDeliver = mission.canDeliver;
   const startMission = () => {
-    controller?.startMission();
+    mission.start();
     setImmersive(true);
   };
   // Appelé directement par le clic : c'est ce geste qui autorise le navigateur à jouer du son.
@@ -401,11 +415,11 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
           <div>
             <p className={styles.eyebrow}>Prototype LEO-DRIVE-01</p>
             <h1>Léo le livreur de pizzas</h1>
-            <p className={styles.lead}>Conduis Léo tout droit sur la chaussée et arrête-toi à chaque livraison.</p>
+            <p className={styles.lead}>Charge les pizzas, conduis jusqu'à chaque adresse, arrête-toi devant la bonne maison et réponds aux questions de livraison.</p>
           </div>
           <div className={styles.missionCard}>
-            <span>Commande du jour</span>
-            <strong>{snapshot.targetCargo} pizzas, une par maison</strong>
+            <span>Mission du jour</span>
+            <strong>2 tournées, 5 maisons, 7 questions</strong>
             <small>{PHASE_LABELS[snapshot.phase]}</small>
           </div>
         </header>
@@ -431,6 +445,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
             onSound={toggleSound}
             onPause={togglePause}
             onQuit={exitDriving}
+            mission={mission.state}
           />
         ) : null}
         <div key="viewport" ref={hostRef} className={immersive ? styles.gameViewport : styles.gameHost} data-zone="scene" />
@@ -442,13 +457,13 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
             </div>
             <div className={styles.panelInfo} role="status" data-assets={snapshot.assets}>
               <div className={styles.panelText}>
-                <strong>Prochaine livraison : {snapshot.targetLabel}</strong>
-                <span>{instructionFor(snapshot, paused)}</span>
+                <strong>Livraison en cours : {dashboard.destination}</strong>
+                <span>{instructionFor(snapshot, paused, missionInstruction(mission.state, snapshot))}</span>
                 {layout.touchControls || layout.format !== "desktop" || canStart || canDeliver ? null : (
                   <small className={styles.keyboardHint}>Clavier : flèches ou W A S D · Espace : freiner · R : reculer · H : klaxon · Échap : quitter</small>
                 )}
               </div>
-              {canDeliver ? <button type="button" className={styles.panelAction} onClick={() => controller?.deliver()}>Livrer la pizza</button> : null}
+              <DeliverButton mission={mission} />
               {canStart && snapshot.assets === "ready" ? <button type="button" className={styles.panelAction} onClick={startMission}>Commencer</button> : null}
               {snapshot.assets === "error" ? <button type="button" className={styles.panelAction} onClick={() => controller?.retryAssets()}>Réessayer</button> : null}
               <HornButton controller={controller} variant="touch" />
@@ -463,26 +478,27 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
           <div key="classic" className={styles.classicOverlay}>
             <SignalChip snapshot={snapshot} />
             <div className={styles.hud}>
-              <span>Dans la voiture : <strong>{snapshot.cargo} pizzas</strong></span>
+              <span>Dans la voiture : <strong>{dashboard.pizzas} pizzas</strong></span>
               <span>Vitesse : <strong>{snapshot.speedKmh} km/h</strong></span>
-              <span>Braquage : <strong>{snapshot.steering}°</strong></span>
-              <span>{snapshot.targetLabel} : <strong>{snapshot.distanceToHouse} m</strong></span>
-              <span>Parcours : <strong>{(snapshot.travelledMeters / 1000).toFixed(1)} km parcourus · sans fin</strong></span>
+              <span>Destination : <strong>{dashboard.destination}</strong></span>
+              <span>Distance parcourue : <strong>{dashboard.travelled}</strong></span>
+              <span>Distance restante : <strong>{dashboard.remaining}</strong></span>
             </div>
           </div>
         )}
+        <LeoMissionOverlay mission={mission} snapshot={snapshot} keyboard={!paused} className={immersive ? styles.missionInScene : undefined} />
       </section>
 
       {immersive ? null : (
         <>
           <section className={styles.panel}>
-            {canStart ? <p>Les pizzas sont chargées. Pars du restaurant et suis la chaussée principale jusqu’à la Maison 1.</p> : null}
-            {snapshot.phase === "DRIVING" ? <p>Prochaine livraison : {snapshot.targetLabel}. Suis la chaussée principale et freine pour t’arrêter. Besoin de reculer ? Arrête-toi avec Freiner, puis maintiens Reculer.</p> : null}
+            {canStart ? <p>Léo ouvre la pizzeria : charge les commandes, puis conduis jusqu’à chaque adresse.</p> : null}
+            {mission.state.stage === "driving" && !canDeliver ? <p>Livraison en cours : {dashboard.destination}. Suis la chaussée principale et arrête-toi dans la zone verte. Besoin de reculer ? Arrête-toi avec Freiner, puis maintiens Reculer.</p> : null}
             {snapshot.signalMessage ? <p className={styles.signal} role="status">{snapshot.signalMessage}</p> : null}
-            {canDeliver ? <p>Tu es arrêté devant {snapshot.targetLabel}. Livre la pizza ici ou reprends la route.</p> : null}
+            {canDeliver ? <p>Tu es arrêté devant le {dashboard.destination}. Appuie sur LIVRER.</p> : null}
             <div className={styles.actions}>
               {canStart ? <button type="button" className={styles.primaryAction} onClick={startMission}>Commencer la mission</button> : null}
-              {canDeliver ? <button type="button" className={styles.primaryAction} onClick={() => controller?.deliver()}>Livrer la pizza</button> : null}
+              <DeliverButton mission={mission} />
               <button type="button" className={styles.secondaryAction} onClick={() => setImmersive(true)}>Mode conduite plein écran</button>
               <SoundButton soundOn={soundOn} onSound={toggleSound} className={styles.secondaryAction} />
             </div>

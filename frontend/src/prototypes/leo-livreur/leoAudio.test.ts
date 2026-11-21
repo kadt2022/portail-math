@@ -5,6 +5,8 @@ import {
   AMBIENCE_LOWPASS_HZ,
   AMBIENCE_VOLUME,
   type AmbienceLoader,
+  CUE_NOTES,
+  CUE_VOLUME,
   DEFAULT_VOLUME,
   EngineModel,
   IDLE_RPM,
@@ -296,6 +298,27 @@ describe("son de Léo", () => {
 
 /** Source du fond sonore : celle qui lit le tampon simulé (1 s), pas le bruit des pneus du moteur. */
 const isAmbience = (node: FakeNode) => node.kind === "buffer-source" && (node.buffer as { duration?: number } | null)?.duration === 1;
+
+describe("signaux de la mission", () => {
+  it("jouent quelques notes douces, seulement son activé, puis libèrent leurs nœuds", () => {
+    const { sound, ctx } = setup();
+    expect(sound.cue("deliver")).toBe(false);
+    sound.setEnabled(true);
+    const before = ctx.nodes.length;
+    expect(sound.cue("correct")).toBe(true);
+    const notes = ctx.nodes.slice(before).filter((node) => node.kind === "oscillator");
+    expect(notes.map((node) => node.frequency.value)).toEqual([...CUE_NOTES.correct]);
+    expect(notes.every((node) => node.type === "sine" && node.stopped)).toBe(true);
+    expect(CUE_VOLUME).toBeLessThanOrEqual(0.15);
+    expect(sound.activeNodes).toBe(ctx.nodes.length);
+    ctx.finish();
+    expect(sound.activeNodes).toBe(before);
+    // Réessayer reste discret : deux notes descendantes, pas de son d'échec.
+    expect(CUE_NOTES.retry).toHaveLength(2);
+    sound.setPaused(true);
+    expect(sound.cue("retry")).toBe(false);
+  });
+});
 
 describe("fond sonore de ville", () => {
   const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

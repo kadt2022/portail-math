@@ -236,6 +236,41 @@ function buildPassBy(ctx: BaseAudioContext, out: AudioNode, when: number, direct
   return { nodes: [engine, engineTone, engineLevel, road, roadBand, roadLevel, level, pan], last: engine };
 }
 
+/** Petits signaux de la mission : remise des pizzas, bonne réponse, invitation à réessayer. */
+export type LeoCue = "deliver" | "correct" | "retry";
+
+/** Notes (Hz) de chaque signal : courtes, douces, jamais stridentes. Réessayer reste neutre (pas de son d'échec). */
+export const CUE_NOTES: Record<LeoCue, readonly number[]> = {
+  deliver: [587, 784],
+  correct: [523, 659, 784],
+  retry: [392, 349],
+};
+/** Volume d'un signal : discret, sous le moteur. */
+export const CUE_VOLUME = 0.12;
+const CUE_NOTE_SECONDS = 0.14;
+
+function buildCue(ctx: BaseAudioContext, out: AudioNode, when: number, kind: LeoCue): OneShot {
+  const nodes: AudioNode[] = [];
+  let last: OscillatorNode | null = null;
+  CUE_NOTES[kind].forEach((frequency, index) => {
+    const start = when + index * CUE_NOTE_SECONDS;
+    const note = ctx.createOscillator();
+    note.type = "sine";
+    note.frequency.value = frequency;
+    const level = ctx.createGain();
+    level.gain.setValueAtTime(0.0001, start);
+    level.gain.exponentialRampToValueAtTime(CUE_VOLUME, start + 0.015);
+    level.gain.exponentialRampToValueAtTime(0.0001, start + CUE_NOTE_SECONDS * 1.6);
+    note.connect(level);
+    level.connect(out);
+    note.start(start);
+    note.stop(start + CUE_NOTE_SECONDS * 1.7);
+    nodes.push(note, level);
+    last = note;
+  });
+  return { nodes, last: last as unknown as OscillatorNode };
+}
+
 /**
  * Collision : « boum » sourd (tonalité qui chute), tôle froissée (bruit qui descend), résonance de la carrosserie ;
  * un accident ajoute des éclats de verre. La force suit la vitesse au moment du choc.
@@ -496,6 +531,13 @@ export class LeoSound {
     if (!this.audible() || !this.ctx || !this.master) return null;
     this.play(buildCrash(this.ctx, this.master, this.ctx.currentTime + 0.01, intensity));
     return collisionKind(intensity);
+  }
+
+  /** Signal de la mission (remise des pizzas, réponse). Silencieux si le son est coupé. */
+  cue(kind: LeoCue) {
+    if (!this.audible() || !this.ctx || !this.master) return false;
+    this.play(buildCue(this.ctx, this.master, this.ctx.currentTime + 0.01, kind));
+    return true;
   }
 
   destroy() {

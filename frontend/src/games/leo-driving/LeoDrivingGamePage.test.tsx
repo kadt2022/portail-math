@@ -14,7 +14,12 @@ const { controllerMock } = vi.hoisted(() => ({
     destroy: vi.fn(),
     refreshLayout: vi.fn(),
     startMission: vi.fn(),
-    deliver: vi.fn(),
+    setDestination: vi.fn(),
+    lockDriving: vi.fn(),
+    resumeDriving: vi.fn(),
+    handOver: vi.fn(async () => undefined),
+    returnToRestaurant: vi.fn(),
+    cue: vi.fn(),
     reset: vi.fn(),
     setControl: vi.fn(),
     turn: vi.fn(),
@@ -35,9 +40,9 @@ vi.mock("../../prototypes/leo-livreur/LeoLivreurGame", () => ({
 import { LeoDrivingGamePage } from "./LeoDrivingGamePage";
 
 const READY: LeoLivreurSnapshot = {
-  phase: "INTRO", speedKmh: 0, heading: 0, steering: 0, cargo: 32, targetCargo: 32, distanceToHouse: 5,
-  targetLabel: "Maison 1", signalState: null, signalMessage: null, signalDistance: null, signalPrepare: false,
-  travelledMeters: 0, routeLengthMeters: Number.POSITIVE_INFINITY, assets: "ready", assetsLoaded: null, assetsTotal: null,
+  phase: "INTRO", speedKmh: 0, heading: 0, steering: 0, remainingMeters: 800, destinationStatus: "ahead",
+  targetLabel: "98, avenue des Manguiers", signalState: null, signalMessage: null, signalDistance: null, signalPrepare: false,
+  travelledMeters: 0, assets: "ready", assetsLoaded: null, assetsTotal: null,
 };
 
 function renderGame() {
@@ -89,10 +94,20 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     for (const name of ["Gauche (maintenir)", "Droite (maintenir)", "Avancer (maintenir)", "Freiner (maintenir)", "Reculer (maintenir)", "Klaxon (maintenir)"]) {
       expect(controls.getByRole("button", { name })).toBeInTheDocument();
     }
+    // Direction désactivée en V1 : visible mais inerte, dans le lecteur comme dans le prototype.
+    expect(controls.getByRole("button", { name: "Gauche (maintenir)" })).toBeDisabled();
+    expect(controls.getByRole("button", { name: "Droite (maintenir)" })).toBeDisabled();
+    expect(controls.getByRole("button", { name: "Avancer (maintenir)" })).toBeEnabled();
     act(() => controllerMock.listener?.(READY));
-    expect(screen.getByText("Pizzas").nextElementSibling).toHaveTextContent("32");
-    expect(screen.getByText("Maison 1").nextElementSibling).toHaveTextContent("5 m");
-    expect(screen.getByRole("button", { name: "Commencer" })).toBeInTheDocument();
+    expect(screen.getByText("Pizzas").nextElementSibling).toHaveTextContent("0");
+    expect(screen.getByText("Parcouru").nextElementSibling).toHaveTextContent("0,00 km");
+    expect(screen.getByText("Reste").nextElementSibling).toHaveTextContent("0,80 km");
+    expect(screen.getByText("Livraison en cours : 98, avenue des Manguiers")).toBeInTheDocument();
+    expect(controllerMock.setDestination).toHaveBeenCalledWith(expect.objectContaining({ label: "98, avenue des Manguiers" }));
+    fireEvent.click(screen.getByRole("button", { name: "Commencer" }));
+    // La pizzeria s'ouvre dans le lecteur, conduite neutralisée.
+    expect(screen.getByRole("dialog", { name: "Tournée 1 — Préparation" })).toBeInTheDocument();
+    expect(controllerMock.lockDriving).toHaveBeenCalled();
   });
 
   it("Pause du lecteur : le moteur s'arrête et les commandes sont relâchées ; Jouer le relance", async () => {
@@ -111,6 +126,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     renderGame();
     await user.click(screen.getByRole("button", { name: "Recommencer la livraison depuis le restaurant" }));
     expect(controllerMock.reset).toHaveBeenCalledOnce();
+    expect(screen.getByRole("dialog", { name: "Tournée 1 — Préparation" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Son coupé" }));
     expect(controllerMock.setSound).toHaveBeenCalledWith(true);
     expect(screen.getByRole("button", { name: "Son activé" })).toBeInTheDocument();

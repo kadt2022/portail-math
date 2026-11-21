@@ -1,0 +1,41 @@
+/* LIVRER : grand, vert, au doigt ; il n'apparaît qu'à l'arrêt devant la bonne maison (panneau de conduite). */
+.deliver {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 150px;
+  min-height: 56px;
+  padding: 6px 22px;
+  border: 1px solid #14532d;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #2bb85e 0%, #22a352 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #14532d;
+}
+
+.deliver:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #14532d;
+}
+
+.deliver:focus-visible {
+  outline: 3px solid #f2a516;
+  outline-offset: 2px;
+}
+
+/* Écran bas (téléphone couché) : LIVRER reste grand, mais tient dans le panneau de conduite. */
+@media (max-height: 520px) {
+  .deliver {
+    min-width: 120px;
+    min-height: 46px;
+    padding: 4px 14px;
+    font-size: 20px;
+  }
+}

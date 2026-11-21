@@ -1,6 +1,8 @@
 /* Léo dans le lecteur standard : la scène Phaser prend tout l'espace, le panneau de conduite (direction, consigne, pédales)
    se place dessous à sa taille réelle. Aucun recouvrement, aucun geste laissé au navigateur. */
 .stage {
+  /* Repère des écrans de la mission (pizzeria, questions, bilans), posés au-dessus de la scène. */
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
@@ -69,4 +71,24 @@
 .stage[data-format="portrait"] .left,
 .stage[data-format="portrait"] .right {
   align-self: end;
+}
+
+/* Fenêtres de la mission : posées sur la seule zone de la scène, jamais sur le panneau de conduite ni la barre du lecteur.
+   Lignes explicites : la fenêtre partage la cellule de la scène sans décaler le panneau. */
+.stage > .scene { grid-row: 1; grid-column: 1; }
+.stage > .controls { grid-row: 2; grid-column: 1; }
+
+.stage > .missionInScene {
+  position: relative;
+  inset: auto;
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* Scène trop basse pour la fenêtre : elle recouvre aussi le panneau de conduite (inactif pendant la question). */
+.stage > .missionOverStage {
+  position: relative;
+  inset: auto;
+  grid-row: 1 / -1;
+  grid-column: 1;
 }
