@@ -69,8 +69,9 @@ describe("échelle du monde : 1 m = 36,96 px", () => {
     expect(pxToMeters(LANE_WIDTH)).toBeCloseTo(2.71, 2);
     expect(pxToMeters(ROAD_WIDTH)).toBeCloseTo(5.41, 2);
     expect(pxToMeters(BRIDGE_END_X - BRIDGE_START_X)).toBeCloseTo(129.9, 1);
-    expect(DESTINATIONS[0].stop.x).toBe(750);
-    expect(pxToMeters(DESTINATIONS[0].stop.x - START_POSITION.x)).toBeCloseTo(12.2, 1);
+    // Zone 1 : 32 maisons, la première à x = 500 (ZONE1_FIRST_HOUSE_X), soit 5,4 m devant le point de départ.
+    expect(DESTINATIONS[0].stop.x).toBe(500);
+    expect(pxToMeters(DESTINATIONS[0].stop.x - START_POSITION.x)).toBeCloseTo(5.4, 1);
     expect(pxToMeters(cityLayout().stopLineEast - START_POSITION.x)).toBeGreaterThan(300);
   });
 });

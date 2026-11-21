@@ -32,11 +32,14 @@ export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
   ],
 };
 
-/** Poids (octets) des lots, mesurés sur le build : servent à estimer le temps de téléchargement. */
+/**
+ * Poids (octets) des lots, mesurés sur les fichiers livrés : servent à estimer le temps de téléchargement.
+ * Toutes les images du jeu sont en WebP (les originaux PNG restent dans assets/ comme sources, sans être téléchargés).
+ */
 export const BUNDLE_BYTES: Record<BundleId, number> = {
-  common: 3_900_000,
+  common: 749_000,
   bridge: 500_000,
-  city: 7_620_000,
+  city: 1_889_000,
 };
 
 /** Débit supposé tant qu'aucune mesure n'existe, et plancher de prudence : 250 kbit/s (réseau mobile faible). */

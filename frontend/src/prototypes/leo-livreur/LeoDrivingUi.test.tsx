@@ -41,7 +41,8 @@ Object.assign(HTMLElement.prototype, {
   hasPointerCapture(this: Element, id: number) { return captured.get(this)?.has(id) ?? false; },
 });
 
-const css = Object.values(import.meta.glob("./LeoLivreurPrototypePage.module.css", { query: "?raw", import: "default", eager: true }))[0] as string;
+// Fins de ligne ramenées au format Unix : le test passe aussi sur un poste Windows (git core.autocrlf).
+const css = (Object.values(import.meta.glob("./LeoLivreurPrototypePage.module.css", { query: "?raw", import: "default", eager: true }))[0] as string).replace(/\r\n/g, "\n");
 
 function setScreen(width: number, height: number, coarse: boolean) {
   Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
