@@ -8,6 +8,7 @@
 import { suburbHouse, ZONE1_HOUSE_COUNT, type LeoDestination } from "./leoGeometry";
 import {
   applicableTemplates,
+  buildDeliveryQuestion,
   deliveryQuestion,
   type DeliveryContext,
   isCorrect,
@@ -168,6 +169,8 @@ export interface MissionState {
   notice: MissedNotice | null;
   /** Question de fin de tournée sur les pizzas restantes, construite d'après ce qui a vraiment été livré. */
   closing: LeoQuestion | null;
+  /** Question de la livraison en cours, fixée quand la remise se termine, d'après le stock réel de la voiture. */
+  delivery: LeoQuestion | null;
   /** Mauvaises réponses à la question affichée. */
   wrong: number;
   /** La question affichée est résolue (message de réussite, bouton pour continuer). */
@@ -191,6 +194,7 @@ export function initialMission(seed: number): MissionState {
     pizzasDelivered: 0,
     notice: null,
     closing: null,
+    delivery: null,
     wrong: 0,
     solved: false,
     results: [],
@@ -230,7 +234,7 @@ export function currentAddress(state: MissionState): MissionAddress {
 export function currentQuestion(state: MissionState): LeoQuestion | null {
   const tour = currentTour(state);
   if (state.stage === "restaurant") return tour.load;
-  if (state.stage === "question") return tour.deliveries[state.stop];
+  if (state.stage === "question") return state.delivery ?? tour.deliveries[state.stop];
   if (state.stage === "stock-question") return state.closing;
   return null;
 }
@@ -250,6 +254,31 @@ function resolved(state: MissionState, id: AddressId) {
 /** Stock de pizzas : chargées moins livrées. Les pizzas d'une maison manquée restent dans la voiture. */
 export function pizzaInventory(loaded: number, deliveredPizzas: number) {
   return Math.max(0, loaded - deliveredPizzas);
+}
+
+/**
+ * Question de la livraison en cours. Le plan l'a préparée en supposant toutes les maisons précédentes livrées : si une
+ * maison a été manquée, ses pizzas sont encore dans la voiture et le stock réel diffère. La question est alors refaite
+ * avec le même modèle d'exercice et les vrais nombres (énoncé, réponse et méthode d'accord avec le stock), à partir
+ * d'une graine dérivée de la partie : une même partie rejouée donne la même question.
+ */
+export function questionForDelivery(state: MissionState): LeoQuestion {
+  const tour = currentTour(state);
+  const planned = tour.deliveries[state.stop];
+  const plannedStock = tour.orders.slice(state.stop).reduce((sum, value) => sum + value, 0);
+  if (state.stock === plannedStock) return planned;
+  const context: DeliveryContext = {
+    tour: (state.tour + 1) as 1 | 2,
+    client: currentAddress(state).client,
+    stock: state.stock,
+    give: tour.orders[state.stop],
+    next: state.stop + 1 < tour.orders.length ? tour.orders[state.stop + 1] : null,
+  };
+  const random = seededRandom((Math.imul(state.plan.seed, 31) + (state.tour + 1) * 101 + state.stop + 1) >>> 0);
+  const same = buildDeliveryQuestion(planned.template, planned.id, context, random);
+  if (same) return same;
+  const used = state.plan.tours.flatMap(({ deliveries }) => deliveries).map(({ template }) => template).filter((template) => template !== planned.template);
+  return deliveryQuestion(planned.id, context, used, random);
 }
 
 /** Fin de tournée : la conduite s'arrête et vient la question sur les pizzas restantes. */
@@ -340,7 +369,7 @@ export function missionReducer(state: MissionState, action: MissionAction): Miss
       return state.notice ? { ...state, notice: null } : state;
 
     case "handover-done":
-      return state.stage === "handover" ? { ...state, stage: "question", wrong: 0, solved: false } : state;
+      return state.stage === "handover" ? { ...state, stage: "question", wrong: 0, solved: false, delivery: questionForDelivery(state) } : state;
 
     case "continue": {
       if (!state.solved) return state;

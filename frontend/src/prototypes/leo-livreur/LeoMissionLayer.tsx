@@ -88,8 +88,14 @@ function SummaryBlocks({ summary, maxStars, meters }: { summary: Omit<TourSummar
 }
 
 /** Action d'une question : le pavé tant qu'elle n'est pas résolue, puis le message de réussite et le bouton suivant. */
-function questionSide(mission: LeoMission, question: LeoQuestion, success: string | null, next: { label: string; onClick: () => void }) {
-  if (!mission.state.solved) return <LeoAnswerPad key={question.id} unit={question.unit} onAnswer={mission.answer} />;
+function questionSide(
+  mission: LeoMission,
+  question: LeoQuestion,
+  success: string | null,
+  next: { label: string; onClick: () => void },
+  keyboard: boolean,
+) {
+  if (!mission.state.solved) return <LeoAnswerPad key={question.id} unit={question.unit} onAnswer={mission.answer} keyboard={keyboard} />;
   return (
     <div className={content.actions}>
       {success ? <p className={content.success} role="status">{success}</p> : null}
@@ -103,7 +109,18 @@ function questionSide(mission: LeoMission, question: LeoQuestion, success: strin
  * livraison, bilans. Rien pendant la conduite : la route reste entièrement visible. `className` : placement dans la
  * zone de la scène, fourni par l'écran hôte.
  */
-export function LeoMissionOverlay({ mission, snapshot, className }: { mission: LeoMission; snapshot: LeoLivreurSnapshot; className?: string }) {
+export function LeoMissionOverlay({
+  mission,
+  snapshot,
+  className,
+  keyboard = true,
+}: {
+  mission: LeoMission;
+  snapshot: LeoLivreurSnapshot;
+  className?: string;
+  /** Clavier de l'ordinateur pour répondre : faux quand le jeu est masqué ou en pause. */
+  keyboard?: boolean;
+}) {
   const { state } = mission;
   const tour = currentTour(state);
   const tourNumber = state.tour + 1;
@@ -120,7 +137,7 @@ export function LeoMissionOverlay({ mission, snapshot, className }: { mission: L
       <LeoMissionWindow
         className={className}
         title={`Tournée ${tourNumber} — Préparation`}
-        side={questionSide(mission, question, null, { label: "Partir", onClick: mission.depart })}
+        side={questionSide(mission, question, null, { label: "Partir", onClick: mission.depart }, keyboard)}
       >
         {/* La méthode guidée reprend les commandes : la liste s'efface alors pour ne pas les répéter. */}
         {help < 3 ? <LeoOrderList orders={orders} /> : null}
@@ -158,7 +175,7 @@ export function LeoMissionOverlay({ mission, snapshot, className }: { mission: L
         side={questionSide(mission, question, `Bravo ! Livraison validée. Il reste ${pizzas(state.stock)} dans la voiture.`, {
           label: last ? "Terminer la tournée" : "Reprendre la route",
           onClick: mission.next,
-        })}
+        }, keyboard)}
       >
         <LeoQuestionPanel question={question} help={help} solved={state.solved} />
       </LeoMissionWindow>
@@ -173,7 +190,7 @@ export function LeoMissionOverlay({ mission, snapshot, className }: { mission: L
         side={questionSide(mission, question, `Exact : il reste ${pizzas(state.stock)} dans la voiture.`, {
           label: "Voir le bilan de la tournée",
           onClick: mission.next,
-        })}
+        }, keyboard)}
       >
         <LeoQuestionPanel question={question} help={help} solved={state.solved} />
       </LeoMissionWindow>

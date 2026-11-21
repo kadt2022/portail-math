@@ -187,6 +187,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
         <LeoMissionOverlay
           mission={mission}
           snapshot={snapshot}
+          keyboard={!suspended}
           className={sceneHeight < MIN_MISSION_SCENE_HEIGHT ? styles.missionOverStage : styles.missionInScene}
         />
         <section className={`${leoStyles.controlsPanel} ${styles.controls}`} aria-label={t("leoDriving.player.controls")}>

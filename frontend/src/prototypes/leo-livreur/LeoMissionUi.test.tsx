@@ -225,11 +225,11 @@ describe("mission complète de Léo : deux tournées, cinq maisons, sept questio
     render(<LeoLivreurPrototypePage startInDrivingMode />);
     push({});
     fireEvent.click(screen.getByRole("button", { name: "Commencer" }));
-    fireEvent.keyDown(window, { key: "9" });
-    fireEvent.keyDown(window, { key: "Backspace" });
-    for (const digit of String(plan.tours[0].load.answer)) fireEvent.keyDown(window, { key: digit });
+    fireEvent.keyDown(document.body, { key: "9" });
+    fireEvent.keyDown(document.body, { key: "Backspace" });
+    for (const digit of String(plan.tours[0].load.answer)) fireEvent.keyDown(document.body, { key: digit });
     expect(within(dialog()).getByLabelText("Ta réponse")).toHaveTextContent(String(plan.tours[0].load.answer));
-    fireEvent.keyDown(window, { key: "Enter" });
+    fireEvent.keyDown(document.body, { key: "Enter" });
     expect(screen.getByRole("button", { name: "Partir" })).toBeInTheDocument();
   });
 });
@@ -381,5 +381,48 @@ describe("livraisons manquées à l'écran (LEO-DRIVE-FIX-01)", () => {
     // Les étoiles ne mesurent que les mathématiques : chargement et bilan réussis du premier coup.
     expect(within(summary).getByRole("img", { name: "3 étoiles sur 3" })).toBeInTheDocument();
     expect(controllerMock.handOver).not.toHaveBeenCalled();
+  });
+});
+
+describe("revue de la PR #76", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    current = base;
+    let call = 0;
+    vi.spyOn(Math, "random").mockImplementation(() => RANDOMS[Math.min(call++, RANDOMS.length - 1)]);
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it("le clavier ne répond pas aux frappes venues d'un autre champ de la page (recherche du catalogue)", () => {
+    const plan = planGame(seedOf(RANDOMS[0]));
+    const search = document.createElement("input");
+    document.body.appendChild(search);
+    try {
+      render(<LeoLivreurPrototypePage startInDrivingMode />);
+      push({});
+      fireEvent.click(screen.getByRole("button", { name: "Commencer" }));
+      search.focus();
+      fireEvent.keyDown(search, { key: "4" });
+      fireEvent.keyDown(search, { key: "Enter" });
+      expect(within(dialog()).getByLabelText("Ta réponse")).toHaveTextContent("?");
+      expect(screen.queryByRole("button", { name: "Partir" })).not.toBeInTheDocument();
+      // Frappes sur la page elle-même : elles servent la question.
+      for (const digit of String(plan.tours[0].load.answer)) fireEvent.keyDown(document.body, { key: digit });
+      expect(within(dialog()).getByLabelText("Ta réponse")).toHaveTextContent(String(plan.tours[0].load.answer));
+    } finally {
+      search.remove();
+    }
+  });
+
+  it("jeu en pause : le clavier ne saisit plus rien dans la question", () => {
+    render(<LeoLivreurPrototypePage startInDrivingMode />);
+    push({});
+    fireEvent.click(screen.getByRole("button", { name: "Commencer" }));
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    fireEvent.keyDown(document.body, { key: "7" });
+    expect(within(dialog()).getByLabelText("Ta réponse")).toHaveTextContent("?");
+    fireEvent.click(screen.getByRole("button", { name: "Reprendre" }));
+    fireEvent.keyDown(document.body, { key: "7" });
+    expect(within(dialog()).getByLabelText("Ta réponse")).toHaveTextContent("7");
   });
 });

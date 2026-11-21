@@ -447,3 +447,71 @@ describe("livraisons manquées (LEO-DRIVE-FIX-01)", () => {
     expect(tourSummary(withMisses, 1).stars).toBe(3);
   });
 });
+
+describe("questions de livraison d'après le stock réel (revue de la PR #76)", () => {
+  /** Joue jusqu'à la question de livraison de `target`, en manquant les maisons de `missed` avant elle. */
+  const reachQuestion = (seed: number, tour: 0 | 1, missed: readonly AddressId[], target: AddressId) => {
+    let state = run(initialMission(seed), { type: "open-restaurant" });
+    if (tour === 1) state = playWholeGameUntilTour2(state);
+    state = run(state, { type: "answer", value: answerOf(state) }, { type: "depart", meters: 0 });
+    while (currentAddress(state).id !== target) {
+      const id = currentAddress(state).id;
+      if (missed.includes(id)) state = run(state, { type: "passed", ids: [id] });
+      else {
+        state = run(state, { type: "deliver", stoppedAt: id }, { type: "handover-done" });
+        state = run(state, { type: "answer", value: answerOf(state) }, { type: "continue", meters: 0 });
+      }
+    }
+    return run(state, { type: "deliver", stoppedAt: target }, { type: "handover-done" });
+  };
+  const playWholeGameUntilTour2 = (opened: MissionState) => {
+    let state = run(opened, { type: "answer", value: answerOf(opened) }, { type: "depart", meters: 0 });
+    for (const id of TOUR_ADDRESSES[0]) {
+      state = run(state, { type: "deliver", stoppedAt: id }, { type: "handover-done" });
+      state = run(state, { type: "answer", value: answerOf(state) }, { type: "continue", meters: 0 });
+    }
+    return run(state, { type: "answer", value: answerOf(state) }, { type: "continue", meters: 0 }, { type: "next-tour" }, { type: "returned" });
+  };
+
+  it("cas signalé : H3 manquée puis livraison à H4, l'énoncé et la réponse partent des pizzas vraiment dans la voiture", () => {
+    const state = reachQuestion(0, 1, ["H3"], "H4");
+    const orders = state.plan.tours[1].orders;
+    const question = currentQuestion(state) as LeoQuestion;
+    expect(state.stock).toBe(orders[0] + orders[1] + orders[2]);
+    if (/^Léo a /.test(question.text)) expect(question.text).toContain(`Léo a ${state.stock} pizzas`);
+    // La réponse, une fois validée, laisse exactement le stock annoncé ensuite.
+    const after = run(state, { type: "answer", value: String(question.answer) });
+    expect(after.solved).toBe(true);
+    if (question.template === "stock-restant") expect(question.answer).toBe(after.stock);
+  });
+
+  it("sur 120 parties : toute question de stock posée après une maison manquée est d'accord avec le stock réel", () => {
+    let checked = 0;
+    for (let seed = 1; seed <= 120; seed += 1) {
+      for (const [tour, missed, target] of [[0, ["H1"], "H2"], [1, ["H3"], "H4"], [1, ["H3"], "H5"], [1, ["H4"], "H5"]] as const) {
+        const state = reachQuestion(seed, tour, missed, target);
+        const question = currentQuestion(state) as LeoQuestion;
+        const give = state.plan.tours[tour].orders[state.stop];
+        if (question.template === "stock-restant" || question.template === "comparaison") {
+          expect(question.text).toContain(String(state.stock));
+          expect(question.answer).toBe(state.stock - give);
+          checked += 1;
+        }
+        if (question.template === "deux-livraisons") {
+          const next = state.plan.tours[tour].orders[state.stop + 1];
+          expect(question.answer).toBe(state.stock - give - next);
+          checked += 1;
+        }
+        expect(question.steps.join(" ")).toContain(String(question.answer));
+        // Même partie, même parcours : même question (déterministe).
+        expect(currentQuestion(reachQuestion(seed, tour, missed, target))).toEqual(question);
+      }
+    }
+    expect(checked).toBeGreaterThan(30);
+  });
+
+  it("sans maison manquée, la question préparée par le plan est gardée telle quelle", () => {
+    const state = reachQuestion(3, 1, [], "H4");
+    expect(currentQuestion(state)).toBe(state.plan.tours[1].deliveries[1]);
+  });
+});

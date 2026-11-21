@@ -486,7 +486,7 @@ export function LeoLivreurPrototypePage({ startInDrivingMode = false, onExit }: 
             </div>
           </div>
         )}
-        <LeoMissionOverlay mission={mission} snapshot={snapshot} className={immersive ? styles.missionInScene : undefined} />
+        <LeoMissionOverlay mission={mission} snapshot={snapshot} keyboard={!paused} className={immersive ? styles.missionInScene : undefined} />
       </section>
 
       {immersive ? null : (

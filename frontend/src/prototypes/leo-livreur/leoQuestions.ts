@@ -272,6 +272,12 @@ export function applicableTemplates(context: DeliveryContext) {
   return DELIVERY_TEMPLATES.filter((template) => template.applies(context)).map(({ name }) => name);
 }
 
+/** Question d'un modèle donné, ou null s'il ne convient pas à cette livraison (stock, commandes). */
+export function buildDeliveryQuestion(name: string, id: string, context: DeliveryContext, random: Random): LeoQuestion | null {
+  const template = DELIVERY_TEMPLATES.find((candidate) => candidate.name === name);
+  return template && template.applies(context) ? template.build(id, context, random) : null;
+}
+
 /**
  * Question de livraison : un modèle applicable, de préférence pas encore utilisé dans la partie, et jamais le même que
  * la question précédente quand un autre modèle convient. `reserved` : modèle à laisser à la maison suivante quand c'est
