@@ -64,10 +64,11 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     nameKey: "leoDriving.name",
     taglineKey: "leoDriving.tagline",
     descriptionKey: "leoDriving.description",
-    // Ouvre directement l'écran de conduite plein écran.
+    // Se joue dans le lecteur standard de la page Jeux (l'adresse reste aussi une page autonome).
     href: "/jeux/conduire-avec-leo",
     availability: "react",
     categoryId: "driving",
+    embed: true,
     featured: true,
     thumbnail: leoCountryside,
     // Voiture de face, détourée, posée sur le décor : même illustration que la bannière.

@@ -131,7 +131,16 @@
     "name": "Conduire avec Léo",
     "description": "Prends le volant de Léo, respecte les feux et livre les pizzas dans toute la ville.",
     "cta": "Prendre le volant",
-    "tagline": "Livre les pizzas en ville"
+    "tagline": "Livre les pizzas en ville",
+    "player": {
+      "label": "Jeu Conduire avec Léo",
+      "pizzas": "Pizzas",
+      "speed": "Vitesse",
+      "restart": "Recommencer la livraison depuis le restaurant",
+      "controls": "Commandes de conduite",
+      "steering": "Direction",
+      "pedals": "Pédales"
+    }
   },
   "turboPulse": {
     "name": "Turbo Pulse",

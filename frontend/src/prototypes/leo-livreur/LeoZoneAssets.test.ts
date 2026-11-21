@@ -86,7 +86,9 @@ describe("lots de ressources par zone", () => {
   it("répartit toutes les textures téléchargées entre les lots, sans doublon", () => {
     const all = [...BUNDLE_TEXTURES.common, ...BUNDLE_TEXTURES.bridge, ...BUNDLE_TEXTURES.city];
     expect(new Set(all).size).toBe(all.length);
-    expect(BUNDLE_BYTES.common).toBeLessThan(400_000);
+    // Le lot commun conditionne le départ : il comprend maintenant le décor du village de la zone 1 (fond, jardins,
+    // maisons, arbres). Plafond relevé de 400 Ko à 800 Ko pour ce décor, en WebP ; il ne doit plus grossir sans raison.
+    expect(BUNDLE_BYTES.common).toBeLessThan(800_000);
   });
 });
 

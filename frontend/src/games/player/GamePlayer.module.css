@@ -469,6 +469,9 @@
 
 .portrait .body {
   display: grid;
+  /* Une seule case, à la taille exacte de la zone : la scène y prend sa hauteur sans jamais l'agrandir (un canvas qui
+     pousse ne fait pas grandir le lecteur). */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   aspect-ratio: auto;
   height: calc(100cqw * 4 / 3 + var(--portrait-reserve, 0px));
@@ -487,6 +490,7 @@
 .screen.portrait .body,
 .screen.landscape .body {
   display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   aspect-ratio: auto;
   max-height: none;

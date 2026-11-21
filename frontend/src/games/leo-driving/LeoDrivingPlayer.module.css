@@ -1,0 +1,72 @@
+/* Léo dans le lecteur standard : la scène Phaser prend tout l'espace, le panneau de conduite (direction, consigne, pédales)
+   se place dessous à sa taille réelle. Aucun recouvrement, aucun geste laissé au navigateur. */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.scene {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  /* Portrait : la scène s'arrête à la hauteur utile du monde ; le fond du lecteur l'entoure. */
+  max-height: var(--scene-max, none);
+  overflow: hidden;
+  background: #8bd879;
+}
+
+/* Le canvas garde sa taille exacte en pixels (fixée par Phaser) : aucun étirement. */
+.scene canvas {
+  display: block;
+}
+
+/* Dans le lecteur, le panneau ne réserve plus les marges des bords de l'écran : c'est le lecteur qui les gère. */
+.controls {
+  padding: 6px 10px;
+  gap: 10px;
+}
+
+/* Écran bas (téléphone couché, lecteur dans la page) : panneau resserré, boutons sans libellé. */
+.stage[data-format="landscape-compact"] .controls {
+  gap: 6px;
+  padding: 4px 6px;
+}
+
+.stage[data-format="landscape-compact"] .info {
+  padding: 2px 8px;
+  font-size: 13px;
+}
+
+.stage[data-format="landscape-compact"] button strong {
+  display: none;
+}
+
+/* Portrait : consigne sur une ligne, puis direction à gauche et pédales à droite, à portée de pouce. */
+.stage[data-format="portrait"] .controls {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "info info info"
+    "left . right";
+  align-items: start;
+  row-gap: 8px;
+  column-gap: 8px;
+  padding: 6px;
+}
+
+.stage[data-format="portrait"] .left,
+.stage[data-format="portrait"] .right {
+  align-self: end;
+}

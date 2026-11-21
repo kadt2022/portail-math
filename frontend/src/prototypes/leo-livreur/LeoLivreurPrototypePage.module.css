@@ -127,7 +127,7 @@
 
 .controls {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -145,6 +145,7 @@
 .forward { background: #32c834; color: white; }
 .brake { background: #ed4334; color: white; }
 .reverse { background: #6b5bd2; color: white; }
+.horn { background: #2f86d6; color: white; }
 
 .gameCard { position: relative; }
 
@@ -451,6 +452,17 @@
 .touch_forward { background: radial-gradient(circle at 50% 28%, #3cc35a, #1c8a33 70%); }
 .touch_brake { background: radial-gradient(circle at 50% 28%, #ec4a3c, #b8251a 70%); }
 .touch_reverse { background: radial-gradient(circle at 50% 28%, #7a68e0, #4a39b0 70%); }
+
+/* Klaxon : au centre du panneau, comme au milieu du volant ; un peu plus petit que les pédales. */
+.touch_horn {
+  --control-size: max(44px, calc(var(--control-size-base, 72px) * 0.8));
+  flex: none;
+  background: radial-gradient(circle at 50% 28%, #4fa6ee, #1f6fb8 70%);
+}
+
+/* Son du jeu : coupé au départ ; activé, le bouton passe en vert. */
+.dashboardButton[data-sound="on"] { background: #1c8a33; }
+.dashboardButton[data-sound="off"][data-compact="true"] { text-decoration: line-through; }
 
 /* Téléphone couché : tout tient sur une ligne, consignes resserrées. */
 .drivingScreen[data-format="landscape-compact"] .panelInfo {

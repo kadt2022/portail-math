@@ -291,9 +291,11 @@ describe("livraison", () => {
 
   it("déploie un parcours de plusieurs kilomètres avec des étapes espacées", () => {
     expect(ROUTE_LENGTH_METERS).toBe(Number.POSITIVE_INFINITY);
-    expect(DESTINATIONS.length).toBeGreaterThanOrEqual(10);
-    expect(DESTINATIONS.at(-1)?.stop.x).toBeGreaterThan(10_000);
-    expect(isLeoRoadPoint(11_600, MAIN_LANE_Y)).toBe(true);
+    expect(DESTINATIONS).toHaveLength(32);
+    expect(DESTINATIONS[0].label).toBe("Maison 1");
+    expect(DESTINATIONS.at(-1)?.label).toBe("Maison 32");
+    expect(DESTINATIONS.at(-1)?.stop.x).toBeLessThan(3 * 2400);
+    expect(isLeoRoadPoint(6_500, MAIN_LANE_Y)).toBe(true);
   });
 
   it("continue à créer des destinations jouables au-delà du premier cycle", () => {

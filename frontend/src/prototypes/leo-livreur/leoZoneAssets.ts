@@ -9,6 +9,7 @@
 // seule la mémoire du jeu, pendant la partie.
 
 import { BRIDGE_END_X, BRIDGE_START_X, cityLayout, CITY_FADE } from "./leoCityLayout";
+import { boulevardLayout, BOULEVARD_FADE } from "./leoBoulevardLayout";
 import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 
 export type BundleId = "common" | "bridge" | "city";
@@ -19,18 +20,26 @@ export type BundleState = "absent" | "loading" | "retrying" | "ready" | "error";
 export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
   common: [
     "leo-traffic-family-blue", "leo-traffic-compact-green", "leo-traffic-sedan-gray", "leo-traffic-city-bus",
-    "leo-traffic-school-bus-occupied", "leo-traffic-taxi-occupied", "leo-traffic-minibus",
-    "leo-car-right", "leo-car-left", "leo-car-front", "leo-car-back", "leo-house", "leo-world-bridge-deck",
+    "leo-traffic-school-bus-occupied", "leo-traffic-taxi-occupied", "leo-traffic-minibus", "leo-world-village-zone1-backdrop",
+    "leo-car-right", "leo-car-left", "leo-car-front", "leo-car-back", "leo-house", "leo-house-yellow", "leo-world-bridge-deck",
+    "leo-house-near-side", "leo-tree", "leo-flowers-near-side", "leo-garden-near-side",
   ],
   bridge: ["leo-world-bridge-rail", "leo-world-suspension-bridge-layer"],
-  city: ["leo-world-city-top", "leo-world-city-bottom", "leo-cross-sedan-turn"],
+  city: [
+    "leo-world-city-top", "leo-world-city-bottom", "leo-world-boulevard-zone4", "leo-cross-sedan-turn",
+    "leo-pedestrian-man-sheet", "leo-pedestrian-woman-sheet", "leo-pedestrian-child-sheet",
+    "leo-pedestrian-depth-front-sheet", "leo-pedestrian-depth-back-sheet",
+  ],
 };
 
-/** Poids (octets) des lots, mesurés sur le build : servent à estimer le temps de téléchargement. */
+/**
+ * Poids (octets) des lots, mesurés sur les fichiers livrés : servent à estimer le temps de téléchargement.
+ * Toutes les images du jeu sont en WebP (les originaux PNG restent dans assets/ comme sources, sans être téléchargés).
+ */
 export const BUNDLE_BYTES: Record<BundleId, number> = {
-  common: 372_000,
+  common: 749_000,
   bridge: 500_000,
-  city: 672_000,
+  city: 1_889_000,
 };
 
 /** Débit supposé tant qu'aucune mesure n'existe, et plancher de prudence : 250 kbit/s (réseau mobile faible). */
@@ -46,8 +55,12 @@ export function bundleSpan(bundle: BundleId): { minX: number; maxX: number } {
   if (bundle === "common") return { minX: Number.NEGATIVE_INFINITY, maxX: Number.POSITIVE_INFINITY };
   if (bundle === "bridge") return { minX: BRIDGE_START_X, maxX: BRIDGE_END_X };
   const city = cityLayout();
-  // Le panneau de la ville et son fondu ; la rue des Jardins (berline) est à l'intérieur du panneau.
-  return { minX: city.panelX - CITY_FADE, maxX: city.panelEnd + CITY_FADE };
+  const boulevard = boulevardLayout();
+  // Entrée de ville + zone 4 et leurs fondus ; la rue des Jardins est dans le premier panneau.
+  return {
+    minX: city.panelX - CITY_FADE,
+    maxX: boulevard.panelEnd + BOULEVARD_FADE,
+  };
 }
 
 /** Lots nécessaires pour afficher l'intervalle [minX, maxX] du monde. */

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cameraZoomFor } from "./leoBridgeLayout";
 import { MIN_CONTROL_SIZE, drivingLayout } from "./leoDrivingLayout";
 import { ROAD_WIDTH, VEHICLE_LENGTH, WORLD_HEIGHT } from "./leoGeometry";
+import { BUNDLE_TEXTURES } from "./leoZoneAssets";
 import type { LeoLivreurSnapshot } from "./LeoLivreurGame";
 
 const { controllerMock, mountMock } = vi.hoisted(() => {
@@ -18,6 +19,8 @@ const { controllerMock, mountMock } = vi.hoisted(() => {
     turn: vi.fn(),
     setPaused: vi.fn(),
     retryAssets: vi.fn(),
+    setSound: vi.fn((on: boolean) => on),
+    horn: vi.fn(),
   };
   const mountMock = vi.fn((_host: HTMLElement, listener: (snapshot: LeoLivreurSnapshot) => void) => {
     controllerMock.listener = listener;
@@ -38,7 +41,8 @@ Object.assign(HTMLElement.prototype, {
   hasPointerCapture(this: Element, id: number) { return captured.get(this)?.has(id) ?? false; },
 });
 
-const css = Object.values(import.meta.glob("./LeoLivreurPrototypePage.module.css", { query: "?raw", import: "default", eager: true }))[0] as string;
+// Fins de ligne ramenées au format Unix : le test passe aussi sur un poste Windows (git core.autocrlf).
+const css = (Object.values(import.meta.glob("./LeoLivreurPrototypePage.module.css", { query: "?raw", import: "default", eager: true }))[0] as string).replace(/\r\n/g, "\n");
 
 function setScreen(width: number, height: number, coarse: boolean) {
   Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -178,6 +182,58 @@ describe("page : écran de conduite", () => {
     expect(controllerMock.setControl).toHaveBeenLastCalledWith("forward", false);
   });
 
+  it("coupe le son au départ ; le bouton Son l'active depuis le clic, puis le coupe", () => {
+    setScreen(1366, 768, false);
+    enter();
+    const dashboard = screen.getByLabelText("Tableau de bord");
+    const sound = within(dashboard).getByRole("button", { name: "Son du jeu" });
+    expect(sound).toHaveAttribute("aria-pressed", "false");
+    expect(sound).toHaveTextContent("Son : non");
+    expect(controllerMock.setSound).not.toHaveBeenCalled();
+    fireEvent.click(sound);
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(true);
+    expect(sound).toHaveAttribute("aria-pressed", "true");
+    expect(sound).toHaveTextContent("Son : oui");
+    fireEvent.click(sound);
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(false);
+    expect(sound).toHaveTextContent("Son : non");
+  });
+
+  it("sur téléphone, écrit seulement « Son », barré quand il est coupé, pour laisser la place à Pause et Quitter", () => {
+    enter();
+    const sound = screen.getByRole("button", { name: "Son du jeu" });
+    expect(sound).toHaveTextContent(/^Son$/);
+    expect(sound).toHaveAttribute("data-compact", "true");
+    expect(sound).toHaveAttribute("data-sound", "off");
+    expect(css).toContain('.dashboardButton[data-sound="off"][data-compact="true"] { text-decoration: line-through; }');
+    fireEvent.click(sound);
+    expect(sound).toHaveAttribute("data-sound", "on");
+  });
+
+  it("reste « Son : non » si le navigateur ne peut pas jouer de son", () => {
+    enter();
+    controllerMock.setSound.mockReturnValueOnce(false);
+    const sound = screen.getByRole("button", { name: "Son du jeu" });
+    fireEvent.click(sound);
+    expect(sound).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("klaxonne tant que le bouton du centre est tenu, et le relâche à la pause", () => {
+    enter();
+    const panel = screen.getByRole("region", { name: "Commandes de conduite" });
+    const horn = within(panel).getByRole("button", { name: "Klaxon (maintenir)" });
+    fireEvent.pointerDown(horn, { pointerId: 3 });
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(true);
+    expect(horn).toHaveAttribute("data-pressed", "true");
+    expect(fireEvent.contextMenu(horn)).toBe(false);
+    fireEvent.pointerUp(horn, { pointerId: 3 });
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(false);
+    expect(horn).toHaveAttribute("data-pressed", "false");
+    fireEvent.pointerDown(horn, { pointerId: 4 });
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    expect(controllerMock.horn).toHaveBeenLastCalledWith(false);
+  });
+
   it("range la direction à gauche et les pédales à droite, sans menu contextuel au long appui", () => {
     enter();
     expect(within(screen.getByLabelText("Direction")).getAllByRole("button").map((button) => button.dataset.control)).toEqual(["left", "right"]);
@@ -242,7 +298,7 @@ describe("page : écran de conduite", () => {
   it("affiche le chargement réel des images au démarrage, sans bouton Commencer tant que tout n'est pas prêt", () => {
     enter();
     const panel = screen.getByRole("region", { name: "Commandes de conduite" });
-    expect(within(panel).getByText(/Chargement du jeu : 0 \/ 13 images/)).toBeInTheDocument();
+    expect(within(panel).getByText(`Chargement du jeu : 0 / ${BUNDLE_TEXTURES.common.length} images…`)).toBeInTheDocument();
     expect(within(panel).queryByRole("button", { name: "Commencer" })).not.toBeInTheDocument();
     act(() => controllerMock.listener?.({ ...driving, phase: "INTRO", signalState: null, signalDistance: null, signalPrepare: false }));
     expect(within(panel).getByRole("button", { name: "Commencer" })).toBeInTheDocument();

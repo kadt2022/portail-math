@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
 import { availableCategories, featuredGame, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
-import { GrilleMagiqueGame, preloadEmbeddedGame, TurboPulsePlayer } from "./embedded-games";
+import { GrilleMagiqueGame, LeoDrivingPlayer, preloadEmbeddedGame, TurboPulsePlayer } from "./embedded-games";
 import { FeaturedGame } from "./FeaturedGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
@@ -64,9 +64,14 @@ export function GamesCataloguePage() {
     setStage("closed");
   }, []);
   const changeFullscreen = useCallback((next: boolean) => setStage(next ? "immersive" : "inline"), []);
+  // Le lecteur revient à l'écran à l'ouverture, ET à chaque changement de jeu lecteur déjà ouvert (jeu recommandé, carte plus
+  // bas dans la page) : l'effet suit aussi le jeu ouvert. Les gestes dans le jeu ne changent ni l'un ni l'autre : aucun défilement.
+  // Il s'exécute après le rendu, quand le cadre du nouveau jeu existe (il porte alors la référence du lecteur).
   useEffect(() => {
     if (stage !== "inline") return;
-    // Défilement immédiat (sans glissement animé) : le lecteur apparaît en place, sans impression de changement de page.
+    // Défilement immédiat (sans glissement animé) : le lecteur apparaît en place, sans impression de changement de page ; aucune
+    // animation, donc la préférence « réduire les animations » est respectée d'office. L'en-tête du site est hors du conteneur
+    // qui défile : le haut du lecteur s'aligne juste dessous, jamais masqué.
     const scroll = () => stageRef.current?.scrollIntoView?.({ block: "start" });
     // Retour du plein écran natif : on attend qu'il soit vraiment quitté, sinon la position visée est celle du lecteur plein écran.
     if (!fullscreenElement()) {
@@ -79,7 +84,7 @@ export function GamesCataloguePage() {
       document.removeEventListener("fullscreenchange", scroll);
       document.removeEventListener("webkitfullscreenchange", scroll);
     };
-  }, [stage]);
+  }, [stage, openGameId]);
 
   // Jeu ouvert et jeux recommandés à côté du lecteur : ils ne sont pas répétés dans « Autres jeux du portail ».
   const open = stage !== "closed";
@@ -198,7 +203,15 @@ export function GamesCataloguePage() {
                   </div>
                 }
               >
-                {id === "turbo-pulse" ? (
+                {id === "conduire-avec-leo" ? (
+                  <LeoDrivingPlayer
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : id === "turbo-pulse" ? (
                   <TurboPulsePlayer
                     fullscreen={shown && immersive}
                     active={shown}
@@ -228,7 +241,7 @@ export function GamesCataloguePage() {
       </GameWatchLayout>
 
       <div className={styles.contents} inert={immersive || covered}>
-      {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} /> : null}
+      {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} onOpen={featuredGame.embed ? openEmbedded : undefined} onIntent={featuredGame.embed ? preloadEmbeddedGame : undefined} /> : null}
 
       {open && visibleGames.length > 0 ? <h2 className={styles.otherGames}>{t("cataloguePage.otherGames")}</h2> : null}
       <div id={filtersId} className={`${styles.chips}${panel === "filters" ? ` ${styles.panelOpen}` : ""}`} role="group" aria-label={t("cataloguePage.filterLabel")}>

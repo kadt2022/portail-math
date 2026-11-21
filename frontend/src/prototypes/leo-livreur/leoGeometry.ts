@@ -34,7 +34,34 @@ export const VEHICLE_LENGTH = 124;
 export const VEHICLE_WIDTH = 36;
 
 /** Maisons rapprochées du bord, en conservant une marge hors chaussée. */
-export const HOUSE_ROW_Y = 880;
+/** Ligne de base des façades côté bas : les maisons reposent sur le jardin derrière le trottoir. */
+export const HOUSE_ROW_Y = 865;
+export const HOUSE_ROW_NORTH_Y = ROAD_Y - (HOUSE_ROW_Y - ROAD_Y);
+export const ZONE1_HOUSE_COUNT = 32;
+export const ZONE1_FIRST_HOUSE_X = 500;
+export const ZONE1_HOUSE_SPACING = 210;
+const ZONE1_SEGMENT_WIDTH = 2400;
+
+/** Évite qu'un grand sprite de maison soit coupé exactement sur une frontière de zone. */
+function awayFromZoneBoundary(x: number) {
+  const boundary = Math.round(x / ZONE1_SEGMENT_WIDTH) * ZONE1_SEGMENT_WIDTH;
+  if (boundary > 0 && Math.abs(x - boundary) < 130) return x + (x < boundary ? -150 : 150);
+  return x;
+}
+
+export function zone1HouseX(index: number) {
+  return awayFromZoneBoundary(ZONE1_FIRST_HOUSE_X + index * ZONE1_HOUSE_SPACING);
+}
+
+/**
+ * Quartier qui suit la ville : il commence à la fin du panneau du boulevard (zone 4, voir leoBoulevardLayout) et
+ * reprend sans fin le décor de la Zone 1 (jardins, arbres, maisons des deux côtés). Ses maisons sont numérotées à la
+ * suite de celles de la Zone 1 : 33, 34, 35… Valeur fixée ici pour éviter une dépendance circulaire ; un test
+ * vérifie qu'elle reste égale à la fin du panneau du boulevard.
+ */
+export const SUBURB_START_X = 15_912;
+/** Première maison du quartier : assez loin du fondu du boulevard pour ne jamais se superposer à son illustration. */
+export const SUBURB_FIRST_HOUSE_X = SUBURB_START_X + 300;
 
 export const START_POSITION = { x: 300, y: MAIN_LANE_Y } as const;
 
@@ -48,58 +75,56 @@ export interface LeoDestination {
   house: { x: number; y: number };
 }
 
-const INITIAL_DESTINATIONS: readonly LeoDestination[] = [
-  {
-    id: "house-1",
-    label: "Maison 1",
-    stop: { x: 750, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 750, y: HOUSE_ROW_Y },
+/** Les 32 maisons de la Zone 1, réparties avant le pont et dans l'ordre du parcours. */
+const INITIAL_DESTINATIONS: readonly LeoDestination[] = Array.from(
+  { length: ZONE1_HOUSE_COUNT },
+  (_, index) => {
+    const x = zone1HouseX(index);
+    const houseY = index % 2 === 0 ? HOUSE_ROW_NORTH_Y : HOUSE_ROW_Y;
+    return {
+      id: `house-${index + 1}`,
+      label: `Maison ${index + 1}`,
+      stop: { x, y: MAIN_LANE_Y },
+      radius: 90,
+      house: { x, y: houseY },
+    };
   },
-  {
-    id: "house-2",
-    label: "Maison 2",
-    stop: { x: 1050, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1050, y: HOUSE_ROW_Y },
-  },
-  {
-    id: "house-3",
-    label: "Maison 3",
-    stop: { x: 1350, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1350, y: HOUSE_ROW_Y },
-  },
-  {
-    id: "house-4",
-    label: "Maison 4",
-    stop: { x: 1650, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x: 1650, y: HOUSE_ROW_Y },
-  },
-  ...[2600, 3800, 5100, 6400, 7700, 9000, 10300, 11600].map((x, index) => ({
-    id: `house-${index + 5}`,
-    label: `Maison ${index + 5}`,
-    stop: { x, y: MAIN_LANE_Y },
-    radius: 90,
-    house: { x, y: HOUSE_ROW_Y },
-  })),
-];
+);
 
 export const DESTINATIONS: readonly LeoDestination[] = INITIAL_DESTINATIONS;
 
-const REPEAT_DELIVERY_SPACING = 1050;
-export function destinationForDelivery(deliveryIndex: number): LeoDestination {
-  if (deliveryIndex < INITIAL_DESTINATIONS.length) return INITIAL_DESTINATIONS[deliveryIndex];
-  const repeatIndex = deliveryIndex - INITIAL_DESTINATIONS.length;
-  const x = 12800 + repeatIndex * REPEAT_DELIVERY_SPACING;
+/**
+ * Maison du quartier après la ville, par rang (0 = Maison 33). Même pas et même alternance que la Zone 1 :
+ * numéro impair de l'autre côté de la route, numéro pair du côté de Léo.
+ */
+export function suburbHouse(rank: number): LeoDestination {
+  const number = ZONE1_HOUSE_COUNT + rank + 1;
+  const x = awayFromZoneBoundary(SUBURB_FIRST_HOUSE_X + rank * ZONE1_HOUSE_SPACING);
   return {
-    id: `delivery-${deliveryIndex + 1}`,
-    label: `Maison ${deliveryIndex + 1}`,
+    id: `house-${number}`,
+    label: `Maison ${number}`,
     stop: { x, y: MAIN_LANE_Y },
     radius: 90,
-    house: { x, y: HOUSE_ROW_Y },
+    house: { x, y: number % 2 === 1 ? HOUSE_ROW_NORTH_Y : HOUSE_ROW_Y },
   };
+}
+
+/** Maisons du quartier dont l'illustration est centrée dans [startX, endX[. */
+export function suburbHousesBetween(startX: number, endX: number): LeoDestination[] {
+  const first = Math.max(0, Math.floor((startX - SUBURB_FIRST_HOUSE_X - 150) / ZONE1_HOUSE_SPACING));
+  const last = Math.floor((endX - SUBURB_FIRST_HOUSE_X + 150) / ZONE1_HOUSE_SPACING);
+  const houses: LeoDestination[] = [];
+  for (let rank = first; rank <= last; rank += 1) {
+    const house = suburbHouse(rank);
+    if (house.house.x >= startX && house.house.x < endX) houses.push(house);
+  }
+  return houses;
+}
+
+/** Après les 32 maisons de la Zone 1, les livraisons continuent dans le quartier qui suit la ville. */
+export function destinationForDelivery(deliveryIndex: number): LeoDestination {
+  if (deliveryIndex < INITIAL_DESTINATIONS.length) return INITIAL_DESTINATIONS[deliveryIndex];
+  return suburbHouse(deliveryIndex - INITIAL_DESTINATIONS.length);
 }
 
 export interface VehiclePose {
