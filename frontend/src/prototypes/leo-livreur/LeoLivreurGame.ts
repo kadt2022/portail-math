@@ -63,6 +63,7 @@ import {
   DESTINATIONS,
   destinationForDelivery,
   laneAt,
+  type LeoDestination,
   MAIN_LANE_Y,
   MAIN_ROAD_X_MIN,
   ONCOMING_LANE_Y,
@@ -71,6 +72,7 @@ import {
   ROAD_Y,
   ROUTE_LENGTH_METERS,
   START_POSITION,
+  suburbHousesBetween,
   VEHICLE_LENGTH,
   VEHICLE_WIDTH,
   vehicleCorners,
@@ -1552,15 +1554,13 @@ export class LeoLivreurScene extends Phaser.Scene {
     ]);
   }
 
+  /** Arbres et massifs du côté de Léo, entre les jardins. `variant` choisit taille, sens et fleurs (stable par arbre). */
   private addNearSidePlanting(
-    container: Phaser.GameObjects.Container, startX: number, endX: number, sidewalkEdge: number,
+    container: Phaser.GameObjects.Container, sidewalkEdge: number, trees: readonly { x: number; variant: number }[],
   ) {
-    const houses = DESTINATIONS.filter(({ house }) => house.y > ROAD_Y).map(({ house }) => house.x);
-    const treePositions = [140, 415, ...houses.slice(1).map((x, index) => (houses[index] + x) / 2)];
     const shadows = this.add.graphics();
     container.add(shadows);
-    for (const [index, x] of treePositions.entries()) {
-      if (x < startX || x >= endX) continue;
+    for (const { x, variant: index } of trees) {
       const treeBase = WORLD_HEIGHT - [2, 6, 5, 3][index % 4];
       const crownTop = sidewalkEdge + [3, 8, 17, 6][index % 4];
       const tree = this.add.image(x, treeBase, "leo-tree").setOrigin(0.5, 1);
@@ -1573,6 +1573,68 @@ export class LeoLivreurScene extends Phaser.Scene {
       const width = 139 + (index % 3) * 9;
       flowers.setScale(width / flowers.width).setFlipX(direction < 0);
       container.add(flowers);
+    }
+  }
+
+  /**
+   * Rue résidentielle de la Zone 1 entre `fromX` et `endX` : fond de campagne, jardins et arbres du côté de Léo,
+   * maisons numérotées des deux côtés. Sert à la Zone 1 et au quartier qui suit la ville (maisons 33 et suivantes).
+   */
+  private addResidentialStreet(
+    container: Phaser.GameObjects.Container,
+    fromX: number,
+    endX: number,
+    houses: readonly LeoDestination[],
+    trees: readonly { x: number; variant: number }[],
+  ) {
+    const backdropWidth = 2172;
+    const backdropHeight = 724;
+    for (let tileX = Math.floor(fromX / backdropWidth) * backdropWidth; tileX < endX; tileX += backdropWidth) {
+      const from = Math.max(fromX, tileX);
+      const to = Math.min(endX, tileX + backdropWidth);
+      if (to <= from) continue;
+      container.add(this.add.image(tileX, 0, "leo-world-village-zone1-backdrop")
+        .setOrigin(0, 0)
+        .setCrop(from - tileX, 0, to - from, backdropHeight)
+        .setDepth(-4.9));
+    }
+    const sidewalkEdge = bridgeLayout().deckBottom;
+    const gardenFrame = this.textures.getFrame("leo-garden-near-side");
+    const gardenScale = (WORLD_HEIGHT - sidewalkEdge) / gardenFrame.height;
+    const gardenTileWidth = gardenFrame.width * gardenScale;
+    // Le motif est ancré dans le monde et déborde visuellement d'une zone de chargement à l'autre.
+    for (let tileX = Math.floor(fromX / gardenTileWidth) * gardenTileWidth; tileX < endX; tileX += gardenTileWidth) {
+      const from = Math.max(fromX, tileX);
+      const to = Math.min(endX, tileX + gardenTileWidth);
+      if (to <= from) continue;
+      container.add(this.add.image(tileX, sidewalkEdge, "leo-garden-near-side").setOrigin(0, 0)
+        .setScale(gardenScale).setCrop((from - tileX) / gardenScale, 0, (to - from) / gardenScale, gardenFrame.height));
+    }
+    this.addNearSidePlanting(container, sidewalkEdge, trees.filter(({ x }) => x >= fromX && x < endX));
+    for (const destination of houses) {
+      const { x, y } = destination.house;
+      if (x < fromX || x >= endX) continue;
+      const number = Number(destination.id.replace("house-", ""));
+      if (y > ROAD_Y) {
+        this.addNearSideHouse(container, x, number, sidewalkEdge);
+        continue;
+      }
+      const houseKey = FAR_SIDE_HOUSE_KEYS[((number - 1) / 2) % FAR_SIDE_HOUSE_KEYS.length];
+      const houseSource = this.textures.get(houseKey).getSourceImage() as HTMLImageElement;
+      const houseBaseY = ROAD_Y - ROAD_HALF_WIDTH - 100;
+      container.add(this.add.image(x, houseBaseY, houseKey)
+        .setOrigin(0.5, 1)
+        .setScale(210 / houseSource.width)
+        .setDepth(2));
+      const signX = x + 70;
+      const signY = houseBaseY - 28;
+      // Les numéros à trois chiffres (100 et plus) ont besoin d'un panneau un peu plus large.
+      container.add(this.add.rectangle(signX, signY, number >= 100 ? 40 : 30, 23, 0xfff4cf, 0.98)
+        .setStrokeStyle(2, 0x2d5270, 1)
+        .setDepth(2.5));
+      container.add(this.add.text(signX, signY, String(number), HOUSE_SIGN_STYLE)
+        .setOrigin(0.5)
+        .setDepth(2.6));
     }
   }
 
@@ -1590,58 +1652,12 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
 
     if (kind === "village") {
-      const backdropWidth = 2172;
-      const backdropHeight = 724;
-      for (let tileX = Math.floor(startX / backdropWidth) * backdropWidth; tileX < endX; tileX += backdropWidth) {
-        const from = Math.max(startX, tileX);
-        const to = Math.min(endX, tileX + backdropWidth);
-        if (to <= from) continue;
-        container.add(this.add.image(tileX, 0, "leo-world-village-zone1-backdrop")
-          .setOrigin(0, 0)
-          .setCrop(from - tileX, 0, to - from, backdropHeight)
-          .setDepth(-4.9));
-      }
-      const sidewalkEdge = bridgeLayout().deckBottom;
-      const gardenFrame = this.textures.getFrame("leo-garden-near-side");
-      const gardenScale = (WORLD_HEIGHT - sidewalkEdge) / gardenFrame.height;
-      const gardenTileWidth = gardenFrame.width * gardenScale;
-      // Le motif est ancré dans le monde et déborde visuellement d'une zone de chargement à l'autre.
-      for (let tileX = Math.floor(startX / gardenTileWidth) * gardenTileWidth; tileX < endX; tileX += gardenTileWidth) {
-        const from = Math.max(startX, tileX);
-        const to = Math.min(endX, tileX + gardenTileWidth);
-        if (to <= from) continue;
-        container.add(this.add.image(tileX, sidewalkEdge, "leo-garden-near-side").setOrigin(0, 0)
-          .setScale(gardenScale).setCrop((from - tileX) / gardenScale, 0, (to - from) / gardenScale, gardenFrame.height));
-      }
-      this.addNearSidePlanting(container, startX, endX, sidewalkEdge);
-      for (const destination of DESTINATIONS) {
-        const { x, y } = destination.house;
-        if (x < startX || x >= endX) continue;
-        const index = Number(destination.id.replace("house-", "")) - 1;
-        if (y > ROAD_Y) {
-          this.addNearSideHouse(container, x, index + 1, sidewalkEdge);
-          continue;
-        }
-        const houseKey = FAR_SIDE_HOUSE_KEYS[(index / 2) % FAR_SIDE_HOUSE_KEYS.length];
-        const houseSource = this.textures.get(houseKey).getSourceImage() as HTMLImageElement;
-        const houseBaseY = ROAD_Y - ROAD_HALF_WIDTH - 100;
-        container.add(this.add.image(x, houseBaseY, houseKey)
-          .setOrigin(0.5, 1)
-          .setScale(210 / houseSource.width)
-          .setDepth(2));
-        const signX = x + 70;
-        const signY = houseBaseY - 28;
-        container.add(this.add.rectangle(signX, signY, 30, 23, 0xfff4cf, 0.98)
-          .setStrokeStyle(2, 0x2d5270, 1)
-          .setDepth(2.5));
-        container.add(this.add.text(signX, signY, destination.label.replace("Maison ", ""), HOUSE_SIGN_STYLE)
-          .setOrigin(0.5)
-          .setDepth(2.6));
-      }
+      const southHouses = DESTINATIONS.filter(({ house }) => house.y > ROAD_Y).map(({ house }) => house.x);
+      const trees = [140, 415, ...southHouses.slice(1).map((x, index) => (southHouses[index] + x) / 2)]
+        .map((x, variant) => ({ x, variant }));
+      this.addResidentialStreet(container, startX, endX, DESTINATIONS, trees);
     } else if (kind !== "bridge") {
-      // Après l'entrée de ville, aucune zone ne retombe sur un écran vert vide. Les panneaux illustrés
-      // restent au premier plan ; cette rangée déterministe prend le relais dans leurs fondus et entre
-      // les futurs décors résidentiel, marché et école.
+      // Ciel sous les panneaux illustrés de la ville : leurs fondus ne laissent jamais voir un écran vert vide.
       container.add(this.add.rectangle(
         centerX,
         (ROAD_Y - ROAD_HALF_WIDTH) / 2,
@@ -1649,26 +1665,18 @@ export class LeoLivreurScene extends Phaser.Scene {
         ROAD_Y - ROAD_HALF_WIDTH,
         SKY_COLOR,
       ).setDepth(-4.9));
-      const spacing = 330;
-      const first = startX + 165;
-      const revealX = kind === "boulevard"
-        ? boulevardLayout().panelEnd - BOULEVARD_FADE
-        : startX;
-      for (let x = first, slot = 0; x < endX; x += spacing, slot += 1) {
-        const size = (id + slot) % 3 === 0 ? { width: 245, height: 163 } : { width: 220, height: 147 };
-        // Le tablier inclut ses trottoirs au-delà de la chaussée : les façades doivent
-        // rester derrière ses bords (mêmes lignes que les maisons historiques).
-        const northY = ROAD_Y - (DESTINATIONS[0].house.y - ROAD_Y);
-        const southY = DESTINATIONS[0].house.y;
-        if (x + size.width / 2 >= revealX) {
-          container.add(this.add.image(x, northY, "leo-house").setDisplaySize(size.width, size.height).setDepth(2));
-        }
-        // Rangée sud décalée d'un demi-pas : pas de répétition en grille parfaite.
-        if (x + spacing / 2 < endX && x + spacing / 2 + size.width / 2 >= revealX) {
-          container.add(this.add.image(x + spacing / 2, southY, "leo-house")
-            .setDisplaySize(size.width, size.height)
-            .setDepth(2));
-        }
+      // Après le boulevard, la rue de la Zone 1 reprend, sans fin, avec ses maisons numérotées à la suite (33, 34…).
+      // Elle commence sous le fondu de sortie du boulevard, qui s'efface donc sur un vrai décor.
+      const fromX = Math.max(startX, boulevardLayout().panelEnd - BOULEVARD_FADE);
+      if (fromX < endX) {
+        const houses = suburbHousesBetween(fromX, endX);
+        // Un arbre entre deux jardins voisins du côté de Léo (voisins pris au-delà de la zone, pour les bords).
+        const south = suburbHousesBetween(fromX - 420, endX + 420).filter(({ house }) => house.y > ROAD_Y);
+        const trees = south.slice(1).map((destination, index) => ({
+          x: (south[index].house.x + destination.house.x) / 2,
+          variant: Number(destination.id.replace("house-", "")) / 2,
+        }));
+        this.addResidentialStreet(container, fromX, endX, houses, trees);
       }
     }
     return container;

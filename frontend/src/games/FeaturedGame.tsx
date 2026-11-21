@@ -58,6 +58,10 @@ function wheelStyle(bus: TrafficBus, wheel: Wheel, src: string) {
 
 interface FeaturedGameProps {
   game: GameCatalogueEntry;
+  /** Jeu intégré à la page : le clic l'ouvre dans le lecteur au lieu de changer de page (l'adresse reste un vrai lien). */
+  onOpen?: (game: GameCatalogueEntry) => void;
+  /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
+  onIntent?: (gameId: string) => void;
 }
 
 // Bannière cliquable en entier : décor, ville et deux vues de la voiture (profil puis face). À l'ouverture, Léo
@@ -66,7 +70,7 @@ interface FeaturedGameProps {
 // Durée totale du mouvement (roulage + demi-tour + approche), un peu arrondie à la hausse.
 const INTRO_MS = 9200;
 
-export function FeaturedGame({ game }: FeaturedGameProps) {
+export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
   // Chaque passage de la souris (ou le focus clavier) rejoue le mouvement complet, une fois l'arrivée terminée.
@@ -81,7 +85,14 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
     setPlay((value) => value + 1);
   };
   const onPointerEnter = (event: PointerEvent) => {
+    onIntent?.(game.id);
     if (event.pointerType === "mouse") replay();
+  };
+  // Clic simple : le jeu s'ouvre dans le lecteur de la page. Clic avec modificateur (nouvel onglet) : le lien normal s'applique.
+  const openInPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!onOpen || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    onOpen(game);
   };
 
   // Ondulation de l’eau sur le décor (ciel, ville, route) : créée au premier passage du pointeur, jamais pour les voitures ni le texte.
@@ -107,6 +118,7 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
   };
   // Au toucher : une onde brève, tout de suite ; le lien s’ouvre sans attendre.
   const onPointerDown = (event: PointerEvent) => {
+    onIntent?.(game.id);
     if (event.pointerType !== "touch") return;
     water()?.touch(event.clientX, event.clientY);
     // Dégradé au toucher (~10 s, fondu en entrée et en sortie) ; un nouveau toucher relance l’animation depuis le début.
@@ -124,11 +136,15 @@ export function FeaturedGame({ game }: FeaturedGameProps) {
       className={styles.hero}
       to={game.href}
       aria-label={t("featured.aria", { name })}
+      onClick={openInPage}
       onPointerEnter={onPointerEnter}
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
       onPointerLeave={() => ripple.current?.leave()}
-      onFocus={(event) => event.currentTarget.matches(":focus-visible") && replay()}
+      onFocus={(event) => {
+        onIntent?.(game.id);
+        if (event.currentTarget.matches(":focus-visible")) replay();
+      }}
     >
       <img ref={skyRef} className={styles.sky} src={countrysideUrl} alt="" width={2172} height={724} fetchPriority="high" decoding="async" />
       <img ref={cityRef} className={styles.city} src={skylineUrl} alt="" width={2048} height={682} decoding="async" />

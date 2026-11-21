@@ -12,7 +12,7 @@ import { pxToMeters } from "./leoUnits";
 import { BUNDLE_TEXTURES } from "./leoZoneAssets";
 import styles from "./LeoLivreurPrototypePage.module.css";
 
-const INITIAL_SNAPSHOT: LeoLivreurSnapshot = {
+export const INITIAL_SNAPSHOT: LeoLivreurSnapshot = {
   phase: "INTRO",
   speedKmh: 0,
   heading: 0,
@@ -38,7 +38,7 @@ const PHASE_LABELS: Record<LeoLivreurSnapshot["phase"], string> = {
   ARRIVED: "Arrêt réussi devant la maison",
 };
 
-const ALL_CONTROLS: readonly LeoLivreurControl[] = ["left", "right", "forward", "brake", "reverse"];
+export const ALL_CONTROLS: readonly LeoLivreurControl[] = ["left", "right", "forward", "brake", "reverse"];
 
 /** Texte de l'indicateur d'approche : distance réelle en mètres. */
 function signalChipText(state: NonNullable<LeoLivreurSnapshot["signalState"]>, distance: number, prepare: boolean) {
@@ -77,7 +77,7 @@ function useViewport() {
  * Bouton à maintenir. Chaque bouton suit son propre doigt (capture du pointeur) : plusieurs boutons peuvent être
  * tenus en même temps (Avancer + Gauche). Aucun geste n'est laissé au navigateur (défilement, zoom, menu).
  */
-function HoldButton({
+export function HoldButton({
   control,
   label,
   icon,
@@ -141,7 +141,7 @@ function HoldButton({
  * Klaxon : sonne tant qu'il est tenu, comme les pédales (capture du pointeur, aucun geste laissé au navigateur).
  * Au centre du panneau, comme le klaxon au milieu d'un volant.
  */
-function HornButton({ controller, variant }: { controller: LeoLivreurController | null; variant: "panel" | "touch" }) {
+export function HornButton({ controller, variant }: { controller: LeoLivreurController | null; variant: "panel" | "touch" }) {
   const [pressed, setPressed] = useState(false);
   const press = (event: PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -272,7 +272,7 @@ export function assetsMessage(snapshot: LeoLivreurSnapshot) {
   return "Chargement de la suite du parcours… Léo attend un instant.";
 }
 
-function instructionFor(snapshot: LeoLivreurSnapshot, paused: boolean) {
+export function instructionFor(snapshot: LeoLivreurSnapshot, paused: boolean) {
   const loading = assetsMessage(snapshot);
   if (loading) return loading;
   if (paused) return "Jeu en pause. Appuie sur Reprendre pour continuer.";

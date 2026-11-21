@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  AMBIENCE_FADE_SECONDS,
+  AMBIENCE_LOWPASS_HZ,
+  AMBIENCE_VOLUME,
+  type AmbienceLoader,
   DEFAULT_VOLUME,
   EngineModel,
   IDLE_RPM,
@@ -44,13 +48,16 @@ class FakeNode {
   curve: Float32Array | null = null;
   buffer: unknown = null;
   loop = false;
+  loopStart = 0;
+  loopEnd = 0;
+  startedAt: number[] = [];
   started = false;
   stopped = false;
   onended: (() => void) | null = null;
   constructor(readonly kind: string) {}
   connect() { this.connected += 1; return this; }
   disconnect() { this.disconnected = true; }
-  start() { this.started = true; }
+  start(...args: number[]) { this.started = true; this.startedAt = args; }
   stop() { this.stopped = true; }
 }
 
@@ -76,7 +83,15 @@ class FakeContext {
   finish() { for (const node of this.nodes) if (node.stopped && node.onended) { const done = node.onended; node.onended = null; done(); } }
 }
 
-function setup(options: { hidden?: boolean } = {}) {
+/** Fond sonore simulé : 1 s à 8000 Hz, avec 80 échantillons de silence de compression au début et 40 à la fin. */
+function fakeAmbience() {
+  const data = new Float32Array(8000).fill(0.2);
+  data.fill(0, 0, 80);
+  data.fill(0, 8000 - 40);
+  return { length: 8000, numberOfChannels: 1, sampleRate: 8000, duration: 1, getChannelData: () => data } as unknown as AudioBuffer;
+}
+
+function setup(options: { hidden?: boolean; ambience?: AmbienceLoader | null } = {}) {
   const ctx = new FakeContext();
   const listeners = new Set<() => void>();
   const doc = {
@@ -85,7 +100,7 @@ function setup(options: { hidden?: boolean } = {}) {
     removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
   };
   const factory = vi.fn(() => ctx as unknown as AudioContext);
-  const sound = new LeoSound(factory, doc as unknown as Document);
+  const sound = new LeoSound(factory, doc as unknown as Document, options.ambience ?? null);
   const fireVisibility = (hidden: boolean) => { doc.hidden = hidden; listeners.forEach((listener) => listener()); };
   return { ctx, sound, factory, fireVisibility, listeners };
 }
@@ -276,5 +291,101 @@ describe("son de Léo", () => {
     expect(listeners.size).toBe(0);
     expect(sound.enabled).toBe(false);
     new LeoSound(() => null, null).destroy();
+  });
+});
+
+/** Source du fond sonore : celle qui lit le tampon simulé (1 s), pas le bruit des pneus du moteur. */
+const isAmbience = (node: FakeNode) => node.kind === "buffer-source" && (node.buffer as { duration?: number } | null)?.duration === 1;
+
+describe("fond sonore de ville", () => {
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  it("n'est téléchargé qu'à l'activation du son, puis joue en boucle, monté en douceur", async () => {
+    const loader = vi.fn(async () => fakeAmbience());
+    const { sound, ctx } = setup({ ambience: loader });
+    sound.update(30, true, false, 0.016);
+    expect(loader).not.toHaveBeenCalled();
+    sound.setEnabled(true);
+    expect(loader).toHaveBeenCalledOnce();
+    await flush();
+    const source = ctx.nodes.find((node) => isAmbience(node)) as FakeNode;
+    expect(source).toBeDefined();
+    // Boucle sans le silence de compression aux bornes : pas de « blanc » à chaque tour.
+    expect(source.loopStart).toBeCloseTo(80 / 8000);
+    expect(source.loopEnd).toBeCloseTo((8000 - 40) / 8000);
+    expect(source.startedAt).toEqual([ctx.currentTime, 80 / 8000]);
+    const gain = ctx.nodes.find((node) => node.kind === "gain" && node.gain.calls.some(([kind]) => kind === "linear")) as FakeNode;
+    expect(gain.gain.calls).toEqual([["set", 0], ["linear", AMBIENCE_VOLUME]]);
+    expect(AMBIENCE_FADE_SECONDS).toBeGreaterThan(0);
+    // Doux même téléphone à fond : volume bas, sous celui du moteur, et aigus feutrés par un filtre passe-bas.
+    expect(AMBIENCE_VOLUME).toBeLessThanOrEqual(0.05);
+    const soften = ctx.nodes.find((node) => node.kind === "filter" && node.type === "lowpass" && node.frequency.value === AMBIENCE_LOWPASS_HZ);
+    expect(soften).toBeDefined();
+    expect(AMBIENCE_LOWPASS_HZ).toBeLessThanOrEqual(1500);
+    expect(sound.activeNodes).toBe(ctx.nodes.length);
+    // Couper puis rétablir le son ne le télécharge pas une seconde fois et ne double pas la boucle.
+    sound.setEnabled(false);
+    sound.setEnabled(true);
+    await flush();
+    expect(loader).toHaveBeenCalledOnce();
+    expect(ctx.nodes.filter((node) => isAmbience(node))).toHaveLength(1);
+  });
+
+  it("se tait avec le reste du son : pause, onglet caché, son coupé", async () => {
+    const { sound, ctx, fireVisibility } = setup({ ambience: async () => fakeAmbience() });
+    sound.setEnabled(true);
+    await flush();
+    sound.setPaused(true);
+    expect(ctx.state).toBe("suspended");
+    sound.setPaused(false);
+    fireVisibility(true);
+    expect(ctx.state).toBe("suspended");
+    fireVisibility(false);
+    expect(ctx.state).toBe("running");
+  });
+
+  it("arrivé après la fermeture du jeu, il est ignoré ; indisponible, les autres sons continuent", async () => {
+    let deliver: (buffer: AudioBuffer) => void = () => undefined;
+    const late = setup({ ambience: () => new Promise((resolve) => { deliver = resolve; }) });
+    late.sound.setEnabled(true);
+    late.sound.destroy();
+    deliver(fakeAmbience());
+    await flush();
+    expect(late.ctx.nodes.some((node) => isAmbience(node))).toBe(false);
+
+    const failing = setup({ ambience: async () => { throw new Error("réseau"); } });
+    expect(failing.sound.setEnabled(true)).toBe(true);
+    await flush();
+    expect(failing.sound.crash(50)).toBe("accrochage");
+  });
+});
+
+describe("moteur d'une citadine moderne", () => {
+  it("ronronne en douceur : ondes rondes, aucune saturation ni dent de scie, aucun battement", () => {
+    const { sound, ctx } = setup();
+    sound.setEnabled(true);
+    const oscillators = ctx.nodes.filter((node) => node.kind === "oscillator");
+    expect(oscillators.map((node) => node.type).sort()).toEqual(["sine", "triangle"]);
+    expect(ctx.nodes.some((node) => node.kind === "shaper")).toBe(false);
+    // L'octave grave suit la fondamentale : un timbre stable, sans grondement qui pulse.
+    sound.update(40, true, false, 0.016);
+    const hum = oscillators.find((node) => node.type === "triangle") as FakeNode;
+    const body = oscillators.find((node) => node.type === "sine") as FakeNode;
+    expect(body.frequency.value).toBeCloseTo(hum.frequency.value / 2);
+  });
+
+  it("fait monter le bruit des pneus avec la vitesse, silencieux à l'arrêt", () => {
+    const { sound, ctx } = setup();
+    sound.setEnabled(true);
+    const tireBand = ctx.nodes.find((node) => node.kind === "filter" && node.type === "bandpass") as FakeNode;
+    const tireLevel = ctx.nodes[ctx.nodes.indexOf(tireBand) + 1];
+    sound.update(0, false, false, 0.016);
+    expect(tireLevel.gain.value).toBe(0);
+    sound.update(30, false, false, 0.016);
+    const slow = tireLevel.gain.value;
+    sound.update(80, false, false, 0.016);
+    expect(slow).toBeGreaterThan(0);
+    expect(tireLevel.gain.value).toBeGreaterThan(slow);
+    expect(sound.engineState.kmh).toBe(80);
   });
 });

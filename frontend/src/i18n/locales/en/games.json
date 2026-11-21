@@ -131,7 +131,16 @@
     "name": "Driving with Léo",
     "description": "Take Léo's wheel, obey the traffic lights and deliver pizzas all over town.",
     "cta": "Take the wheel",
-    "tagline": "Deliver pizzas across town"
+    "tagline": "Deliver pizzas across town",
+    "player": {
+      "label": "Drive with Léo game",
+      "pizzas": "Pizzas",
+      "speed": "Speed",
+      "restart": "Restart the delivery from the restaurant",
+      "controls": "Driving controls",
+      "steering": "Steering",
+      "pedals": "Pedals"
+    }
   },
   "turboPulse": {
     "name": "Turbo Pulse",

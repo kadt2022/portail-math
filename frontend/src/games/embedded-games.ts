@@ -6,6 +6,7 @@ import { lazy } from "react";
 const loaders = {
   "grille-magique": () => import("./grille-magique/GrilleMagiqueGame").then((m) => ({ default: m.GrilleMagiqueGame })),
   "turbo-pulse": () => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })),
+  "conduire-avec-leo": () => import("./leo-driving/LeoDrivingPlayer").then((m) => ({ default: m.LeoDrivingPlayer })),
 } as const;
 
 type EmbeddedGameId = keyof typeof loaders;
@@ -23,3 +24,4 @@ export function preloadEmbeddedGame(id: string): void {
 
 export const GrilleMagiqueGame = lazy(loaders["grille-magique"]);
 export const TurboPulsePlayer = lazy(loaders["turbo-pulse"]);
+export const LeoDrivingPlayer = lazy(loaders["conduire-avec-leo"]);

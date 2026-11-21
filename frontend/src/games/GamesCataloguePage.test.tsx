@@ -20,6 +20,22 @@ vi.mock("./turbo-pulse/TurboPulseGame", () => ({
   }),
 }));
 
+vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => ({
+  mountLeoLivreurGame: () => ({
+    destroy: () => undefined,
+    refreshLayout: () => undefined,
+    startMission: () => undefined,
+    deliver: () => undefined,
+    reset: () => undefined,
+    setControl: () => undefined,
+    turn: () => undefined,
+    setPaused: () => undefined,
+    retryAssets: () => undefined,
+    setSound: () => false,
+    horn: () => undefined,
+  }),
+}));
+
 function renderPage() {
   return render(
     <MemoryRouter>
@@ -344,6 +360,38 @@ describe("Disposition lecteur, recommandations et autres jeux", () => {
     expect(within(asideAfter).queryByRole("link", { name: "Jouer à Turbo Pulse" })).not.toBeInTheDocument();
   });
 
+  it("changer de jeu lecteur ouvert ramène le haut du nouveau lecteur à l'écran ; jouer ne fait pas défiler la page", async () => {
+    stubDevice(false);
+    const original = Element.prototype.scrollIntoView;
+    const targets: Array<{ element: Element; options: unknown }> = [];
+    Element.prototype.scrollIntoView = function (this: Element, options?: boolean | ScrollIntoViewOptions) {
+      targets.push({ element: this, options });
+    };
+    try {
+      const user = userEvent.setup();
+      renderPage();
+      await user.click(tilesLink());
+      await gameRegion();
+      targets.length = 0;
+
+      // Lecteur déjà ouvert : on choisit un autre jeu (ici dans « À voir aussi »).
+      const aside = screen.getByRole("complementary", { name: "À voir aussi" });
+      await user.click(within(aside).getByRole("link", { name: "Jouer à Turbo Pulse" }));
+      const turbo = await screen.findByRole("region", { name: "Turbo Pulse" }, { timeout: 8000 });
+      // Défilement ciblé sur le cadre du nouveau lecteur (pas un retour en haut du document), immédiat.
+      expect(targets).toHaveLength(1);
+      expect(targets[0].element.contains(turbo)).toBe(true);
+      expect(targets[0].options).toEqual({ block: "start" });
+
+      // Geste dans le jeu (pause) : la page ne bouge pas.
+      targets.length = 0;
+      await user.click(within(turbo).getByRole("button", { name: "Pause" }));
+      expect(targets).toHaveLength(0);
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
   it("une recommandation qui n'est pas intégrée reste un vrai lien vers son jeu", async () => {
     stubDevice(false);
     const user = userEvent.setup();
@@ -399,5 +447,31 @@ describe("Haut de la page Jeux : recherche dans l'en-tête et mode lecteur", () 
     expect(screen.getByRole("heading", { level: 1, name: "Les jeux" })).toBeInTheDocument();
     await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
     expect(screen.getByText("Découvre, joue et apprends avec nos jeux éducatifs")).toBeInTheDocument();
+  });
+});
+
+describe("Conduire avec Léo dans la page Jeux", () => {
+  const leoRegion = () => screen.findByRole("region", { name: "Jeu Conduire avec Léo" }, { timeout: 8000 });
+
+  it("la bannière à la une ouvre Léo dans le lecteur de la page, sans changer de page", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const [banner] = screen.getAllByRole("link", { name: "Jouer à Conduire avec Léo" });
+    await user.click(banner);
+    const region = await leoRegion();
+    expect(within(region).getByRole("toolbar", { name: "Commandes du jeu" })).toBeInTheDocument();
+    expect(within(region).getByRole("region", { name: "Commandes de conduite" })).toBeInTheDocument();
+    // La page Jeux reste là : informations du jeu dessous, recommandations à côté.
+    expect(screen.getByRole("region", { name: "À propos de Conduire avec Léo" })).toBeInTheDocument();
+  });
+
+  it("la carte de Léo dans la galerie l'ouvre aussi dans le lecteur ; Fermer ramène aux autres jeux", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: "Jouer à Conduire avec Léo" });
+    await user.click(links[links.length - 1]);
+    const region = await leoRegion();
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
   });
 });

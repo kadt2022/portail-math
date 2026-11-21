@@ -1,13 +1,19 @@
 // Son de Léo : moteur « Vroom », voitures qui passent, collisions et klaxon, entièrement calculés par l'API Web Audio
-// du navigateur. Aucun fichier son téléchargé, aucune bibliothèque, aucun réglage enregistré (doctrine V1).
+// du navigateur, sur un fond sonore de ville (un seul fichier MP3, joué en boucle). Aucune bibliothèque, aucun
+// réglage enregistré (doctrine V1).
 //
 // Garde-fous :
 // - son coupé au départ ; le contexte audio n'est créé qu'à l'activation par l'enfant (geste exigé par les navigateurs) ;
+//   le fond sonore n'est téléchargé qu'à ce moment-là, jamais si l'enfant garde le son coupé ;
 // - volume plafonné puis limiteur : aucun réglage ne produit de pic sonore ;
-// - son suspendu en pause et quand l'onglet passe en arrière-plan ;
+// - son suspendu en pause et quand l'onglet passe en arrière-plan (fond sonore compris, repris au même endroit) ;
 // - chaque son ponctuel (klaxon, passage, collision) libère ses nœuds à la fin ; trois voitures entendues au plus.
 //
 // Module sans Phaser : la scène lui transmet la vitesse et les pédales, il ne lit rien d'autre.
+
+import { loopBounds } from "../../games/audio/GameAudio";
+
+import cityAmbienceUrl from "./assets/leo-ambiance-ville.mp3";
 
 /** Rapports d'une petite citadine : km/h obtenus à 1000 tr/min dans chaque rapport (index 1 à 5). */
 export const KMH_PER_1000 = [0, 7.6, 13.4, 19.8, 26.0, 31.5] as const;
@@ -34,6 +40,8 @@ export interface EngineState {
   throttle: number;
   /** Secondes restantes de la coupure brève du passage de rapport. */
   shiftDip: number;
+  /** Vitesse réelle (km/h, sans signe) : règle le bruit des pneus sur la route. */
+  kmh: number;
 }
 
 /**
@@ -41,11 +49,12 @@ export interface EngineState {
  * puis retombe à chaque rapport passé. Pur et déterministe (testable).
  */
 export class EngineModel {
-  state: EngineState = { rpm: IDLE_RPM, gear: 1, throttle: 0.1, shiftDip: 0 };
+  state: EngineState = { rpm: IDLE_RPM, gear: 1, throttle: 0.1, shiftDip: 0, kmh: 0 };
 
   step(kmh: number, accelerating: boolean, braking: boolean, seconds: number): EngineState {
     const speed = Math.abs(kmh);
     const state = this.state;
+    state.kmh = speed;
     state.throttle = accelerating ? 1 : speed > 0.5 && !braking ? 0.25 : 0.1;
     const rpmIn = (gear: number) => (speed / KMH_PER_1000[gear]) * 1000;
     if (speed < 1) state.gear = 1;
@@ -117,70 +126,62 @@ interface OneShot {
   last: AudioScheduledSourceNode;
 }
 
-/** Moteur « Vroom » : grave, aigus coupés, basse pure, grondement ; s'ouvre quand on accélère. */
+/** Vitesse (km/h) à laquelle le bruit des pneus atteint son niveau maximal. */
+const TIRE_FULL_KMH = 90;
+
+/**
+ * Moteur d'une petite citadine moderne : un ronronnement grave et lisse (ondes douces, aucune saturation, aucun
+ * battement), à peine plus présent à l'accélération, et le bruit des pneus sur la route qui monte avec la vitesse.
+ * C'est ce roulement, plus que le moteur, qu'on entend dans une voiture d'aujourd'hui.
+ */
 function buildVroom(ctx: BaseAudioContext, out: AudioNode) {
-  const saw = ctx.createOscillator();
-  saw.type = "sawtooth";
-  const thick = ctx.createOscillator();
-  thick.type = "sawtooth";
-  const thickLevel = ctx.createGain();
-  thickLevel.gain.value = 0.5;
-  const sub = ctx.createOscillator();
-  sub.type = "sine";
-  const subLevel = ctx.createGain();
-  subLevel.gain.value = 0.9;
-  const pre = ctx.createGain();
-  const shaper = ctx.createWaveShaper();
-  shaper.curve = softClip(1.8);
-  const low1 = ctx.createBiquadFilter();
-  low1.type = "lowpass";
-  low1.Q.value = 0.7;
-  const low2 = ctx.createBiquadFilter();
-  low2.type = "lowpass";
-  low2.Q.value = 0.5;
-  const bass = ctx.createBiquadFilter();
-  bass.type = "lowshelf";
-  bass.frequency.value = 140;
-  bass.gain.value = 8;
-  const growl = ctx.createGain();
-  growl.gain.value = 0.7;
-  const rumble = ctx.createOscillator();
-  rumble.type = "sine";
-  const rumbleDepth = ctx.createGain();
-  rumbleDepth.gain.value = 0.2;
+  // Fondamentale douce (triangle) et son octave grave (sinus) : un timbre rond, sans la râpe des dents de scie.
+  const hum = ctx.createOscillator();
+  hum.type = "triangle";
+  const body = ctx.createOscillator();
+  body.type = "sine";
+  const bodyLevel = ctx.createGain();
+  bodyLevel.gain.value = 0.8;
+  const tone = ctx.createBiquadFilter();
+  tone.type = "lowpass";
+  tone.Q.value = 0.5;
+  const engineLevel = ctx.createGain();
+  engineLevel.gain.value = 0;
+  // Roulement des pneus : bruit large, centré dans les graves-médiums, réglé sur la vitesse.
+  const tires = ctx.createBufferSource();
+  tires.buffer = noiseBuffer(ctx);
+  tires.loop = true;
+  const tireBand = ctx.createBiquadFilter();
+  tireBand.type = "bandpass";
+  tireBand.Q.value = 0.7;
+  const tireLevel = ctx.createGain();
+  tireLevel.gain.value = 0;
   const level = ctx.createGain();
-  level.gain.value = 0;
-  saw.connect(pre);
-  thick.connect(thickLevel);
-  thickLevel.connect(pre);
-  sub.connect(subLevel);
-  subLevel.connect(pre);
-  pre.connect(shaper);
-  shaper.connect(low1);
-  low1.connect(low2);
-  low2.connect(bass);
-  bass.connect(growl);
-  growl.connect(level);
-  rumble.connect(rumbleDepth);
-  rumbleDepth.connect(growl.gain);
+  level.gain.value = 1;
+  hum.connect(tone);
+  body.connect(bodyLevel);
+  bodyLevel.connect(tone);
+  tone.connect(engineLevel);
+  engineLevel.connect(level);
+  tires.connect(tireBand);
+  tireBand.connect(tireLevel);
+  tireLevel.connect(level);
   level.connect(out);
-  for (const source of [saw, thick, sub, rumble]) source.start();
-  const nodes: AudioNode[] = [saw, thick, thickLevel, sub, subLevel, pre, shaper, low1, low2, bass, growl, rumble, rumbleDepth, level];
+  for (const source of [hum, body, tires]) source.start();
+  const nodes: AudioNode[] = [hum, body, bodyLevel, tone, engineLevel, tires, tireBand, tireLevel, level];
   return {
     nodes,
     set(engine: EngineState, t: number) {
       const f = firingFrequency(engine.rpm);
-      const load = engine.shiftDip > 0 ? 0.05 : engine.throttle;
-      saw.frequency.setTargetAtTime(f, t, 0.07);
-      thick.frequency.setTargetAtTime(f * 1.006, t, 0.07);
-      sub.frequency.setTargetAtTime(f, t, 0.07);
-      rumble.frequency.setTargetAtTime(f * 0.5, t, 0.07);
-      pre.gain.setTargetAtTime(0.9 + load * 1.4, t, 0.05);
-      const cutoff = 170 + engine.rpm * 0.07 + load * 520;
-      low1.frequency.setTargetAtTime(cutoff, t, 0.06);
-      low2.frequency.setTargetAtTime(cutoff * 1.4, t, 0.06);
-      rumbleDepth.gain.setTargetAtTime(0.18 + load * 0.12, t, 0.06);
-      level.gain.setTargetAtTime(0.17 + load * 0.1, t, 0.05);
+      // Boîte moderne : le passage de rapport s'entend à peine (léger creux, pas de coupure).
+      const load = engine.shiftDip > 0 ? engine.throttle * 0.6 : engine.throttle;
+      hum.frequency.setTargetAtTime(f, t, 0.12);
+      body.frequency.setTargetAtTime(f / 2, t, 0.12);
+      tone.frequency.setTargetAtTime(220 + engine.rpm * 0.05 + load * 160, t, 0.1);
+      engineLevel.gain.setTargetAtTime(0.24 + load * 0.1, t, 0.1);
+      const roll = Math.min(1, engine.kmh / TIRE_FULL_KMH);
+      tireBand.frequency.setTargetAtTime(350 + roll * 450, t, 0.2);
+      tireLevel.gain.setTargetAtTime(roll * 0.28, t, 0.15);
     },
   };
 }
@@ -352,11 +353,33 @@ export type AudioContextFactory = () => AudioContext | null;
 const defaultFactory: AudioContextFactory = () => (typeof AudioContext === "undefined" ? null : new AudioContext());
 
 /**
+ * Volume du fond sonore de ville (gain avant le limiteur) : un murmure tout juste perceptible, très loin sous le moteur et les klaxons. Le
+ * plafond est fixé ici et non par l'appareil : même volume du téléphone à fond, le fond reste doux.
+ */
+export const AMBIENCE_VOLUME = 0.04;
+/** Les aigus du bruit (souffle, ressac) sont adoucis au-dessus de cette fréquence (Hz) : un fond feutré, jamais agressif. */
+export const AMBIENCE_LOWPASS_HZ = 1200;
+/** Montée progressive du fond sonore à son arrivée (s) : jamais d'entrée brutale. */
+export const AMBIENCE_FADE_SECONDS = 1.5;
+
+/** Charge et décode le fond sonore ; `null` si le navigateur ne peut pas le fournir. */
+export type AmbienceLoader = (ctx: AudioContext) => Promise<AudioBuffer | null>;
+
+export const loadCityAmbience: AmbienceLoader = async (ctx) => {
+  if (typeof fetch === "undefined") return null;
+  const response = await fetch(cityAmbienceUrl);
+  if (!response.ok) return null;
+  return ctx.decodeAudioData(await response.arrayBuffer());
+};
+
+/**
  * Chef d'orchestre du son de Léo. Coupé au départ : rien n'est créé tant que l'enfant n'a pas activé le son.
  */
 export class LeoSound {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  private ambience: GainNode | null = null;
+  private ambienceSource: AudioBufferSourceNode | null = null;
   private engine: ReturnType<typeof buildVroom> | null = null;
   private horn: ReturnType<typeof buildHorn> | null = null;
   private readonly model = new EngineModel();
@@ -369,6 +392,7 @@ export class LeoSound {
   constructor(
     private readonly createContext: AudioContextFactory = defaultFactory,
     private readonly doc: Document | null = typeof document === "undefined" ? null : document,
+    private readonly loadAmbience: AmbienceLoader | null = loadCityAmbience,
   ) {
     this.doc?.addEventListener("visibilitychange", this.onVisibility);
   }
@@ -409,6 +433,16 @@ export class LeoSound {
       this.engine = buildVroom(ctx, master);
       this.live += 2 + this.engine.nodes.length;
       this.engine.set(this.model.state, ctx.currentTime);
+      // Fond sonore : sa propre piste, branchée sur le limiteur (son volume ne dépend pas de celui du moteur).
+      const ambience = ctx.createGain();
+      ambience.gain.value = 0;
+      ambience.connect(limiter);
+      this.ambience = ambience;
+      this.live += 1;
+      this.loadAmbience?.(ctx)
+        .then((buffer) => this.startAmbience(ctx, buffer))
+        // Fond sonore indisponible (réseau, format) : le jeu garde ses autres sons, sans erreur visible.
+        .catch(() => undefined);
     }
     this.enabledFlag = on && this.ctx !== null;
     if (!this.enabledFlag) this.hornOff();
@@ -471,8 +505,36 @@ export class LeoSound {
     this.ctx = null;
     this.engine = null;
     this.master = null;
+    this.ambience = null;
+    this.ambienceSource = null;
     this.horn = null;
     if (ctx) void ctx.close();
+  }
+
+  /** Fond sonore en boucle continue (sans le silence de compression aux bornes), monté en douceur. */
+  private startAmbience(ctx: AudioContext, buffer: AudioBuffer | null) {
+    const gain = this.ambience;
+    // Contexte fermé ou remplacé entre-temps : le fond sonore arrivé en retard est ignoré.
+    if (!buffer || this.ctx !== ctx || !gain || this.ambienceSource) return;
+    const { start, end } = loopBounds(buffer);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.loopStart = start;
+    source.loopEnd = end;
+    const soften = ctx.createBiquadFilter();
+    soften.type = "lowpass";
+    soften.frequency.value = AMBIENCE_LOWPASS_HZ;
+    soften.Q.value = 0.5;
+    source.connect(soften);
+    soften.connect(gain);
+    this.live += 1;
+    const t = ctx.currentTime;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(AMBIENCE_VOLUME, t + AMBIENCE_FADE_SECONDS);
+    source.start(t, start);
+    this.ambienceSource = source;
+    this.live += 1;
   }
 
   private audible() {

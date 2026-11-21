@@ -1,14 +1,20 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { LeoLivreurPrototypePage } from "../../prototypes/leo-livreur/LeoLivreurPrototypePage";
+import { exitNativeFullscreen } from "../fullscreen";
+import { LeoDrivingPlayer } from "./LeoDrivingPlayer";
 
 /**
- * « Conduire avec Léo » : le jeu s'ouvre directement sur l'écran de conduite plein écran (tableau de bord, scène,
- * commandes). « Quitter » ramène au catalogue des jeux.
+ * Page autonome de « Conduire avec Léo » (adresse directe /jeux/conduire-avec-leo). Depuis la page « Jeux », le même lecteur
+ * se joue directement dans le catalogue ; ici, il occupe sa propre page, en affichage normal (plein écran au choix).
+ * « Fermer » ramène au catalogue des jeux.
  */
 export function LeoDrivingGamePage() {
   const navigate = useNavigate();
-  const backToGames = useCallback(() => navigate("/jeux"), [navigate]);
-  return <LeoLivreurPrototypePage startInDrivingMode onExit={backToGames} />;
+  const [fullscreen, setFullscreen] = useState(false);
+  const backToGames = useCallback(async () => {
+    await exitNativeFullscreen();
+    navigate("/jeux");
+  }, [navigate]);
+  return <LeoDrivingPlayer pageHeading fullscreen={fullscreen} onFullscreenChange={setFullscreen} onClose={() => void backToGames()} />;
 }
