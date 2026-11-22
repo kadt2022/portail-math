@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
+import { intentHandlers } from "./preload/cardIntent";
 import type { CardPlacement } from "./gallery-layout";
 import styles from "./GameCard.module.css";
 
@@ -12,13 +13,15 @@ interface GameCardProps {
   placement?: CardPlacement;
   /** Jeux intégrés à la page : le clic ouvre le jeu sur place au lieu de changer de page (l’adresse reste un vrai lien). */
   onOpen?: (game: GameCatalogueEntry) => void;
-  /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
-  onIntent?: (gameId: string) => void;
+  /** Survol stable à la souris : le jeu peut se précharger avant le clic (voir intentPreloader). */
+  onIntent?: (gameId: string, stillHovered: () => boolean) => void;
+  /** Le pointeur quitte la carte : un préchargement qui n'a pas commencé est annulé. */
+  onIntentEnd?: (gameId: string) => void;
 }
 
 // Toute la carte est le lien : pas de bouton « Jouer » séparé. L'illustration occupe
 // la carte entière, le titre et l'accroche sont posés sur une bande en bas.
-export function GameCard({ game, placement, onOpen, onIntent }: GameCardProps) {
+export function GameCard({ game, placement, onOpen, onIntent, onIntentEnd }: GameCardProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
   const style: React.CSSProperties | undefined = placement
@@ -61,11 +64,11 @@ export function GameCard({ game, placement, onOpen, onIntent }: GameCardProps) {
     </>
   );
   const label = t("card.playAria", { name });
-  const intent = onIntent ? () => onIntent(game.id) : undefined;
+  const intent = intentHandlers(game.id, onIntent, onIntentEnd);
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} onPointerEnter={intent} onPointerDown={intent} onFocus={intent}>
+      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} {...intent}>
         {content}
       </Link>
     );

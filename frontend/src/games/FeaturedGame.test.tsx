@@ -27,6 +27,8 @@ describe("Bannière du jeu à la une", () => {
     expect(banner).toHaveAttribute("href", "/jeux/conduire-avec-leo");
     expect(banner).toHaveTextContent("Conduire avec Léo");
     expect(banner).not.toHaveTextContent("Jeu éducatif");
+    // Pas d'accroche sur la bannière : seul le titre du jeu est posé sur la route.
+    expect(banner).not.toHaveTextContent("Livre les pizzas en ville");
   });
 
   it("compose le décor, Léo de profil, Léo de face et le bus de la voie d'en face (tous décoratifs)", () => {

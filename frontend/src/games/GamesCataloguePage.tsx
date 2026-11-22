@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
 import { availableCategories, featuredGame, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
-import { GrilleMagiqueGame, LeoDrivingPlayer, preloadEmbeddedGame, TurboPulsePlayer } from "./embedded-games";
+import { GrilleMagiqueGame, LeoDrivingPlayer, onGameChosen, onGameIntent, onGameIntentEnd, TurboPulsePlayer } from "./embedded-games";
 import { FeaturedGame } from "./FeaturedGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
@@ -51,6 +51,8 @@ export function GamesCataloguePage() {
   const stageRef = useRef<HTMLDivElement>(null);
   const immersive = stage === "immersive";
   const openEmbedded = useCallback((game: GameCatalogueEntry) => {
+    // Le jeu choisi passe avant tout préchargement en attente (il se charge normalement, préchargé ou non).
+    onGameChosen();
     setOpenGameId(game.id);
     setMountedIds((ids) => (ids.includes(game.id) ? ids : [...ids, game.id]));
     if (immersiveDevice && !fullscreenElement()) {
@@ -184,7 +186,7 @@ export function GamesCataloguePage() {
             <>
               <h2 className={styles.recommendedTitle}>{t("cataloguePage.recommended")}</h2>
               {recommended.map((game) => (
-                <RecommendedGameCard key={game.id} game={game} onOpen={game.embed ? openEmbedded : undefined} onIntent={game.embed ? preloadEmbeddedGame : undefined} />
+                <RecommendedGameCard key={game.id} game={game} onOpen={game.embed ? openEmbedded : undefined} onIntent={game.embed ? onGameIntent : undefined} onIntentEnd={game.embed ? onGameIntentEnd : undefined} />
               ))}
             </>
           ) : undefined
@@ -241,7 +243,7 @@ export function GamesCataloguePage() {
       </GameWatchLayout>
 
       <div className={styles.contents} inert={immersive || covered}>
-      {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} onOpen={featuredGame.embed ? openEmbedded : undefined} onIntent={featuredGame.embed ? preloadEmbeddedGame : undefined} /> : null}
+      {featuredGame && !filtering && stage === "closed" ? <FeaturedGame key={visitKey} game={featuredGame} onOpen={featuredGame.embed ? openEmbedded : undefined} onIntent={featuredGame.embed ? onGameIntent : undefined} onIntentEnd={featuredGame.embed ? onGameIntentEnd : undefined} /> : null}
 
       {open && visibleGames.length > 0 ? <h2 className={styles.otherGames}>{t("cataloguePage.otherGames")}</h2> : null}
       <div id={filtersId} className={`${styles.chips}${panel === "filters" ? ` ${styles.panelOpen}` : ""}`} role="group" aria-label={t("cataloguePage.filterLabel")}>
@@ -273,7 +275,7 @@ export function GamesCataloguePage() {
       {visibleGames.length > 0 ? (
         <div ref={gridRef} className={styles.grid}>
           {visibleGames.map((game, index) => (
-            <GameCard key={game.id} game={game} placement={placements[index]} onOpen={openEmbedded} onIntent={game.embed ? preloadEmbeddedGame : undefined} />
+            <GameCard key={game.id} game={game} placement={placements[index]} onOpen={openEmbedded} onIntent={game.embed ? onGameIntent : undefined} onIntentEnd={game.embed ? onGameIntentEnd : undefined} />
           ))}
         </div>
       ) : (
