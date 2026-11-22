@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GameAudio } from "../audio/GameAudio";
 import type { TurboPulseSnapshot } from "./TurboPulseGame";
 import { TurboPulsePage } from "./TurboPulsePage";
 import { TurboPulsePlayer } from "./TurboPulsePlayer";
@@ -29,6 +30,7 @@ const { gameMock, mountTurboPulseGameMock } = vi.hoisted(() => {
 vi.mock("./turbo-pulse-backgrounds", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./turbo-pulse-backgrounds")>()),
   loadImage: () => Promise.resolve(),
+  downloadImage: () => Promise.resolve(),
 }));
 
 vi.mock("./TurboPulseGame", () => ({
@@ -66,6 +68,8 @@ describe("page Turbo Pulse", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     gameMock.listener = null;
+    // Musique : chargée aussitôt (aucun fichier réel dans jsdom) ; le chargement se termine donc avec le moteur.
+    vi.spyOn(GameAudio.prototype, "loadMusic").mockResolvedValue(undefined);
   });
 
   it("monte une seule scène, affiche le calcul sans réponse et détruit Phaser à la sortie", async () => {

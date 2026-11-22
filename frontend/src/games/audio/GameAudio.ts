@@ -1,3 +1,4 @@
+import { type DownloadProgress, fetchWithProgress } from "../loading/fetchWithProgress";
 import { renderSoundEffect, type EffectOptions, type SoundEffect } from "./sound-effects";
 
 // Moteur audio des jeux : une piste musicale d'ambiance et des effets sonores événementiels, sur deux pistes indépendantes,
@@ -153,10 +154,9 @@ export class GameAudio {
   }
 
   /** Télécharge le morceau d'ambiance (il ne sera décodé qu'au premier besoin du contexte audio). */
-  async loadMusic(url: string): Promise<void> {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Musique introuvable : ${url}`);
-    this.musicData = await response.arrayBuffer();
+  /** Télécharge la musique (en annonçant sa progression si demandé) ; elle est décodée dès que le son est disponible. */
+  async loadMusic(url: string, onProgress?: DownloadProgress): Promise<void> {
+    this.musicData = await fetchWithProgress(url, onProgress);
     if (this.context) await this.decodeMusic();
   }
 

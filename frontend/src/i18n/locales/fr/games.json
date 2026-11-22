@@ -159,6 +159,7 @@
       "defense": "Défense",
       "solve": "À résoudre",
       "currentOperation": "Calcul actuel : {{operation}}",
+      "loading": { "title": "Chargement des ressources", "label": "Chargement du jeu" },
       "canvasLabel": "Scène interactive Turbo Pulse. Oriente le piston et touche un fruit portant la bonne réponse.",
       "failure": {
         "eyebrow": "Défense franchie",
