@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -327,6 +327,26 @@ describe("page Turbo Pulse", () => {
     await engineMounted();
     expect(gameMock.togglePause).toHaveBeenCalledOnce();
     visibility.mockRestore();
+  });
+
+  it("Pause pendant le téléchargement du moteur : la demande est affichée puis appliquée à son arrivée", async () => {
+    render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    // Moteur pas encore arrivé : le bouton Pause répond quand même (même chemin que la pause de veille du lecteur).
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    expect(mountTurboPulseGameMock).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Jouer" })).toBeInTheDocument();
+    expect(screen.getByText("Jeu en pause")).toBeInTheDocument();
+    await engineMounted();
+    expect(gameMock.togglePause).toHaveBeenCalledOnce();
+  });
+
+  it("Pause puis reprise avant l'arrivée du moteur : la partie démarre normalement, sans pause", async () => {
+    render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
+    fireEvent.click(screen.getByRole("button", { name: "Reprendre" }));
+    expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+    await engineMounted();
+    expect(gameMock.togglePause).not.toHaveBeenCalled();
   });
 
   it("lecteur visible à l'arrivée du moteur : la partie démarre normalement, sans pause", async () => {

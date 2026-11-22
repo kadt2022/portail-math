@@ -179,6 +179,11 @@ export function TurboPulsePlayer({
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
+  // Pause demandée avant l'arrivée du moteur (bouton Pause, veille de la page) : mémorisée et affichée, puis appliquée au
+  // montage. Sans elle, la demande était perdue et la partie démarrait toute seule.
+  const [engineReady, setEngineReady] = useState(false);
+  const [pausedBeforeEngine, setPausedBeforeEngine] = useState(false);
+  const pausedBeforeEngineRef = useRef(false);
 
   // Musique d'ambiance (308 Ko) : demandée une fois le décor affiché (étape 3). Une seule fois par ouverture du jeu.
   const musicRequested = useRef(false);
@@ -237,9 +242,12 @@ export function TurboPulsePlayer({
         controllerRef.current = mountTurboPulseGame(host, setSnapshot, audio);
         // La scène a pu être mise à l'échelle avant l'arrivée du moteur : Phaser se recale sur la taille actuelle.
         controllerRef.current.refreshLayout();
-        // Lecteur masqué ou page en veille pendant le téléchargement du moteur : la pause demandée alors n'avait encore aucune
-        // partie à arrêter. La partie démarre donc en pause, et l'enfant la lance d'un toucher sur « Reprendre ».
-        if (!activeRef.current || document.visibilityState === "hidden") controllerRef.current.togglePause();
+        // Pause demandée pendant le téléchargement (et pas reprise depuis), lecteur masqué ou page cachée : la partie démarre
+        // en pause, et l'enfant la lance d'un toucher sur « Reprendre ».
+        if (pausedBeforeEngineRef.current || !activeRef.current || document.visibilityState === "hidden") {
+          controllerRef.current.togglePause();
+        }
+        setEngineReady(true);
       })
       .catch((error: unknown) => {
         // Moteur introuvable (réseau coupé) : même issue qu'avant, l'erreur remonte au cadre d'erreur de la page.
@@ -332,6 +340,18 @@ export function TurboPulsePlayer({
     else audioRef.current?.pauseMusic();
   }, [musicOn]);
 
+  // Pause et reprise demandées par le joueur ou par le lecteur (veille) : avant le moteur, la demande est mémorisée.
+  const requestPaused = (next: boolean) => {
+    const controller = controllerRef.current;
+    if (!controller) {
+      pausedBeforeEngineRef.current = next;
+      setPausedBeforeEngine(next);
+      return;
+    }
+    if (snapshot.paused !== next) controller.togglePause();
+  };
+  const paused = engineReady ? snapshot.paused : pausedBeforeEngine;
+
   const rank = rankForLevel(snapshot.levelIndex);
   const progress = Math.min(100, (snapshot.solved / CALCULATIONS_PER_LEVEL) * 100);
   const isSuccess = snapshot.status === "level-complete" || snapshot.status === "mastered";
@@ -373,9 +393,9 @@ export function TurboPulsePlayer({
         { label: t("turboPulse.game.streak"), value: `🔥 ${snapshot.streak}` },
         { label: t("turboPulse.game.defense"), value: `🛡️ ${snapshot.intrusions} / ${snapshot.intrusionLimit}` },
       ]}
-      paused={snapshot.paused}
-      onPlay={() => snapshot.paused && controllerRef.current?.togglePause()}
-      onPause={() => !snapshot.paused && controllerRef.current?.togglePause()}
+      paused={paused}
+      onPlay={() => requestPaused(false)}
+      onPause={() => requestPaused(true)}
       ended={!canPause}
       onRestart={() => controllerRef.current?.restartRun()}
       extraControls={
