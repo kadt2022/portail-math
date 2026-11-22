@@ -71,6 +71,7 @@ import {
   ROAD_HALF_WIDTH,
   ROAD_WIDTH,
   ROAD_Y,
+  SCENE_BOTTOM,
   START_POSITION,
   suburbHousesBetween,
   VEHICLE_LENGTH,
@@ -471,7 +472,8 @@ export class LeoLivreurScene extends Phaser.Scene {
       if (Number.isFinite(fixed) && fixed > 0) this.fixedLaneCap = Math.min(fixed, MAX_LANE_CAP);
       this.createDebugOverlay();
     }
-    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    // Jusqu'au sol sous le décor (SCENE_BOTTOM) : la base des maisons du côté sud ne touche jamais le bord de l'écran.
+    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, SCENE_BOTTOM);
     // Suivi rigide : un lissage (lerp) fait continuer à défiler le décor après l'arrêt de Léo,
     // ce qui ressemble à un freinage élastique de tout le trafic.
     this.cameras.main.startFollow(this.car, true, 1, 1);
@@ -924,7 +926,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.judgeSignal(this.time.now);
     this.updateSignalReadout();
     this.updateWorldZones();
-    if (this.motion.x > WORLD_WIDTH - 20_000) this.cameras.main.setBounds(0, 0, this.motion.x + 1_000_000, WORLD_HEIGHT);
+    if (this.motion.x > WORLD_WIDTH - 20_000) this.cameras.main.setBounds(0, 0, this.motion.x + 1_000_000, SCENE_BOTTOM);
     this.updateTraffic(seconds, delta);
     this.updatePedestrians(seconds);
     if (!this.car) return;
@@ -1668,7 +1670,7 @@ export class LeoLivreurScene extends Phaser.Scene {
       Math.max(startX, boulevard.panelX),
       boulevard.bottomEnd - 2,
       Math.min(endX, boulevard.panelEnd) - Math.max(startX, boulevard.panelX),
-      WORLD_HEIGHT - boulevard.bottomEnd + 2,
+      SCENE_BOTTOM - boulevard.bottomEnd + 2,
     );
     objects.push(grass);
     const signals = boulevardSignals().filter((signal) => signal.x >= startX && signal.x < endX);
@@ -1764,7 +1766,8 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
     const sidewalkEdge = bridgeLayout().deckBottom;
     const gardenFrame = this.textures.getFrame("leo-garden-near-side");
-    const gardenScale = (WORLD_HEIGHT - sidewalkEdge) / gardenFrame.height;
+    // Le jardin descend jusqu'au sol sous le décor : sa bordure fleurie reste sous les maisons, jamais coupée.
+    const gardenScale = (SCENE_BOTTOM - sidewalkEdge) / gardenFrame.height;
     const gardenTileWidth = gardenFrame.width * gardenScale;
     // Le motif est ancré dans le monde et déborde visuellement d'une zone de chargement à l'autre.
     for (let tileX = Math.floor(fromX / gardenTileWidth) * gardenTileWidth; tileX < endX; tileX += gardenTileWidth) {
@@ -1807,12 +1810,12 @@ export class LeoLivreurScene extends Phaser.Scene {
     const container = this.add.container(0, 0).setDepth(-5);
     const width = endX - startX;
     const centerX = (startX + endX) / 2;
-    container.add(this.add.rectangle(centerX, WORLD_HEIGHT / 2, width, WORLD_HEIGHT, WORLD_BACKGROUND_COLOR).setDepth(-5));
+    container.add(this.add.rectangle(centerX, SCENE_BOTTOM / 2, width, SCENE_BOTTOM, WORLD_BACKGROUND_COLOR).setDepth(-5));
     if (kind === "bridge") {
       const bridge = bridgeLayout();
       const waterY = bridge.bottomPartTop + (1 - SUSPENSION.bottomStart) * SUSPENSION.height * bridge.suspensionScale - 4;
       container.add(this.add.rectangle(centerX, bridge.topPartBottom / 2, width, bridge.topPartBottom, SKY_COLOR).setDepth(-4.95));
-      container.add(this.add.rectangle(centerX, (waterY + WORLD_HEIGHT) / 2, width, WORLD_HEIGHT - waterY, WATER_COLOR).setDepth(-4.95));
+      container.add(this.add.rectangle(centerX, (waterY + SCENE_BOTTOM) / 2, width, SCENE_BOTTOM - waterY, WATER_COLOR).setDepth(-4.95));
     }
 
     if (kind === "village") {

@@ -19,11 +19,13 @@ import {
   FAR_SIDE_HOUSE_BASE_Y,
   FAR_SIDE_HOUSE_MAX_HEIGHT,
   FAR_SIDE_HOUSE_WIDTH,
+  GROUND_MARGIN,
   HOUSE_ROW_Y,
   MAIN_LANE_Y,
   ROAD_HALF_WIDTH,
   ROAD_WIDTH,
   ROAD_Y,
+  SCENE_BOTTOM,
   STREET_VIEW_HEIGHT,
   STREET_VIEW_TOP,
   WORLD_HEIGHT,
@@ -99,7 +101,8 @@ describe("zoom de la caméra", () => {
 
   it("n'agrandit jamais l'image et ne descend pas sous l'échelle minimale sur téléphone", () => {
     expect(cameraZoomFor(3000, 2000)).toBe(1);
-    expect(cameraZoomFor(320, 300)).toBe(MIN_CAMERA_ZOOM);
+    // Cadre de téléphone assez haut pour toute la rue (720 unités) à l'échelle minimale.
+    expect(cameraZoomFor(320, 320)).toBe(MIN_CAMERA_ZOOM);
   });
 
   it("la bande de rue va du toit de la plus haute maison nord au bas du monde, et tient dans la vue de bureau", () => {
@@ -109,7 +112,10 @@ describe("zoom de la caméra", () => {
       expect((FAR_SIDE_HOUSE_WIDTH * height) / width).toBeLessThanOrEqual(FAR_SIDE_HOUSE_MAX_HEIGHT);
     }
     expect(STREET_VIEW_TOP).toBe(FAR_SIDE_HOUSE_BASE_Y - FAR_SIDE_HOUSE_MAX_HEIGHT);
-    expect(STREET_VIEW_TOP + STREET_VIEW_HEIGHT).toBe(WORLD_HEIGHT);
+    // La bande descend jusqu'au sol sous le décor : la base des maisons sud n'est jamais au bord de l'écran.
+    expect(STREET_VIEW_TOP + STREET_VIEW_HEIGHT).toBe(SCENE_BOTTOM);
+    expect(SCENE_BOTTOM).toBe(WORLD_HEIGHT + GROUND_MARGIN);
+    expect(GROUND_MARGIN).toBeGreaterThan(0);
     // Maisons sud et route comprises ; la bande ne dépasse pas la vue de bureau (aucun changement sur ordinateur).
     expect(STREET_VIEW_TOP).toBeLessThan(ROAD_Y - ROAD_HALF_WIDTH);
     expect(HOUSE_ROW_Y).toBeLessThan(WORLD_HEIGHT);
@@ -127,7 +133,7 @@ describe("zoom de la caméra", () => {
   });
 
   it("cadre de bureau ou assez haut : échelle inchangée par la bande de rue", () => {
-    for (const [width, height] of [[1150, 620], [1025, 449], [1366, 618], [320, 300]]) {
+    for (const [width, height] of [[1150, 620], [1025, 449], [1366, 618], [320, 320]]) {
       const fit = Math.min(width / VIEW_WORLD_WIDTH, height / VIEW_WORLD_HEIGHT);
       expect(cameraZoomFor(width, height)).toBe(Math.max(MIN_CAMERA_ZOOM, Math.min(1, fit)));
     }

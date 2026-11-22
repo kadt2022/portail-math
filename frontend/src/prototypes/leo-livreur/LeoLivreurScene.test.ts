@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, onTes
 
 import { LeoLivreurScene, mountLeoLivreurGame, renderPixelRatio, type LeoLivreurSnapshot } from "./LeoLivreurGame";
 import { BRIDGE_END_X, BRIDGE_START_X, cityLayout } from "./leoCityLayout";
-import { DESTINATIONS, MAIN_LANE_Y, ROAD_Y, START_POSITION } from "./leoGeometry";
+import { DESTINATIONS, MAIN_LANE_Y, ROAD_Y, SCENE_BOTTOM, START_POSITION, WORLD_HEIGHT } from "./leoGeometry";
 import { MISSION_ADDRESSES } from "./leoMission";
 import type { LeoSound } from "./leoAudio";
 import { kmhToPx, pxToMeters } from "./leoUnits";
@@ -132,6 +132,19 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
   afterEach(() => {
     while (games.length) games.pop()?.destroy(true);
     window.history.replaceState(null, "", "/");
+  });
+
+  it("la caméra descend jusqu'au sol sous le décor : la base des maisons du bas n'est jamais au bord de l'écran", async () => {
+    const { internals, step, started } = await mountScene();
+    await stepUntil(step, started);
+    const scene = internals as unknown as LeoLivreurScene;
+    expect(scene.cameras.main.getBounds().bottom).toBe(SCENE_BOTTOM);
+    // Scène de téléphone tenu droit (343 × 319) : la vue va jusqu'au sol, sans montrer plus que la hauteur du monde.
+    scene.scale.resize(343, 319);
+    await step(20);
+    const view = scene.cameras.main.worldView;
+    expect(view.bottom).toBeCloseTo(SCENE_BOTTOM, 0);
+    expect(view.height).toBeLessThanOrEqual(WORLD_HEIGHT + 0.5);
   });
 
   it("démarre avec le seul lot commun et attend Commencer", async () => {

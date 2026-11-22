@@ -108,7 +108,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(toolbarNames()).toEqual([
       "Pause",
       "Recommencer la livraison depuis le restaurant",
-      "Son coupé",
+      "Son activé",
       "Passer en plein écran",
       "Fermer le jeu et retrouver les autres jeux",
     ]);
@@ -146,15 +146,31 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(controllerMock.setPaused).toHaveBeenLastCalledWith(false);
   });
 
-  it("Recommencer repart du restaurant, Son active le son du jeu (coupé au départ)", async () => {
+  it("Recommencer repart du restaurant ; le son est activé par défaut, allumé au premier geste, et le bouton Son le coupe", async () => {
     const user = userEvent.setup();
     renderGame();
+    // Son voulu dès l'ouverture, mais rien n'est joué avant un geste de l'enfant (règle des navigateurs).
+    expect(screen.getByRole("button", { name: "Son activé" })).toHaveAttribute("aria-pressed", "true");
+    expect(controllerMock.setSound).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Recommencer la livraison depuis le restaurant" }));
     expect(controllerMock.reset).toHaveBeenCalledOnce();
     expect(screen.getByRole("dialog", { name: "Tournée 1 — Préparation" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Son coupé" }));
+    // Premier geste dans le lecteur : le son s'allume, une seule fois.
+    expect(controllerMock.setSound).toHaveBeenCalledOnce();
     expect(controllerMock.setSound).toHaveBeenCalledWith(true);
-    expect(screen.getByRole("button", { name: "Son activé" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Son activé" }));
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(false);
+    expect(screen.getByRole("button", { name: "Son coupé" })).toHaveAttribute("aria-pressed", "false");
+    await user.click(screen.getByRole("button", { name: "Son coupé" }));
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(true);
+  });
+
+  it("navigateur sans son : au premier geste, le bouton revient à « Son coupé »", async () => {
+    controllerMock.setSound.mockReturnValueOnce(false);
+    const user = userEvent.setup();
+    renderGame();
+    await user.click(screen.getByRole("button", { name: "Pause" }));
+    expect(screen.getByRole("button", { name: "Son coupé" })).toBeInTheDocument();
   });
 
   it("plein écran : la barre disparaît, seul « Quitter » reste, et les commandes de conduite restent dans la scène", async () => {

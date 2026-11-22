@@ -44,8 +44,10 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const [controller, setController] = useState<LeoLivreurController | null>(null);
   const [snapshot, setSnapshot] = useState<LeoLivreurSnapshot>(INITIAL_SNAPSHOT);
   const [paused, setPaused] = useState(false);
-  // Son coupé au départ, activé par l'enfant (règle du jeu de Léo).
-  const [soundOn, setSoundOn] = useState(false);
+  // Son activé par défaut. Le navigateur n'autorise le son qu'après un geste : il s'allume au premier toucher (ou à la
+  // première touche) dans le lecteur ; le bouton Son le coupe ou le rallume à tout moment.
+  const [soundOn, setSoundOn] = useState(true);
+  const soundStarted = useRef(false);
   // Taille des boutons de conduite : d'après la place réelle du lecteur, pas celle de la fenêtre.
   const [stageSize, setStageSize] = useState({ width: 960, height: 540 });
   // Hauteur réelle de la scène : trop basse, les fenêtres de la mission recouvrent aussi le panneau de conduite (inactif).
@@ -108,8 +110,28 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     controllerRef.current?.refreshLayout();
   }, [fullscreen, cover, releaseAll]);
 
+  // Premier geste dans le lecteur : le son voulu par défaut est réellement allumé (navigateur sans son : bouton « coupé »).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !controller || !soundOn || soundStarted.current) return;
+    const start = () => {
+      if (soundStarted.current) return;
+      soundStarted.current = true;
+      if (!controller.setSound(true)) setSoundOn(false);
+    };
+    root.addEventListener("pointerdown", start, true);
+    root.addEventListener("keydown", start, true);
+    return () => {
+      root.removeEventListener("pointerdown", start, true);
+      root.removeEventListener("keydown", start, true);
+    };
+  }, [controller, soundOn]);
+
   // Appelé directement par le clic : c'est ce geste qui autorise le navigateur à jouer du son.
-  const toggleSound = () => setSoundOn(controller?.setSound(!soundOn) ?? false);
+  const toggleSound = () => {
+    soundStarted.current = true;
+    setSoundOn(controller?.setSound(!soundOn) ?? false);
+  };
   // Recommencer : nouvelle partie depuis le restaurant (la scène repart du départ, odomètre à zéro).
   const restart = () => {
     releaseAll();
