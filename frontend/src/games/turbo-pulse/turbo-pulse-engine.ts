@@ -29,6 +29,19 @@ export function fruitSpawnYRange(
   };
 }
 
+// Ramène une hauteur de fruit dans la plage de circulation : c'est la seule zone visible où un fruit a le droit d'être.
+export function clampToFruitRange(y: number, range: FruitSpawnYRange): number {
+  return Math.min(range.max, Math.max(range.min, y));
+}
+
+// Hauteurs des fruits de départ d'un niveau : régulièrement réparties dans la plage de circulation du monde réel (et
+// non dans celle du monde de référence 960x540), au centre de bandes égales. Sur un monde bas (téléphone), aucun fruit
+// ne démarre donc sous le bas visible de la scène.
+export function startingFruitYs(count: number, range: FruitSpawnYRange): number[] {
+  const span = Math.max(0, range.max - range.min);
+  return Array.from({ length: count }, (_, index) => range.min + (span * (index + 0.5)) / count);
+}
+
 // Monde de référence (voir TurboPulseGame.ts) : le monde réel suit la taille
 // du conteneur (Scale.RESIZE), mais toutes les tailles visuelles/hitboxes
 // ci-dessous sont conçues pour cette résolution — c'est le point de départ

@@ -43,6 +43,7 @@ interface SceneInternals {
   cannonBadge?: { text: string };
   worldWidth: number;
   worldHeight: number;
+  fruitYRange: { min: number; max: number };
   cannonY: number;
   cannonArm?: { x: number; y: number; scaleX: number };
   cannonBase?: { x: number; y: number; scaleX: number };
@@ -366,6 +367,55 @@ describe("scène Turbo Pulse", () => {
 
     expect(internals.fruits).toHaveLength(fruitsAvant);
     expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
+  });
+
+  // Fruits entièrement dans le monde visible : sous le bandeau HUD et au-dessus du bas de la scène.
+  function expectFruitsVisible(internals: SceneInternals) {
+    const radius = internals.metrics.fruitRadius;
+    for (const fruit of internals.fruits) {
+      expect(fruit.view.y).toBeGreaterThanOrEqual(internals.fruitYRange.min);
+      expect(fruit.view.y).toBeLessThanOrEqual(internals.fruitYRange.max);
+      expect(fruit.view.y + radius).toBeLessThan(internals.worldHeight);
+    }
+  }
+
+  it.each([
+    ["téléphone tenu droit, dans la page", 480, 308],
+    ["téléphone couché, dans la page", 765, 278],
+    ["téléphone couché, plein écran", 812, 329],
+    ["monde minimal", 480, 270],
+  ])("%s (%i × %i) : les trois fruits de départ sont entièrement visibles", async (_mode, width, height) => {
+    const { scene } = await mountSceneAtSize(width, height);
+    const internals = internalsOf(scene);
+    expect(internals.fruits).toHaveLength(3);
+    expectFruitsVisible(internals);
+  });
+
+  it("rotation en pleine partie (portrait vers paysage) : les fruits en jeu sont ramenés dans la nouvelle zone visible", async () => {
+    const { scene } = await mountSceneAtSize(480, 641);
+    const internals = internalsOf(scene);
+    // Un fruit bas, valide dans la scène portrait (641 de haut)…
+    internals.fruits[2].view.y = internals.fruitYRange.max;
+    const valeurs = internals.fruits.map((fruit) => [fruit.spec.number, fruit.view.x, fruit.speed]);
+
+    scene.scale.resize(480, 308);
+
+    // … reste visible dans la scène paysage (308) ; abscisse, vitesse et valeur sont inchangées.
+    expect(internals.worldHeight).toBe(308);
+    expectFruitsVisible(internals);
+    expect(internals.fruits.map((fruit) => [fruit.spec.number, fruit.view.x, fruit.speed])).toEqual(valeurs);
+  });
+
+  it("l'ondulation d'un fruit ne le fait jamais sortir de la zone visible", async () => {
+    const { scene } = await mountSceneAtSize(480, 270);
+    const internals = internalsOf(scene);
+    for (const fruit of internals.fruits) {
+      fruit.view.y = internals.fruitYRange.max;
+      fruit.phase = Math.PI / 2; // ondulation vers le bas au départ
+      fruit.view.x = 400;
+    }
+    for (let frame = 0; frame < 120; frame += 1) scene.update(frame * 16, 16);
+    expectFruitsVisible(internals);
   });
 
   it("relance le parcours au niveau 1 depuis le panneau maîtrisé", async () => {

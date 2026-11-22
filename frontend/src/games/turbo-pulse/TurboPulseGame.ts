@@ -20,6 +20,7 @@ import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
   chooseTargetResult,
+  clampToFruitRange,
   comboForHit,
   createFruitSpec,
   createStartingFruitSpecs,
@@ -30,6 +31,7 @@ import {
   hasFullyCrossedDefense,
   INTRUSION_LIMITS,
   MAX_FRUITS,
+  startingFruitYs,
   operationForResult,
   randomInt,
   REFERENCE_WORLD_HEIGHT,
@@ -261,7 +263,8 @@ export class TurboPulseScene extends Phaser.Scene {
       const fruit = this.fruits[index];
       fruit.view.x -= fruit.speed * seconds;
       fruit.phase += fruit.wobble * seconds;
-      fruit.view.y += Math.sin(fruit.phase) * 0.35;
+      // Ondulation bornée à la plage de circulation : un fruit ne sort jamais de la zone visible, même en dérivant.
+      fruit.view.y = clampToFruitRange(fruit.view.y + Math.sin(fruit.phase) * 0.35, this.fruitYRange);
       if (hasFullyCrossedDefense(fruit.view.x, this.metrics.fruitRadius, DEFENSE_X)) {
         if (this.registerIntrusion(fruit)) return;
       }
@@ -378,6 +381,11 @@ export class TurboPulseScene extends Phaser.Scene {
     this.metrics = getTurboPulseVisualMetrics(width, height);
     this.cannonY = height - this.metrics.cannonBottomMargin;
     this.fruitYRange = fruitSpawnYRange(this.metrics.fruitRadius, height);
+    // Rotation, plein écran, redimensionnement : les fruits déjà en jeu restent dans la nouvelle plage visible (seule leur
+    // hauteur est ramenée ; abscisse, vitesse et valeur sont inchangées).
+    this.fruits.forEach((fruit) => {
+      fruit.view.y = clampToFruitRange(fruit.view.y, this.fruitYRange);
+    });
     this.drawWorld();
     this.applyCannonMetrics();
   };
@@ -517,7 +525,10 @@ export class TurboPulseScene extends Phaser.Scene {
     }
     const starting = createStartingFruitSpecs(index);
     this.nextFruitId = 4;
-    [630, 760, 890].forEach((x, fruitIndex) => this.createFruitActor(starting[fruitIndex], x, 155 + fruitIndex * 112));
+    // Hauteurs réparties dans la plage du monde réel (et non celle du monde de référence) : sur un téléphone, aucun fruit
+    // de départ ne passe sous le bas visible de la scène.
+    const startingYs = startingFruitYs(starting.length, this.fruitYRange);
+    [630, 760, 890].forEach((x, fruitIndex) => this.createFruitActor(starting[fruitIndex], x, startingYs[fruitIndex]));
     this.setTarget(starting[0].number);
     this.scheduleNextArrival(this.time.now);
     this.feedback = `Niveau ${index + 1} — ${TURBO_LEVELS[index].name}`;

@@ -75,6 +75,31 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(en.leoDriving.name).toBe("Driving with Léo");
   });
 
+  it.each([
+    // Scène paysage basse (téléphone couché, lecteur dans la page) : colonnes de part et d'autre, klaxon avec la direction.
+    [765, 227, "landscape-rails", true],
+    // Ordinateur : panneau sous la scène, comme avant ; le klaxon reste à côté de la consigne.
+    [1025, 449, "landscape-compact", false],
+  ] as const)("scène de %i × %i : panneau « %s »", async (width, height, format, hornWithSteering) => {
+    const widthSpy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(width);
+    const heightSpy = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(height);
+    renderGame();
+    // Remesure de la scène une fois la disposition appliquée (redimensionnement, puis deux images d'animation).
+    await act(async () => {
+      window.dispatchEvent(new Event("resize"));
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    });
+    const controls = screen.getByRole("region", { name: "Commandes de conduite" });
+    expect(controls.closest("[data-format]")).toHaveAttribute("data-format", format);
+    const steering = within(within(controls).getByLabelText("Direction"));
+    expect(steering.queryByRole("button", { name: "Klaxon (maintenir)" }) !== null).toBe(hornWithSteering);
+    // Toutes les commandes de conduite restent dans la région, une seule fois chacune.
+    expect(within(controls).getAllByRole("button", { name: "Klaxon (maintenir)" })).toHaveLength(1);
+    expect(within(within(controls).getByLabelText("Pédales")).getAllByRole("button")).toHaveLength(3);
+    widthSpy.mockRestore();
+    heightSpy.mockRestore();
+  });
+
   it("s'ouvre dans le lecteur standard : en-tête de partie, barre de commandes et commandes de conduite dans la scène", () => {
     renderGame();
     expect(region().className).not.toMatch(/fullscreen/);

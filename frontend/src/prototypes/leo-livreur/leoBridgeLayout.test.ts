@@ -12,7 +12,36 @@ import {
   VIEW_WORLD_HEIGHT,
   VIEW_WORLD_WIDTH,
 } from "./leoBridgeLayout";
-import { MAIN_LANE_Y, ROAD_HALF_WIDTH, ROAD_WIDTH, ROAD_Y } from "./leoGeometry";
+import turquoiseHouse from "./assets/leo-house-turquoise.webp?inline";
+import yellowHouse from "./assets/leo-house-yellow-v1-compact.webp?inline";
+
+import {
+  FAR_SIDE_HOUSE_BASE_Y,
+  FAR_SIDE_HOUSE_MAX_HEIGHT,
+  FAR_SIDE_HOUSE_WIDTH,
+  HOUSE_ROW_Y,
+  MAIN_LANE_Y,
+  ROAD_HALF_WIDTH,
+  ROAD_WIDTH,
+  ROAD_Y,
+  STREET_VIEW_HEIGHT,
+  STREET_VIEW_TOP,
+  WORLD_HEIGHT,
+} from "./leoGeometry";
+
+/** Dimensions d'une image WebP (en-têtes VP8, VP8L ou VP8X), lues dans les octets du fichier lui-même. */
+function webpSize(dataUri: string) {
+  const binary = atob(dataUri.slice(dataUri.indexOf(",") + 1));
+  const byte = (index: number) => binary.charCodeAt(index);
+  const uint = (index: number, length: number) => Array.from({ length }, (_, k) => byte(index + k) * 256 ** k).reduce((a, b) => a + b, 0);
+  const chunk = binary.slice(12, 16);
+  if (chunk === "VP8X") return { width: 1 + uint(24, 3), height: 1 + uint(27, 3) };
+  if (chunk === "VP8L") {
+    const bits = uint(21, 4);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  }
+  return { width: uint(26, 2) & 0x3fff, height: uint(28, 2) & 0x3fff };
+}
 
 describe("pont en pseudo-3D", () => {
   const layout = bridgeLayout();
@@ -71,6 +100,37 @@ describe("zoom de la caméra", () => {
   it("n'agrandit jamais l'image et ne descend pas sous l'échelle minimale sur téléphone", () => {
     expect(cameraZoomFor(3000, 2000)).toBe(1);
     expect(cameraZoomFor(320, 300)).toBe(MIN_CAMERA_ZOOM);
+  });
+
+  it("la bande de rue va du toit de la plus haute maison nord au bas du monde, et tient dans la vue de bureau", () => {
+    // Façades nord réellement chargées (voir FAR_SIDE_HOUSE_KEYS) : aucune n'est plus haute que la constante.
+    for (const image of [turquoiseHouse, yellowHouse]) {
+      const { width, height } = webpSize(image);
+      expect((FAR_SIDE_HOUSE_WIDTH * height) / width).toBeLessThanOrEqual(FAR_SIDE_HOUSE_MAX_HEIGHT);
+    }
+    expect(STREET_VIEW_TOP).toBe(FAR_SIDE_HOUSE_BASE_Y - FAR_SIDE_HOUSE_MAX_HEIGHT);
+    expect(STREET_VIEW_TOP + STREET_VIEW_HEIGHT).toBe(WORLD_HEIGHT);
+    // Maisons sud et route comprises ; la bande ne dépasse pas la vue de bureau (aucun changement sur ordinateur).
+    expect(STREET_VIEW_TOP).toBeLessThan(ROAD_Y - ROAD_HALF_WIDTH);
+    expect(HOUSE_ROW_Y).toBeLessThan(WORLD_HEIGHT);
+    expect(STREET_VIEW_HEIGHT).toBeLessThanOrEqual(VIEW_WORLD_HEIGHT);
+  });
+
+  it("cadre bas (téléphone, lecteur dans la page) : la caméra recule juste assez pour montrer toute la rue", () => {
+    // Scènes mesurées sur téléphone : couché dans la page, couché en plein écran, colonnes latérales.
+    for (const [width, height] of [[765, 165], [812, 268], [600, 231], [207, 174]]) {
+      const zoom = cameraZoomFor(width, height);
+      expect(height / zoom).toBeGreaterThanOrEqual(STREET_VIEW_HEIGHT - 0.5);
+      // Jamais plus de recul que nécessaire : la rue remplit exactement la hauteur quand l'échelle minimale ne suffit pas.
+      if (height / MIN_CAMERA_ZOOM < STREET_VIEW_HEIGHT) expect(height / zoom).toBeCloseTo(STREET_VIEW_HEIGHT, 5);
+    }
+  });
+
+  it("cadre de bureau ou assez haut : échelle inchangée par la bande de rue", () => {
+    for (const [width, height] of [[1150, 620], [1025, 449], [1366, 618], [320, 300]]) {
+      const fit = Math.min(width / VIEW_WORLD_WIDTH, height / VIEW_WORLD_HEIGHT);
+      expect(cameraZoomFor(width, height)).toBe(Math.max(MIN_CAMERA_ZOOM, Math.min(1, fit)));
+    }
   });
 
   it("la scène du pont tient dans la vue avec le décalage de caméra", () => {

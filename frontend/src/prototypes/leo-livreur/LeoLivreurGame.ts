@@ -60,6 +60,8 @@ import {
 import { updateLeoMotion, type LeoMotionInput, type LeoMotionState } from "./leoDriving";
 import {
   DESTINATIONS,
+  FAR_SIDE_HOUSE_BASE_Y,
+  FAR_SIDE_HOUSE_WIDTH,
   isInsideDestination,
   laneAt,
   type LeoDestination,
@@ -1783,10 +1785,10 @@ export class LeoLivreurScene extends Phaser.Scene {
       }
       const houseKey = FAR_SIDE_HOUSE_KEYS[((number - 1) / 2) % FAR_SIDE_HOUSE_KEYS.length];
       const houseSource = this.textures.get(houseKey).getSourceImage() as HTMLImageElement;
-      const houseBaseY = ROAD_Y - ROAD_HALF_WIDTH - 100;
+      const houseBaseY = FAR_SIDE_HOUSE_BASE_Y;
       container.add(this.add.image(x, houseBaseY, houseKey)
         .setOrigin(0.5, 1)
-        .setScale(210 / houseSource.width)
+        .setScale(FAR_SIDE_HOUSE_WIDTH / houseSource.width)
         .setDepth(2));
       const signX = x + 70;
       const signY = houseBaseY - 28;
