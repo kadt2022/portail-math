@@ -15,6 +15,7 @@ import {
   FRUIT_BADGE_SIZE,
 } from "./turbo-pulse-art";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
+import { MIN_WORLD_HEIGHT, MIN_WORLD_WIDTH } from "./turbo-pulse-world";
 import {
   CALCULATIONS_PER_LEVEL,
   CANNON_BOTTOM_MARGIN,
@@ -47,8 +48,8 @@ import {
 // Un clamp maison ici (sur worldWidth/worldHeight seuls) laisserait le
 // canvas continuer à rétrécir en dessous pendant que la logique de jeu
 // croirait le monde plus grand qu'il ne l'est réellement à l'écran.
-export const MIN_WORLD_WIDTH = 480;
-export const MIN_WORLD_HEIGHT = 270;
+// Valeurs définies sans Phaser (turbo-pulse-world) : le lecteur les lit sans télécharger le moteur.
+export { MIN_WORLD_HEIGHT, MIN_WORLD_WIDTH };
 const DEFENSE_X = 72;
 const SHOT_SPEED = 620;
 
@@ -185,6 +186,8 @@ export class TurboPulseScene extends Phaser.Scene {
   private lastFireAt = 0;
   private muted = false;
   private paused = false;
+  /** Vrai une fois create() terminé : avant, this.scene n'existe pas encore (voir togglePause). */
+  private created = false;
   private completionTimer?: Phaser.Time.TimerEvent;
 
   private readonly audio?: TurboPulseSoundOutput;
@@ -238,6 +241,12 @@ export class TurboPulseScene extends Phaser.Scene {
       this.fire();
     });
     this.restartRun();
+    this.created = true;
+    // Pause demandée avant la création de la scène (voir togglePause) : la partie démarre figée, sans rien perdre.
+    if (this.paused) {
+      this.scene.pause();
+      this.emitSnapshot();
+    }
   }
 
   update(time: number, delta: number) {
@@ -341,6 +350,11 @@ export class TurboPulseScene extends Phaser.Scene {
   // qu'à ignorer les entrées pointeur pendant la pause.
   togglePause = () => {
     if (this.status !== "playing" && this.status !== "clearing") return;
+    // Scène pas encore créée par Phaser (juste après le montage, page en veille) : la pause est notée, et create() l'applique.
+    if (!this.created) {
+      this.paused = !this.paused;
+      return;
+    }
     this.paused = !this.paused;
     if (this.paused) this.scene.pause();
     else this.scene.resume();

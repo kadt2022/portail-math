@@ -25,6 +25,12 @@ const { gameMock, mountTurboPulseGameMock } = vi.hoisted(() => {
   return { gameMock, mountTurboPulseGameMock };
 });
 
+// Décors : chargés aussitôt (aucune image réelle dans jsdom) ; le moteur démarre donc dès le premier décor.
+vi.mock("./turbo-pulse-backgrounds", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./turbo-pulse-backgrounds")>()),
+  loadImage: () => Promise.resolve(),
+}));
+
 vi.mock("./TurboPulseGame", () => ({
   mountTurboPulseGame: mountTurboPulseGameMock,
   MIN_WORLD_WIDTH: 480,
@@ -50,14 +56,21 @@ const snapshot: TurboPulseSnapshot = {
   paused: false,
 };
 
+/** Le moteur Phaser arrive par un import dynamique (voir TurboPulsePlayer) : on attend son montage. */
+const engineMounted = () => act(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await vi.dynamicImportSettled();
+});
+
 describe("page Turbo Pulse", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     gameMock.listener = null;
   });
 
-  it("monte une seule scène, affiche le calcul sans réponse et détruit Phaser à la sortie", () => {
+  it("monte une seule scène, affiche le calcul sans réponse et détruit Phaser à la sortie", async () => {
     const view = render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByText("2 + 3 = ?")).toBeInTheDocument();
     expect(screen.queryByText("2 + 3 = 5")).not.toBeInTheDocument();
@@ -66,10 +79,11 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.destroy).toHaveBeenCalledOnce();
   });
 
-  it("cadre plus petit que la scène minimale : la scène garde sa taille et elle est réduite pour tenir entière (canon visible)", () => {
+  it("cadre plus petit que la scène minimale : la scène garde sa taille et elle est réduite pour tenir entière (canon visible)", async () => {
     const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(360);
     const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(216);
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     const host = screen.getByRole("img", { name: /Scène interactive Turbo Pulse/ });
     // 360 / 480 = 0,75 et 216 / 270 = 0,8 : la plus forte réduction l'emporte, la scène fait 480 × 288 avant réduction.
     expect(host.style.getPropertyValue("--scene-scale")).toBe("0.75");
@@ -80,11 +94,12 @@ describe("page Turbo Pulse", () => {
     height.mockRestore();
   });
 
-  it("retour de veille : la scène est remesurée et Phaser recalcule sa taille, sans recréer le jeu", () => {
+  it("retour de veille : la scène est remesurée et Phaser recalcule sa taille, sans recréer le jeu", async () => {
     const frames: FrameRequestCallback[] = [];
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
     vi.stubGlobal("cancelAnimationFrame", () => undefined);
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     gameMock.refreshLayout.mockClear();
     Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
     document.dispatchEvent(new Event("visibilitychange"));
@@ -97,10 +112,28 @@ describe("page Turbo Pulse", () => {
     vi.unstubAllGlobals();
   });
 
-  it("cadre assez grand : aucune réduction", () => {
+  it("retour de veille : un défilement resté dans le cadre du jeu est annulé, la scène n'est jamais décalée", async () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
+    vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
+    const frame = screen.getByRole("img", { name: /Scène interactive Turbo Pulse/ }).parentElement as HTMLElement;
+    // Défilement laissé par le navigateur pendant la veille (bouton « Reprendre » montré alors que la scène débordait).
+    let scrollTop = 3.2;
+    Object.defineProperty(frame, "scrollTop", { configurable: true, get: () => scrollTop, set: (value: number) => { scrollTop = value; } });
+    window.dispatchEvent(new Event("pageshow"));
+    frames.splice(0).forEach((callback) => callback(0));
+    frames.splice(0).forEach((callback) => callback(0));
+    expect(frame.scrollTop).toBe(0);
+    vi.unstubAllGlobals();
+  });
+
+  it("cadre assez grand : aucune réduction", async () => {
     const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(960);
     const height = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(540);
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     const host = screen.getByRole("img", { name: /Scène interactive Turbo Pulse/ });
     expect(host.style.getPropertyValue("--scene-scale")).toBe("");
     expect(host.style.width).toBe("");
@@ -111,14 +144,16 @@ describe("page Turbo Pulse", () => {
   it("relie les commandes tactiles de 48 px au contrôleur du jeu", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     await user.click(screen.getByRole("button", { name: "Son activé" }));
     await user.click(screen.getByRole("button", { name: "Recommencer la partie" }));
     expect(gameMock.toggleMuted).toHaveBeenCalledOnce();
     expect(gameMock.restartRun).toHaveBeenCalledOnce();
   });
 
-  it("offre la barre de commandes standard : Pause/Jouer, Recommencer, Son, Plein écran et Fermer (pas de Portrait sur ordinateur)", () => {
+  it("offre la barre de commandes standard : Pause/Jouer, Recommencer, Son, Plein écran et Fermer (pas de Portrait sur ordinateur)", async () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     const bar = screen.getByRole("toolbar", { name: "Commandes du jeu" });
     for (const name of ["Pause", "Recommencer la partie", "Son activé", "Passer en plein écran", "Fermer le jeu et retrouver les autres jeux"]) {
       expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
@@ -128,6 +163,7 @@ describe("page Turbo Pulse", () => {
   it("échec : une petite carte, le résultat, les tentatives restantes si elles comptent, et une action", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, score: 42, levelIndex: 5, levelName: "X High", intrusions: 1, intrusionLimit: 2, status: "failed", expertAttemptUsed: 1, failureAction: "retry" }));
     const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
     // Échec : pas de score ; sur un niveau expert, les tentatives restantes (et rien d'autre).
@@ -140,8 +176,9 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.retryLevel).toHaveBeenCalledOnce();
   });
 
-  it("échec sur un niveau ordinaire : seulement le résultat et « Réessayer », sans compteur de tentatives", () => {
+  it("échec sur un niveau ordinaire : seulement le résultat et « Réessayer », sans compteur de tentatives", async () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 0, intrusions: 5, status: "failed", expertAttemptUsed: null, failureAction: "retry" }));
     const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
     expect(within(panel).queryByText(/tentative/i)).not.toBeInTheDocument();
@@ -152,6 +189,7 @@ describe("page Turbo Pulse", () => {
   it("échec après la dernière tentative experte : le bouton annonce le retour au niveau 1 (mécanisme du moteur conservé)", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, levelName: "Ultra High", intrusions: 1, intrusionLimit: 1, status: "failed", expertAttemptUsed: 3, failureAction: "restart-run" }));
     const panel = screen.getByRole("dialog", { name: "Oups ! Réessaie" });
     expect(within(panel).getByText("Plus de tentative : retour au niveau 1")).toBeInTheDocument();
@@ -162,6 +200,7 @@ describe("page Turbo Pulse", () => {
   it("met le jeu en pause sans perte d’état puis reprend exactement où il en était", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
 
     await user.click(screen.getByRole("button", { name: "Pause" }));
     expect(gameMock.togglePause).toHaveBeenCalledOnce();
@@ -178,8 +217,9 @@ describe("page Turbo Pulse", () => {
     expect(screen.getByText("🏆 7")).toBeInTheDocument();
   });
 
-  it("désactive le bouton de lecture pendant un panneau d’échec ou de réussite", () => {
+  it("désactive le bouton de lecture pendant un panneau d’échec ou de réussite", async () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, status: "failed", intrusions: 1 }));
     // Panneau de fin : la partie ne tourne plus, le bouton de lecture (« Jouer ») est désactivé.
     expect(screen.getByRole("button", { name: "Jouer" })).toBeDisabled();
@@ -189,6 +229,7 @@ describe("page Turbo Pulse", () => {
   it("victoire : une petite fenêtre « Niveau réussi ! », le score et « Continuer »", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, score: 120, levelIndex: 0, status: "level-complete" }));
     const panel = screen.getByRole("dialog", { name: "Niveau réussi !" });
     expect(within(panel).getByText("Score : 120")).toBeInTheDocument();
@@ -197,8 +238,9 @@ describe("page Turbo Pulse", () => {
     expect(gameMock.nextLevel).toHaveBeenCalledOnce();
   });
 
-  it("célèbre la maîtrise complète dans la même petite fenêtre", () => {
+  it("célèbre la maîtrise complète dans la même petite fenêtre", async () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
 
     expect(screen.getByRole("heading", { name: "Chevalier d'Or" })).toBeInTheDocument();
@@ -218,6 +260,7 @@ describe("page Turbo Pulse", () => {
         </Routes>
       </MemoryRouter>,
     );
+    await engineMounted();
 
     await user.click(screen.getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
 
@@ -231,6 +274,7 @@ describe("page Turbo Pulse", () => {
 
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
 
     // La page autonome s'ouvre en affichage normal ; en plein écran, la barre disparaît et seul « Quitter » reste.
@@ -252,17 +296,43 @@ describe("page Turbo Pulse", () => {
     vi.stubGlobal("matchMedia", (query: string) => ({ matches: !query.includes("orientation"), media: query, addEventListener: () => undefined, removeEventListener: () => undefined }));
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
     await user.click(screen.getByRole("button", { name: "Passer en portrait" }));
     expect(screen.getByRole("region", { name: "Turbo Pulse" })).toHaveAttribute("data-orientation", "portrait");
     expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
     vi.unstubAllGlobals();
   });
 
-  it("met la partie en pause quand le lecteur n'est plus visible", () => {
+  it("met la partie en pause quand le lecteur n'est plus visible", async () => {
     const view = render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    await engineMounted();
     act(() => gameMock.listener?.(snapshot));
     view.rerender(<MemoryRouter><TurboPulsePlayer active={false} /></MemoryRouter>);
+    await engineMounted();
     expect(gameMock.togglePause).toHaveBeenCalledOnce();
+  });
+
+  it("lecteur masqué pendant le téléchargement du moteur : la partie démarre en pause", async () => {
+    const view = render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    view.rerender(<MemoryRouter><TurboPulsePlayer active={false} /></MemoryRouter>);
+    expect(mountTurboPulseGameMock).not.toHaveBeenCalled();
+    await engineMounted();
+    expect(mountTurboPulseGameMock).toHaveBeenCalledOnce();
+    expect(gameMock.togglePause).toHaveBeenCalledOnce();
+  });
+
+  it("mise en veille pendant le téléchargement du moteur : la partie démarre en pause, sans repartir seule", async () => {
+    const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    await engineMounted();
+    expect(gameMock.togglePause).toHaveBeenCalledOnce();
+    visibility.mockRestore();
+  });
+
+  it("lecteur visible à l'arrivée du moteur : la partie démarre normalement, sans pause", async () => {
+    render(<MemoryRouter><TurboPulsePlayer active /></MemoryRouter>);
+    await engineMounted();
+    expect(gameMock.togglePause).not.toHaveBeenCalled();
   });
 
   afterEach(() => {

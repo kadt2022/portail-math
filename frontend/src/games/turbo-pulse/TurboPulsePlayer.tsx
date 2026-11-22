@@ -1,34 +1,33 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  MIN_WORLD_HEIGHT,
-  MIN_WORLD_WIDTH,
-  mountTurboPulseGame,
-  type TurboPulseController,
-  type TurboPulseSnapshot,
-} from "./TurboPulseGame";
+// Types seulement : le moteur Phaser (et ses 313 Ko) est chargé à la demande, voir l'effet de montage.
+import type { TurboPulseController, TurboPulseSnapshot } from "./TurboPulseGame";
+import { MIN_WORLD_HEIGHT, MIN_WORLD_WIDTH } from "./turbo-pulse-world";
 import { GameAudio } from "../audio/GameAudio";
 import { GAMES_SOUND_STORAGE_KEY, usePageVisible } from "../audio/useGameAudio";
 import { onViewportSettled } from "../viewport-events";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
+import { backgroundFor, loadImage, nextBackgroundFor } from "./turbo-pulse-backgrounds";
+import themeUrl from "../../assets/turbo-pulse/turbo-pulse-theme.mp3";
 import styles from "./TurboPulsePlayer.module.css";
 
-// import() dynamique (pas un import statique) : Vite ne télécharge le décor
-// d'un niveau que lorsqu'il est effectivement atteint, au lieu de charger les
-// 7 fonds dès l'arrivée sur le jeu. Un monde par niveau, dans la galaxie
-// Kimbo : Zion, Verdalia, Aqualis, Solara, Glacia, Pyra puis Ultima.
-const LEVEL_BACKGROUND_MODULES = [
-  () => import("../../assets/turbo-pulse/niv001.webp"),
-  () => import("../../assets/turbo-pulse/niv002.webp"),
-  () => import("../../assets/turbo-pulse/niv003.webp"),
-  () => import("../../assets/turbo-pulse/niv004.webp"),
-  () => import("../../assets/turbo-pulse/niv005.webp"),
-  () => import("../../assets/turbo-pulse/niv006.webp"),
-  () => import("../../assets/turbo-pulse/niv007.webp"),
-] as const;
+/**
+ * Attente maximale (ms) du moteur avant de demander le premier décor : sur un réseau qui ne répond plus, le décor est
+ * tout de même demandé.
+ */
+const ENGINE_WAIT_TIMEOUT_MS = 15_000;
+
+/** Promesse résolue de l'extérieur (une seule fois). */
+function deferred() {
+  let resolve: () => void = () => undefined;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
 
 const INITIAL_SNAPSHOT: TurboPulseSnapshot = {
   levelIndex: 0,
@@ -168,38 +167,85 @@ export function TurboPulsePlayer({
   const audioRef = useRef<GameAudio | null>(null);
   const [snapshot, setSnapshot] = useState(INITIAL_SNAPSHOT);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+  const [engineFailure, setEngineFailure] = useState<Error | null>(null);
+  if (engineFailure) throw engineFailure;
 
-  // Décor chargé par niveau (voir LEVEL_BACKGROUND_MODULES) : re-déclenché
-  // uniquement quand levelIndex change réellement, jamais à chaque
-  // instantané de partie (score/série/etc.), pour ne jamais re-télécharger
-  // le même décor. `cancelled` évite d'appliquer un import résolu en retard
-  // après un changement de niveau plus récent (ex. Recommencer pendant que
-  // l'import du niveau précédent était encore en vol).
+  // Ordre des téléchargements sur une connexion lente (le débit est partagé : ce qui part en même temps arrive plus tard) :
+  // 1. le moteur Phaser, pour que la partie démarre au plus tôt ; 2. le décor du niveau en cours, en priorité haute ;
+  // 3. la musique et le décor du niveau suivant. Rien de secondaire ne retarde la partie ni le décor.
+  const engineSettled = useRef(deferred());
+  // Dernière valeur de `active`, lue à l'arrivée du moteur (voir l'effet de montage).
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+
+  // Musique d'ambiance (308 Ko) : demandée une fois le décor affiché (étape 3). Une seule fois par ouverture du jeu.
+  const musicRequested = useRef(false);
+  const requestMusic = () => {
+    if (musicRequested.current || !audioRef.current) return;
+    musicRequested.current = true;
+    void audioRef.current.loadMusic(themeUrl).catch(() => undefined);
+  };
+
+  // Décor du niveau (voir turbo-pulse-backgrounds) : re-déclenché uniquement quand levelIndex change réellement, jamais à
+  // chaque instantané de partie, pour ne jamais redemander le même décor. Demandé une fois le moteur arrivé (étape 2), en
+  // priorité haute, et affiché une fois décodé ; puis la musique et le décor du niveau suivant, en priorité basse : au
+  // changement de niveau, il est déjà là. `cancelled` évite d'appliquer un décor arrivé après un changement de niveau.
   useEffect(() => {
     let cancelled = false;
-    const index = Math.min(snapshot.levelIndex, LEVEL_BACKGROUND_MODULES.length - 1);
-    LEVEL_BACKGROUND_MODULES[index]()
-      .then((module) => {
-        if (!cancelled) setBackgroundUrl(module.default);
+    let timer = 0;
+    const url = backgroundFor(snapshot.levelIndex);
+    Promise.race([
+      engineSettled.current.promise,
+      new Promise<void>((done) => {
+        timer = window.setTimeout(done, ENGINE_WAIT_TIMEOUT_MS);
+      }),
+    ])
+      .then(() => loadImage(url, "high"))
+      .then(() => {
+        if (cancelled) return;
+        setBackgroundUrl(url);
+        requestMusic();
+        const next = nextBackgroundFor(snapshot.levelIndex);
+        if (next) void loadImage(next, "low").catch(() => undefined);
       })
       .catch(() => {
         // Décor indisponible (réseau coupé) : la partie continue sur le décor déjà affiché ou le fond de secours du cadre.
+        if (!cancelled) requestMusic();
       });
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, [snapshot.levelIndex]);
 
   useEffect(() => {
     if (!gameHostRef.current) return;
-    // Son : musique d'ambiance et effets, sur deux pistes indépendantes (voir GameAudio). La musique n'est téléchargée qu'ici,
-    // à l'ouverture de Turbo Pulse ; les effets sont fabriqués par programmation, sans fichier.
+    // Son : musique d'ambiance et effets, sur deux pistes indépendantes (voir GameAudio). La musique est téléchargée après
+    // le premier décor (voir requestMusic) ; les effets sont fabriqués par programmation, sans fichier.
     const audio = new GameAudio({ storageKey: GAMES_SOUND_STORAGE_KEY });
     audioRef.current = audio;
-    controllerRef.current = mountTurboPulseGame(gameHostRef.current, setSnapshot, audio);
-    void import("../../assets/turbo-pulse/turbo-pulse-theme.mp3")
-      .then((module) => audio.loadMusic(module.default))
-      .catch(() => undefined);
+    musicRequested.current = false;
+    // Moteur chargé à la demande (étape 1), dès l'ouverture : le lecteur s'affiche sans l'attendre, et le décor ne lui
+    // dispute pas le débit (il part une fois le moteur arrivé).
+    let disposed = false;
+    const host = gameHostRef.current;
+    import("./TurboPulseGame")
+      .then(({ mountTurboPulseGame }) => {
+        if (disposed) return;
+        controllerRef.current = mountTurboPulseGame(host, setSnapshot, audio);
+        // La scène a pu être mise à l'échelle avant l'arrivée du moteur : Phaser se recale sur la taille actuelle.
+        controllerRef.current.refreshLayout();
+        // Lecteur masqué ou page en veille pendant le téléchargement du moteur : la pause demandée alors n'avait encore aucune
+        // partie à arrêter. La partie démarre donc en pause, et l'enfant la lance d'un toucher sur « Reprendre ».
+        if (!activeRef.current || document.visibilityState === "hidden") controllerRef.current.togglePause();
+      })
+      .catch((error: unknown) => {
+        // Moteur introuvable (réseau coupé) : même issue qu'avant, l'erreur remonte au cadre d'erreur de la page.
+        if (!disposed) setEngineFailure(error instanceof Error ? error : new Error(String(error)));
+      })
+      .finally(() => engineSettled.current.resolve());
     // Le toucher qui a ouvert le jeu autorise déjà le son sur la plupart des navigateurs ; sinon, le prochain toucher dans le
     // lecteur le réveille (iPhone).
     audio.unlock();
@@ -208,6 +254,7 @@ export function TurboPulsePlayer({
     root?.addEventListener("pointerdown", unlock, true);
     root?.addEventListener("keydown", unlock, true);
     return () => {
+      disposed = true;
       root?.removeEventListener("pointerdown", unlock, true);
       root?.removeEventListener("keydown", unlock, true);
       controllerRef.current?.destroy();
@@ -247,6 +294,10 @@ export function TurboPulsePlayer({
         host.style.height = "";
         host.style.removeProperty("--scene-scale");
       }
+      // Le cadre ne défile jamais (voir .canvasFrame) ; sur un navigateur sans overflow: clip, un défilement resté d'une
+      // disposition précédente est annulé ici, sinon la scène resterait décalée.
+      frame.scrollTop = 0;
+      frame.scrollLeft = 0;
       controllerRef.current?.refreshLayout();
     };
     fit();

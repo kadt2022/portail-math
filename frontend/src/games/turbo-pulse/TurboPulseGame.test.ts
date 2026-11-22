@@ -257,6 +257,21 @@ describe("scène Turbo Pulse", () => {
     expect(lastSnapshot(snapshots).score).toBe(scoreAvant);
   });
 
+  it("pause demandée avant que Phaser ait créé la scène (veille au démarrage) : aucun plantage, la partie démarre en pause", async () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+    const snapshots: TurboPulseSnapshot[] = [];
+    const controller = mountTurboPulseGame(parent, (snapshot) => snapshots.push(snapshot));
+    // Juste après le montage : la scène n'existe pas encore pour Phaser.
+    expect(() => controller.togglePause()).not.toThrow();
+    await vi.waitFor(() => expect(snapshots.some((snapshot) => snapshot.paused)).toBe(true), { timeout: 5000 });
+    expect(lastSnapshot(snapshots).paused).toBe(true);
+    // Reprise d'un toucher sur « Reprendre » : la partie repart normalement.
+    controller.togglePause();
+    expect(lastSnapshot(snapshots).paused).toBe(false);
+    controller.destroy();
+  });
+
   it("ne met pas en pause un niveau déjà échoué", async () => {
     const { scene, snapshots } = await mountScene();
     const internals = internalsOf(scene);
