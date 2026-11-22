@@ -9,8 +9,8 @@
 // zoom uniforme (`cameraZoomFor`). En portrait, la scène est limitée à la hauteur utile du monde (au-delà, la
 // caméra ne montrerait que du vide).
 
-import { cameraZoomFor } from "./leoBridgeLayout";
-import { WORLD_HEIGHT } from "./leoGeometry";
+import { cameraZoomFor, MIN_CAMERA_ZOOM } from "./leoBridgeLayout";
+import { STREET_VIEW_HEIGHT, WORLD_HEIGHT } from "./leoGeometry";
 
 export interface DrivingViewport {
   width: number;
@@ -62,4 +62,43 @@ export function drivingLayout(viewport: DrivingViewport): DrivingLayout {
   const sceneMaxHeight = format === "portrait" ? Math.floor(WORLD_HEIGHT * cameraZoomFor(width, height)) : null;
 
   return { orientation, format, touchControls: viewport.coarsePointer, controlSize, sceneMaxHeight };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Disposition dans le lecteur standard des jeux
+//
+// Dans le lecteur, Léo ne reçoit pas tout l'écran mais une scène (souvent 16/9) dont il doit retirer son panneau de
+// conduite. Sur un téléphone, ce panneau posé sous la scène pouvait n'en laisser que 60 à 80 px : la rue était
+// coupée. Quand la scène restante serait plus basse que la rue à l'échelle minimale de la caméra, le panneau se
+// partage en deux colonnes, de part et d'autre de la scène (direction et klaxon à gauche, pédales à droite, sous le
+// pouce de chaque main) ; seule la consigne reste sous la scène, sur une ligne.
+
+export type PlayerDrivingFormat = DrivingFormat | "landscape-rails";
+
+export interface PlayerDrivingLayout extends Omit<DrivingLayout, "format"> {
+  format: PlayerDrivingFormat;
+}
+
+/** Largeur de scène sous laquelle direction, consigne et pédales ne tiennent plus sur une ligne. */
+export const NARROW_STAGE_WIDTH = 640;
+/** Espace entre deux boutons du panneau (voir panelLeft / panelRight). */
+const PANEL_GAP = 8;
+/** Plus grand bouton des colonnes latérales : celui du panneau compact. */
+const MAX_RAIL_CONTROL_SIZE = 56;
+/** Hauteur de scène sous laquelle la rue entière ne tient plus à l'échelle minimale de la caméra. */
+export const MIN_STREET_SCENE_HEIGHT = Math.ceil(STREET_VIEW_HEIGHT * MIN_CAMERA_ZOOM);
+
+export function playerDrivingLayout(stage: DrivingViewport): PlayerDrivingLayout {
+  const width = Math.max(1, stage.width);
+  const height = Math.max(1, stage.height);
+  // Scène portrait : le panneau portrait du jeu (consigne, puis direction et pédales) laisse assez de hauteur.
+  if (width < height) return drivingLayout(stage);
+  // Scène paysage étroite : le panneau prend la disposition portrait (deux lignes), sinon ses boutons ne tiendraient pas.
+  const narrow = width < NARROW_STAGE_WIDTH;
+  const underScene = drivingLayout({ ...stage, height: narrow ? Math.max(height, width + 1) : height });
+  const panelHeight = underScene.controlSize + 2 * PANEL_PADDING + (narrow ? MIN_CONTROL_SIZE + PANEL_GAP : 0);
+  if (height - panelHeight >= MIN_STREET_SCENE_HEIGHT) return underScene;
+  // Colonnes latérales : trois boutons empilés de chaque côté, sur toute la hauteur de la scène.
+  const controlSize = Math.floor(clamp((height - 2 * PANEL_PADDING - 2 * PANEL_GAP) / 3, MIN_CONTROL_SIZE, MAX_RAIL_CONTROL_SIZE));
+  return { orientation: "landscape", format: "landscape-rails", touchControls: stage.coarsePointer, controlSize, sceneMaxHeight: null };
 }

@@ -14,6 +14,7 @@ import {
   fullscreenElement,
   lockOrientation,
 } from "../fullscreen";
+import { useDeviceOrientation } from "../useDeviceOrientation";
 import { useImmersiveDevice } from "../useImmersiveDevice";
 import { useInertOutside } from "../useInertOutside";
 import { onPageSuspended } from "../viewport-events";
@@ -128,6 +129,12 @@ export interface GamePlayerProps {
    * Sinon (par défaut), la scène s'arrête au-dessus de la barre de commandes.
    */
   stageUnderControls?: boolean;
+  /**
+   * Orientation de la scène à l'ouverture sur téléphone : paysage (par défaut), ou « device » : celle dans laquelle l'appareil
+   * est tenu, suivie ensuite à chaque rotation tant que le joueur n'a pas choisi lui-même (bouton Portrait / Paysage). Pour
+   * les jeux dont la scène paysage, une fois réduite à la largeur d'un téléphone tenu droit, deviendrait trop basse.
+   */
+  initialOrientation?: PlayerOrientation | "device";
   /** Décor derrière tout le lecteur (ciel, dégradé…). */
   backdrop?: ReactNode;
   /** Calques posés par-dessus le lecteur (ex. main du tutoriel). */
@@ -168,6 +175,7 @@ export function GamePlayer({
   onClose,
   cover = false,
   stageUnderControls = false,
+  initialOrientation = "landscape",
   backdrop,
   overlay,
   children,
@@ -178,8 +186,12 @@ export function GamePlayer({
   const nativeFullscreen = useRef(false);
   // Présentation voulue à l'instant (une demande de plein écran natif peut aboutir après un retour à l'affichage normal).
   const wantsFullscreen = useRef(fullscreen);
-  const [orientation, setOrientation] =
-    useState<PlayerOrientation>("landscape");
+  // Orientation choisie par le joueur ; absente (« device »), c'est celle de l'appareil, en direct.
+  const deviceOrientation = useDeviceOrientation();
+  const [chosenOrientation, setOrientation] = useState<PlayerOrientation | null>(
+    initialOrientation === "device" ? null : initialOrientation,
+  );
+  const orientation = chosenOrientation ?? deviceOrientation;
   const orientationRef = useRef(orientation);
 
   // Plein écran (natif ou repli CSS) : le reste de l'application est inerte, le focus reste dans le lecteur.

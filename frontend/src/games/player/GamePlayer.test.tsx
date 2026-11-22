@@ -178,6 +178,54 @@ describe("Lecteur standard des jeux", () => {
     expect(region()).toHaveAttribute("data-orientation", "landscape");
   });
 
+  // Téléphone tenu droit (ou couché) : la requête d'orientation suit `held.portrait`, et `rotate` simule une rotation.
+  function stubHeldPhone(portrait: boolean) {
+    const held = { portrait };
+    const listeners = new Set<() => void>();
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      get matches() {
+        return query.includes("orientation") ? held.portrait : true;
+      },
+      media: query,
+      addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
+      removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
+    }));
+    return {
+      rotate: (next: boolean) =>
+        act(() => {
+          held.portrait = next;
+          listeners.forEach((listener) => listener());
+        }),
+    };
+  }
+
+  it("sans option, un téléphone tenu droit ouvre toujours le jeu en paysage (aucun changement pour les autres jeux)", () => {
+    stubHeldPhone(true);
+    render(<FakeGame />);
+    expect(region()).toHaveAttribute("data-orientation", "landscape");
+    vi.unstubAllGlobals();
+  });
+
+  it("orientation « device » : suit l'appareil à l'ouverture et à chaque rotation, jusqu'au choix du joueur", async () => {
+    const phone = stubHeldPhone(true);
+    const user = userEvent.setup();
+    render(<FakeGame initialOrientation="device" />);
+    // Tenu droit : scène portrait dès l'ouverture.
+    expect(region()).toHaveAttribute("data-orientation", "portrait");
+    // L'enfant couche le téléphone : la scène passe en paysage.
+    await phone.rotate(false);
+    expect(region()).toHaveAttribute("data-orientation", "landscape");
+    await phone.rotate(true);
+    expect(region()).toHaveAttribute("data-orientation", "portrait");
+    // Choix explicite (bouton Paysage) : il est gardé, même si l'appareil tourne encore.
+    await user.click(screen.getByRole("button", { name: "Passer en paysage" }));
+    expect(region()).toHaveAttribute("data-orientation", "landscape");
+    await phone.rotate(false);
+    await phone.rotate(true);
+    expect(region()).toHaveAttribute("data-orientation", "landscape");
+    vi.unstubAllGlobals();
+  });
+
   it("téléphone : orientation et plein écran sont indépendants, les quatre présentations, sans perte de partie", async () => {
     stubPhone();
     const user = userEvent.setup();

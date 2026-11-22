@@ -92,3 +92,57 @@
   grid-row: 1 / -1;
   grid-column: 1;
 }
+
+/* Colonnes latérales (scène paysage trop basse pour un panneau dessous, voir playerDrivingLayout) : direction et klaxon à
+   gauche, pédales à droite, sur toute la hauteur ; la consigne reste sous la scène, sur une ligne. Les colonnes ont la
+   largeur exacte d'un bouton et de ses marges : la scène prend tout le reste, sans être recouverte. */
+.stage[data-format="landscape-rails"] {
+  --rail-padding: 6px;
+  --rail-width: calc(var(--control-size) + 2 * var(--rail-padding));
+  grid-template-columns: var(--rail-width) minmax(0, 1fr) var(--rail-width);
+}
+
+.stage[data-format="landscape-rails"] > .scene,
+.stage[data-format="landscape-rails"] > .missionInScene {
+  grid-column: 2;
+}
+
+.stage[data-format="landscape-rails"] > .controls {
+  grid-column: 2;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "info";
+  padding: 4px 6px;
+}
+
+/* Le panneau reste une seule région accessible ; ses deux colonnes sont posées sur les bords de la scène (repère : .stage). */
+.stage[data-format="landscape-rails"] .left,
+.stage[data-format="landscape-rails"] .right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  width: var(--rail-width);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rail-padding);
+  background: inherit;
+}
+
+.stage[data-format="landscape-rails"] .left { left: 0; }
+.stage[data-format="landscape-rails"] .right { right: 0; }
+
+.stage[data-format="landscape-rails"] .info {
+  padding: 2px 8px;
+  font-size: 13px;
+}
+
+.stage[data-format="landscape-rails"] button strong {
+  display: none;
+}
+
+/* Fenêtre de la mission sur une scène basse : elle recouvre aussi les colonnes (inactives pendant la question). */
+.stage[data-format="landscape-rails"] > .missionOverStage {
+  z-index: 1;
+  grid-column: 1 / -1;
+}

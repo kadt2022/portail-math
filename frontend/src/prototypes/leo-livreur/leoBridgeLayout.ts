@@ -9,7 +9,7 @@
 //   5. garde-corps avant, devant les véhicules
 //   6. arches, piles et rivière (bas du calque de suspension)
 
-import { ROAD_HALF_WIDTH, ROAD_WIDTH, ROAD_Y } from "./leoGeometry";
+import { ROAD_HALF_WIDTH, ROAD_WIDTH, ROAD_Y, STREET_VIEW_HEIGHT } from "./leoGeometry";
 
 /** Lignes de leo-world-bridge-deck-v1.webp (1024 × 341) mesurées sur l'image. */
 export const DECK = {
@@ -60,10 +60,14 @@ export const VIEW_WORLD_HEIGHT = 720;
 /** Sur un petit écran on ne descend pas sous cette échelle : les voitures resteraient illisibles. */
 export const MIN_CAMERA_ZOOM = 0.42;
 
-/** Échelle de la caméra pour un cadre de `width` × `height` pixels : tout le décor visible, jamais d'agrandissement. */
+/**
+ * Échelle de la caméra pour un cadre de `width` × `height` pixels : tout le décor visible, jamais d'agrandissement.
+ * L'échelle minimale (lisibilité des voitures) cède devant la hauteur de la rue : dans un cadre bas, la caméra recule
+ * juste assez pour montrer en entier les maisons des deux côtés (STREET_VIEW_HEIGHT), au lieu de les couper.
+ */
 export function cameraZoomFor(width: number, height: number) {
   const fit = Math.min(width / VIEW_WORLD_WIDTH, height / VIEW_WORLD_HEIGHT);
-  return Math.max(MIN_CAMERA_ZOOM, Math.min(1, fit));
+  return Math.min(Math.max(MIN_CAMERA_ZOOM, Math.min(1, fit)), height / STREET_VIEW_HEIGHT);
 }
 
 /** Décalage de caméra sur le pont pour montrer pylônes et lampadaires sans écraser la rivière. */

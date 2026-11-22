@@ -4,15 +4,13 @@ import { useTranslation } from "react-i18next";
 import { mountLeoLivreurGame, type LeoLivreurController, type LeoLivreurSnapshot } from "../../prototypes/leo-livreur/LeoLivreurGame";
 import { ALL_CONTROLS, HoldButton, HornButton, INITIAL_SNAPSHOT, instructionFor } from "../../prototypes/leo-livreur/LeoLivreurPrototypePage";
 import leoStyles from "../../prototypes/leo-livreur/LeoLivreurPrototypePage.module.css";
-import { drivingLayout } from "../../prototypes/leo-livreur/leoDrivingLayout";
+import { drivingLayout, playerDrivingLayout } from "../../prototypes/leo-livreur/leoDrivingLayout";
 import { DeliverButton, LeoMissionOverlay, missionDashboard, missionInstruction } from "../../prototypes/leo-livreur/LeoMissionLayer";
 import { useLeoMission } from "../../prototypes/leo-livreur/useLeoMission";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { onViewportSettled } from "../viewport-events";
 import styles from "./LeoDrivingPlayer.module.css";
 
-/** Largeur de lecteur sous laquelle direction, consigne et pédales ne tiennent plus sur une seule ligne. */
-const NARROW_STAGE_WIDTH = 640;
 /**
  * Hauteur de scène sous laquelle une fenêtre de la mission ne tient plus (pavé tactile compris) : elle recouvre alors
  * aussi le panneau de conduite, inactif pendant la question. La barre du lecteur et le tableau de bord restent dégagés.
@@ -46,8 +44,10 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const [controller, setController] = useState<LeoLivreurController | null>(null);
   const [snapshot, setSnapshot] = useState<LeoLivreurSnapshot>(INITIAL_SNAPSHOT);
   const [paused, setPaused] = useState(false);
-  // Son coupé au départ, activé par l'enfant (règle du jeu de Léo).
-  const [soundOn, setSoundOn] = useState(false);
+  // Son activé par défaut. Le navigateur n'autorise le son qu'après un geste : il s'allume au premier toucher (ou à la
+  // première touche) dans le lecteur ; le bouton Son le coupe ou le rallume à tout moment.
+  const [soundOn, setSoundOn] = useState(true);
+  const soundStarted = useRef(false);
   // Taille des boutons de conduite : d'après la place réelle du lecteur, pas celle de la fenêtre.
   const [stageSize, setStageSize] = useState({ width: 960, height: 540 });
   // Hauteur réelle de la scène : trop basse, les fenêtres de la mission recouvrent aussi le panneau de conduite (inactif).
@@ -110,8 +110,28 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     controllerRef.current?.refreshLayout();
   }, [fullscreen, cover, releaseAll]);
 
+  // Premier geste dans le lecteur : le son voulu par défaut est réellement allumé (navigateur sans son : bouton « coupé »).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !controller || !soundOn || soundStarted.current) return;
+    const start = () => {
+      if (soundStarted.current) return;
+      soundStarted.current = true;
+      if (!controller.setSound(true)) setSoundOn(false);
+    };
+    root.addEventListener("pointerdown", start, true);
+    root.addEventListener("keydown", start, true);
+    return () => {
+      root.removeEventListener("pointerdown", start, true);
+      root.removeEventListener("keydown", start, true);
+    };
+  }, [controller, soundOn]);
+
   // Appelé directement par le clic : c'est ce geste qui autorise le navigateur à jouer du son.
-  const toggleSound = () => setSoundOn(controller?.setSound(!soundOn) ?? false);
+  const toggleSound = () => {
+    soundStarted.current = true;
+    setSoundOn(controller?.setSound(!soundOn) ?? false);
+  };
   // Recommencer : nouvelle partie depuis le restaurant (la scène repart du départ, odomètre à zéro).
   const restart = () => {
     releaseAll();
@@ -119,14 +139,14 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     setPaused(false);
   };
 
-  // Lecteur étroit (téléphone tenu droit, même quand la scène est en paysage) : le panneau prend la disposition portrait du
-  // jeu (consigne au-dessus, direction et pédales dessous), sinon les boutons ne tiendraient pas sur une ligne.
-  const narrow = stageSize.width < NARROW_STAGE_WIDTH;
-  const layout = drivingLayout({
+  // Disposition du panneau d'après la place réelle de la scène (voir playerDrivingLayout) : sous la scène quand la rue
+  // y tient encore, sinon en deux colonnes de part et d'autre de la scène.
+  const layout = playerDrivingLayout({
     width: stageSize.width,
-    height: narrow ? Math.max(stageSize.height, stageSize.width + 1) : stageSize.height,
+    height: stageSize.height,
     coarsePointer: typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches,
   });
+  const rails = layout.format === "landscape-rails";
   const stageStyle = {
     "--control-size": `${layout.controlSize}px`,
     "--control-size-base": `${layout.controlSize}px`,
@@ -181,6 +201,9 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
       onFullscreenChange={onFullscreenChange}
       onClose={onClose}
       cover={cover}
+      // Téléphone tenu droit : la scène paysage, réduite à sa largeur, ne laisserait qu'une bande de route ; la scène
+      // portrait montre toute la rue avec le panneau de conduite dessous. L'enfant garde le choix (bouton Paysage).
+      initialOrientation="device"
     >
       <div ref={stageRef} className={styles.stage} style={stageStyle} data-format={layout.format}>
         <div ref={hostRef} className={styles.scene} data-zone="scene" />
@@ -194,6 +217,8 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
           <div className={`${leoStyles.panelLeft} ${styles.left}`} aria-label={t("leoDriving.player.steering")}>
             <HoldButton control="left" label="Gauche" icon="←" controller={controller} variant="touch" />
             <HoldButton control="right" label="Droite" icon="→" controller={controller} variant="touch" />
+            {/* Colonnes latérales : le klaxon rejoint la direction, la consigne garde une seule ligne sous la scène. */}
+            {rails ? <HornButton controller={controller} variant="touch" /> : null}
           </div>
           <div className={`${leoStyles.panelInfo} ${styles.info}`} role="status" data-assets={snapshot.assets}>
             <div className={leoStyles.panelText}>
@@ -211,7 +236,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
                 Réessayer
               </button>
             ) : null}
-            <HornButton controller={controller} variant="touch" />
+            {rails ? null : <HornButton controller={controller} variant="touch" />}
           </div>
           <div className={`${leoStyles.panelRight} ${styles.right}`} aria-label={t("leoDriving.player.pedals")}>
             <HoldButton control="forward" label="Avancer" icon="↑" controller={controller} variant="touch" />

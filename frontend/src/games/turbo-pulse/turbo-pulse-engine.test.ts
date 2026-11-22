@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   chooseTargetResult,
   clamp,
+  clampToFruitRange,
   comboForHit,
   createFruitSpec,
   createStartingFruitSpecs,
@@ -18,6 +19,7 @@ import {
   REFERENCE_WORLD_HEIGHT,
   REFERENCE_WORLD_WIDTH,
   registerFailure,
+  startingFruitYs,
   TURBO_LEVELS,
   type ExpertFailures,
   type FruitSpec,
@@ -110,6 +112,33 @@ describe("moteur Turbo Pulse", () => {
     expect(range.min - radius).toBeGreaterThanOrEqual(HUD_SAFE_TOP);
     expect(range.max).toBeLessThan(540);
     expect(range.min).toBeLessThan(range.max);
+  });
+
+  it("répartit les fruits de départ dans la plage réelle du monde, du plus bas (téléphone) au plus haut", () => {
+    // 270 : plancher du monde ; 308 et 278 : téléphones mesurés ; 540 et 704 : ordinateur.
+    for (const height of [270, 278, 308, 329, 540, 704]) {
+      const radius = getTurboPulseVisualMetrics(960, height).fruitRadius;
+      const range = fruitSpawnYRange(radius, height);
+      const ys = startingFruitYs(3, range);
+      expect(ys).toHaveLength(3);
+      for (const y of ys) {
+        expect(y).toBeGreaterThanOrEqual(range.min);
+        expect(y).toBeLessThanOrEqual(range.max);
+        // Fruit entier dans le monde visible, sous le bandeau HUD.
+        expect(y - radius).toBeGreaterThanOrEqual(HUD_SAFE_TOP);
+        expect(y + radius).toBeLessThan(height);
+      }
+      // Trois hauteurs distinctes, de haut en bas.
+      expect(ys[0]).toBeLessThan(ys[1]);
+      expect(ys[1]).toBeLessThan(ys[2]);
+    }
+  });
+
+  it("ramène une hauteur hors plage à la borne la plus proche, sans toucher une hauteur déjà valide", () => {
+    const range = { min: 105, max: 178 };
+    expect(clampToFruitRange(379, range)).toBe(178);
+    expect(clampToFruitRange(40, range)).toBe(105);
+    expect(clampToFruitRange(150, range)).toBe(150);
   });
 
   it("génère toujours une opération dont le résultat est la valeur ciblée", () => {

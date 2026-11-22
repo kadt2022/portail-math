@@ -75,6 +75,31 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(en.leoDriving.name).toBe("Driving with Léo");
   });
 
+  it.each([
+    // Scène paysage basse (téléphone couché, lecteur dans la page) : colonnes de part et d'autre, klaxon avec la direction.
+    [765, 227, "landscape-rails", true],
+    // Ordinateur : panneau sous la scène, comme avant ; le klaxon reste à côté de la consigne.
+    [1025, 449, "landscape-compact", false],
+  ] as const)("scène de %i × %i : panneau « %s »", async (width, height, format, hornWithSteering) => {
+    const widthSpy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(width);
+    const heightSpy = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(height);
+    renderGame();
+    // Remesure de la scène une fois la disposition appliquée (redimensionnement, puis deux images d'animation).
+    await act(async () => {
+      window.dispatchEvent(new Event("resize"));
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    });
+    const controls = screen.getByRole("region", { name: "Commandes de conduite" });
+    expect(controls.closest("[data-format]")).toHaveAttribute("data-format", format);
+    const steering = within(within(controls).getByLabelText("Direction"));
+    expect(steering.queryByRole("button", { name: "Klaxon (maintenir)" }) !== null).toBe(hornWithSteering);
+    // Toutes les commandes de conduite restent dans la région, une seule fois chacune.
+    expect(within(controls).getAllByRole("button", { name: "Klaxon (maintenir)" })).toHaveLength(1);
+    expect(within(within(controls).getByLabelText("Pédales")).getAllByRole("button")).toHaveLength(3);
+    widthSpy.mockRestore();
+    heightSpy.mockRestore();
+  });
+
   it("s'ouvre dans le lecteur standard : en-tête de partie, barre de commandes et commandes de conduite dans la scène", () => {
     renderGame();
     expect(region().className).not.toMatch(/fullscreen/);
@@ -83,7 +108,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(toolbarNames()).toEqual([
       "Pause",
       "Recommencer la livraison depuis le restaurant",
-      "Son coupé",
+      "Son activé",
       "Passer en plein écran",
       "Fermer le jeu et retrouver les autres jeux",
     ]);
@@ -121,15 +146,31 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(controllerMock.setPaused).toHaveBeenLastCalledWith(false);
   });
 
-  it("Recommencer repart du restaurant, Son active le son du jeu (coupé au départ)", async () => {
+  it("Recommencer repart du restaurant ; le son est activé par défaut, allumé au premier geste, et le bouton Son le coupe", async () => {
     const user = userEvent.setup();
     renderGame();
+    // Son voulu dès l'ouverture, mais rien n'est joué avant un geste de l'enfant (règle des navigateurs).
+    expect(screen.getByRole("button", { name: "Son activé" })).toHaveAttribute("aria-pressed", "true");
+    expect(controllerMock.setSound).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Recommencer la livraison depuis le restaurant" }));
     expect(controllerMock.reset).toHaveBeenCalledOnce();
     expect(screen.getByRole("dialog", { name: "Tournée 1 — Préparation" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Son coupé" }));
+    // Premier geste dans le lecteur : le son s'allume, une seule fois.
+    expect(controllerMock.setSound).toHaveBeenCalledOnce();
     expect(controllerMock.setSound).toHaveBeenCalledWith(true);
-    expect(screen.getByRole("button", { name: "Son activé" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Son activé" }));
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(false);
+    expect(screen.getByRole("button", { name: "Son coupé" })).toHaveAttribute("aria-pressed", "false");
+    await user.click(screen.getByRole("button", { name: "Son coupé" }));
+    expect(controllerMock.setSound).toHaveBeenLastCalledWith(true);
+  });
+
+  it("navigateur sans son : au premier geste, le bouton revient à « Son coupé »", async () => {
+    controllerMock.setSound.mockReturnValueOnce(false);
+    const user = userEvent.setup();
+    renderGame();
+    await user.click(screen.getByRole("button", { name: "Pause" }));
+    expect(screen.getByRole("button", { name: "Son coupé" })).toBeInTheDocument();
   });
 
   it("plein écran : la barre disparaît, seul « Quitter » reste, et les commandes de conduite restent dans la scène", async () => {

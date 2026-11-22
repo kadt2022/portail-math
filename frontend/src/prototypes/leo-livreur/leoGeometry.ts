@@ -37,6 +37,24 @@ export const VEHICLE_WIDTH = 36;
 /** Ligne de base des façades côté bas : les maisons reposent sur le jardin derrière le trottoir. */
 export const HOUSE_ROW_Y = 865;
 export const HOUSE_ROW_NORTH_Y = ROAD_Y - (HOUSE_ROW_Y - ROAD_Y);
+/** Façades du côté opposé (nord) : posées à 100 px derrière le bord de la chaussée, toutes à la même largeur. */
+export const FAR_SIDE_HOUSE_BASE_Y = ROAD_Y - ROAD_HALF_WIDTH - 100;
+export const FAR_SIDE_HOUSE_WIDTH = 210;
+/** Façade nord la plus haute : la maison turquoise (image 720 × 480, à la largeur commune). */
+export const FAR_SIDE_HOUSE_MAX_HEIGHT = (FAR_SIDE_HOUSE_WIDTH * 480) / 720;
+/**
+ * Bande de sol sous le décor : les maisons, arbres et jardins du côté sud sont composés pour finir à WORLD_HEIGHT ; sans
+ * cette marge, leur base touchait le bord de l'écran et semblait coupée. Le sol (jardin, eau, herbe) la prolonge, et la
+ * caméra peut y descendre. 20 : la rue complète mesure alors exactement la hauteur de vue prévue (VIEW_WORLD_HEIGHT).
+ */
+export const GROUND_MARGIN = 20;
+export const SCENE_BOTTOM = WORLD_HEIGHT + GROUND_MARGIN;
+/**
+ * Bande de rue que l'enfant doit toujours voir en entier : du toit des maisons nord jusqu'au sol sous les maisons du
+ * côté sud. Plus basse que le cadre, la caméra coupait les maisons.
+ */
+export const STREET_VIEW_TOP = FAR_SIDE_HOUSE_BASE_Y - FAR_SIDE_HOUSE_MAX_HEIGHT;
+export const STREET_VIEW_HEIGHT = SCENE_BOTTOM - STREET_VIEW_TOP;
 export const ZONE1_HOUSE_COUNT = 32;
 export const ZONE1_FIRST_HOUSE_X = 500;
 export const ZONE1_HOUSE_SPACING = 210;
