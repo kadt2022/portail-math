@@ -55,6 +55,77 @@ describe("téléchargement avec progression", () => {
     await expect(fetchWithProgress("/absent.mp3")).rejects.toThrow("404");
   });
 
+  it("téléchargement bloqué (ni octet, ni erreur) : abandonné après le délai d'inactivité", async () => {
+    vi.useFakeTimers();
+    try {
+      // Le serveur ne répond jamais ; seule l'annulation met fin à la requête.
+      const fetchMock = vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+          }),
+      );
+      vi.stubGlobal("fetch", fetchMock);
+      const result = fetchWithProgress("/bloque.webp", undefined, "high", 60_000);
+      const settled = vi.fn();
+      result.then(settled, settled);
+      await vi.advanceTimersByTimeAsync(59_999);
+      expect(settled).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(result).rejects.toThrow("bloqué");
+      expect(fetchMock).toHaveBeenCalledWith("/bloque.webp", expect.objectContaining({ priority: "high", signal: expect.any(AbortSignal) }));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("fichier lent mais vivant : jamais coupé, le délai repart à chaque morceau reçu", async () => {
+    vi.useFakeTimers();
+    try {
+      let push: (part: Uint8Array) => void = () => {};
+      let close = () => {};
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          push = (part) => controller.enqueue(part);
+          close = () => controller.close();
+        },
+      });
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(body, { headers: { "content-length": "3" } })));
+      const result = fetchWithProgress("/lent.webp", undefined, undefined, 60_000);
+      // Un octet toutes les 50 s : 150 s au total, bien plus que le délai, sans jamais 60 s de silence.
+      for (let part = 0; part < 3; part += 1) {
+        await vi.advanceTimersByTimeAsync(50_000);
+        push(new Uint8Array([part]));
+      }
+      close();
+      expect(Array.from(new Uint8Array(await result))).toEqual([0, 1, 2]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("plusieurs fichiers dont un bloqué : l'ensemble se termine quand même après le délai, sans rejeter", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string, init?: RequestInit) =>
+          url === "/bloque.webp"
+            ? new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener("abort", () => reject(init.signal?.reason)))
+            : Promise.resolve(new Response(new Uint8Array(4), { headers: { "content-length": "4" } })),
+        ),
+      );
+      const done = vi.fn();
+      void fetchAllWithProgress(["/ok.webp", "/bloque.webp"], undefined, "high", 60_000).then(done);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(done).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(done).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("plusieurs fichiers en parallèle : une seule progression d'ensemble, total connu quand chacun a annoncé sa taille", async () => {
     const sizes: Record<string, number> = { "/a.webp": 3, "/b.webp": 5 };
     const fetchMock = vi.fn(async (url: string) => new Response(new Uint8Array(sizes[url]), { headers: { "content-length": String(sizes[url]) } }));

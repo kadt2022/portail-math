@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { DELIVERED_TEXTURE_SIZES, DELIVERY_MARGIN, logicalSizeFor, MEASURED_DISPLAY_SCALE } from "./leoTextureDelivery";
 import { STARTUP_TEXTURE_URLS, TEXTURE_URLS } from "./leoTextureUrls";
-import { BUNDLE_TEXTURES } from "./leoZoneAssets";
+import { ALL_TEXTURE_KEYS } from "./leoZoneAssets";
 
 /** Fichiers livrés réduits (suffixe : leur largeur), en données incorporées pour en lire l'en-tête. */
 const DELIVERED_FILES = import.meta.glob<string>("./assets/*-{815,396,384,390,251,253}.webp", { query: "?inline", eager: true, import: "default" });
@@ -47,8 +47,8 @@ describe("textures livrées allégées", () => {
     }
   });
 
-  it("l'écran de chargement attend exactement les images du lot commun", () => {
-    expect(STARTUP_TEXTURE_URLS).toEqual(BUNDLE_TEXTURES.common.map((key) => TEXTURE_URLS[key]));
+  it("l'écran de chargement attend exactement les images de tout le parcours (commun, pont, ville)", () => {
+    expect(STARTUP_TEXTURE_URLS).toEqual(ALL_TEXTURE_KEYS.map((key) => TEXTURE_URLS[key]));
     expect(STARTUP_TEXTURE_URLS.every((url) => typeof url === "string" && url.length > 0)).toBe(true);
   });
 });

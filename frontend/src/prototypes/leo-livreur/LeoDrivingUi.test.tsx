@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cameraZoomFor } from "./leoBridgeLayout";
 import { MIN_CONTROL_SIZE, drivingLayout } from "./leoDrivingLayout";
 import { ROAD_WIDTH, VEHICLE_LENGTH, WORLD_HEIGHT } from "./leoGeometry";
-import { BUNDLE_TEXTURES } from "./leoZoneAssets";
+import { ALL_TEXTURE_KEYS } from "./leoZoneAssets";
 import type { LeoLivreurSnapshot } from "./LeoLivreurGame";
 
 const { controllerMock, mountMock } = vi.hoisted(() => {
@@ -329,7 +329,7 @@ describe("page : écran de conduite", () => {
     // Entrée directe en conduite (« Conduire avec Léo ») : le bouton Commencer attend la fin du chargement.
     render(<LeoLivreurPrototypePage startInDrivingMode />);
     const panel = screen.getByRole("region", { name: "Commandes de conduite" });
-    expect(within(panel).getByText(`Chargement du jeu : 0 / ${BUNDLE_TEXTURES.common.length} images…`)).toBeInTheDocument();
+    expect(within(panel).getByText(`Chargement du jeu : 0 / ${ALL_TEXTURE_KEYS.length} images…`)).toBeInTheDocument();
     expect(within(panel).queryByRole("button", { name: "Commencer" })).not.toBeInTheDocument();
     act(() => controllerMock.listener?.({ ...driving, phase: "INTRO", signalState: null, signalDistance: null, signalPrepare: false }));
     expect(within(panel).getByRole("button", { name: "Commencer" })).toBeInTheDocument();
