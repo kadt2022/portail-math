@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { fetchWithProgress } from "./fetchWithProgress";
+import { fetchAllWithProgress, fetchWithProgress } from "./fetchWithProgress";
 import { createLoadingProgress } from "./loadingProgress";
 
 describe("progression du chargement", () => {
@@ -53,6 +53,43 @@ describe("téléchargement avec progression", () => {
   it("fichier introuvable : une erreur claire (le chargement la traite sans rester bloqué)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
     await expect(fetchWithProgress("/absent.mp3")).rejects.toThrow("404");
+  });
+
+  it("plusieurs fichiers en parallèle : une seule progression d'ensemble, total connu quand chacun a annoncé sa taille", async () => {
+    const sizes: Record<string, number> = { "/a.webp": 3, "/b.webp": 5 };
+    const fetchMock = vi.fn(async (url: string) => new Response(new Uint8Array(sizes[url]), { headers: { "content-length": String(sizes[url]) } }));
+    vi.stubGlobal("fetch", fetchMock);
+    const reports: Array<[number, number | null]> = [];
+    await fetchAllWithProgress(["/a.webp", "/b.webp"], (loaded, total) => reports.push([loaded, total]), "high");
+    // Les deux téléchargements partent ensemble, en priorité haute.
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(["/a.webp", "/b.webp"]);
+    expect(fetchMock).toHaveBeenCalledWith("/a.webp", { priority: "high" });
+    expect(reports.at(-1)).toEqual([8, 8]);
+    // Tant qu'un fichier n'a pas annoncé sa taille, le total reste inconnu.
+    expect(reports[0][1]).toBeNull();
+    expect(reports.map(([loaded]) => loaded)).toEqual([...reports.map(([loaded]) => loaded)].sort((x, y) => x - y));
+  });
+
+  it("un fichier en échec ne bloque pas l'ensemble : il compte pour terminé (son utilisateur le redemandera)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => (url === "/absent.webp" ? new Response(null, { status: 404 }) : new Response(new Uint8Array(4), { headers: { "content-length": "4" } }))),
+    );
+    const reports: Array<[number, number | null]> = [];
+    await expect(fetchAllWithProgress(["/absent.webp", "/ok.webp"], (loaded, total) => reports.push([loaded, total]))).resolves.toBeUndefined();
+    expect(reports.at(-1)).toEqual([4, 4]);
+  });
+});
+
+describe("rendus de l'écran de chargement", () => {
+  it("signalé seulement quand le pourcentage entier change, jamais à chaque morceau reçu", () => {
+    const seen: number[] = [];
+    const progress = createLoadingProgress({ images: 100_000 }, (fraction) => seen.push(fraction));
+    // 1 000 morceaux de 100 octets : 100 % en tout, au plus un signal par pourcentage.
+    for (let loaded = 100; loaded <= 100_000; loaded += 100) progress.report("images", loaded, 100_000);
+    expect(seen.length).toBeLessThanOrEqual(101);
+    expect(seen.at(-1)).toBe(1);
+    expect(new Set(seen.map((fraction) => Math.floor(fraction * 100))).size).toBe(seen.length);
   });
 });
 

@@ -34,12 +34,13 @@ export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
 
 /**
  * Poids (octets) des lots, mesurés sur les fichiers livrés : servent à estimer le temps de téléchargement.
- * Toutes les images du jeu sont en WebP (les originaux PNG restent dans assets/ comme sources, sans être téléchargés).
+ * Toutes les images du jeu sont en WebP (les originaux restent dans assets/ comme sources, sans être téléchargés) ; certaines
+ * sont livrées réduites à leur taille réelle d'affichage (voir leoTextureDelivery).
  */
 export const BUNDLE_BYTES: Record<BundleId, number> = {
-  common: 749_000,
+  common: 673_000,
   bridge: 500_000,
-  city: 1_889_000,
+  city: 1_253_000,
 };
 
 /** Débit supposé tant qu'aucune mesure n'existe, et plancher de prudence : 250 kbit/s (réseau mobile faible). */

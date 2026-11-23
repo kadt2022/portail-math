@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 
-import { mountLeoLivreurGame, type LeoLivreurController, type LeoLivreurSnapshot } from "../../prototypes/leo-livreur/LeoLivreurGame";
-import { ALL_CONTROLS, HoldButton, HornButton, INITIAL_SNAPSHOT, instructionFor } from "../../prototypes/leo-livreur/LeoLivreurPrototypePage";
+import type { LeoLivreurController, LeoLivreurSnapshot } from "../../prototypes/leo-livreur/LeoLivreurGame";
+import { ALL_CONTROLS, HoldButton, HornButton, INITIAL_SNAPSHOT, instructionFor } from "../../prototypes/leo-livreur/LeoDrivingControls";
 import leoStyles from "../../prototypes/leo-livreur/LeoLivreurPrototypePage.module.css";
 import { drivingLayout, playerDrivingLayout } from "../../prototypes/leo-livreur/leoDrivingLayout";
 import { DeliverButton, LeoMissionOverlay, missionDashboard, missionInstruction } from "../../prototypes/leo-livreur/LeoMissionLayer";
 import { useLeoMission } from "../../prototypes/leo-livreur/useLeoMission";
+import { STARTUP_TEXTURE_URLS } from "../../prototypes/leo-livreur/leoTextureUrls";
+import { fetchAllWithProgress } from "../loading/fetchWithProgress";
+import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
+import { createLoadingProgress } from "../loading/loadingProgress";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { onViewportSettled } from "../viewport-events";
+import { loadLeoEngine } from "./leoEngine";
 import styles from "./LeoDrivingPlayer.module.css";
 
 /**
@@ -16,6 +21,22 @@ import styles from "./LeoDrivingPlayer.module.css";
  * aussi le panneau de conduite, inactif pendant la question. La barre du lecteur et le tableau de bord restent dégagés.
  */
 const MIN_MISSION_SCENE_HEIGHT = 280;
+
+/**
+ * Poids estimés (octets) de ce qu'attend l'écran de chargement, remplacés par la taille réelle dès qu'elle est connue :
+ * le moteur (Phaser et la scène, compressés) n'annonce pas sa progression ; les images du démarrage (lot commun), si.
+ * Les deux sont téléchargés en même temps ; la scène relit ensuite les images dans le cache HTTP.
+ */
+const LOADING_ESTIMATES = { engine: 350_000, images: 673_000 };
+
+/** Habillage de l'écran de chargement commun aux couleurs de Léo : nuit en ville, barre orange de la pizzeria. */
+const LEO_LOADING_THEME = {
+  "--loading-background": "radial-gradient(circle at 50% 40%, #1f5368 0%, #10303f 70%, #0a1f2b 100%)",
+  "--loading-title": "#ffe7c2",
+  "--loading-track-border": "rgb(255 190 120 / 45%)",
+  "--loading-fill": "linear-gradient(90deg, #ef6a37, #ffb347 60%, #ffe0a3)",
+  "--loading-glow": "rgb(255 160 80 / 60%)",
+} as CSSProperties;
 
 export interface LeoDrivingPlayerProps {
   /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
@@ -43,6 +64,13 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const controllerRef = useRef<LeoLivreurController | null>(null);
   const [controller, setController] = useState<LeoLivreurController | null>(null);
   const [snapshot, setSnapshot] = useState<LeoLivreurSnapshot>(INITIAL_SNAPSHOT);
+  // Écran de chargement : le moteur (import dynamique) et les images du démarrage arrivent en même temps. La partie n'est
+  // jouable qu'une fois les deux prêts ; un échec propose Réessayer (nouvel import, ou reprise des images).
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [loadingGone, setLoadingGone] = useState(false);
+  const [engineFailed, setEngineFailed] = useState(false);
+  const [engineAttempt, setEngineAttempt] = useState(0);
   const [paused, setPaused] = useState(false);
   // Son activé par défaut. Le navigateur n'autorise le son qu'après un geste : il s'allume au premier toucher (ou à la
   // première touche) dans le lecteur ; le bouton Son le coupe ou le rallume à tout moment.
@@ -57,11 +85,51 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const dashboard = missionDashboard(mission.state, snapshot);
 
   useEffect(() => {
-    if (!hostRef.current) return;
-    const mounted = mountLeoLivreurGame(hostRef.current, setSnapshot);
-    controllerRef.current = mounted;
-    setController(mounted);
     const host = hostRef.current;
+    if (!host) return;
+    let cancelled = false;
+    let teardown = () => {};
+    const progress = createLoadingProgress(LOADING_ESTIMATES, setLoadingProgress, "engine");
+    const onSnapshot = (next: LeoLivreurSnapshot) => {
+      setSnapshot(next);
+      // Première fois que tout est prêt : la partie devient jouable (les attentes de zone suivantes restent dans le
+      // panneau de conduite, sans écran de chargement).
+      if (next.assets === "ready") {
+        progress.complete("images");
+        setStarted(true);
+      }
+    };
+    const engine = loadLeoEngine().then((module) => {
+      progress.complete("engine");
+      return module;
+    });
+    const images = fetchAllWithProgress(STARTUP_TEXTURE_URLS, (loaded, total) => progress.report("images", loaded, total), "high");
+    Promise.all([engine, images])
+      .then(([{ mountLeoLivreurGame }]) => {
+        if (cancelled) return;
+        const mounted = mountLeoLivreurGame(host, onSnapshot);
+        controllerRef.current = mounted;
+        setController(mounted);
+        teardown = () => {
+          mounted.destroy();
+          controllerRef.current = null;
+          setController(null);
+        };
+      })
+      .catch(() => {
+        if (!cancelled) setEngineFailed(true);
+      });
+    return () => {
+      cancelled = true;
+      teardown();
+    };
+  }, [engineAttempt]);
+
+  // Taille réelle de la scène, suivie dès l'ouverture (le panneau de conduite se dispose pendant le chargement) ; le
+  // moteur, une fois arrivé, se recadre à chaque mesure.
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
     const stage = stageRef.current;
     const measure = () => {
       if (stage) setStageSize({ width: stage.clientWidth, height: stage.clientHeight });
@@ -76,11 +144,25 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     return () => {
       observer.disconnect();
       stopListening();
-      mounted.destroy();
-      controllerRef.current = null;
-      setController(null);
     };
   }, []);
+
+  // Tout est prêt : l'écran de chargement s'efface en fondu, puis quitte la scène.
+  useEffect(() => {
+    if (!started) return;
+    const timer = window.setTimeout(() => setLoadingGone(true), LOADING_FADE_MS);
+    return () => window.clearTimeout(timer);
+  }, [started]);
+
+  const loadingFailed = !started && (engineFailed || snapshot.assets === "error");
+  const retryLoading = () => {
+    if (engineFailed) {
+      setEngineFailed(false);
+      setEngineAttempt((attempt) => attempt + 1);
+    } else {
+      controllerRef.current?.retryAssets();
+    }
+  };
 
   const releaseAll = useCallback(() => {
     for (const control of ALL_CONTROLS) controllerRef.current?.setControl(control, false);
@@ -207,6 +289,15 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     >
       <div ref={stageRef} className={styles.stage} style={stageStyle} data-format={layout.format}>
         <div ref={hostRef} className={styles.scene} data-zone="scene" />
+        {loadingGone ? null : (
+          <GameLoadingScreen
+            progress={started ? 1 : loadingProgress}
+            finished={started}
+            failed={loadingFailed}
+            onRetry={retryLoading}
+            theme={LEO_LOADING_THEME}
+          />
+        )}
         <LeoMissionOverlay
           mission={mission}
           snapshot={snapshot}

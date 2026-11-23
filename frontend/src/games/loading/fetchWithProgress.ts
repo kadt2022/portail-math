@@ -32,3 +32,32 @@ export async function fetchWithProgress(url: string, onProgress?: DownloadProgre
   onProgress?.(loaded, loaded);
   return bytes.buffer;
 }
+
+/**
+ * Télécharge plusieurs fichiers en parallèle et annonce la progression de l'ensemble (octets reçus / octets attendus,
+ * total connu seulement quand chaque fichier a annoncé sa taille). Ne rejette jamais : un fichier en échec est simplement
+ * compté comme terminé (celui qui l'utilise le redemandera et gérera l'erreur).
+ */
+export async function fetchAllWithProgress(urls: readonly string[], onProgress?: DownloadProgress, priority?: "high" | "low"): Promise<void> {
+  const files = urls.map(() => ({ loaded: 0, total: null as number | null }));
+  const emit = () => {
+    const loaded = files.reduce((sum, file) => sum + file.loaded, 0);
+    const known = files.every((file) => file.total !== null);
+    onProgress?.(loaded, known ? files.reduce((sum, file) => sum + (file.total ?? 0), 0) : null);
+  };
+  await Promise.all(
+    urls.map((url, index) =>
+      fetchWithProgress(
+        url,
+        (loaded, total) => {
+          files[index] = { loaded, total };
+          emit();
+        },
+        priority,
+      ).catch(() => {
+        files[index] = { loaded: files[index].loaded, total: files[index].loaded };
+        emit();
+      }),
+    ),
+  );
+}

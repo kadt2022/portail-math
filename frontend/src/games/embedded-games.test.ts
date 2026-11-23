@@ -1,0 +1,29 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const { imported } = vi.hoisted(() => ({ imported: [] as string[] }));
+
+// Modules des jeux remplacés : on ne vérifie ici que ce que le survol précharge.
+vi.mock("./leo-driving/LeoDrivingPlayer", () => {
+  imported.push("lecteur de Léo");
+  return { LeoDrivingPlayer: () => null };
+});
+vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => {
+  imported.push("moteur de Léo");
+  return { mountLeoLivreurGame: vi.fn() };
+});
+
+import { onGameIntent } from "./embedded-games";
+
+describe("préchargement du catalogue", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it("survol stable de Léo : le lecteur et son moteur (désormais à part) sont préchargés ensemble, jamais avant 250 ms", async () => {
+    onGameIntent("conduire-avec-leo");
+    await vi.advanceTimersByTimeAsync(249);
+    expect(imported).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1);
+    await vi.dynamicImportSettled();
+    expect(imported.sort()).toEqual(["lecteur de Léo", "moteur de Léo"]);
+  });
+});

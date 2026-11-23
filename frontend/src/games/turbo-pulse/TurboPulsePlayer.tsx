@@ -11,8 +11,8 @@ import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
 import { backgroundFor, type BackgroundSize, backgroundSizeFor, downloadImage, loadImage, nextBackgroundFor } from "./turbo-pulse-backgrounds";
+import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
 import { createLoadingProgress } from "../loading/loadingProgress";
-import { TurboPulseLoading } from "./TurboPulseLoading";
 import themeUrl from "../../assets/turbo-pulse/turbo-pulse-theme.mp3";
 import styles from "./TurboPulsePlayer.module.css";
 
@@ -21,9 +21,6 @@ import styles from "./TurboPulsePlayer.module.css";
  * Le moteur (Phaser et la scène, mesurés compressés) n'annonce pas sa progression : il compte pour son poids d'un bloc.
  */
 const LOADING_ESTIMATES = { engine: 330_000, decor: 90_000, music: 308_000 };
-/** Durée du fondu de l'écran de chargement (voir TurboPulseLoading.module.css). */
-const LOADING_FADE_MS = 400;
-
 /** Promesse résolue de l'extérieur (une seule fois). */
 function deferred() {
   let resolve: () => void = () => undefined;
@@ -488,7 +485,7 @@ export function TurboPulsePlayer({
             <span>{t("turboPulse.game.solve")}</span>
             <strong>{snapshot.operation}</strong>
           </div>
-          {loadingGone ? null : <TurboPulseLoading progress={loadingProgress} finished={loaded} />}
+          {loadingGone ? null : <GameLoadingScreen progress={loadingProgress} finished={loaded} />}
           {snapshot.status === "failed" ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.retryLevel()} /> : null}
           {isSuccess ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.nextLevel()} /> : null}
         </div>
