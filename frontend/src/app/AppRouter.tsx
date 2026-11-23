@@ -52,6 +52,14 @@ const LeoDrivingGamePage = lazyRoute(
   },
   { heavy: true },
 );
+// La Rivière des Fractions embarque Babylon.js : son moteur est demandé en même temps que la page.
+const RiviereFractionsGamePage = lazyRoute(
+  () => {
+    void import("@mbuyamba/riviere-fractions").then((m) => m.preloadRiverFractionsEngine()).catch(() => undefined);
+    return import("../games/riviere-fractions/RiviereFractionsGamePage").then((m) => m.RiviereFractionsGamePage);
+  },
+  { heavy: true },
+);
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });
 const ProgressionPage = lazyRoute(() => import("./ProgressionPage").then((m) => m.ProgressionPage));
@@ -145,6 +153,7 @@ export function AppRouter() {
               <LeoDrivingGamePage />
             }
           />
+          <Route path="jeux/riviere-des-fractions" element={<RiviereFractionsGamePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />

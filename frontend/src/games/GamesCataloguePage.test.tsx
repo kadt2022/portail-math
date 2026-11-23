@@ -104,8 +104,10 @@ describe("GamesCataloguePage", () => {
     renderPage();
     await user.type(screen.getByRole("searchbox", { name: "Chercher un jeu" }), "riviere");
     const cards = screen.getAllByRole("link", { name: /^Jouer à/ });
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des fractions");
+    // La nouvelle Rivière des Fractions 3D et l'ancienne version, gardée jusqu'à la validation de la nouvelle.
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des Fractions");
+    expect(cards[1]).toHaveAccessibleName("Jouer à La Rivière des fractions");
   });
 
   it("explique l'absence de résultat", async () => {
@@ -435,8 +437,8 @@ describe("Haut de la page Jeux : recherche dans l'en-tête et mode lecteur", () 
     );
     await user.type(screen.getByRole("searchbox", { name: "Rechercher un jeu" }), "riviere");
     const cards = screen.getAllByRole("link", { name: /^Jouer à/ });
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des fractions");
+    expect(cards).toHaveLength(2);
+    expect(cards[1]).toHaveAccessibleName("Jouer à La Rivière des fractions");
     // La recherche de la page (téléphone) montre la même valeur.
     expect(screen.getByRole("searchbox", { name: "Chercher un jeu" })).toHaveValue("riviere");
   });
