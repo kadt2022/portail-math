@@ -520,7 +520,6 @@ export class LeoLivreurScene extends Phaser.Scene {
         }));
       }
     }
-    this.createPedestrians();
   }
 
   /** Convertit les trois planches transparentes en vraies planches Phaser à quatre images. */
@@ -537,7 +536,31 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
   }
 
-  /** Les passants ne sont présents que lorsque le lot urbain est prêt, puis sont recyclés avec lui. */
+  /**
+   * Passants du boulevard : leurs images sont chargées dès le départ, mais ils n'entrent en scène qu'à l'approche de la
+   * ville (une zone avant la vue), pour que l'enfant les voie marcher dès son arrivée au lieu de trouver un trottoir
+   * déjà vidé pendant l'accueil ou les livraisons. Ils quittent la scène quand Léo s'éloigne nettement (deux zones de
+   * marge, pas de va-et-vient en marche arrière) et reviennent, au départ de leur marche, à la visite suivante.
+   */
+  private managePedestrians() {
+    if (this.assets.state("city") !== "ready") return;
+    const view = framedViewRange(this.motion.x, this.lookDir, this.framing, this.baseViewWidth());
+    const near = bundlesForRange(view.minX - WORLD_ZONE_WIDTH, view.maxX + WORLD_ZONE_WIDTH).includes("city");
+    if (near) {
+      this.createPedestrians();
+      return;
+    }
+    const far = !bundlesForRange(view.minX - 2 * WORLD_ZONE_WIDTH, view.maxX + 2 * WORLD_ZONE_WIDTH).includes("city");
+    if (far) this.removePedestrians();
+  }
+
+  private removePedestrians() {
+    for (const pedestrian of this.pedestrians) pedestrian.sprite.destroy();
+    for (const pedestrian of this.depthPedestrians) pedestrian.sprite.destroy();
+    this.pedestrians = [];
+    this.depthPedestrians = [];
+  }
+
   private createPedestrians() {
     if (this.pedestrians.length > 0) return;
     this.pedestrians = boulevardPedestrians().map((spec) => {
@@ -862,6 +885,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.updateWorldZones();
     if (this.motion.x > WORLD_WIDTH - 20_000) this.cameras.main.setBounds(0, 0, this.motion.x + 1_000_000, SCENE_BOTTOM);
     this.updateTraffic(seconds, delta);
+    this.managePedestrians();
     this.updatePedestrians(seconds);
     if (!this.car) return;
     const steeringPulseActive = this.time.now < this.steeringPulseUntil;
@@ -2033,6 +2057,18 @@ export function renderPixelRatio(devicePixelRatio: number | undefined) {
   return Math.min(2, Math.max(1, ratio));
 }
 
+/**
+ * Arrête une partie de Léo : son coupé, puis destruction Phaser (au début de l'image suivante). Phaser laisse sur
+ * `document` un écouteur « visibilitychange » qui garde la partie détruite pour toujours, et avec elle, par sa
+ * configuration, la scène et toutes ses images : ce lien est coupé ici, pour qu'une partie fermée libère sa mémoire
+ * (fermer puis rouvrir le jeu n'accumule pas les parcours chargés).
+ */
+export function releaseLeoGame(game: Phaser.Game) {
+  for (const scene of game.scene.getScenes(false)) if (scene instanceof LeoLivreurScene) scene.destroySound();
+  game.destroy(true);
+  (game.config as { sceneConfig: unknown }).sceneConfig = null;
+}
+
 export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListener): LeoLivreurController {
   const pixelRatio = renderPixelRatio(window.devicePixelRatio);
   const scene = new LeoLivreurScene(onSnapshot, pixelRatio);
@@ -2056,10 +2092,7 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
   });
 
   return {
-    destroy: () => {
-      scene.destroySound();
-      game.destroy(true);
-    },
+    destroy: () => releaseLeoGame(game),
     refreshLayout: () => {
       const size = backing();
       game.scale.resize(size.width, size.height);
