@@ -17,12 +17,6 @@ import themeUrl from "../../assets/turbo-pulse/turbo-pulse-theme.mp3";
 import styles from "./TurboPulsePlayer.module.css";
 
 /**
- * Attente maximale (ms) du moteur avant de demander le premier décor : sur un réseau qui ne répond plus, le décor est
- * tout de même demandé.
- */
-const ENGINE_WAIT_TIMEOUT_MS = 15_000;
-
-/**
  * Poids estimés des ressources de l'écran de chargement (octets), remplacés par la taille réelle dès qu'elle est connue.
  * Le moteur (Phaser et la scène, mesurés compressés) n'annonce pas sa progression : il compte pour son poids d'un bloc.
  */
@@ -204,18 +198,13 @@ export function TurboPulsePlayer({
   // chaque instantané de partie, pour ne jamais redemander le même décor. Demandé une fois le chargement terminé (le décor
   // du premier niveau est alors déjà dans le cache), en priorité haute, et affiché une fois décodé ; puis le décor du
   // niveau suivant, en priorité basse : au changement de niveau, il est déjà là. `cancelled` évite d'appliquer un décor
-  // arrivé après un changement de niveau.
+  // arrivé après un changement de niveau. Aucun délai de secours : l'attente se termine toujours (une ressource en échec
+  // ne bloque pas le chargement), et rien de secondaire ne doit disputer le débit à l'écran de chargement.
   useEffect(() => {
     let cancelled = false;
-    let timer = 0;
     const size = () => backgroundSize();
     const url = () => backgroundFor(snapshot.levelIndex, size());
-    Promise.race([
-      resourcesReady.current.promise,
-      new Promise<void>((done) => {
-        timer = window.setTimeout(done, ENGINE_WAIT_TIMEOUT_MS);
-      }),
-    ])
+    resourcesReady.current.promise
       .then(() => loadImage(url(), "high"))
       .then(() => {
         if (cancelled) return;
@@ -227,7 +216,6 @@ export function TurboPulsePlayer({
       .catch(() => undefined);
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
     };
   }, [snapshot.levelIndex]);
 

@@ -115,6 +115,32 @@ describe("chargement de Turbo Pulse", () => {
     expect(screen.queryByText("Chargement des ressources")).not.toBeInTheDocument();
   });
 
+  it("connexion lente (plus de 15 s) : rien de secondaire ne part tant que l'écran de chargement attend une ressource", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const tick = (ms: number) =>
+        act(async () => {
+          await vi.advanceTimersByTimeAsync(ms);
+          await vi.dynamicImportSettled();
+          await vi.advanceTimersByTimeAsync(0);
+        });
+      render(<TurboPulsePlayer />);
+      await tick(0);
+      // Décor du niveau 1 arrivé ; la musique, elle, met plus de 15 secondes.
+      downloads[0].resolve();
+      await tick(20_000);
+      expect(mountMock).not.toHaveBeenCalled();
+      // Aucun décor téléchargé en dehors de l'écran de chargement (ni celui du niveau suivant).
+      expect(loads).toEqual([]);
+      music.resolve();
+      await tick(0);
+      expect(mountMock).toHaveBeenCalledOnce();
+      expect(loads).toContainEqual({ url: LEVEL_BACKGROUNDS.small[1], priority: "low" });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("réseau coupé pour le décor ou la musique : le chargement ne reste jamais bloqué, la partie démarre", async () => {
     const unhandled = vi.fn();
     window.addEventListener("unhandledrejection", unhandled);
