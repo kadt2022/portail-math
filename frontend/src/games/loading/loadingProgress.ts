@@ -34,8 +34,14 @@ export function createLoadingProgress<Id extends string>(estimates: Record<Id, n
     }
     return total > 0 ? loaded / total : 1;
   };
+  // Signalé seulement quand le pourcentage entier affiché change : des dizaines de fichiers reçus morceau par morceau
+  // ne déclenchent pas pour autant des milliers de rendus de l'écran (le fil principal reste au jeu qui démarre).
+  let reported = -1;
   const emit = () => {
     shown = Math.max(shown, compute());
+    const percent = Math.floor(shown * 100);
+    if (percent === reported) return;
+    reported = percent;
     onChange(shown);
   };
   const isDone = () => (Object.values(parts) as Array<{ complete: boolean }>).every((part) => part.complete);

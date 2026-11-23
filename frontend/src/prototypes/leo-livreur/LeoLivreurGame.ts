@@ -1,35 +1,6 @@
 import Phaser from "phaser";
 
-import backCarUrl from "./assets/leo-car-back.webp";
-import familyTrafficUrl from "./assets/leo-traffic-family-blue-v1.webp";
-import compactTrafficUrl from "./assets/leo-traffic-compact-green-v1.webp";
-import sedanTrafficUrl from "./assets/leo-traffic-sedan-gray-v1.webp";
-import cityBusTrafficUrl from "./assets/leo-traffic-city-bus-v1.webp";
-import schoolBusTrafficUrl from "./assets/leo-traffic-school-bus-occupied-v1.webp";
-import taxiTrafficUrl from "./assets/leo-traffic-taxi-occupied-v1.webp";
-import minibusTrafficUrl from "./assets/leo-traffic-minibus-v1.webp";
-import frontCarUrl from "./assets/leo-car-front.webp";
-import houseUrl from "./assets/leo-house-turquoise.webp";
-import nearSideHouseUrl from "./assets/leo-house-near-side-v1.webp";
-import villageTreeUrl from "./assets/leo-tree-v1.webp";
-import nearSideFlowersUrl from "./assets/leo-flowers-near-side-v1.webp";
-import nearSideGardenUrl from "./assets/leo-garden-near-side-v1.webp";
-import houseYellowUrl from "./assets/leo-house-yellow-v1-compact.webp";
-import leftCarUrl from "./assets/leo-car-left.webp";
-import rightCarUrl from "./assets/leo-car-right.webp";
-import bridgeLayerUrl from "./assets/leo-world-suspension-bridge-layer-v2.webp";
-import bridgeDeckUrl from "./assets/leo-world-bridge-deck-v1.webp";
-import bridgeRailUrl from "./assets/leo-world-bridge-rail-v1.webp";
-import villageBackdropUrl from "./assets/leo-world-village-zone1-backdrop-v1.webp";
 import { BRIDGE_CAMERA_OFFSET, bridgeLayout, cameraZoomFor, DECK, RAIL, SKY_COLOR, SUSPENSION, WATER_COLOR } from "./leoBridgeLayout";
-import cityTopUrl from "./assets/leo-world-city-top-v1.webp";
-import cityBottomUrl from "./assets/leo-world-city-bottom-v1.webp";
-import boulevardZone4Url from "./assets/leo-world-boulevard-zone4-v7-seated-below-crop.webp";
-import pedestrianManUrl from "./assets/leo-pedestrian-man-walk-v1.webp";
-import pedestrianWomanUrl from "./assets/leo-pedestrian-woman-walk-v1.webp";
-import pedestrianChildUrl from "./assets/leo-pedestrian-child-walk-v1.webp";
-import pedestrianDepthFrontUrl from "./assets/leo-pedestrian-depth-front-walk-v1.webp";
-import pedestrianDepthBackUrl from "./assets/leo-pedestrian-depth-back-walk-v1.webp";
 import { cameraProfile, CITY_FADE, CITY_REF, cityLayout } from "./leoCityLayout";
 import { BOULEVARD_FADE, BOULEVARD_REF, boulevardLayout, boulevardSignals, type BoulevardSignal } from "./leoBoulevardLayout";
 import {
@@ -46,9 +17,10 @@ import crossLimousineUrl from "./assets/leo-cross-limousine-v1.webp";
 import crossSedanUrl from "./assets/leo-cross-sedan-v1.webp";
 import crossSportUrl from "./assets/leo-cross-sport-v1.webp";
 import crossSuvUrl from "./assets/leo-cross-suv-v1.webp";
-import crossSedanTurnUrl from "./assets/leo-cross-sedan-turn-v1.webp";
 import { CrossTrafficManager } from "./leoCrossTraffic";
 import { CrossViews } from "./leoCrossView";
+import { logicalSizeFor } from "./leoTextureDelivery";
+import { TEXTURE_URLS } from "./leoTextureUrls";
 import { DepthTraffic, SEDAN_TURN_PROFILE, SHEET_VIEWS, SHEET_WHEELS, TURN_SHEET, sheetCrop, turnTextureKey, turnWheelTextureKey } from "./leoDepthVehicle";
 import { IntersectionController } from "./leoIntersection";
 import {
@@ -199,39 +171,6 @@ const COLLISION_COOLDOWN_MS = 900;
 const PASS_HEARING_DISTANCE = 260;
 const MIN_PASS_KMH = 12;
 
-/** Adresse de chaque texture téléchargée (une seule source de vérité pour le préchargement et les lots). */
-const TEXTURE_URLS: Record<string, string> = {
-  "leo-traffic-family-blue": familyTrafficUrl,
-  "leo-traffic-compact-green": compactTrafficUrl,
-  "leo-traffic-sedan-gray": sedanTrafficUrl,
-  "leo-traffic-city-bus": cityBusTrafficUrl,
-  "leo-traffic-school-bus-occupied": schoolBusTrafficUrl,
-  "leo-traffic-taxi-occupied": taxiTrafficUrl,
-  "leo-traffic-minibus": minibusTrafficUrl,
-  "leo-car-right": rightCarUrl,
-  "leo-car-left": leftCarUrl,
-  "leo-car-front": frontCarUrl,
-  "leo-car-back": backCarUrl,
-  "leo-house": houseUrl,
-  "leo-house-near-side": nearSideHouseUrl,
-  "leo-tree": villageTreeUrl,
-  "leo-flowers-near-side": nearSideFlowersUrl,
-  "leo-garden-near-side": nearSideGardenUrl,
-  "leo-house-yellow": houseYellowUrl,
-  "leo-world-bridge-deck": bridgeDeckUrl,
-  "leo-world-bridge-rail": bridgeRailUrl,
-  "leo-world-suspension-bridge-layer": bridgeLayerUrl,
-  "leo-world-village-zone1-backdrop": villageBackdropUrl,
-  "leo-world-city-top": cityTopUrl,
-  "leo-world-city-bottom": cityBottomUrl,
-  "leo-world-boulevard-zone4": boulevardZone4Url,
-  "leo-pedestrian-man-sheet": pedestrianManUrl,
-  "leo-pedestrian-woman-sheet": pedestrianWomanUrl,
-  "leo-pedestrian-child-sheet": pedestrianChildUrl,
-  "leo-pedestrian-depth-front-sheet": pedestrianDepthFrontUrl,
-  "leo-pedestrian-depth-back-sheet": pedestrianDepthBackUrl,
-  "leo-cross-sedan-turn": crossSedanTurnUrl,
-};
 const BRIDGE_SOURCE_KEY = "leo-world-suspension-bridge-layer";
 const PEDESTRIAN_SHEETS = [
   ["leo-pedestrian-man-sheet", "leo-pedestrian-man"],
@@ -425,6 +364,9 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   preload() {
+    // Textures livrées allégées : redessinées à leur taille logique dès leur arrivée, avant tout usage (voir
+    // leoTextureDelivery). Vaut pour le démarrage comme pour les lots chargés ensuite.
+    this.load.on("filecomplete", (key: string) => this.restoreLogicalSize(key));
     // Démarrage : uniquement le lot commun (Léo, trafic, maisons, tablier). Le pont et la ville arrivent ensuite,
     // en arrière-plan, quand Léo s'en approche.
     for (const key of BUNDLE_TEXTURES.common) this.load.image(key, TEXTURE_URLS[key]);
@@ -722,6 +664,26 @@ export class LeoLivreurScene extends Phaser.Scene {
 
   retryAssets() {
     this.assets.retryFailed();
+  }
+
+  /** Redessine une texture livrée réduite à sa taille logique (illustration d'origine), sous la même clé. */
+  private restoreLogicalSize(key: string) {
+    if (!this.textures.exists(key)) return;
+    const source = this.textures.get(key).getSourceImage() as HTMLImageElement;
+    const size = logicalSizeFor(key, { width: source.naturalWidth || source.width, height: source.naturalHeight || source.height });
+    if (!size) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = size.width;
+    canvas.height = size.height;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(source, 0, 0, size.width, size.height);
+    // Simple source canvas (et non une CanvasTexture de Phaser, qui garderait en plus une copie de tous ses pixels en
+    // mémoire JavaScript) : seule l'image affichée occupe la mémoire, comme une image ordinaire.
+    this.textures.remove(key);
+    this.textures.addImage(key, canvas as unknown as HTMLImageElement);
   }
 
   /**

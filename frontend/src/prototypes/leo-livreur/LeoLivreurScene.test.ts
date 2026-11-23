@@ -423,6 +423,25 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     expect(last().assets).toBe("ready");
   });
 
+  it("textures livrées réduites : redessinées à leur taille logique dès leur arrivée, au démarrage comme dans la ville", async () => {
+    const { internals, step, started } = await mountScene();
+    await stepUntil(step, started);
+    const size = (key: string) => {
+      const source = internals.textures.get(key).source[0];
+      return { width: source.width, height: source.height };
+    };
+    // Images simulées reçues en 512 × 256 : celles livrées réduites retrouvent la taille de l'illustration d'origine,
+    // les autres gardent la taille reçue.
+    expect(size("leo-car-right")).toEqual({ width: 502, height: 364 });
+    expect(size("leo-traffic-family-blue")).toEqual({ width: 640, height: 320 });
+    expect(size("leo-tree")).toEqual({ width: 512, height: 256 });
+    // Lot de la ville, chargé plus tard : planches des piétons à leur taille logique, découpées en vues de 543 × 724.
+    teleport(internals, cityLayout().panelX + 400);
+    await stepUntil(step, () => internals.assets.state("city") === "ready", 2000);
+    expect(size("leo-pedestrian-man-sheet")).toEqual({ width: 2172, height: 724 });
+    expect(internals.textures.get("leo-pedestrian-man").get(0).width).toBe(543);
+  });
+
   it("rend ses vraies images à Léo quand une image du démarrage arrive après une reprise", async () => {
     failures.set(/leo-car-right/, 1);
     const { scene, internals, last, step, started } = await mountScene();

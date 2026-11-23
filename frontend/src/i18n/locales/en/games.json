@@ -1,4 +1,10 @@
 {
+  "loadingScreen": {
+    "title": "Loading resources",
+    "label": "Loading the game",
+    "failed": "The download was interrupted.",
+    "retry": "Try again"
+  },
   "cataloguePage": {
     "title": "Games",
     "subtitle": "Discover, play and learn with our educational games",
@@ -159,7 +165,6 @@
       "defense": "Defence",
       "solve": "Solve",
       "currentOperation": "Current equation: {{operation}}",
-      "loading": { "title": "Loading resources", "label": "Loading the game" },
       "canvasLabel": "Interactive Turbo Pulse scene. Aim the piston and hit a fruit carrying the correct answer.",
       "failure": {
         "eyebrow": "Defence breached",

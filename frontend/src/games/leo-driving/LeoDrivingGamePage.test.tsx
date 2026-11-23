@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import en from "../../i18n/locales/en/games.json";
 import fr from "../../i18n/locales/fr/games.json";
@@ -45,8 +45,12 @@ const READY: LeoLivreurSnapshot = {
   travelledMeters: 0, assets: "ready", assetsLoaded: null, assetsTotal: null,
 };
 
-function renderGame() {
-  return render(
+/**
+ * Ouvre le jeu et attend le moteur : il arrive à part (import dynamique), en même temps que les images du démarrage
+ * (téléchargements simulés, instantanés).
+ */
+async function renderGame() {
+  const result = render(
     <MemoryRouter initialEntries={["/jeux/conduire-avec-leo"]}>
       <Routes>
         <Route path="/jeux" element={<p>Catalogue des jeux</p>} />
@@ -54,6 +58,13 @@ function renderGame() {
       </Routes>
     </MemoryRouter>,
   );
+  await act(async () => {
+    for (let step = 0; step < 4; step += 1) {
+      await vi.dynamicImportSettled();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  });
+  return result;
 }
 
 const region = () => screen.getByRole("region", { name: "Jeu Conduire avec Léo" });
@@ -63,7 +74,11 @@ const toolbarNames = () =>
     .map((button) => button.getAttribute("aria-label") ?? button.textContent);
 
 describe("Conduire avec Léo dans le lecteur standard", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(new Uint8Array(8))));
+  });
+  afterEach(() => vi.unstubAllGlobals());
 
   it("figure dans le catalogue des jeux, en français et en anglais, et se joue dans la page Jeux", () => {
     const entry = gameCatalogue.find((game) => game.id === "conduire-avec-leo");
@@ -83,7 +98,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
   ] as const)("scène de %i × %i : panneau « %s »", async (width, height, format, hornWithSteering) => {
     const widthSpy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(width);
     const heightSpy = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(height);
-    renderGame();
+    await renderGame();
     // Remesure de la scène une fois la disposition appliquée (redimensionnement, puis deux images d'animation).
     await act(async () => {
       window.dispatchEvent(new Event("resize"));
@@ -100,8 +115,8 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     heightSpy.mockRestore();
   });
 
-  it("s'ouvre dans le lecteur standard : en-tête de partie, barre de commandes et commandes de conduite dans la scène", () => {
-    renderGame();
+  it("s'ouvre dans le lecteur standard : en-tête de partie, barre de commandes et commandes de conduite dans la scène", async () => {
+    await renderGame();
     expect(region().className).not.toMatch(/fullscreen/);
     expect(screen.getByRole("heading", { level: 1, name: "Conduire avec Léo" })).toBeInTheDocument();
     // Barre du lecteur : plus de tableau de bord propre à Léo (Son, Pause, Quitter du prototype).
@@ -137,7 +152,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
 
   it("Pause du lecteur : le moteur s'arrête et les commandes sont relâchées ; Jouer le relance", async () => {
     const user = userEvent.setup();
-    renderGame();
+    await renderGame();
     await user.click(screen.getByRole("button", { name: "Pause" }));
     expect(controllerMock.setPaused).toHaveBeenLastCalledWith(true);
     expect(controllerMock.setControl).toHaveBeenCalledWith("forward", false);
@@ -148,7 +163,7 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
 
   it("Recommencer repart du restaurant ; le son est activé par défaut, allumé au premier geste, et le bouton Son le coupe", async () => {
     const user = userEvent.setup();
-    renderGame();
+    await renderGame();
     // Son voulu dès l'ouverture, mais rien n'est joué avant un geste de l'enfant (règle des navigateurs).
     expect(screen.getByRole("button", { name: "Son activé" })).toHaveAttribute("aria-pressed", "true");
     expect(controllerMock.setSound).not.toHaveBeenCalled();
@@ -168,14 +183,14 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
   it("navigateur sans son : au premier geste, le bouton revient à « Son coupé »", async () => {
     controllerMock.setSound.mockReturnValueOnce(false);
     const user = userEvent.setup();
-    renderGame();
+    await renderGame();
     await user.click(screen.getByRole("button", { name: "Pause" }));
     expect(screen.getByRole("button", { name: "Son coupé" })).toBeInTheDocument();
   });
 
   it("plein écran : la barre disparaît, seul « Quitter » reste, et les commandes de conduite restent dans la scène", async () => {
     const user = userEvent.setup();
-    renderGame();
+    await renderGame();
     await user.click(screen.getByRole("button", { name: "Passer en plein écran" }));
     expect(region().className).toMatch(/fullscreen/);
     expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
@@ -184,8 +199,8 @@ describe("Conduire avec Léo dans le lecteur standard", () => {
     expect(region().className).not.toMatch(/fullscreen/);
   });
 
-  it("Fermer ramène au catalogue des jeux", () => {
-    renderGame();
+  it("Fermer ramène au catalogue des jeux", async () => {
+    await renderGame();
     fireEvent.click(screen.getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
     return screen.findByText("Catalogue des jeux");
   });

@@ -13,7 +13,7 @@
 
 import { loopBounds } from "../../games/audio/GameAudio";
 
-import cityAmbienceUrl from "./assets/leo-ambiance-ville.mp3";
+import cityAmbienceUrl from "./assets/leo-ambiance-ville-64k.m4a";
 
 /** Rapports d'une petite citadine : km/h obtenus à 1000 tr/min dans chaque rapport (index 1 à 5). */
 export const KMH_PER_1000 = [0, 7.6, 13.4, 19.8, 26.0, 31.5] as const;

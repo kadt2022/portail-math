@@ -1,8 +1,9 @@
 import { lazy } from "react";
 
+import { loadLeoEngine } from "./leo-driving/leoEngine";
 import { createIntentPreloader } from "./preload/intentPreloader";
 
-// Jeux qui se jouent dans le lecteur de la page « Jeux ». Leur code (et pour Turbo Pulse, le moteur Phaser) n'est téléchargé qu'à la
+// Jeux qui se jouent dans le lecteur de la page « Jeux ». Leur code (et pour Turbo Pulse et Léo, le moteur Phaser) n'est téléchargé qu'à la
 // demande : jamais à l'ouverture du catalogue. Un survol stable à la souris (250 ms) sur une carte le précharge
 // (voir intentPreloader), pour que le lecteur s'ouvre aussitôt au clic ; l'ouverture d'un jeu, elle, charge toujours
 // normalement, préchargé ou non.
@@ -18,10 +19,11 @@ function isEmbeddedGameId(id: string): id is EmbeddedGameId {
   return id in loaders;
 }
 
-// Turbo Pulse charge son moteur Phaser à la demande (le lecteur s'affiche sans l'attendre) : l'intention du joueur
-// prépare aussi ce moteur, pour que la partie démarre aussitôt au clic.
+// Turbo Pulse et Léo chargent leur moteur Phaser à la demande (le lecteur et son écran de chargement s'affichent sans
+// l'attendre) : l'intention du joueur prépare aussi ce moteur, pour que la partie démarre aussitôt au clic.
 const warmups: Partial<Record<EmbeddedGameId, () => Promise<unknown>>> = {
   "turbo-pulse": () => import("./turbo-pulse/TurboPulseGame"),
+  "conduire-avec-leo": () => loadLeoEngine(),
 };
 
 /** Télécharge le code du jeu (le navigateur ne charge un module qu'une fois : sans effet s'il est déjà là). */
@@ -48,6 +50,15 @@ export function onGameChosen(): void {
   preloader.cancelAll();
 }
 
-export const GrilleMagiqueGame = lazy(loaders["grille-magique"]);
-export const TurboPulsePlayer = lazy(loaders["turbo-pulse"]);
-export const LeoDrivingPlayer = lazy(loaders["conduire-avec-leo"]);
+/**
+ * Ouverture d'un jeu : son lecteur, et en même temps son moteur (sans attendre que le lecteur soit affiché pour le
+ * demander). Le chargement du jeu choisi, jamais un préchargement.
+ */
+function open<Id extends EmbeddedGameId>(id: Id): ReturnType<(typeof loaders)[Id]> {
+  void warmups[id]?.().catch(() => undefined);
+  return loaders[id]() as ReturnType<(typeof loaders)[Id]>;
+}
+
+export const GrilleMagiqueGame = lazy(() => open("grille-magique"));
+export const TurboPulsePlayer = lazy(() => open("turbo-pulse"));
+export const LeoDrivingPlayer = lazy(() => open("conduire-avec-leo"));

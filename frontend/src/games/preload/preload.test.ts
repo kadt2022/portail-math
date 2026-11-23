@@ -132,6 +132,28 @@ describe("défilement pendant le survol", () => {
     await vi.advanceTimersByTimeAsync(250);
     expect(load).toHaveBeenCalledWith("turbo-pulse");
   });
+
+  it("carte en attente dans la file, puis emportée par un défilement : revérifiée au départ, elle n'est pas téléchargée", async () => {
+    const { load, calls } = controlledLoader();
+    const preloader = createIntentPreloader({ load });
+    preloader.intent("a");
+    await vi.advanceTimersByTimeAsync(250);
+    // « b » passe ses 250 ms pendant que « a » se télécharge : il attend dans la file.
+    let bHovered = true;
+    preloader.intent("b", () => bHovered);
+    await vi.advanceTimersByTimeAsync(250);
+    expect(load.mock.calls.map(([id]) => id)).toEqual(["a"]);
+    // La page défile : la carte « b » quitte le pointeur sans événement de sortie.
+    bHovered = false;
+    calls[0].finish();
+    await settle();
+    expect(load.mock.calls.map(([id]) => id)).toEqual(["a"]);
+    // Plus tard, la souris revient et s'arrête sur « b » : il est alors préchargé normalement.
+    bHovered = true;
+    preloader.intent("b", () => bHovered);
+    await vi.advanceTimersByTimeAsync(250);
+    expect(load.mock.calls.map(([id]) => id)).toEqual(["a", "b"]);
+  });
 });
 
 describe("carte toujours sous le pointeur", () => {

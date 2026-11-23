@@ -6,6 +6,7 @@ import { AppLayout } from "./AppLayout";
 import { PRIMARY_COURSES } from "./course-navigation";
 import { lazyRoute } from "./LazyRoute";
 import { NotFoundPage } from "./NotFoundPage";
+import { loadLeoEngine } from "../games/leo-driving/leoEngine";
 
 // LEO-PERF-02 : chaque page est téléchargée seulement quand on l'ouvre. Le tableau de bord, la mise en page et la
 // page introuvable restent dans le fichier principal (premier affichage). Ouvrir un jeu ne télécharge plus le
@@ -42,7 +43,15 @@ const GrilleMagiquePage = lazyRoute(() => import("../games/grille-magique/Grille
 const NewGameComingSoonPage = lazyRoute(() => import("../games/new-game/NewGameComingSoonPage").then((m) => m.NewGameComingSoonPage));
 // Turbo Pulse et Léo embarquent Phaser (moteur de jeu lourd, avec effets de bord au chargement du module).
 const TurboPulsePage = lazyRoute(() => import("../games/turbo-pulse/TurboPulsePage").then((m) => m.TurboPulsePage), { heavy: true });
-const LeoDrivingGamePage = lazyRoute(() => import("../games/leo-driving/LeoDrivingGamePage").then((m) => m.LeoDrivingGamePage), { heavy: true });
+// Le moteur de Léo est demandé en même temps que la page (et non une fois le lecteur affiché) : les visites suivantes ne
+// l'attendent pas.
+const LeoDrivingGamePage = lazyRoute(
+  () => {
+    void loadLeoEngine().catch(() => undefined);
+    return import("../games/leo-driving/LeoDrivingGamePage").then((m) => m.LeoDrivingGamePage);
+  },
+  { heavy: true },
+);
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });
 const ProgressionPage = lazyRoute(() => import("./ProgressionPage").then((m) => m.ProgressionPage));

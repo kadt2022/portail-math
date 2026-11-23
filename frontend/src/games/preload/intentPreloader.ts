@@ -4,7 +4,8 @@
 // - Survol à la souris : le préchargement ne part qu'après une intention stable (250 ms par défaut), et il est annulé si le
 //   pointeur quitte la carte avant. Une seule intention attend à la fois : traverser vite le catalogue ne précharge rien.
 // - File d'attente bornée (un préchargement à la fois par défaut) ; un préchargement en attente dans la file est retiré
-//   si le pointeur quitte la carte ; un jeu déjà préchargé ne l'est jamais deux fois.
+//   si le pointeur quitte la carte, et la carte est revérifiée juste avant de partir (elle a pu quitter le pointeur
+//   pendant un défilement, sans signaler sa sortie) ; un jeu déjà préchargé ne l'est jamais deux fois.
 // - Jeu choisi : tout ce qui attend encore (intention, file) est annulé, pour laisser le débit au jeu ouvert.
 // L'ouverture réelle d'un jeu ne passe jamais par ici : rien ne peut la bloquer ni la retarder.
 
@@ -31,13 +32,16 @@ export interface IntentPreloader {
 export function createIntentPreloader({ load, delayMs = 250, maxConcurrent = 1 }: IntentPreloaderOptions): IntentPreloader {
   /** Jeux dont le préchargement a commencé (ou est terminé). */
   const started = new Set<string>();
-  const queue: string[] = [];
+  /** Préchargements en attente, chacun avec sa vérification « carte toujours sous le pointeur ». */
+  const queue: Array<{ id: string; stillHovered?: () => boolean }> = [];
   let running = 0;
   let pending: { id: string; timer: ReturnType<typeof setTimeout> } | null = null;
 
   const pump = () => {
     while (running < maxConcurrent && queue.length > 0) {
-      const id = queue.shift() as string;
+      const { id, stillHovered } = queue.shift() as { id: string; stillHovered?: () => boolean };
+      // La carte a quitté le pointeur pendant l'attente : rien n'est téléchargé (elle pourra l'être à un prochain survol).
+      if (stillHovered && !stillHovered()) continue;
       started.add(id);
       running += 1;
       void load(id)
@@ -56,7 +60,7 @@ export function createIntentPreloader({ load, delayMs = 250, maxConcurrent = 1 }
 
   return {
     intent(id, stillHovered) {
-      if (started.has(id) || queue.includes(id) || pending?.id === id) return;
+      if (started.has(id) || queue.some((entry) => entry.id === id) || pending?.id === id) return;
       // Une seule intention en attente : la nouvelle carte remplace la précédente.
       cancelPending();
       pending = {
@@ -64,14 +68,14 @@ export function createIntentPreloader({ load, delayMs = 250, maxConcurrent = 1 }
         timer: setTimeout(() => {
           pending = null;
           if (stillHovered && !stillHovered()) return;
-          queue.push(id);
+          queue.push({ id, stillHovered });
           pump();
         }, delayMs),
       };
     },
     end(id) {
       if (pending?.id === id) cancelPending();
-      const queued = queue.indexOf(id);
+      const queued = queue.findIndex((entry) => entry.id === id);
       if (queued >= 0) queue.splice(queued, 1);
     },
     cancelAll() {
