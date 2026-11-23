@@ -1,0 +1,95 @@
+/* Écran de chargement de Turbo Pulse : recouvre la scène tant que le jeu n'est pas prêt, puis s'efface en fondu. */
+.loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: radial-gradient(circle at 50% 45%, #2a1c52 0%, #120b2c 70%, #0b0720 100%);
+  transition: opacity 400ms ease, visibility 400ms;
+}
+
+.finished {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.panel {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(420px, 82%);
+}
+
+.title {
+  margin: 0;
+  color: #fff3c4;
+  font-size: clamp(12px, 2.2cqw, 15px);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.track {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid rgb(255 214 110 / 45%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 50%);
+}
+
+/* Partie chargée : dégradé doré, et un reflet lumineux qui la parcourt sans cesse. */
+.fill {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f08a1c, #ffc93c 60%, #fff0a8);
+  box-shadow: 0 0 12px rgb(255 201 60 / 70%);
+  transition: width 250ms ease-out;
+}
+
+.fill::after {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 75%), transparent);
+  animation: shine 1.4s linear infinite;
+  content: "";
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-120%);
+  }
+
+  to {
+    transform: translateX(260%);
+  }
+}
+
+.percent {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(18px, 3.4cqw, 24px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill::after {
+    animation: none;
+  }
+
+  .fill,
+  .loading {
+    transition: none;
+  }
+}

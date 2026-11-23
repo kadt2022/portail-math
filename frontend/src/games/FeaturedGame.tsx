@@ -2,6 +2,9 @@ import { Fragment, useEffect, useRef, useState, type PointerEvent } from "react"
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { stillUnderPointer, trackPointer } from "./preload/cardIntent";
+
+
 import countrysideUrl from "../prototypes/leo-livreur/assets/leo-countryside-v1.webp";
 
 import skylineUrl from "./assets/leo-city-skyline-2k.webp";
@@ -60,8 +63,10 @@ interface FeaturedGameProps {
   game: GameCatalogueEntry;
   /** Jeu intégré à la page : le clic l'ouvre dans le lecteur au lieu de changer de page (l'adresse reste un vrai lien). */
   onOpen?: (game: GameCatalogueEntry) => void;
-  /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
-  onIntent?: (gameId: string) => void;
+  /** Survol stable à la souris : le jeu peut se précharger avant le clic (voir intentPreloader). */
+  onIntent?: (gameId: string, stillHovered: () => boolean) => void;
+  /** Le pointeur quitte la carte : un préchargement qui n'a pas commencé est annulé. */
+  onIntentEnd?: (gameId: string) => void;
 }
 
 // Bannière cliquable en entier : décor, ville et deux vues de la voiture (profil puis face). À l'ouverture, Léo
@@ -70,7 +75,7 @@ interface FeaturedGameProps {
 // Durée totale du mouvement (roulage + demi-tour + approche), un peu arrondie à la hausse.
 const INTRO_MS = 9200;
 
-export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
+export function FeaturedGame({ game, onOpen, onIntent, onIntentEnd }: FeaturedGameProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
   // Chaque passage de la souris (ou le focus clavier) rejoue le mouvement complet, une fois l'arrivée terminée.
@@ -85,8 +90,11 @@ export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
     setPlay((value) => value + 1);
   };
   const onPointerEnter = (event: PointerEvent) => {
-    onIntent?.(game.id);
-    if (event.pointerType === "mouse") replay();
+    // Survol à la souris seulement : sur un écran tactile, aucun préchargement spéculatif.
+    if (event.pointerType !== "mouse") return;
+    trackPointer(event);
+    onIntent?.(game.id, stillUnderPointer(event.currentTarget));
+    replay();
   };
   // Clic simple : le jeu s'ouvre dans le lecteur de la page. Clic avec modificateur (nouvel onglet) : le lien normal s'applique.
   const openInPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -114,11 +122,11 @@ export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
   useEffect(() => () => ripple.current?.dispose(), []);
   const onPointerMove = (event: PointerEvent) => {
     if (event.pointerType === "touch") return;
+    if (event.pointerType === "mouse") trackPointer(event);
     water()?.move(event.clientX, event.clientY);
   };
   // Au toucher : une onde brève, tout de suite ; le lien s’ouvre sans attendre.
   const onPointerDown = (event: PointerEvent) => {
-    onIntent?.(game.id);
     if (event.pointerType !== "touch") return;
     water()?.touch(event.clientX, event.clientY);
     // Dégradé au toucher (~10 s, fondu en entrée et en sortie) ; un nouveau toucher relance l’animation depuis le début.
@@ -140,9 +148,11 @@ export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
       onPointerEnter={onPointerEnter}
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
-      onPointerLeave={() => ripple.current?.leave()}
+      onPointerLeave={() => {
+        ripple.current?.leave();
+        onIntentEnd?.(game.id);
+      }}
       onFocus={(event) => {
-        onIntent?.(game.id);
         if (event.currentTarget.matches(":focus-visible")) replay();
       }}
     >
@@ -180,7 +190,6 @@ export function FeaturedGame({ game, onOpen, onIntent }: FeaturedGameProps) {
       <span className={styles.body}>
         <span className={styles.kicker}>{t("featured.label")}</span>
         <span className={styles.title}>{name}</span>
-        <span className={styles.tagline}>{t(game.taglineKey)}</span>
       </span>
     </Link>
   );

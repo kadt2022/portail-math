@@ -47,21 +47,26 @@ describe("GameCard", () => {
     expect(screen.queryByText(`Destination atteinte : ${turboPulse.href}`)).not.toBeInTheDocument();
   });
 
-  it("signale l'intention de jouer (survol, focus, toucher) avant le clic, pour précharger le jeu", async () => {
+  it("signale le survol à la souris et sa fin, pour précharger le jeu ; ni le toucher ni le focus ne préchargent", async () => {
     const onIntent = vi.fn();
+    const onIntentEnd = vi.fn();
     const user = userEvent.setup();
     render(
       <MemoryRouter>
-        <GameCard game={turboPulse} onOpen={() => undefined} onIntent={onIntent} />
+        <GameCard game={turboPulse} onOpen={() => undefined} onIntent={onIntent} onIntentEnd={onIntentEnd} />
       </MemoryRouter>,
     );
     const link = screen.getByRole("link", { name: /Jouer à/ });
     await user.hover(link);
-    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
+    expect(onIntent).toHaveBeenCalledWith("turbo-pulse", expect.any(Function));
+    await user.unhover(link);
+    expect(onIntentEnd).toHaveBeenCalledWith("turbo-pulse");
     onIntent.mockClear();
+    // Écran tactile : le doigt qui arrive sur la carte n'est pas un survol, rien n'est préchargé.
+    await user.pointer({ keys: "[TouchA]", target: link });
+    // Clavier : le focus seul ne précharge pas non plus (le clic ou Entrée ouvre le jeu, qui se charge normalement).
     await user.tab();
-    expect(link).toHaveFocus();
-    expect(onIntent).toHaveBeenCalledWith("turbo-pulse");
+    expect(onIntent).not.toHaveBeenCalled();
   });
 
   it("garde l'adresse du jeu comme vrai lien quand rien n'ouvre le jeu sur place", async () => {

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
+import { intentHandlers } from "./preload/cardIntent";
 import styles from "./RecommendedGameCard.module.css";
 
 interface RecommendedGameCardProps {
@@ -10,15 +11,18 @@ interface RecommendedGameCardProps {
   /** Jeux intégrés à la page : le clic les ouvre dans le lecteur principal (l'adresse reste un vrai lien). */
   onOpen?: (game: GameCatalogueEntry) => void;
   /** Intention de jouer (survol, focus, toucher) : le jeu commence à se télécharger avant le clic. */
-  onIntent?: (gameId: string) => void;
+  /** Survol stable à la souris : le jeu peut se précharger avant le clic (voir intentPreloader). */
+  onIntent?: (gameId: string, stillHovered: () => boolean) => void;
+  /** Le pointeur quitte la carte : un préchargement qui n'a pas commencé est annulé. */
+  onIntentEnd?: (gameId: string) => void;
 }
 
 // Petite carte horizontale des jeux recommandés, à droite du lecteur : miniature, titre et catégorie.
-export function RecommendedGameCard({ game, onOpen, onIntent }: RecommendedGameCardProps) {
+export function RecommendedGameCard({ game, onOpen, onIntent, onIntentEnd }: RecommendedGameCardProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
   const label = t("card.playAria", { name });
-  const intent = onIntent ? () => onIntent(game.id) : undefined;
+  const intent = intentHandlers(game.id, onIntent, onIntentEnd);
 
   const openInPlayer = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -46,7 +50,7 @@ export function RecommendedGameCard({ game, onOpen, onIntent }: RecommendedGameC
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} to={game.href} aria-label={label} onClick={game.embed ? openInPlayer : undefined} onPointerEnter={intent} onPointerDown={intent} onFocus={intent}>
+      <Link className={styles.card} to={game.href} aria-label={label} onClick={game.embed ? openInPlayer : undefined} {...intent}>
         {content}
       </Link>
     );

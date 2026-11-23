@@ -205,11 +205,6 @@
   text-shadow: 0 2px 8px rgb(0 0 0 / 55%);
 }
 
-.tagline {
-  color: #eef3ff;
-  font-size: clamp(16px, 1.8vw, 22px);
-}
-
 @media (max-width: 639px) {
   .hero {
     /* Téléphone : la bannière suit la largeur de l'écran (rapport 1,6) et reste compacte ; plus plat (2,5), le texte écrase la voiture. */

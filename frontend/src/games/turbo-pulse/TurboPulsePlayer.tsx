@@ -10,15 +10,19 @@ import { onViewportSettled } from "../viewport-events";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
-import { backgroundFor, loadImage, nextBackgroundFor } from "./turbo-pulse-backgrounds";
+import { backgroundFor, type BackgroundSize, backgroundSizeFor, downloadImage, loadImage, nextBackgroundFor } from "./turbo-pulse-backgrounds";
+import { createLoadingProgress } from "../loading/loadingProgress";
+import { TurboPulseLoading } from "./TurboPulseLoading";
 import themeUrl from "../../assets/turbo-pulse/turbo-pulse-theme.mp3";
 import styles from "./TurboPulsePlayer.module.css";
 
 /**
- * Attente maximale (ms) du moteur avant de demander le premier décor : sur un réseau qui ne répond plus, le décor est
- * tout de même demandé.
+ * Poids estimés des ressources de l'écran de chargement (octets), remplacés par la taille réelle dès qu'elle est connue.
+ * Le moteur (Phaser et la scène, mesurés compressés) n'annonce pas sa progression : il compte pour son poids d'un bloc.
  */
-const ENGINE_WAIT_TIMEOUT_MS = 15_000;
+const LOADING_ESTIMATES = { engine: 330_000, decor: 90_000, music: 308_000 };
+/** Durée du fondu de l'écran de chargement (voir TurboPulseLoading.module.css). */
+const LOADING_FADE_MS = 400;
 
 /** Promesse résolue de l'extérieur (une seule fois). */
 function deferred() {
@@ -54,7 +58,13 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
   const { t } = useTranslation("games");
   const failed = snapshot.status === "failed";
   const mastered = snapshot.status === "mastered";
-  const title = failed ? t("turboPulse.game.end.failTitle") : mastered ? t("turboPulse.game.success.masteredTitle") : t("turboPulse.game.end.winTitle");
+  // Le niveau terminé donne le numéro et le rang du trophée (source de vérité : les rangs du jeu, Acier au niveau 1).
+  const rank = rankForLevel(snapshot.levelIndex);
+  const title = failed
+    ? t("turboPulse.game.end.failTitle")
+    : mastered
+      ? t("turboPulse.game.success.masteredTitle")
+      : t("turboPulse.game.end.winTitle", { level: snapshot.levelIndex + 1 });
   const attemptsNote =
     snapshot.failureAction === "restart-run"
       ? t("turboPulse.game.end.noAttemptLeft")
@@ -71,20 +81,28 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
       : t("turboPulse.game.end.next");
   return (
     <div className={styles.endBackdrop} role="presentation">
-      <section className={`${styles.endCard} ${failed ? styles.endFailed : styles.endWon}`} role="dialog" aria-modal="true" aria-labelledby="turbo-end-title">
+      <section
+        className={`${styles.endCard} ${failed ? styles.endFailed : styles.endWon} ${mastered ? styles.endMastered : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="turbo-end-title"
+        data-rank={failed ? undefined : rank.id}
+      >
         <span className={styles.endIcon} aria-hidden="true">
-          {failed ? (
+          {mastered ? (
+            // Victoire finale : l'emblème couronné de l'Or royal, plus grand et lumineux.
+            <RankEmblem rank={rank} size={28} />
+          ) : failed ? (
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
               <circle cx="12" cy="12" r="9" />
               <path d="M9 9.5h.01M15 9.5h.01M8.5 16c2-1.6 5-1.6 7 0" />
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" focusable="false">
-              <path d="M7 3h10v2h3a1 1 0 0 1 1 1c0 3.2-1.9 5.4-4.6 5.9A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.6 11.9C4.9 11.4 3 9.2 3 6a1 1 0 0 1 1-1h3V3Zm-1.9 4c.2 1.6 1 2.6 2.2 3A9 9 0 0 1 7 7H5.1Zm13.8 0H17a9 9 0 0 1-.3 3c1.2-.4 2-1.4 2.2-3ZM8 21h8v1H8v-1Z" />
-            </svg>
+            <RankTrophy rank={rank} />
           )}
         </span>
         <h2 id="turbo-end-title" className={styles.endTitle}>{title}</h2>
+        {mastered ? <p className={styles.endRank}>{t("turboPulse.game.success.knightRank")}</p> : null}
         {failed ? (
           // Niveaux experts : les tentatives restantes, seulement quand elles comptent.
           attemptsNote ? <p className={styles.endNote}>{attemptsNote}</p> : null
@@ -101,6 +119,26 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
         </button>
       </section>
     </div>
+  );
+}
+
+// Trophée de réussite aux couleurs du rang du niveau terminé (Acier, Bronze… Or royal).
+function RankTrophy({ rank }: { rank: TurboPulseRank }) {
+  const gradient = useId();
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+      <defs>
+        <linearGradient id={gradient} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor={rank.lightCss} />
+          <stop offset="0.55" stopColor={rank.accentCss} />
+          <stop offset="1" stopColor={rank.darkCss} />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#${gradient})`}
+        d="M7 3h10v2h3a1 1 0 0 1 1 1c0 3.2-1.9 5.4-4.6 5.9A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.6 11.9C4.9 11.4 3 9.2 3 6a1 1 0 0 1 1-1h3V3Zm-1.9 4c.2 1.6 1 2.6 2.2 3A9 9 0 0 1 7 7H5.1Zm13.8 0H17a9 9 0 0 1-.3 3c1.2-.4 2-1.4 2.2-3ZM8 21h8v1H8v-1Z"
+      />
+    </svg>
   );
 }
 
@@ -170,10 +208,15 @@ export function TurboPulsePlayer({
   const [engineFailure, setEngineFailure] = useState<Error | null>(null);
   if (engineFailure) throw engineFailure;
 
-  // Ordre des téléchargements sur une connexion lente (le débit est partagé : ce qui part en même temps arrive plus tard) :
-  // 1. le moteur Phaser, pour que la partie démarre au plus tôt ; 2. le décor du niveau en cours, en priorité haute ;
-  // 3. la musique et le décor du niveau suivant. Rien de secondaire ne retarde la partie ni le décor.
-  const engineSettled = useRef(deferred());
+  // Chargement : la partie ne commence qu'avec le moteur, le décor du premier niveau et la musique (écran de chargement et
+  // vrai pourcentage d'ici là). Le décor du niveau suivant se prépare ensuite pendant la partie, en priorité basse.
+  const resourcesReady = useRef(deferred());
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [loadingGone, setLoadingGone] = useState(false);
+  // Version des décors (960 pour les téléphones, 1280 au-delà) d'après la largeur réelle de la scène à l'instant du
+  // téléchargement : un passage en plein écran sur ordinateur fait prendre la version 1280 au niveau suivant.
+  const backgroundSize = (): BackgroundSize => backgroundSizeFor((canvasFrameRef.current?.clientWidth ?? 0) * (window.devicePixelRatio || 1));
   // Dernière valeur de `active`, lue à l'arrivée du moteur (voir l'effet de montage).
   const activeRef = useRef(active);
   useEffect(() => {
@@ -185,59 +228,62 @@ export function TurboPulsePlayer({
   const [pausedBeforeEngine, setPausedBeforeEngine] = useState(false);
   const pausedBeforeEngineRef = useRef(false);
 
-  // Musique d'ambiance (308 Ko) : demandée une fois le décor affiché (étape 3). Une seule fois par ouverture du jeu.
-  const musicRequested = useRef(false);
-  const requestMusic = () => {
-    if (musicRequested.current || !audioRef.current) return;
-    musicRequested.current = true;
-    void audioRef.current.loadMusic(themeUrl).catch(() => undefined);
-  };
-
   // Décor du niveau (voir turbo-pulse-backgrounds) : re-déclenché uniquement quand levelIndex change réellement, jamais à
-  // chaque instantané de partie, pour ne jamais redemander le même décor. Demandé une fois le moteur arrivé (étape 2), en
-  // priorité haute, et affiché une fois décodé ; puis la musique et le décor du niveau suivant, en priorité basse : au
-  // changement de niveau, il est déjà là. `cancelled` évite d'appliquer un décor arrivé après un changement de niveau.
+  // chaque instantané de partie, pour ne jamais redemander le même décor. Demandé une fois le chargement terminé (le décor
+  // du premier niveau est alors déjà dans le cache), en priorité haute, et affiché une fois décodé ; puis le décor du
+  // niveau suivant, en priorité basse : au changement de niveau, il est déjà là. `cancelled` évite d'appliquer un décor
+  // arrivé après un changement de niveau. Aucun délai de secours : l'attente se termine toujours (une ressource en échec
+  // ne bloque pas le chargement), et rien de secondaire ne doit disputer le débit à l'écran de chargement.
   useEffect(() => {
     let cancelled = false;
-    let timer = 0;
-    const url = backgroundFor(snapshot.levelIndex);
-    Promise.race([
-      engineSettled.current.promise,
-      new Promise<void>((done) => {
-        timer = window.setTimeout(done, ENGINE_WAIT_TIMEOUT_MS);
-      }),
-    ])
-      .then(() => loadImage(url, "high"))
+    const size = () => backgroundSize();
+    const url = () => backgroundFor(snapshot.levelIndex, size());
+    resourcesReady.current.promise
+      .then(() => loadImage(url(), "high"))
       .then(() => {
         if (cancelled) return;
-        setBackgroundUrl(url);
-        requestMusic();
-        const next = nextBackgroundFor(snapshot.levelIndex);
+        setBackgroundUrl(url());
+        const next = nextBackgroundFor(snapshot.levelIndex, size());
         if (next) void loadImage(next, "low").catch(() => undefined);
       })
-      .catch(() => {
-        // Décor indisponible (réseau coupé) : la partie continue sur le décor déjà affiché ou le fond de secours du cadre.
-        if (!cancelled) requestMusic();
-      });
+      // Décor indisponible (réseau coupé) : la partie continue sur le décor déjà affiché ou le fond de secours du cadre.
+      .catch(() => undefined);
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
     };
   }, [snapshot.levelIndex]);
 
   useEffect(() => {
     if (!gameHostRef.current) return;
-    // Son : musique d'ambiance et effets, sur deux pistes indépendantes (voir GameAudio). La musique est téléchargée après
-    // le premier décor (voir requestMusic) ; les effets sont fabriqués par programmation, sans fichier.
+    // Son : musique d'ambiance et effets, sur deux pistes indépendantes (voir GameAudio). La musique fait partie du
+    // chargement ; les effets sont fabriqués par programmation, sans fichier.
     const audio = new GameAudio({ storageKey: GAMES_SOUND_STORAGE_KEY });
     audioRef.current = audio;
-    musicRequested.current = false;
-    // Moteur chargé à la demande (étape 1), dès l'ouverture : le lecteur s'affiche sans l'attendre, et le décor ne lui
-    // dispute pas le débit (il part une fois le moteur arrivé).
     let disposed = false;
     const host = gameHostRef.current;
-    import("./TurboPulseGame")
-      .then(({ mountTurboPulseGame }) => {
+    const progress = createLoadingProgress(
+      LOADING_ESTIMATES,
+      (fraction) => {
+        if (!disposed) setLoadingProgress(fraction);
+      },
+      "engine",
+    );
+    // Les trois ressources partent ensemble ; une ressource en échec (réseau coupé) ne bloque jamais le chargement : le
+    // jeu démarre sans elle (fond de secours, ou partie sans musique). Seul le moteur est indispensable.
+    const engine = import("./TurboPulseGame").finally(() => progress.complete("engine"));
+    const firstDecor = backgroundFor(INITIAL_SNAPSHOT.levelIndex, backgroundSize());
+    const decor = downloadImage(firstDecor, (loaded, total) => progress.report("decor", loaded, total))
+      .then(() => {
+        if (!disposed) setBackgroundUrl(firstDecor);
+      })
+      .catch(() => undefined)
+      .finally(() => progress.complete("decor"));
+    const music = audio
+      .loadMusic(themeUrl, (loaded, total) => progress.report("music", loaded, total))
+      .catch(() => undefined)
+      .finally(() => progress.complete("music"));
+    Promise.all([engine, decor, music])
+      .then(([{ mountTurboPulseGame }]) => {
         if (disposed) return;
         controllerRef.current = mountTurboPulseGame(host, setSnapshot, audio);
         // La scène a pu être mise à l'échelle avant l'arrivée du moteur : Phaser se recale sur la taille actuelle.
@@ -248,12 +294,13 @@ export function TurboPulsePlayer({
           controllerRef.current.togglePause();
         }
         setEngineReady(true);
+        setLoaded(true);
       })
       .catch((error: unknown) => {
         // Moteur introuvable (réseau coupé) : même issue qu'avant, l'erreur remonte au cadre d'erreur de la page.
         if (!disposed) setEngineFailure(error instanceof Error ? error : new Error(String(error)));
       })
-      .finally(() => engineSettled.current.resolve());
+      .finally(() => resourcesReady.current.resolve());
     // Le toucher qui a ouvert le jeu autorise déjà le son sur la plupart des navigateurs ; sinon, le prochain toucher dans le
     // lecteur le réveille (iPhone).
     audio.unlock();
@@ -325,6 +372,13 @@ export function TurboPulsePlayer({
   useEffect(() => {
     controllerRef.current?.refreshLayout();
   }, [fullscreen, cover]);
+
+  // À 100 % : l'écran de chargement s'efface en fondu, puis quitte la page.
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = window.setTimeout(() => setLoadingGone(true), LOADING_FADE_MS);
+    return () => window.clearTimeout(timer);
+  }, [loaded]);
 
   // Jeu masqué (fermé, onglet changé) : la partie se met en pause, sans rien perdre.
   useEffect(() => {
@@ -434,6 +488,7 @@ export function TurboPulsePlayer({
             <span>{t("turboPulse.game.solve")}</span>
             <strong>{snapshot.operation}</strong>
           </div>
+          {loadingGone ? null : <TurboPulseLoading progress={loadingProgress} finished={loaded} />}
           {snapshot.status === "failed" ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.retryLevel()} /> : null}
           {isSuccess ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.nextLevel()} /> : null}
         </div>
