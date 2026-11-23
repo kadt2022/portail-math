@@ -7,6 +7,7 @@ import { GameAudio } from "../audio/GameAudio";
 import type { TurboPulseSnapshot } from "./TurboPulseGame";
 import { TurboPulsePage } from "./TurboPulsePage";
 import { TurboPulsePlayer } from "./TurboPulsePlayer";
+import { TURBO_RANKS } from "./turbo-pulse-ranks";
 
 const { gameMock, mountTurboPulseGameMock } = vi.hoisted(() => {
   const gameMock = {
@@ -230,25 +231,49 @@ describe("page Turbo Pulse", () => {
     expect(screen.queryByRole("button", { name: "Pause" })).not.toBeInTheDocument();
   });
 
-  it("victoire : une petite fenêtre « Niveau réussi ! », le score et « Continuer »", async () => {
+  it("victoire : une petite fenêtre « Niveau 1 réussi ! », le score et « Continuer »", async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, score: 120, levelIndex: 0, status: "level-complete" }));
-    const panel = screen.getByRole("dialog", { name: "Niveau réussi !" });
+    const panel = screen.getByRole("dialog", { name: "Niveau 1 réussi !" });
     expect(within(panel).getByText("Score : 120")).toBeInTheDocument();
     expect(within(panel).getAllByRole("button")).toHaveLength(1);
     await user.click(within(panel).getByRole("button", { name: "Continuer" }));
     expect(gameMock.nextLevel).toHaveBeenCalledOnce();
   });
 
-  it("célèbre la maîtrise complète dans la même petite fenêtre", async () => {
+  it("le numéro et le trophée suivent le niveau terminé : Acier au niveau 1, jamais un trophée doré", async () => {
+    render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
+    await engineMounted();
+    // Niveaux 1 à 6 : réussites intermédiaires, chacune avec son numéro et le rang défini par le jeu.
+    for (const levelIndex of [0, 1, 2, 3, 4, 5]) {
+      act(() => gameMock.listener?.({ ...snapshot, levelIndex, status: "level-complete" }));
+      const rank = TURBO_RANKS[levelIndex];
+      const panel = screen.getByRole("dialog", { name: `Niveau ${levelIndex + 1} réussi !` });
+      expect(panel).toHaveAttribute("data-rank", rank.id);
+      const stops = [...panel.querySelectorAll("stop")].map((stop) => stop.getAttribute("stop-color"));
+      expect(stops).toEqual([rank.lightCss, rank.accentCss, rank.darkCss]);
+    }
+    act(() => gameMock.listener?.({ ...snapshot, levelIndex: 0, status: "level-complete" }));
+    const steel = screen.getByRole("dialog", { name: "Niveau 1 réussi !" });
+    const gold = TURBO_RANKS[6];
+    const colors = [...steel.querySelectorAll("stop")].map((stop) => stop.getAttribute("stop-color"));
+    expect(colors).not.toContain(gold.accentCss);
+    expect(colors).not.toContain(gold.lightCss);
+  });
+
+  it("victoire finale au niveau 7 : « Turbo Pulse Or ! », plus marquante, sans « Chevalier d'or »", async () => {
     render(<MemoryRouter><TurboPulsePage /></MemoryRouter>);
     await engineMounted();
     act(() => gameMock.listener?.({ ...snapshot, levelIndex: 6, status: "mastered", totalSolved: 84 }));
 
-    expect(screen.getByRole("heading", { name: "Chevalier d'Or" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Rejouer depuis le niveau 1" })).toBeInTheDocument();
+    const panel = screen.getByRole("dialog", { name: "Turbo Pulse Or !" });
+    expect(panel).toHaveAttribute("data-rank", "gold");
+    expect(panel.className).toMatch(/endMastered/);
+    expect(within(panel).getByText("Niveau 7 — Or royal")).toBeInTheDocument();
+    expect(screen.queryByText(/chevalier/i)).not.toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: "Rejouer depuis le niveau 1" })).toBeInTheDocument();
   });
 
   it("quitte le plein écran puis retourne au catalogue de jeux au clic sur Quitter", async () => {

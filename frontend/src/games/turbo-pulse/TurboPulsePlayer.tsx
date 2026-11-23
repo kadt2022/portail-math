@@ -58,7 +58,13 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
   const { t } = useTranslation("games");
   const failed = snapshot.status === "failed";
   const mastered = snapshot.status === "mastered";
-  const title = failed ? t("turboPulse.game.end.failTitle") : mastered ? t("turboPulse.game.success.masteredTitle") : t("turboPulse.game.end.winTitle");
+  // Le niveau terminé donne le numéro et le rang du trophée (source de vérité : les rangs du jeu, Acier au niveau 1).
+  const rank = rankForLevel(snapshot.levelIndex);
+  const title = failed
+    ? t("turboPulse.game.end.failTitle")
+    : mastered
+      ? t("turboPulse.game.success.masteredTitle")
+      : t("turboPulse.game.end.winTitle", { level: snapshot.levelIndex + 1 });
   const attemptsNote =
     snapshot.failureAction === "restart-run"
       ? t("turboPulse.game.end.noAttemptLeft")
@@ -75,20 +81,28 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
       : t("turboPulse.game.end.next");
   return (
     <div className={styles.endBackdrop} role="presentation">
-      <section className={`${styles.endCard} ${failed ? styles.endFailed : styles.endWon}`} role="dialog" aria-modal="true" aria-labelledby="turbo-end-title">
+      <section
+        className={`${styles.endCard} ${failed ? styles.endFailed : styles.endWon} ${mastered ? styles.endMastered : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="turbo-end-title"
+        data-rank={failed ? undefined : rank.id}
+      >
         <span className={styles.endIcon} aria-hidden="true">
-          {failed ? (
+          {mastered ? (
+            // Victoire finale : l'emblème couronné de l'Or royal, plus grand et lumineux.
+            <RankEmblem rank={rank} size={28} />
+          ) : failed ? (
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
               <circle cx="12" cy="12" r="9" />
               <path d="M9 9.5h.01M15 9.5h.01M8.5 16c2-1.6 5-1.6 7 0" />
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" focusable="false">
-              <path d="M7 3h10v2h3a1 1 0 0 1 1 1c0 3.2-1.9 5.4-4.6 5.9A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.6 11.9C4.9 11.4 3 9.2 3 6a1 1 0 0 1 1-1h3V3Zm-1.9 4c.2 1.6 1 2.6 2.2 3A9 9 0 0 1 7 7H5.1Zm13.8 0H17a9 9 0 0 1-.3 3c1.2-.4 2-1.4 2.2-3ZM8 21h8v1H8v-1Z" />
-            </svg>
+            <RankTrophy rank={rank} />
           )}
         </span>
         <h2 id="turbo-end-title" className={styles.endTitle}>{title}</h2>
+        {mastered ? <p className={styles.endRank}>{t("turboPulse.game.success.knightRank")}</p> : null}
         {failed ? (
           // Niveaux experts : les tentatives restantes, seulement quand elles comptent.
           attemptsNote ? <p className={styles.endNote}>{attemptsNote}</p> : null
@@ -105,6 +119,26 @@ function EndPanel({ snapshot, onAction }: { snapshot: TurboPulseSnapshot; onActi
         </button>
       </section>
     </div>
+  );
+}
+
+// Trophée de réussite aux couleurs du rang du niveau terminé (Acier, Bronze… Or royal).
+function RankTrophy({ rank }: { rank: TurboPulseRank }) {
+  const gradient = useId();
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+      <defs>
+        <linearGradient id={gradient} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor={rank.lightCss} />
+          <stop offset="0.55" stopColor={rank.accentCss} />
+          <stop offset="1" stopColor={rank.darkCss} />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#${gradient})`}
+        d="M7 3h10v2h3a1 1 0 0 1 1 1c0 3.2-1.9 5.4-4.6 5.9A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.6 11.9C4.9 11.4 3 9.2 3 6a1 1 0 0 1 1-1h3V3Zm-1.9 4c.2 1.6 1 2.6 2.2 3A9 9 0 0 1 7 7H5.1Zm13.8 0H17a9 9 0 0 1-.3 3c1.2-.4 2-1.4 2.2-3ZM8 21h8v1H8v-1Z"
+      />
+    </svg>
   );
 }
 

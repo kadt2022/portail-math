@@ -173,7 +173,7 @@
       },
       "success": {
         "title": "Level {{level}} complete!",
-        "masteredTitle": "Golden Knight",
+        "masteredTitle": "Turbo Pulse Gold!",
         "knightRank": "Level 7 — Royal Gold"
       },
       "paused": {
@@ -209,7 +209,7 @@
       "rankLabel": "{{rank}} rank",
       "end": {
         "failTitle": "Oops! Try again",
-        "winTitle": "Level complete!",
+        "winTitle": "Level {{level}} complete!",
         "score": "Score: {{score}}",
         "retry": "Try again",
         "next": "Continue",

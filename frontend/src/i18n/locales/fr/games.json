@@ -173,7 +173,7 @@
       },
       "success": {
         "title": "Niveau {{level}} terminé !",
-        "masteredTitle": "Chevalier d'Or",
+        "masteredTitle": "Turbo Pulse Or !",
         "knightRank": "Niveau 7 — Or royal"
       },
       "paused": {
@@ -209,7 +209,7 @@
       "rankLabel": "Rang {{rank}}",
       "end": {
         "failTitle": "Oups ! Réessaie",
-        "winTitle": "Niveau réussi !",
+        "winTitle": "Niveau {{level}} réussi !",
         "score": "Score : {{score}}",
         "retry": "Réessayer",
         "next": "Continuer",
