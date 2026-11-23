@@ -8,6 +8,7 @@ import { drivingLayout, playerDrivingLayout } from "../../prototypes/leo-livreur
 import { DeliverButton, LeoMissionOverlay, missionDashboard, missionInstruction } from "../../prototypes/leo-livreur/LeoMissionLayer";
 import { useLeoMission } from "../../prototypes/leo-livreur/useLeoMission";
 import { STARTUP_TEXTURE_URLS } from "../../prototypes/leo-livreur/leoTextureUrls";
+import { BUNDLE_BYTES } from "../../prototypes/leo-livreur/leoZoneAssets";
 import { fetchAllWithProgress } from "../loading/fetchWithProgress";
 import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
 import { createLoadingProgress } from "../loading/loadingProgress";
@@ -27,7 +28,20 @@ const MIN_MISSION_SCENE_HEIGHT = 280;
  * le moteur (Phaser et la scène, compressés) n'annonce pas sa progression ; les images du démarrage (lot commun), si.
  * Les deux sont téléchargés en même temps ; la scène relit ensuite les images dans le cache HTTP.
  */
-const LOADING_ESTIMATES = { engine: 350_000, images: 673_000 };
+/**
+ * Parts de l'écran de chargement, en octets : le moteur, toutes les images du parcours (commun, pont, ville), puis leur
+ * préparation par la scène (décodage, fondus du pont, vues de la berline, piétons). Cette dernière part n'est comptée
+ * qu'une fois la scène prête : la barre n'atteint jamais 100 % avant que la partie puisse commencer.
+ */
+const LOADING_ESTIMATES = { engine: 350_000, images: BUNDLE_BYTES.common + BUNDLE_BYTES.bridge + BUNDLE_BYTES.city, scene: 150_000 };
+/** Au-delà, l'écran explique que le chargement peut durer (connexion lente), sans rien interrompre. */
+const SLOW_LOADING_MS = 20_000;
+/**
+ * Image du départ qui ne reçoit plus rien depuis ce délai (ni octet, ni erreur) : abandonnée, pour que la scène démarre
+ * quand même et la redemande avec ses propres reprises (puis Réessayer). Inactivité et non durée totale : une connexion
+ * lente mais vivante n'est jamais coupée ; la marge couvre aussi l'attente d'une connexion libre (6 par serveur en HTTP/1.1).
+ */
+const STALL_TIMEOUT_MS = 60_000;
 
 /** Habillage de l'écran de chargement commun aux couleurs de Léo : nuit en ville, barre orange de la pizzeria. */
 const LEO_LOADING_THEME = {
@@ -92,10 +106,11 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     const progress = createLoadingProgress(LOADING_ESTIMATES, setLoadingProgress, "engine");
     const onSnapshot = (next: LeoLivreurSnapshot) => {
       setSnapshot(next);
-      // Première fois que tout est prêt : la partie devient jouable (les attentes de zone suivantes restent dans le
-      // panneau de conduite, sans écran de chargement).
+      // Tout le parcours est prêt : la partie devient jouable. Plus rien n'est téléchargé ensuite (une reprise après
+      // échec, exceptionnelle, s'afficherait dans le panneau de conduite, sans écran de chargement).
       if (next.assets === "ready") {
         progress.complete("images");
+        progress.complete("scene");
         setStarted(true);
       }
     };
@@ -103,7 +118,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
       progress.complete("engine");
       return module;
     });
-    const images = fetchAllWithProgress(STARTUP_TEXTURE_URLS, (loaded, total) => progress.report("images", loaded, total), "high");
+    const images = fetchAllWithProgress(STARTUP_TEXTURE_URLS, (loaded, total) => progress.report("images", loaded, total), "high", STALL_TIMEOUT_MS);
     Promise.all([engine, images])
       .then(([{ mountLeoLivreurGame }]) => {
         if (cancelled) return;
@@ -296,6 +311,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
             failed={loadingFailed}
             onRetry={retryLoading}
             theme={LEO_LOADING_THEME}
+            slowAfterMs={SLOW_LOADING_MS}
           />
         )}
         <LeoMissionOverlay

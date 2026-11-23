@@ -3,7 +3,8 @@
     "title": "Loading resources",
     "label": "Loading the game",
     "failed": "The download was interrupted.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "slow": "Loading is taking a little longer. Please wait. On a slow connection, it can take up to a minute, or even longer."
   },
   "cataloguePage": {
     "title": "Games",

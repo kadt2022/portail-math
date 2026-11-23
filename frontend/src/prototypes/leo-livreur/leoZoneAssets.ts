@@ -1,20 +1,22 @@
-// Chargement progressif des ressources par zone (LEO-PERF-02, étapes 3 à 5). Pur (sans Phaser), donc testable.
+// Ressources de Conduire avec Léo, regroupées en lots par zone. Pur (sans Phaser), donc testable.
 //
 // Trois lots de textures :
-//   - « common » : Léo, le trafic, les maisons et le tablier (présent dans toutes les zones) — chargé au départ ;
-//   - « bridge » : garde-corps et calque du pont suspendu — zones du pont seulement ;
-//   - « city »   : illustration de la ville et planche des 7 vues de la berline — zones de la ville seulement.
-// Un lot est téléchargé avant que Léo l'atteigne (anticipation selon la position, la vitesse, le sens, le poids du
-// lot et le débit mesuré), libéré quand Léo s'en éloigne nettement, rechargé s'il revient. Aucun stockage persistant :
-// seule la mémoire du jeu, pendant la partie.
+//   - « common » : Léo, le trafic, les maisons, le village et le tablier ;
+//   - « bridge » : garde-corps et calque du pont suspendu ;
+//   - « city »   : illustration de la ville, piétons et planche des 7 vues de la berline.
+// Les trois lots sont téléchargés et préparés avant le départ, puis gardés en mémoire pendant toute la partie : une
+// attente au début plutôt qu'un arrêt de Léo en pleine conduite (marche arrière et retours entre zones compris). Aucun
+// stockage persistant : seule la mémoire du jeu, pendant la partie ; le cache HTTP sert les visites suivantes.
 
 import { BRIDGE_END_X, BRIDGE_START_X, cityLayout, CITY_FADE } from "./leoCityLayout";
 import { boulevardLayout, BOULEVARD_FADE } from "./leoBoulevardLayout";
-import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 
 export type BundleId = "common" | "bridge" | "city";
 /** « retrying » : échec, reprise automatique programmée ; les demandes ordinaires attendent la fin du délai. */
 export type BundleState = "absent" | "loading" | "retrying" | "ready" | "error";
+
+/** Lots dans l'ordre de leur préparation. */
+export const ALL_BUNDLES: readonly BundleId[] = ["common", "bridge", "city"];
 
 /** Clés de texture téléchargées par lot (les textures dérivées sont gérées par la scène). */
 export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
@@ -32,8 +34,11 @@ export const BUNDLE_TEXTURES: Record<BundleId, readonly string[]> = {
   ],
 };
 
+/** Toutes les textures téléchargées avant le départ. */
+export const ALL_TEXTURE_KEYS: readonly string[] = ALL_BUNDLES.flatMap((bundle) => BUNDLE_TEXTURES[bundle]);
+
 /**
- * Poids (octets) des lots, mesurés sur les fichiers livrés : servent à estimer le temps de téléchargement.
+ * Poids (octets) des lots, mesurés sur les fichiers livrés : servent à estimer la progression avant que le serveur annonce les tailles réelles.
  * Toutes les images du jeu sont en WebP (les originaux restent dans assets/ comme sources, sans être téléchargés) ; certaines
  * sont livrées réduites à leur taille réelle d'affichage (voir leoTextureDelivery).
  */
@@ -43,10 +48,6 @@ export const BUNDLE_BYTES: Record<BundleId, number> = {
   city: 1_253_000,
 };
 
-/** Débit supposé tant qu'aucune mesure n'existe, et plancher de prudence : 250 kbit/s (réseau mobile faible). */
-export const FALLBACK_BANDWIDTH_BPS = 250_000;
-/** Marge de sécurité appliquée au temps de téléchargement estimé (connexions irrégulières). */
-export const SAFETY_FACTOR = 2;
 /** Tentatives automatiques après un échec, avant de demander à l'enfant de réessayer. */
 export const MAX_AUTO_RETRIES = 2;
 export const RETRY_DELAYS_MS = [2000, 6000] as const;
@@ -72,32 +73,6 @@ export function bundlesForRange(minX: number, maxX: number): BundleId[] {
   });
 }
 
-/**
- * Intervalle à préparer d'avance : la vue, plus devant Léo la distance qu'il parcourt pendant le téléchargement
- * estimé du plus gros lot (× marge de sécurité), et au moins une zone ; une zone derrière (marche arrière).
- * `direction` : +1 vers l'est, -1 vers l'ouest. `speed` en px/s (valeur absolue utilisée).
- */
-export function prefetchRange(
-  view: { minX: number; maxX: number },
-  speed: number,
-  direction: 1 | -1,
-  bandwidthBps: number,
-): { minX: number; maxX: number } {
-  const bps = Math.max(FALLBACK_BANDWIDTH_BPS, Number.isFinite(bandwidthBps) ? bandwidthBps : 0);
-  const heaviest = Math.max(BUNDLE_BYTES.bridge, BUNDLE_BYTES.city);
-  const seconds = (heaviest * 8) / bps;
-  const ahead = Math.max(WORLD_ZONE_WIDTH, Math.abs(speed) * seconds * SAFETY_FACTOR);
-  const behind = WORLD_ZONE_WIDTH;
-  return direction > 0
-    ? { minX: view.minX - behind, maxX: view.maxX + ahead }
-    : { minX: view.minX - ahead, maxX: view.maxX + behind };
-}
-
-/** Intervalle au-delà duquel un lot peut être libéré (hystérésis : on ne libère pas ce qu'on vient de quitter). */
-export function keepRange(prefetch: { minX: number; maxX: number }) {
-  return { minX: prefetch.minX - WORLD_ZONE_WIDTH, maxX: prefetch.maxX + WORLD_ZONE_WIDTH };
-}
-
 /** Téléchargeur d'un lot (Phaser dans le jeu, simulé dans les tests). Résout quand tout le lot est prêt. */
 export type BundleFetcher = (bundle: BundleId) => Promise<void>;
 export type Scheduler = (callback: () => void, delayMs: number) => void;
@@ -109,21 +84,17 @@ export interface BundleStatus {
 
 /**
  * États des lots : jamais deux téléchargements simultanés du même lot, reprises automatiques limitées, puis erreur
- * explicite (bouton Réessayer), libération seulement des lots inutilisés.
+ * explicite (bouton Réessayer), aucune libération pendant la partie.
  */
 export class ZoneAssetManager {
   private readonly status = new Map<BundleId, BundleStatus>();
   private readonly inFlight = new Map<BundleId, Promise<void>>();
-  /** Débit mesuré (bit/s) sur les téléchargements terminés ; 0 tant qu'aucune mesure. */
-  bandwidthBps = 0;
-
   constructor(
     private readonly fetchBundle: BundleFetcher,
     private readonly schedule: Scheduler = (callback, delay) => { setTimeout(callback, delay); },
-    private readonly now: () => number = () => performance.now(),
     private readonly onChange: () => void = () => {},
   ) {
-    for (const bundle of ["common", "bridge", "city"] as const) this.status.set(bundle, { state: "absent", attempts: 0 });
+    for (const bundle of ALL_BUNDLES) this.status.set(bundle, { state: "absent", attempts: 0 });
   }
 
   state(bundle: BundleId): BundleState {
@@ -140,7 +111,7 @@ export class ZoneAssetManager {
 
   /** Lots en erreur définitive (reprises automatiques épuisées). */
   failed(): BundleId[] {
-    return (["common", "bridge", "city"] as const).filter((bundle) => this.state(bundle) === "error");
+    return ALL_BUNDLES.filter((bundle) => this.state(bundle) === "error");
   }
 
   /**
@@ -163,26 +134,12 @@ export class ZoneAssetManager {
     }
   }
 
-  /** Libère un lot devenu inutile (l'appelant a vérifié qu'aucun objet ne l'utilise). Le lot commun ne l'est jamais. */
-  release(bundle: BundleId) {
-    if (bundle === "common") return false;
-    const current = this.status.get(bundle) as BundleStatus;
-    if (current.state !== "ready") return false;
-    this.status.set(bundle, { state: "absent", attempts: 0 });
-    this.onChange();
-    return true;
-  }
-
   private start(bundle: BundleId): Promise<void> {
     const current = this.status.get(bundle) as BundleStatus;
     this.status.set(bundle, { state: "loading", attempts: current.attempts + 1 });
     this.onChange();
-    const startedAt = this.now();
     const run = this.fetchBundle(bundle)
       .then(() => {
-        const seconds = Math.max(0.05, (this.now() - startedAt) / 1000);
-        const measured = (BUNDLE_BYTES[bundle] * 8) / seconds;
-        this.bandwidthBps = this.bandwidthBps > 0 ? Math.min(this.bandwidthBps, measured) : measured;
         this.status.set(bundle, { state: "ready", attempts: 0 });
         this.inFlight.delete(bundle);
         this.onChange();

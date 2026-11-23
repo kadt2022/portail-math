@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./GameLoadingScreen.module.css";
@@ -13,6 +13,11 @@ export interface GameLoadingScreenProps {
   onRetry?: () => void;
   /** Habillage du jeu : variables --loading-* (fond, barre, textes). Par défaut, celui de Turbo Pulse. */
   theme?: CSSProperties;
+  /**
+   * Délai (ms) après lequel, si le chargement dure encore, un message invite à patienter (connexion lente). Le
+   * téléchargement continue. Sans valeur, aucun message.
+   */
+  slowAfterMs?: number;
 }
 
 /** Durée du fondu de sortie (voir GameLoadingScreen.module.css). */
@@ -20,9 +25,15 @@ export const LOADING_FADE_MS = 400;
 
 // Écran de chargement commun aux jeux, intégré à leur scène : discret, une barre qui avance avec les octets réellement
 // reçus et leur pourcentage, sans répéter le nom du jeu. À 100 %, il s'efface et le jeu commence.
-export function GameLoadingScreen({ progress, finished, failed = false, onRetry, theme }: GameLoadingScreenProps) {
+export function GameLoadingScreen({ progress, finished, failed = false, onRetry, theme, slowAfterMs }: GameLoadingScreenProps) {
   const { t } = useTranslation("games");
   const percent = Math.min(100, Math.floor(progress * 100));
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (slowAfterMs === undefined || finished) return;
+    const timer = window.setTimeout(() => setSlow(true), slowAfterMs);
+    return () => window.clearTimeout(timer);
+  }, [slowAfterMs, finished]);
   return (
     <div className={`${styles.loading} ${finished ? styles.finished : ""}`} aria-hidden={finished} style={theme}>
       <div className={styles.panel}>
@@ -49,7 +60,14 @@ export function GameLoadingScreen({ progress, finished, failed = false, onRetry,
             ) : null}
           </>
         ) : (
-          <p className={styles.percent}>{percent} %</p>
+          <>
+            <p className={styles.percent}>{percent} %</p>
+            {slow && !finished ? (
+              <p className={styles.slow} role="status">
+                {t("loadingScreen.slow")}
+              </p>
+            ) : null}
+          </>
         )}
       </div>
     </div>

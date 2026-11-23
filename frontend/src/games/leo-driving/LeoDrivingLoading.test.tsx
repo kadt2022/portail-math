@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { LeoLivreurSnapshot } from "../../prototypes/leo-livreur/LeoLivreurGame";
 import { STARTUP_TEXTURE_URLS } from "../../prototypes/leo-livreur/leoTextureUrls";
+import { ALL_TEXTURE_KEYS } from "../../prototypes/leo-livreur/leoZoneAssets";
 
 const { engine } = vi.hoisted(() => ({
   engine: {
@@ -75,15 +76,17 @@ describe("écran de chargement de Conduire avec Léo", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("moteur et images du démarrage en même temps ; jouable seulement quand tout est prêt, puis l'écran s'efface", async () => {
+  it("moteur et images de tout le parcours en même temps ; jouable seulement quand tout est prêt, puis l'écran s'efface", async () => {
     render(<LeoDrivingPlayer />);
     await settle();
     expect(screen.getByText("Chargement des ressources")).toBeInTheDocument();
     // L'écran ne répète pas le nom du jeu (déjà dans l'en-tête du lecteur).
     expect(within(loadingScreen() as HTMLElement).queryByText(/Léo|Conduire/)).not.toBeInTheDocument();
-    // Les images du lot commun partent tout de suite, en priorité haute, sans attendre le moteur ; rien d'autre.
+    // Les images de tout le parcours (commun, pont, ville) partent tout de suite, en priorité haute, sans attendre le
+    // moteur ; rien d'autre.
     expect(downloads.map(({ url }) => url)).toEqual([...STARTUP_TEXTURE_URLS]);
-    expect(vi.mocked(fetch)).toHaveBeenCalledWith(STARTUP_TEXTURE_URLS[0], { priority: "high" });
+    expect(STARTUP_TEXTURE_URLS).toHaveLength(ALL_TEXTURE_KEYS.length);
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith(STARTUP_TEXTURE_URLS[0], expect.objectContaining({ priority: "high", signal: expect.any(AbortSignal) }));
     // Moteur arrivé, images encore en route : la scène n'est pas montée.
     expect(engine.mount).not.toHaveBeenCalled();
     const before = percent();
@@ -91,8 +94,11 @@ describe("écran de chargement de Conduire avec Léo", () => {
     await settle();
     expect(percent()).toBeGreaterThan(before);
     expect(engine.mount).toHaveBeenCalledOnce();
+    // Moteur et images reçus, scène en préparation : jamais 100 % avant que tout soit prêt.
+    expect(percent()).toBeLessThan(100);
     // Scène montée, images en cours de lecture par la scène : pas encore jouable.
     act(() => engine.listener?.(SNAPSHOT));
+    expect(percent()).toBeLessThan(100);
     expect(loadingScreen()).toHaveAttribute("aria-hidden", "false");
     expect(screen.queryByRole("button", { name: "Commencer" })).not.toBeInTheDocument();
     act(() => engine.listener?.({ ...SNAPSHOT, assets: "ready", assetsLoaded: null, assetsTotal: null }));
@@ -106,6 +112,19 @@ describe("écran de chargement de Conduire avec Léo", () => {
     // Plus tard, une attente de zone (pont, ville) ne ramène pas l'écran de chargement.
     act(() => engine.listener?.({ ...SNAPSHOT, phase: "DRIVING", assets: "loading", assetsLoaded: null, assetsTotal: null }));
     expect(screen.queryByText("Chargement des ressources")).not.toBeInTheDocument();
+  });
+
+  it("chargement de plus de 20 secondes : un message invite à patienter, le téléchargement continue", () => {
+    vi.useFakeTimers();
+    try {
+      render(<LeoDrivingPlayer />);
+      act(() => vi.advanceTimersByTime(20_000));
+      expect(screen.getByText(/^Le chargement prend un peu plus de temps. Merci de patienter./)).toHaveAttribute("role", "status");
+      // Aucun téléchargement interrompu ni relancé : les mêmes images restent en cours.
+      expect(downloads.map(({ url }) => url)).toEqual([...STARTUP_TEXTURE_URLS]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("images du démarrage introuvables après les reprises : Réessayer relance leur téléchargement", async () => {

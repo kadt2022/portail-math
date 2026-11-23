@@ -84,6 +84,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Chargement long : une phrase pour rassurer, sous le pourcentage ; le téléchargement continue. */
+.slow {
+  max-width: 360px;
+  margin: 0;
+  color: var(--loading-text, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0.9;
+}
+
 /* Échec : un message court et le bouton Réessayer, à la place du pourcentage. */
 .failed {
   margin: 0;

@@ -85,11 +85,11 @@ import {
 import { LeoSound, passerPitch, type LeoCue } from "./leoAudio";
 import { kmhToPx, pxToKmh, pxToMeters } from "./leoUnits";
 import {
+  ALL_BUNDLES,
+  ALL_TEXTURE_KEYS,
   BUNDLE_TEXTURES,
   ZoneAssetManager,
   bundlesForRange,
-  keepRange,
-  prefetchRange,
   type BundleId,
 } from "./leoZoneAssets";
 import { DensityGovernor, initialLaneCap, laneY, TrafficManager, trafficWheelPose, vehicleBounds } from "./leoTraffic";
@@ -184,22 +184,6 @@ const FADED_BRIDGE_KEYS = [
   "leo-world-suspension-bridge-layer-faded-start",
   "leo-world-suspension-bridge-layer-faded-end",
 ] as const;
-/** Images à télécharger pour un lot, sauf si ses textures dérivées existent déjà. */
-const sourceTexturesFor = (bundle: BundleId) => BUNDLE_TEXTURES[bundle];
-/** Textures fabriquées dans le navigateur à partir d'un lot (libérées avec lui). */
-const derivedTexturesFor = (bundle: BundleId): string[] => {
-  if (bundle === "bridge") return [...FADED_BRIDGE_KEYS];
-  if (bundle === "city") {
-    return [
-      ...SHEET_VIEWS.map((view) => turnTextureKey(view.angle)),
-      ...SHEET_VIEWS.flatMap((view) => (SHEET_WHEELS[view.angle] ?? []).map((_wheel, index) => turnWheelTextureKey(view.angle, index))),
-      wheelTextureKey(SEDAN_TURN_PROFILE, 0),
-      wheelTextureKey(SEDAN_TURN_PROFILE, 1),
-      ...PEDESTRIAN_SHEETS.map(([, textureKey]) => textureKey),
-    ];
-  }
-  return [];
-};
 /**
  * Trafic de la rue perpendiculaire qui tourne (profils des 5 véhicules noirs) : à l'arrêt depuis l'expérience de la
  * rue des Jardins. Tant qu'il l'est, ses 5 illustrations (≈ 217 ko) ne sont ni téléchargées ni préparées : le
@@ -341,14 +325,13 @@ export class LeoLivreurScene extends Phaser.Scene {
   private readonly assets = new ZoneAssetManager(
     (bundle) => this.fetchBundle(bundle),
     (callback, delay) => { this.time.delayedCall(delay, callback); },
-    () => performance.now(),
     () => this.onAssetsChanged(),
   );
   /** Téléchargements en file : le chargeur de Phaser n'en traite qu'un à la fois. */
   private readonly loadQueue: Array<{ bundle: BundleId; resolve: () => void; reject: () => void }> = [];
   private loadingJob: { bundle: BundleId; resolve: () => void; reject: () => void; failed: boolean } | null = null;
   private assetsLoaded: number | null = 0;
-  private assetsTotal: number | null = BUNDLE_TEXTURES.common.length;
+  private assetsTotal: number | null = ALL_TEXTURE_KEYS.length;
   private assetsWaiting = false;
   /** Son du jeu (moteur, voitures qui passent, collisions, klaxon) : coupé tant que l'enfant ne l'active pas. */
   private readonly leoSound: LeoSound;
@@ -367,9 +350,9 @@ export class LeoLivreurScene extends Phaser.Scene {
     // Textures livrées allégées : redessinées à leur taille logique dès leur arrivée, avant tout usage (voir
     // leoTextureDelivery). Vaut pour le démarrage comme pour les lots chargés ensuite.
     this.load.on("filecomplete", (key: string) => this.restoreLogicalSize(key));
-    // Démarrage : uniquement le lot commun (Léo, trafic, maisons, tablier). Le pont et la ville arrivent ensuite,
-    // en arrière-plan, quand Léo s'en approche.
-    for (const key of BUNDLE_TEXTURES.common) this.load.image(key, TEXTURE_URLS[key]);
+    // Tout le parcours avant le départ (lot commun, pont, ville) : une attente au début plutôt qu'un arrêt de Léo en
+    // pleine conduite. Les lots restent ensuite en mémoire jusqu'à la fin de la partie.
+    for (const key of ALL_TEXTURE_KEYS) this.load.image(key, TEXTURE_URLS[key]);
     if (CROSS_TRAFFIC_ENABLED) {
       this.load.image("leo-cross-limousine", crossLimousineUrl);
       this.load.image("leo-cross-bus", crossBusUrl);
@@ -379,7 +362,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
     // Progression réelle : nombre d'images reçues sur le nombre demandé.
     this.load.on("progress", (value: number) => {
-      this.assetsLoaded = Math.round(value * BUNDLE_TEXTURES.common.length);
+      this.assetsLoaded = Math.round(value * ALL_TEXTURE_KEYS.length);
       this.publish();
     });
   }
@@ -432,6 +415,9 @@ export class LeoLivreurScene extends Phaser.Scene {
     // Le cadre peut changer de taille (fenêtre, téléphone qui tourne) : on recalcule l'échelle.
     this.scale.on("resize", () => this.applyCameraZoom());
     this.registerKeyboardControls();
+    // Pont et ville : déjà reçus avec le reste (preload), préparés maintenant que la scène existe ; une image en échec
+    // est retéléchargée par le gestionnaire. « Commencer » n'apparaît qu'une fois les trois lots prêts.
+    for (const bundle of ALL_BUNDLES) void this.assets.request(bundle);
     this.publish();
   }
 
@@ -463,18 +449,33 @@ export class LeoLivreurScene extends Phaser.Scene {
     });
   }
 
+  /**
+   * Image source d'un lot ni présente, ni déjà transformée : le pont en ses versions à fondus, la planche de la berline
+   * en ses vues, chaque planche de piétons en planche animée. Une source transformée est libérée et jamais redemandée.
+   */
+  private sourceMissing(key: string) {
+    if (this.textures.exists(key)) return false;
+    const derived =
+      key === BRIDGE_SOURCE_KEY
+        ? FADED_BRIDGE_KEYS
+        : key === TURN_SHEET.key
+          ? SHEET_VIEWS.map((view) => turnTextureKey(view.angle))
+          : PEDESTRIAN_SHEETS.filter(([sheetKey]) => sheetKey === key).map(([, textureKey]) => textureKey);
+    return derived.length === 0 || !derived.every((derivedKey) => this.textures.exists(derivedKey));
+  }
+
   private pumpLoader() {
     if (this.loadingJob || this.load.isLoading()) return;
     const next = this.loadQueue.shift();
     if (!next) return;
-    const missing = sourceTexturesFor(next.bundle).filter((key) => !this.textures.exists(key));
+    const missing = BUNDLE_TEXTURES[next.bundle].filter((key) => this.sourceMissing(key));
     this.loadingJob = { ...next, failed: false };
     for (const key of missing) this.load.image(key, TEXTURE_URLS[key]);
     this.load.once("complete", () => {
       const job = this.loadingJob;
       this.loadingJob = null;
       if (!job) return;
-      const complete = sourceTexturesFor(job.bundle).every((key) => this.textures.exists(key));
+      const complete = BUNDLE_TEXTURES[job.bundle].every((key) => !this.sourceMissing(key));
       if (job.failed || !complete) job.reject();
       else {
         this.prepareBundle(job.bundle);
@@ -486,8 +487,9 @@ export class LeoLivreurScene extends Phaser.Scene {
   }
 
   /**
-   * Textures dérivées d'un lot (fondus du pont, vues découpées de la berline), puis libération des images sources
-   * devenues inutiles : 6 Mo (pont) et 5 Mo (planche) de mémoire graphique en moins.
+   * Textures dérivées d'un lot (fondus du pont, vues découpées de la berline, planches animées des piétons), puis
+   * libération des images sources devenues inutiles : 6 Mo (pont), 5 Mo (planche) et 31 Mo (piétons) de mémoire
+   * graphique en moins.
    */
   private prepareBundle(bundle: BundleId) {
     if (bundle === "common") {
@@ -530,6 +532,8 @@ export class LeoLivreurScene extends Phaser.Scene {
         frameWidth: PEDESTRIAN_FRAME.width,
         frameHeight: PEDESTRIAN_FRAME.height,
       });
+      // La planche animée a sa propre copie en mémoire graphique : l'image d'origine, devenue inutile, est libérée.
+      this.textures.remove(sheetKey);
     }
   }
 
@@ -607,36 +611,6 @@ export class LeoLivreurScene extends Phaser.Scene {
     }
   }
 
-  /**
-   * Libère un lot : ses objets (décor, berline) sont détruits AVANT ses textures. Jamais si un véhicule du trafic
-   * utilise encore une de ses textures (la berline reprise par l'avenue du Savoir).
-   */
-  private unloadBundle(bundle: BundleId) {
-    if (bundle === "common") return false;
-    if (bundle === "city") {
-      const inUse = this.traffic.vehicles.some((vehicle) => vehicle.active && vehicle.spec === SEDAN_TURN_PROFILE);
-      if (inUse) return false;
-      this.depthTraffic.reset();
-      for (const sprite of this.depthSprites.values()) sprite.destroy();
-      for (const wheels of this.depthWheels.values()) for (const wheel of wheels) wheel.holder.destroy();
-      this.depthSprites.clear();
-      this.depthWheels.clear();
-      for (const pedestrian of this.pedestrians) pedestrian.sprite.destroy();
-      this.pedestrians = [];
-      for (const pedestrian of this.depthPedestrians) pedestrian.sprite.destroy();
-      this.depthPedestrians = [];
-      for (const view of this.trafficViews) {
-        if (view.spec === SEDAN_TURN_PROFILE) {
-          view.spec = null;
-          view.body.setVisible(false);
-        }
-      }
-    }
-    for (const key of derivedTexturesFor(bundle)) if (this.textures.exists(key)) this.textures.remove(key);
-    for (const key of sourceTexturesFor(bundle)) if (this.textures.exists(key)) this.textures.remove(key);
-    return this.assets.release(bundle);
-  }
-
   private onAssetsChanged() {
     // Un lot arrivé ou parti : les zones visibles sont reconstruites avec les bonnes textures.
     this.rebuildZones();
@@ -649,21 +623,22 @@ export class LeoLivreurScene extends Phaser.Scene {
     return !this.assets.isReady(bundlesForRange(range.minX - 300, range.maxX + 300));
   }
 
-  /** Demande les lots qui approchent et libère ceux dont Léo s'est nettement éloigné. */
-  private manageBundles() {
-    const view = framedViewRange(this.motion.x, this.lookDir, this.framing, this.baseViewWidth());
-    const direction = this.motion.speed * Math.cos(this.motion.heading) < 0 ? -1 : this.lookDir;
-    const prefetch = prefetchRange(view, Math.abs(this.motion.speed), direction, this.assets.bandwidthBps);
-    for (const bundle of bundlesForRange(prefetch.minX, prefetch.maxX)) void this.assets.request(bundle);
-    const keep = keepRange(prefetch);
-    const kept = new Set(bundlesForRange(keep.minX, keep.maxX));
-    for (const bundle of ["bridge", "city"] as const) {
-      if (!kept.has(bundle) && this.assets.state(bundle) === "ready") this.unloadBundle(bundle);
-    }
-  }
-
   retryAssets() {
     this.assets.retryFailed();
+  }
+
+  /**
+   * Texture dessinée dans le navigateur, posée sur un simple canevas : une CanvasTexture de Phaser garderait en plus une
+   * copie de tous ses pixels en mémoire JavaScript (6 Mo par version du pont), inutile pour une image qui ne change plus.
+   */
+  private addDrawnTexture(key: string, width: number, height: number, draw: (context: CanvasRenderingContext2D) => void) {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    draw(context);
+    this.textures.addImage(key, canvas as unknown as HTMLImageElement);
   }
 
   /** Redessine une texture livrée réduite à sa taille logique (illustration d'origine), sous la même clé. */
@@ -696,10 +671,9 @@ export class LeoLivreurScene extends Phaser.Scene {
       const key = turnTextureKey(view.angle);
       if (this.textures.exists(key)) continue;
       const crop = sheetCrop(view);
-      const texture = this.textures.createCanvas(key, crop.width, crop.height);
-      if (!texture) continue;
-      texture.getContext().drawImage(sheet, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
-      texture.refresh();
+      this.addDrawnTexture(key, crop.width, crop.height, (context) => {
+        context.drawImage(sheet, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+      });
       // Disques de jante : l'ellipse de la vue est redressée en cercle ; à l'affichage, le conteneur la ré-aplatit,
       // si bien qu'en tournant la jante reste dans son ellipse (roue vue de biais).
       (SHEET_WHEELS[view.angle] ?? []).forEach((wheel, index) => {
@@ -755,23 +729,21 @@ export class LeoLivreurScene extends Phaser.Scene {
     ];
     for (const [key, left, right] of variants) {
       if (this.textures.exists(key)) continue;
-      const texture = this.textures.createCanvas(key, width, height);
-      if (!texture) continue;
-      const context = texture.getContext();
-      context.drawImage(source, 0, 0, width, height);
-      // La bande 42–61 % est la réservation exacte pour la chaussée du jeu.
-      // Nettoyage de l'alpha généré : aucun faux tablier ne peut apparaître dedans.
-      context.clearRect(0, height * 0.42, width, height * 0.19);
-      context.globalCompositeOperation = "destination-in";
-      const alpha = context.createLinearGradient(0, 0, width, 0);
-      alpha.addColorStop(0, "rgba(255,255,255,0)");
-      alpha.addColorStop(left, "rgba(255,255,255,1)");
-      alpha.addColorStop(1 - right, "rgba(255,255,255,1)");
-      alpha.addColorStop(1, "rgba(255,255,255,0)");
-      context.fillStyle = alpha;
-      context.fillRect(0, 0, width, height);
-      context.globalCompositeOperation = "source-over";
-      texture.refresh();
+      this.addDrawnTexture(key, width, height, (context) => {
+        context.drawImage(source, 0, 0, width, height);
+        // La bande 42–61 % est la réservation exacte pour la chaussée du jeu.
+        // Nettoyage de l'alpha généré : aucun faux tablier ne peut apparaître dedans.
+        context.clearRect(0, height * 0.42, width, height * 0.19);
+        context.globalCompositeOperation = "destination-in";
+        const alpha = context.createLinearGradient(0, 0, width, 0);
+        alpha.addColorStop(0, "rgba(255,255,255,0)");
+        alpha.addColorStop(left, "rgba(255,255,255,1)");
+        alpha.addColorStop(1 - right, "rgba(255,255,255,1)");
+        alpha.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = alpha;
+        context.fillRect(0, 0, width, height);
+        context.globalCompositeOperation = "source-over";
+      });
     }
   }
 
@@ -874,8 +846,8 @@ export class LeoLivreurScene extends Phaser.Scene {
     const seconds = Math.min(delta / 1000, 0.05);
     this.leoSound.update(pxToKmh(Math.abs(this.motion.speed)), this.controls.forward || this.controls.reverse, this.controls.brake, seconds);
     this.updateBridgeCamera(seconds);
-    this.manageBundles();
-    // Ressources de la vue absentes : tout le monde s'arrête (Léo, trafic, feux) jusqu'à leur arrivée.
+    // Sécurité : tout est prêt avant « Commencer », mais si une ressource de la vue manquait (reprise après un échec),
+    // tout le monde s'arrête (Léo, trafic, feux) jusqu'à son arrivée plutôt que de traverser une zone vide.
     const waiting = this.assetsBlocking();
     if (waiting !== this.assetsWaiting) {
       this.assetsWaiting = waiting;
@@ -1207,7 +1179,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     const destination = this.currentDestination();
     this.distanceKey = this.currentDistanceKey();
     const failed = this.assets.failed().length > 0;
-    const loading = this.assetsTotal !== null || this.assetsWaiting || this.assets.state("common") !== "ready";
+    const loading = this.assetsTotal !== null || this.assetsWaiting || !this.assets.isReady(ALL_BUNDLES);
     this.onSnapshot({
       assets: failed ? "error" : loading ? "loading" : "ready",
       assetsLoaded: this.assetsLoaded,
@@ -1242,7 +1214,7 @@ export class LeoLivreurScene extends Phaser.Scene {
     this.lastZoneWindow = "";
   }
 
-  /** Fenêtre glissante : objets monde créés et détruits avec les zones ; textures gérées par lots (manageBundles). */
+  /** Fenêtre glissante : objets monde créés et détruits avec les zones ; textures chargées avant le départ et gardées toute la partie. */
   private updateWorldZones() {
     const range = framedViewRange(this.motion.x, this.lookDir, this.framing, this.baseViewWidth());
     const wanted = zonesToKeep(this.motion.x, range.minX, range.maxX);

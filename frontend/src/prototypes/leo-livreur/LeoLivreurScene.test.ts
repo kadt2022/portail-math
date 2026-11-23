@@ -14,7 +14,7 @@ import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 /**
  * Scène réelle dans un vrai moteur Phaser (rendu canvas simulé par vitest-canvas-mock). Les images sont « reçues »
  * immédiatement, sauf celles que le test fait échouer : on vérifie ainsi le démarrage, la conduite, les livraisons
- * et tout le cycle de vie des lots de ressources (attente, reprise, erreur, libération).
+ * et le chargement de tout le parcours avant le départ (reprise, erreur, aucune libération ensuite).
  */
 interface Internals {
   motion: { x: number; y: number; speed: number; heading: number; steeringAngle: number };
@@ -79,8 +79,8 @@ async function mountScene(sound?: ReturnType<typeof spySound>) {
     await flush();
   };
   const last = () => snapshots[snapshots.length - 1];
-  // Démarrage terminé : lot commun prêt ET instantané « ready » publié (l'attente se lève à l'image suivante).
-  const started = () => internals.assets.state("common") === "ready" && last()?.assets === "ready";
+  // Démarrage terminé : les trois lots prêts ET instantané « ready » publié (l'attente se lève à l'image suivante).
+  const started = () => ["common", "bridge", "city"].every((bundle) => internals.assets.state(bundle) === "ready") && last()?.assets === "ready";
   return { scene, internals, snapshots, game, step, last, started };
 }
 
@@ -147,12 +147,17 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     expect(view.height).toBeLessThanOrEqual(WORLD_HEIGHT + 0.5);
   });
 
-  it("démarre avec le seul lot commun et attend Commencer", async () => {
+  it("démarre avec tout le parcours prêt (village, pont, ville) et attend Commencer", async () => {
     const { internals, last, step, started } = await mountScene();
     await stepUntil(step, started);
-    expect(internals.assets.state("bridge")).toBe("absent");
-    expect(internals.assets.state("city")).toBe("absent");
     expect(last().assets).toBe("ready");
+    // Pont et ville préparés dès le départ ; leurs images sources, transformées, sont libérées.
+    for (const key of ["leo-world-suspension-bridge-layer-faded", "leo-world-city-top", "leo-pedestrian-man", "leo-cross-sedan-turn-90"]) {
+      expect(internals.textures.exists(key), key).toBe(true);
+    }
+    for (const key of ["leo-world-suspension-bridge-layer", "leo-cross-sedan-turn", "leo-pedestrian-man-sheet"]) {
+      expect(internals.textures.exists(key), key).toBe(false);
+    }
     expect(last().phase).toBe("INTRO");
     expect(last().targetLabel).toBe(DESTINATIONS[0].label);
     expect(last().travelledMeters).toBe(0);
@@ -372,58 +377,51 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     });
   });
 
-  it("met Léo en attente devant le pont, télécharge pont puis ville, et libère tout en s'éloignant", async () => {
+  it("traverse le village, le pont et la ville, puis revient en marche arrière, sans jamais attendre ni recharger", async () => {
     const { scene, internals, last, step, started } = await mountScene();
     await stepUntil(step, started);
+    const loads = vi.spyOn(scene.load, "start");
     scene.startMission();
-    teleport(internals, BRIDGE_START_X + 400);
-    await step(1);
-    expect(internals.assetsWaiting).toBe(true);
-    expect(last().assets).toBe("loading");
-    await stepUntil(step, () => internals.assets.state("bridge") === "ready" && !internals.assetsWaiting);
-    // Image source du pont libérée, seules les versions affichées restent.
-    expect(internals.textures.exists("leo-world-suspension-bridge-layer")).toBe(false);
-    expect(last().assets).toBe("ready");
-    // La ville arrive avec ses feux, ses voitures en profondeur et la berline qui tourne.
     const city = cityLayout();
-    teleport(internals, city.stopLineEast - 600);
-    await stepUntil(step, () => internals.assets.state("city") === "ready" && !internals.assetsWaiting);
-    expect(internals.textures.exists("leo-cross-sedan-turn")).toBe(false);
-    scene.setControl("forward", true);
-    await step(120);
-    scene.setControl("forward", false);
-    scene.setControl("brake", true);
-    await step(120);
-    scene.setControl("brake", false);
-    // Retour au départ : pont et ville sont libérés.
-    teleport(internals, START_POSITION.x);
-    await stepUntil(step, () => internals.assets.state("bridge") === "absent" && internals.assets.state("city") === "absent");
-    expect(internals.textures.exists("leo-world-city-top")).toBe(false);
-    // Et rechargés au retour.
-    teleport(internals, BRIDGE_END_X - 200);
-    await stepUntil(step, () => internals.assets.state("bridge") === "ready" && !internals.assetsWaiting);
+    for (const x of [BRIDGE_START_X + 400, BRIDGE_END_X - 200, city.stopLineEast - 600, city.panelEnd - 400, BRIDGE_END_X - 200, START_POSITION.x + 600]) {
+      teleport(internals, x);
+      await step(2);
+      expect(internals.assetsWaiting, `x = ${x}`).toBe(false);
+      expect(last().assets).toBe("ready");
+    }
+    // Marche arrière sur le pont, puis retour vers la ville : Léo roule, rien n'est libéré ni redemandé.
+    teleport(internals, BRIDGE_START_X + 1200);
+    scene.setControl("reverse", true);
+    await step(90);
+    scene.setControl("reverse", false);
+    expect(internals.motion.x).toBeLessThan(BRIDGE_START_X + 1200);
+    expect(internals.assetsWaiting).toBe(false);
+    for (const bundle of ["common", "bridge", "city"]) expect(internals.assets.state(bundle)).toBe("ready");
+    expect(internals.textures.exists("leo-world-city-top")).toBe(true);
+    expect(internals.textures.exists("leo-world-suspension-bridge-layer-faded")).toBe(true);
+    expect(loads).not.toHaveBeenCalled();
   });
 
-  it("reprend un téléchargement en échec après son délai, puis signale l'erreur et réessaie sur demande", async () => {
-    failures.set(/suspension-bridge-layer/, MAX_AUTO_RETRIES + 1);
+  it("une image du pont introuvable au départ : reprises après délai, erreur, puis Réessayer rend la partie jouable", async () => {
+    failures.set(/suspension-bridge-layer/, 100);
     const { scene, internals, last, step, started } = await mountScene();
-    await stepUntil(step, started);
-    scene.startMission();
-    teleport(internals, BRIDGE_START_X + 400);
     await stepUntil(step, () => internals.assets.state("bridge") === "retrying");
-    expect(internals.assets.attempts("bridge")).toBe(1);
-    // Pendant le délai, aucune nouvelle tentative malgré les demandes de chaque image.
+    expect(last().assets).toBe("loading");
+    const attempts = internals.assets.attempts("bridge");
+    // Pendant le délai, aucune nouvelle tentative.
     await step(30);
-    expect(internals.assets.attempts("bridge")).toBe(1);
+    expect(internals.assets.attempts("bridge")).toBe(attempts);
     await stepUntil(step, () => internals.assets.state("bridge") === "error", 2000);
+    expect(internals.assets.attempts("bridge")).toBe(MAX_AUTO_RETRIES + 1);
     expect(last().assets).toBe("error");
-    // Le réseau revient : Réessayer relance le pont, puis la conduite reprend.
+    // Le réseau revient : Réessayer relance le pont, puis la partie devient jouable.
+    failures.clear();
     scene.retryAssets();
-    await stepUntil(step, () => internals.assets.state("bridge") === "ready" && !internals.assetsWaiting);
-    expect(last().assets).toBe("ready");
+    await stepUntil(step, started);
+    expect(internals.textures.exists("leo-world-suspension-bridge-layer-faded")).toBe(true);
   });
 
-  it("textures livrées réduites : redessinées à leur taille logique dès leur arrivée, au démarrage comme dans la ville", async () => {
+  it("textures livrées réduites : redessinées à leur taille logique dès leur arrivée", async () => {
     const { internals, step, started } = await mountScene();
     await stepUntil(step, started);
     const size = (key: string) => {
@@ -435,11 +433,10 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     expect(size("leo-car-right")).toEqual({ width: 502, height: 364 });
     expect(size("leo-traffic-family-blue")).toEqual({ width: 640, height: 320 });
     expect(size("leo-tree")).toEqual({ width: 512, height: 256 });
-    // Lot de la ville, chargé plus tard : planches des piétons à leur taille logique, découpées en vues de 543 × 724.
-    teleport(internals, cityLayout().panelX + 400);
-    await stepUntil(step, () => internals.assets.state("city") === "ready", 2000);
-    expect(size("leo-pedestrian-man-sheet")).toEqual({ width: 2172, height: 724 });
+    // Piétons : planche animée à la taille logique, en vues de 543 × 724 ; l'image d'origine n'est pas gardée en double.
+    expect(size("leo-pedestrian-man")).toEqual({ width: 2172, height: 724 });
     expect(internals.textures.get("leo-pedestrian-man").get(0).width).toBe(543);
+    expect(internals.textures.exists("leo-pedestrian-man-sheet")).toBe(false);
   });
 
   it("rend ses vraies images à Léo quand une image du démarrage arrive après une reprise", async () => {
@@ -462,6 +459,8 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     const sound = spySound();
     const { scene, step, started } = await mountScene(sound);
     await stepUntil(step, started);
+    // Tout est prêt dès la construction de la scène : une image jouée suffit pour que le son reçoive l'état.
+    await step(1);
     expect(sound.update).toHaveBeenLastCalledWith(0, false, false, expect.any(Number));
     scene.startMission();
     scene.setControl("forward", true);
