@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { fetchAllWithProgress, fetchWithProgress } from "./fetchWithProgress";
+import { DOWNLOAD_CONCURRENCY, fetchAllWithProgress, fetchWithProgress } from "./fetchWithProgress";
 import { createLoadingProgress } from "./loadingProgress";
 
 describe("progression du chargement", () => {
@@ -116,7 +116,7 @@ describe("téléchargement avec progression", () => {
         ),
       );
       const done = vi.fn();
-      void fetchAllWithProgress(["/ok.webp", "/bloque.webp"], undefined, "high", 60_000).then(done);
+      void fetchAllWithProgress(["/ok.webp", "/bloque.webp"], undefined, { priority: "high", stallTimeoutMs: 60_000 }).then(done);
       await vi.advanceTimersByTimeAsync(30_000);
       expect(done).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(30_000);
@@ -131,8 +131,10 @@ describe("téléchargement avec progression", () => {
     const fetchMock = vi.fn(async (url: string) => new Response(new Uint8Array(sizes[url]), { headers: { "content-length": String(sizes[url]) } }));
     vi.stubGlobal("fetch", fetchMock);
     const reports: Array<[number, number | null]> = [];
-    await fetchAllWithProgress(["/a.webp", "/b.webp"], (loaded, total) => reports.push([loaded, total]), "high");
-    // Les deux téléchargements partent ensemble, en priorité haute.
+    const received = await fetchAllWithProgress(["/a.webp", "/b.webp"], (loaded, total) => reports.push([loaded, total]), { priority: "high" });
+    expect([...received.keys()]).toEqual(["/a.webp", "/b.webp"]);
+    expect(received.get("/b.webp")?.byteLength).toBe(5);
+    // Les deux téléchargements partent ensemble (moins que la limite), en priorité haute.
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(["/a.webp", "/b.webp"]);
     expect(fetchMock).toHaveBeenCalledWith("/a.webp", { priority: "high" });
     expect(reports.at(-1)).toEqual([8, 8]);
@@ -147,8 +149,85 @@ describe("téléchargement avec progression", () => {
       vi.fn(async (url: string) => (url === "/absent.webp" ? new Response(null, { status: 404 }) : new Response(new Uint8Array(4), { headers: { "content-length": "4" } }))),
     );
     const reports: Array<[number, number | null]> = [];
-    await expect(fetchAllWithProgress(["/absent.webp", "/ok.webp"], (loaded, total) => reports.push([loaded, total]))).resolves.toBeUndefined();
+    const received = await fetchAllWithProgress(["/absent.webp", "/ok.webp"], (loaded, total) => reports.push([loaded, total]));
+    expect([...received.keys()]).toEqual(["/ok.webp"]);
     expect(reports.at(-1)).toEqual([4, 4]);
+  });
+
+  it(`au plus ${DOWNLOAD_CONCURRENCY} téléchargements à la fois, dans l'ordre demandé`, async () => {
+    const pending: Array<() => void> = [];
+    let active = 0;
+    let peak = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((resolve) => {
+            active += 1;
+            peak = Math.max(peak, active);
+            pending.push(() => {
+              active -= 1;
+              resolve(new Response(new Uint8Array(1), { headers: { "content-length": "1" } }));
+            });
+          }),
+      ),
+    );
+    const urls = Array.from({ length: 10 }, (_, index) => `/f${index}.webp`);
+    const all = fetchAllWithProgress(urls);
+    for (let round = 0; round < 20 && pending.length > 0; round += 1) {
+      await Promise.resolve();
+      pending.shift()?.();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    const received = await all;
+    expect(received.size).toBe(10);
+    expect(peak).toBe(DOWNLOAD_CONCURRENCY);
+    expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual(urls);
+  });
+
+  it("un fichier en attente de son tour n'est jamais pris pour bloqué, même après plusieurs minutes d'attente", async () => {
+    vi.useFakeTimers();
+    try {
+      // Connexion à 250 kbit/s partagée : chaque fichier actif reçoit un octet toutes les 30 s (jamais 60 s de silence),
+      // et attend son tour bien plus de 60 s.
+      const streams: Array<{ push: (part: Uint8Array) => void; close: () => void; left: number }> = [];
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () => {
+          let push: (part: Uint8Array) => void = () => {};
+          let close = () => {};
+          const body = new ReadableStream<Uint8Array>({
+            start(controller) {
+              push = (part) => controller.enqueue(part);
+              close = () => controller.close();
+            },
+          });
+          streams.push({ push, close, left: 4 });
+          return new Response(body, { headers: { "content-length": "4" } });
+        }),
+      );
+      const urls = Array.from({ length: 8 }, (_, index) => `/lent${index}.webp`);
+      const done = vi.fn();
+      const all = fetchAllWithProgress(urls, undefined, { stallTimeoutMs: 60_000, concurrency: 2 }).then((received) => {
+        done();
+        return received;
+      });
+      // 8 fichiers de 4 octets, 2 à la fois, un octet par fichier actif toutes les 30 s : environ 8 minutes en tout.
+      for (let tick = 0; tick < 40 && !done.mock.calls.length; tick += 1) {
+        await vi.advanceTimersByTimeAsync(30_000);
+        for (const stream of streams.filter((each) => each.left > 0)) {
+          stream.push(new Uint8Array([1]));
+          stream.left -= 1;
+          if (stream.left === 0) stream.close();
+        }
+        await vi.advanceTimersByTimeAsync(0);
+      }
+      const received = await all;
+      expect(received.size).toBe(8);
+      expect(vi.mocked(fetch)).toHaveBeenCalledTimes(8);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

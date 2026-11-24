@@ -125,7 +125,7 @@ describe("gestionnaire de chargement des lots", () => {
 describe("intégration dans la scène", () => {
   it("télécharge tout le parcours avant le départ et ne libère plus aucun lot pendant la partie", () => {
     const preload = game.slice(game.indexOf("  preload() {"), game.indexOf("  create() {"));
-    expect(preload).toContain("for (const key of ALL_TEXTURE_KEYS) this.load.image(key, TEXTURE_URLS[key]);");
+    expect(preload).toContain("for (const key of ALL_TEXTURE_KEYS) this.load.image(key, this.downloaded.get(TEXTURE_URLS[key]) ?? TEXTURE_URLS[key]);");
     // Le gestionnaire n'a plus de quoi libérer un lot, ni d'anticipation selon la vitesse ou le débit.
     expect("release" in ZoneAssetManager.prototype).toBe(false);
     expect(game).not.toContain("manageBundles");

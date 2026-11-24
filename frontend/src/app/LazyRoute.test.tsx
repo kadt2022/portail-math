@@ -2,6 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 import { useState, type ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { useGameLoading } from "../games/loading/GameLoaderHost";
 import { lazyRoute, preloadRoutes } from "./LazyRoute";
 
 function deferred<T>() {
@@ -70,5 +71,34 @@ describe("pages chargées à la demande", () => {
     lazyRoute(heavy, { heavy: true });
     await preloadRoutes();
     expect(heavy).not.toHaveBeenCalled();
+  });
+
+  it("page d'un jeu : le chargeur commun des jeux dès l'arrivée, à la place de l'indicateur ; puis le jeu, une fois prêt", async () => {
+    const download = deferred<() => ReactElement>();
+    const Page = lazyRoute(() => download.promise, { heavy: true, game: "grille-magique" });
+    render(<Page />);
+    // Avant même le code de la page : le chargeur des jeux, à 0 %, et non l'indicateur des pages.
+    expect(screen.queryByText("Chargement…")).not.toBeInTheDocument();
+    expect(screen.getByText("Initialisation du jeu…")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Chargement du jeu" })).toHaveAttribute("aria-valuenow", "0");
+    function GamePage() {
+      const loading = useGameLoading();
+      // Page arrivée : le code du lecteur est là (jalon posé par l'hôte) ; le jeu signale qu'il est prêt.
+      return (
+        <button type="button" onClick={() => loading.ready()}>
+          Jeu monté
+        </button>
+      );
+    }
+    await act(async () => download.resolve(GamePage));
+    expect(screen.getByRole("progressbar", { name: "Chargement du jeu" })).toHaveAttribute("aria-valuenow", "7");
+    // La page est masquée sous le chargeur tant que le jeu n'est pas prêt.
+    expect(screen.queryByRole("button", { name: "Jeu monté" })).not.toBeInTheDocument();
+    // (Texte masqué : sans nom accessible tant qu'il est caché, d'où la recherche par le texte du bouton.)
+    await act(async () => screen.getByText("Jeu monté").click());
+    expect(screen.queryByRole("progressbar", { name: "Chargement du jeu", hidden: true })).toBeNull();
+    expect(document.querySelector("[data-loading]")).toBeNull();
+    expect(screen.getByRole("button", { name: "Jeu monté" })).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar", { name: "Chargement du jeu" })).not.toBeInTheDocument();
   });
 });

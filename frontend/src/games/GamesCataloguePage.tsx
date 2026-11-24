@@ -9,6 +9,10 @@ import { FeaturedGame } from "./FeaturedGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
 import { GameInfo } from "./GameInfo";
+import { GameLoaderHost, ReachMilestone } from "./loading/GameLoaderHost";
+import { startGameLoading } from "./loading/gameLoadingProfiles";
+import type { LoadingSession } from "./loading/loadingSession";
+import { GamePlayerFrame } from "./player/GamePlayerFrame";
 import { GameWatchLayout } from "./player/GameWatchLayout";
 import { RecommendedGameCard } from "./RecommendedGameCard";
 import { galleryPlacements, maxCardsPerRow } from "./gallery-layout";
@@ -48,11 +52,16 @@ export function GamesCataloguePage() {
   // Jeu ouvert (id du catalogue) et jeux déjà montés : un jeu fermé reste monté (partie conservée), en pause.
   const [openGameId, setOpenGameId] = useState<string | null>(null);
   const [mountedIds, setMountedIds] = useState<string[]>([]);
+  // Séance de chargement de chaque jeu ouvert, créée dans le geste du clic : le chargeur commun s'affiche aussitôt, avant
+  // même le téléchargement du code du jeu, et son horloge (seuil des 90 s) part de ce clic.
+  const [loadingSessions, setLoadingSessions] = useState<Readonly<Record<string, LoadingSession>>>({});
   const stageRef = useRef<HTMLDivElement>(null);
   const immersive = stage === "immersive";
   const openEmbedded = useCallback((game: GameCatalogueEntry) => {
     // Le jeu choisi passe avant tout préchargement en attente (il se charge normalement, préchargé ou non).
     onGameChosen();
+    const session = startGameLoading(game.id);
+    setLoadingSessions((sessions) => (sessions[game.id] ? sessions : { ...sessions, [game.id]: session }));
     setOpenGameId(game.id);
     setMountedIds((ids) => (ids.includes(game.id) ? ids : [...ids, game.id]));
     if (immersiveDevice && !fullscreenElement()) {
@@ -196,15 +205,11 @@ export function GamesCataloguePage() {
           const shown = id === openGameId && stage !== "closed";
           return (
             <div key={id} ref={shown ? stageRef : undefined} className={`${styles.stage}${shown && covered ? ` ${styles.stageCover}` : ""}`} hidden={!shown}>
-              {/* Téléchargement du jeu : un état discret DANS le cadre du lecteur, à sa taille, pour que la page ne bouge pas. */}
-              <Suspense
-                fallback={
-                  <div className={styles.playerLoading} role="status">
-                    <span className={styles.playerSpinner} aria-hidden="true" />
-                    {t("cataloguePage.loading")}
-                  </div>
-                }
-              >
+              {/* Chargeur commun posé sur le cadre du lecteur dès le clic ; pendant le téléchargement du code du jeu, le cadre
+                  garde déjà la taille du lecteur, pour que la page ne bouge pas. */}
+              <GameLoaderHost game={id} session={loadingSessions[id]} visible={shown} square={shown && covered} onClose={closeEmbedded}>
+              <Suspense fallback={<GamePlayerFrame />}>
+                <ReachMilestone id="player" />
                 {id === "conduire-avec-leo" ? (
                   <LeoDrivingPlayer
                     fullscreen={shown && immersive}
@@ -232,6 +237,7 @@ export function GamesCataloguePage() {
                   />
                 )}
               </Suspense>
+              </GameLoaderHost>
             </div>
           );
         })}

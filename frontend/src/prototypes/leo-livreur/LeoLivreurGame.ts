@@ -338,6 +338,11 @@ export class LeoLivreurScene extends Phaser.Scene {
   /** Position de chaque voiture du trafic par rapport à Léo à l'image précédente : un changement de côté = un passage. */
   private readonly passSides = new Map<number, number>();
   private lastCrashAt = Number.NEGATIVE_INFINITY;
+  /**
+   * Images déjà téléchargées par le lecteur (adresse d'origine → adresse locale temporaire) : la scène les lit en
+   * mémoire, sans repasser par le réseau. Chaque adresse locale est libérée dès que Phaser a lu son image.
+   */
+  private readonly downloaded = new Map<string, string>();
 
   constructor(onSnapshot: SnapshotListener, pixelRatio = 1, sound: LeoSound = new LeoSound()) {
     super({ key: "leo-livreur" });
@@ -349,10 +354,13 @@ export class LeoLivreurScene extends Phaser.Scene {
   preload() {
     // Textures livrées allégées : redessinées à leur taille logique dès leur arrivée, avant tout usage (voir
     // leoTextureDelivery). Vaut pour le démarrage comme pour les lots chargés ensuite.
-    this.load.on("filecomplete", (key: string) => this.restoreLogicalSize(key));
+    this.load.on("filecomplete", (key: string) => {
+      this.restoreLogicalSize(key);
+      this.releaseDownloaded(TEXTURE_URLS[key]);
+    });
     // Tout le parcours avant le départ (lot commun, pont, ville) : une attente au début plutôt qu'un arrêt de Léo en
     // pleine conduite. Les lots restent ensuite en mémoire jusqu'à la fin de la partie.
-    for (const key of ALL_TEXTURE_KEYS) this.load.image(key, TEXTURE_URLS[key]);
+    for (const key of ALL_TEXTURE_KEYS) this.load.image(key, this.downloaded.get(TEXTURE_URLS[key]) ?? TEXTURE_URLS[key]);
     if (CROSS_TRAFFIC_ENABLED) {
       this.load.image("leo-cross-limousine", crossLimousineUrl);
       this.load.image("leo-cross-bus", crossBusUrl);
@@ -662,6 +670,22 @@ export class LeoLivreurScene extends Phaser.Scene {
     if (!context) return;
     draw(context);
     this.textures.addImage(key, canvas as unknown as HTMLImageElement);
+  }
+
+  /** Images reçues par le lecteur avant le démarrage de la scène (voir `downloaded`). */
+  useDownloadedImages(images: ReadonlyMap<string, string>) {
+    for (const [url, local] of images) this.downloaded.set(url, local);
+  }
+
+  /** Adresse locale temporaire d'une image : libérée (et ses octets avec) une fois l'image lue, ou à la fermeture. */
+  releaseDownloaded(url?: string) {
+    const urls = url === undefined ? [...this.downloaded.keys()] : [url];
+    for (const each of urls) {
+      const local = this.downloaded.get(each);
+      if (!local) continue;
+      URL.revokeObjectURL(local);
+      this.downloaded.delete(each);
+    }
   }
 
   /** Redessine une texture livrée réduite à sa taille logique (illustration d'origine), sous la même clé. */
@@ -2064,14 +2088,24 @@ export function renderPixelRatio(devicePixelRatio: number | undefined) {
  * (fermer puis rouvrir le jeu n'accumule pas les parcours chargés).
  */
 export function releaseLeoGame(game: Phaser.Game) {
-  for (const scene of game.scene.getScenes(false)) if (scene instanceof LeoLivreurScene) scene.destroySound();
+  for (const scene of game.scene.getScenes(false)) {
+    if (!(scene instanceof LeoLivreurScene)) continue;
+    scene.destroySound();
+    scene.releaseDownloaded();
+  }
   game.destroy(true);
   (game.config as { sceneConfig: unknown }).sceneConfig = null;
 }
 
-export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListener): LeoLivreurController {
+export interface MountLeoOptions {
+  /** Images déjà téléchargées (adresse d'origine → adresse locale « blob: ») : lues en mémoire, sans second téléchargement. */
+  downloadedImages?: ReadonlyMap<string, string>;
+}
+
+export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListener, options: MountLeoOptions = {}): LeoLivreurController {
   const pixelRatio = renderPixelRatio(window.devicePixelRatio);
   const scene = new LeoLivreurScene(onSnapshot, pixelRatio);
+  if (options.downloadedImages) scene.useDownloadedImages(options.downloadedImages);
   // Canvas en pixels réels de l'écran (net sur téléphone), affiché à la taille CSS du cadre (zoom 1 / densité) :
   // aucune déformation, mêmes proportions, même portion du monde visible.
   const backing = () => ({ width: Math.max(host.clientWidth, 1) * pixelRatio, height: Math.max(host.clientHeight, 1) * pixelRatio });
@@ -2080,8 +2114,10 @@ export function mountLeoLivreurGame(host: HTMLElement, onSnapshot: SnapshotListe
     parent: host,
     transparent: true,
     scene,
-    // Réseau lent : un fichier qui ne répond pas en 45 s est considéré en échec (puis repris, voir ZoneAssetManager).
-    loader: { timeout: 45_000 },
+    // Aucune durée totale maximale par fichier : sur une connexion lente, un fichier qui arrive encore n'est jamais coupé.
+    // Les images du départ arrivent d'ailleurs déjà téléchargées (voir downloadedImages) ; seule une reprise après
+    // échec passe par le réseau de Phaser, et une vraie coupure y est signalée par le navigateur (erreur, puis reprises).
+    loader: { timeout: 0 },
     // Le son du jeu est géré par LeoSound, créé seulement quand l'enfant l'active : Phaser n'ouvre aucun audio.
     audio: { noAudio: true },
     scale: {

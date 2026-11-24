@@ -1,0 +1,60 @@
+/* Hôte du chargeur : prend la place du lecteur (ou de son cadre d'attente) et sert de repère au chargeur posé dessus. */
+.host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 24px;
+}
+
+.host > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.square {
+  border-radius: 0;
+}
+
+/* Catalogue : le chargeur recouvre exactement le cadre du lecteur. Dans la page, il reste sous l'en-tête et les menus du
+   site (z-index 40 à 100) quand on fait défiler la page pendant le chargement. */
+.coverFrame {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+}
+
+/* Plein écran (téléphone, tablette) : le lecteur est fixé à z-index 2000 (voir GamePlayer) et couvre déjà tout le site ;
+   le chargeur passe au-dessus de lui jusqu'au jeu prêt. */
+.square .coverFrame {
+  z-index: 2100;
+}
+
+/* Page d'un jeu ouverte directement : le chargeur a la taille d'un lecteur, en haut de la page ; la page, masquée dessous,
+   réserve au moins cette hauteur pendant son téléchargement. */
+.page {
+  border-radius: 0;
+}
+
+.pageContent {
+  min-height: min(calc(min(74svh, 720px) + 60px), 62.5vw);
+}
+
+.page[data-loading] .pageContent {
+  visibility: hidden;
+}
+
+.pageFrame {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  min-height: 220px;
+  aspect-ratio: 16 / 10;
+  max-height: calc(min(74svh, 720px) + 60px);
+  overflow: hidden;
+  border-radius: 24px;
+}
