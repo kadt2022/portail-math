@@ -29,7 +29,7 @@ seul. Origine du code et licences : `ORIGINES.md`.
    dans les matériaux (pas de post-traitement), brume. Coût mesuré en rendu logiciel : environ −26 % d'images/s.
 3. **Arbre stylisé** — validé. `src/engine/geometry/trees/stylizedTree.ts` : 4 niveaux de détail
    (7 100 · 1 460 · 502 · 216 triangles). Le 4ᵉ (très lointain) a été ajouté pour la forêt : **à faire valider**.
-4. **Forêt d'essai (YAMBA-RIVER-FOREST-02)** — livrée sur un seul tronçon (410 à 590 m), **pas dans le jeu**.
+4. **Forêt d'essai (YAMBA-RIVER-FOREST-02)** — livrée sur un seul tronçon (410 à 590 m), **active dans le jeu sur ce tronçon seulement** (`FOREST_TRIAL` dans `src/adapters/useRiverFractions.tsx`).
    - `geometry/trees/forest.ts` : 8 teintes mêlées, 3 étages, massifs et clairières jusqu'à 72 m de l'axe, lignes
      de vue des panneaux protégées, sol de sous-bois.
    - `geometry/trees/undergrowth.ts` : arbustes, plantes à larges feuilles, herbes.

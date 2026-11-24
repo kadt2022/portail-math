@@ -22,6 +22,12 @@ const DOWNLOAD_SHARE = 0.55;
 const LEFT_KEYS = new Set(["ArrowLeft", "KeyA", "KeyQ"]);
 const RIGHT_KEYS = new Set(["ArrowRight", "KeyD"]);
 
+/**
+ * Forêt d'essai (YAMBA-RIVER-FOREST-02) : sur ce seul tronçon, la forêt d'arbres stylisés remplace les anciens arbres.
+ * Le reste du niveau garde son décor tant que le Capitaine n'a pas validé la généralisation.
+ */
+const FOREST_TRIAL = { from: 410, to: 590 } as const;
+
 export function useRiverFractions(settings: RiverFractionsSettings): RiverFractionsGame {
   const { locale, active = true, seed, showPerformance = false, maxPixelRatio, loadEngine = loadRiverEngine } = settings;
   const t = useMemo(() => createTranslator(locale), [locale]);
@@ -118,6 +124,7 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
           maxPixelRatio,
           onLaneCrossed: (fork, lane) => session.laneCrossed(fork, lane),
           onBuildProgress: (fraction) => setProgress((value) => Math.max(value, DOWNLOAD_SHARE + (1 - DOWNLOAD_SHARE) * fraction)),
+          forest: FOREST_TRIAL,
         });
         if (cancelled) {
           created.dispose();

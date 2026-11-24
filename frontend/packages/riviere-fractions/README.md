@@ -140,7 +140,7 @@ buissons (faits de boules et de volumes empilés) par une forêt faite d'un seul
 distances de bascule sont 15, 32 et 62 m pour l'arbre, au-delà de quoi vient le niveau très lointain (216
 triangles) ; les plantes hors du champ de la caméra ne sont pas dessinées.
 
-Le jeu ne plante pas encore cette forêt. On la voit dans l'atelier : `dev/river-views.html?s=430&forest=410:590`,
+Le jeu la plante sur le tronçon d'essai 410 à 590 m (`FOREST_TRIAL` dans `src/adapters/useRiverFractions.tsx`) ; le reste du niveau garde son ancien décor. On la voit aussi dans l'atelier : `dev/river-views.html?s=430&forest=410:590`,
 avec `wide=500:42:-95` pour une vue aérienne, ou `far=0` et `under=0` pour mesurer sans le niveau très lointain ou
 sans le sous-bois. `dev/tree-showroom.html?view=palettes&palettes` et `?view=sizes&sizes` montrent les teintes et
 les tailles.
