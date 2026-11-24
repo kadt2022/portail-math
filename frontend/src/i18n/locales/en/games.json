@@ -43,6 +43,12 @@
     "cta": "Play",
     "tagline": "Ride the times tables"
   },
+  "trainMultiplications": {
+    "name": "The Multiplication Train 3D",
+    "description": "Drive a real steam locomotive: viaduct, mountain tunnel, underground passage and station stops. Multiplication missions are coming soon.",
+    "cta": "Play",
+    "tagline": "Take the train's controls"
+  },
   "fractionRiver": {
     "name": "The Fraction River",
     "description": "Cross the river by picking the right fractions.",

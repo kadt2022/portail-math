@@ -11,6 +11,7 @@ const loaders = {
   "grille-magique": () => import("./grille-magique/GrilleMagiqueGame").then((m) => ({ default: m.GrilleMagiqueGame })),
   "turbo-pulse": () => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })),
   "conduire-avec-leo": () => import("./leo-driving/LeoDrivingPlayer").then((m) => ({ default: m.LeoDrivingPlayer })),
+  "train-des-multiplications": () => import("./train-multiplications/TrainMultiplicationsPlayer").then((m) => ({ default: m.TrainMultiplicationsPlayer })),
 } as const;
 
 type EmbeddedGameId = keyof typeof loaders;
@@ -24,6 +25,8 @@ function isEmbeddedGameId(id: string): id is EmbeddedGameId {
 const warmups: Partial<Record<EmbeddedGameId, () => Promise<unknown>>> = {
   "turbo-pulse": () => import("./turbo-pulse/TurboPulseGame"),
   "conduire-avec-leo": () => loadLeoEngine(),
+  // Babylon.js et le monde ferroviaire : un morceau à part, jamais téléchargé à l'ouverture du portail ni du catalogue.
+  "train-des-multiplications": () => import("@mbuyamba/train-multiplications").then((m) => m.preloadTrainMultiplicationsEngine()),
 };
 
 /** Télécharge le code du jeu (le navigateur ne charge un module qu'une fois : sans effet s'il est déjà là). */
@@ -62,3 +65,4 @@ function open<Id extends EmbeddedGameId>(id: Id): ReturnType<(typeof loaders)[Id
 export const GrilleMagiqueGame = lazy(() => open("grille-magique"));
 export const TurboPulsePlayer = lazy(() => open("turbo-pulse"));
 export const LeoDrivingPlayer = lazy(() => open("conduire-avec-leo"));
+export const TrainMultiplicationsPlayer = lazy(() => open("train-des-multiplications"));

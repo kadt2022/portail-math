@@ -1,0 +1,374 @@
+/* Le Train des multiplications : scène plein cadre et tableau de bord par-dessus. */
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #c8def0;
+  font-family: "Trebuchet MS", system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.host {
+  position: absolute;
+  inset: 0;
+}
+
+.unsupported {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  color: #12344f;
+  font-weight: 700;
+  text-align: center;
+}
+
+.info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  min-width: 170px;
+  max-width: min(60%, 280px);
+  padding: 8px 12px 10px;
+  border-radius: 14px;
+  background: rgb(18 38 66 / 82%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 25%);
+}
+
+.info p {
+  margin: 0;
+}
+
+.infoLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffd36b;
+}
+
+.infoTitle {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.infoDistance {
+  font-size: 0.85rem;
+  color: #d8e6f5;
+}
+
+.approach {
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 20%);
+  overflow: hidden;
+}
+
+.approach span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #3ecf6e, #ffd36b);
+}
+
+.switchBox {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.switchLabel {
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgb(18 38 66 / 72%);
+  color: #fff;
+  font-size: 0.72rem;
+}
+
+.switchButton {
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 2px solid #ffd36b;
+  border-radius: 12px;
+  background: #1e4f8a;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.toast {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 16px;
+  background: rgb(255 248 230 / 95%);
+  color: #4a2a00;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 25%);
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+.dashboard {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgb(52 58 70 / 92%), rgb(28 32 40 / 94%));
+  box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
+}
+
+.gauge {
+  position: relative;
+  width: 96px;
+  height: 84px;
+  flex: none;
+}
+
+.gauge svg {
+  width: 100%;
+  height: 100%;
+}
+
+.arcGreen,
+.arcYellow,
+.arcRed {
+  fill: none;
+  stroke-width: 7;
+}
+
+.arcGreen {
+  stroke: #3ecf6e;
+}
+
+.arcYellow {
+  stroke: #ffc93c;
+}
+
+.arcRed {
+  stroke: #ef4b3a;
+}
+
+.needle {
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: transform 0.12s linear;
+}
+
+.hub {
+  fill: #fff;
+}
+
+.gaugeValue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+.gaugeUnit {
+  color: #cdd6e4;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control,
+.camera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 64px;
+  min-height: 64px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 25%), 0 2px 6px rgb(0 0 0 / 30%);
+}
+
+.control:active,
+.camera:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 25%);
+}
+
+.control:focus-visible,
+.camera:focus-visible,
+.switchButton:focus-visible {
+  outline: 3px solid #ffd36b;
+  outline-offset: 2px;
+}
+
+.accelerate {
+  background: linear-gradient(180deg, #4bd36f, #23974a);
+}
+
+.brake {
+  background: linear-gradient(180deg, #f2604f, #b8281c);
+}
+
+.reverse {
+  background: linear-gradient(180deg, #4a9bf0, #1f5fb4);
+}
+
+.reverse[aria-disabled="true"] {
+  opacity: 0.6;
+}
+
+.stop {
+  background: linear-gradient(180deg, #ff9a3c, #d9541a);
+}
+
+.stop[aria-pressed="true"] {
+  outline: 3px solid #fff;
+}
+
+.whistle {
+  background: linear-gradient(180deg, #e9b949, #b07d14);
+}
+
+.cameras {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgb(28 32 40 / 85%);
+}
+
+.camera {
+  min-width: 58px;
+  min-height: 58px;
+  background: linear-gradient(180deg, #4b5566, #2c3340);
+}
+
+.camera[aria-pressed="true"] {
+  background: linear-gradient(180deg, #2f80d1, #1b4f8a);
+  box-shadow: 0 0 0 2px #ffd36b inset;
+}
+
+.perf {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font: 12px/1.4 ui-monospace, monospace;
+}
+
+/* Écran étroit ou bas (téléphone) : commandes compactes, caméras au-dessus du tableau de bord. */
+@media (max-width: 760px), (max-height: 460px) {
+  .control,
+  .camera {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 4px;
+    font-size: 0.6rem;
+  }
+
+  .gauge {
+    width: 72px;
+    height: 64px;
+  }
+
+  .gaugeValue {
+    font-size: 1.05rem;
+  }
+
+  .dashboard {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .controls {
+    gap: 5px;
+  }
+
+  .info {
+    min-width: 0;
+    padding: 6px 10px 8px;
+  }
+
+  .infoTitle {
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard {
+    right: 10px;
+    justify-content: space-between;
+  }
+
+  .cameras {
+    bottom: auto;
+    top: 84px;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+
+  .needle {
+    transition: none;
+  }
+}

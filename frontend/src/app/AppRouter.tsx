@@ -52,6 +52,14 @@ const LeoDrivingGamePage = lazyRoute(
   },
   { heavy: true },
 );
+// Le Train des multiplications embarque Babylon.js : son moteur est demandé en même temps que la page.
+const TrainMultiplicationsGamePage = lazyRoute(
+  () => {
+    void import("@mbuyamba/train-multiplications").then((m) => m.preloadTrainMultiplicationsEngine()).catch(() => undefined);
+    return import("../games/train-multiplications/TrainMultiplicationsGamePage").then((m) => m.TrainMultiplicationsGamePage);
+  },
+  { heavy: true },
+);
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });
 const ProgressionPage = lazyRoute(() => import("./ProgressionPage").then((m) => m.ProgressionPage));
@@ -145,6 +153,7 @@ export function AppRouter() {
               <LeoDrivingGamePage />
             }
           />
+          <Route path="jeux/train-des-multiplications" element={<TrainMultiplicationsGamePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
           <Route path="a-propos" element={<AboutPage />} />

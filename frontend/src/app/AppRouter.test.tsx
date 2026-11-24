@@ -95,7 +95,9 @@ describe("Routeur du portail React", () => {
   it("affiche le catalogue sur /app/jeux", () => {
     renderAt("/app/jeux");
     expect(screen.getByRole("heading", { level: 1, name: /les jeux/i })).toBeInTheDocument();
-    expect(screen.getByText(/le train des multiplications/i)).toBeInTheDocument();
+    // L'ancienne version et la version 3D sont toutes deux au catalogue tant que la 3D n'est pas validée.
+    expect(screen.getByText("Le Train des multiplications")).toBeInTheDocument();
+    expect(screen.getByText("Le Train des multiplications 3D")).toBeInTheDocument();
   });
 
   it("affiche la bibliothèque et son premier livre", async () => {
