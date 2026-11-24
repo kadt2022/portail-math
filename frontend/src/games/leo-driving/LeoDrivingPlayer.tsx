@@ -10,7 +10,7 @@ import { useLeoMission } from "../../prototypes/leo-livreur/useLeoMission";
 import { STARTUP_TEXTURE_URLS } from "../../prototypes/leo-livreur/leoTextureUrls";
 import { BUNDLE_BYTES } from "../../prototypes/leo-livreur/leoZoneAssets";
 import { fetchAllWithProgress } from "../loading/fetchWithProgress";
-import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
+import { useGameLoading } from "../loading/GameLoaderHost";
 import { createLoadingProgress } from "../loading/loadingProgress";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { onViewportSettled } from "../viewport-events";
@@ -24,33 +24,19 @@ import styles from "./LeoDrivingPlayer.module.css";
 const MIN_MISSION_SCENE_HEIGHT = 280;
 
 /**
- * Poids estimés (octets) de ce qu'attend l'écran de chargement, remplacés par la taille réelle dès qu'elle est connue :
- * le moteur (Phaser et la scène, compressés) n'annonce pas sa progression ; les images du démarrage (lot commun), si.
- * Les deux sont téléchargés en même temps ; la scène relit ensuite les images dans le cache HTTP.
+ * Ressources (de 10 à 100 % du chargeur commun), en octets : toutes les images du parcours (commun, pont, ville), puis
+ * leur préparation par la scène (décodage, fondus du pont, vues de la berline, piétons). Cette dernière part n'est
+ * comptée qu'une fois la scène prête : la barre n'atteint jamais 100 % avant que la partie puisse commencer. Le moteur
+ * (Phaser), lui, est un jalon de l'initialisation.
  */
+const RESOURCE_ESTIMATES = { images: BUNDLE_BYTES.common + BUNDLE_BYTES.bridge + BUNDLE_BYTES.city, scene: 150_000 };
 /**
- * Parts de l'écran de chargement, en octets : le moteur, toutes les images du parcours (commun, pont, ville), puis leur
- * préparation par la scène (décodage, fondus du pont, vues de la berline, piétons). Cette dernière part n'est comptée
- * qu'une fois la scène prête : la barre n'atteint jamais 100 % avant que la partie puisse commencer.
- */
-const LOADING_ESTIMATES = { engine: 350_000, images: BUNDLE_BYTES.common + BUNDLE_BYTES.bridge + BUNDLE_BYTES.city, scene: 150_000 };
-/** Au-delà, l'écran explique que le chargement peut durer (connexion lente), sans rien interrompre. */
-const SLOW_LOADING_MS = 20_000;
-/**
- * Image du départ qui ne reçoit plus rien depuis ce délai (ni octet, ni erreur) : abandonnée, pour que la scène démarre
- * quand même et la redemande avec ses propres reprises (puis Réessayer). Inactivité et non durée totale : une connexion
- * lente mais vivante n'est jamais coupée ; la marge couvre aussi l'attente d'une connexion libre (6 par serveur en HTTP/1.1).
+ * Image active (sa connexion ouverte) qui ne reçoit plus rien depuis ce délai, ni octet ni erreur : abandonnée, pour que
+ * la scène démarre quand même et la redemande avec ses propres reprises (puis Réessayer). Inactivité et non durée totale :
+ * une connexion lente mais vivante n'est jamais coupée ; les téléchargements étant limités (DOWNLOAD_CONCURRENCY), une
+ * image n'attend jamais une connexion libre pendant ce délai.
  */
 const STALL_TIMEOUT_MS = 60_000;
-
-/** Habillage de l'écran de chargement commun aux couleurs de Léo : nuit en ville, barre orange de la pizzeria. */
-const LEO_LOADING_THEME = {
-  "--loading-background": "radial-gradient(circle at 50% 40%, #1f5368 0%, #10303f 70%, #0a1f2b 100%)",
-  "--loading-title": "#ffe7c2",
-  "--loading-track-border": "rgb(255 190 120 / 45%)",
-  "--loading-fill": "linear-gradient(90deg, #ef6a37, #ffb347 60%, #ffe0a3)",
-  "--loading-glow": "rgb(255 160 80 / 60%)",
-} as CSSProperties;
 
 export interface LeoDrivingPlayerProps {
   /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
@@ -78,11 +64,11 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
   const controllerRef = useRef<LeoLivreurController | null>(null);
   const [controller, setController] = useState<LeoLivreurController | null>(null);
   const [snapshot, setSnapshot] = useState<LeoLivreurSnapshot>(INITIAL_SNAPSHOT);
-  // Écran de chargement : le moteur (import dynamique) et les images du démarrage arrivent en même temps. La partie n'est
-  // jouable qu'une fois les deux prêts ; un échec propose Réessayer (nouvel import, ou reprise des images).
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  // Chargeur commun (posé par l'hôte du lecteur) : le moteur (import dynamique) et les images du parcours arrivent en même
+  // temps. La partie n'est jouable qu'une fois les deux prêts ; un échec propose Réessayer (nouvel import, ou reprise des
+  // images).
+  const loading = useGameLoading();
   const [started, setStarted] = useState(false);
-  const [loadingGone, setLoadingGone] = useState(false);
   const [engineFailed, setEngineFailed] = useState(false);
   const [engineAttempt, setEngineAttempt] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -103,7 +89,10 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     if (!host) return;
     let cancelled = false;
     let teardown = () => {};
-    const progress = createLoadingProgress(LOADING_ESTIMATES, setLoadingProgress, "engine");
+    // Lecteur monté : ses ressources sont connues et demandées (dernier jalon de l'initialisation).
+    loading.milestone("mounted");
+    const progress = createLoadingProgress(RESOURCE_ESTIMATES, (fraction) => loading.reportResources(fraction));
+    const localImages = new Map<string, string>();
     const onSnapshot = (next: LeoLivreurSnapshot) => {
       setSnapshot(next);
       // Tout le parcours est prêt : la partie devient jouable. Plus rien n'est téléchargé ensuite (une reprise après
@@ -112,17 +101,28 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
         progress.complete("images");
         progress.complete("scene");
         setStarted(true);
+        loading.ready();
       }
     };
     const engine = loadLeoEngine().then((module) => {
-      progress.complete("engine");
+      loading.milestone("engine");
       return module;
     });
-    const images = fetchAllWithProgress(STARTUP_TEXTURE_URLS, (loaded, total) => progress.report("images", loaded, total), "high", STALL_TIMEOUT_MS);
+    const images = fetchAllWithProgress(STARTUP_TEXTURE_URLS, (loaded, total) => progress.report("images", loaded, total), {
+      priority: "high",
+      stallTimeoutMs: STALL_TIMEOUT_MS,
+    });
     Promise.all([engine, images])
-      .then(([{ mountLeoLivreurGame }]) => {
-        if (cancelled) return;
-        const mounted = mountLeoLivreurGame(host, onSnapshot);
+      .then(([{ mountLeoLivreurGame }, received]) => {
+        // Octets reçus confiés à la scène par des adresses locales (« blob: ») : un seul téléchargement, sans limite de
+        // durée ; les octets bruts ne sont gardés nulle part ailleurs, et chaque adresse est libérée dès son image lue.
+        for (const [url, data] of received) localImages.set(url, URL.createObjectURL(new Blob([data], { type: "image/webp" })));
+        received.clear();
+        if (cancelled) {
+          for (const local of localImages.values()) URL.revokeObjectURL(local);
+          return;
+        }
+        const mounted = mountLeoLivreurGame(host, onSnapshot, { downloadedImages: localImages });
         controllerRef.current = mounted;
         setController(mounted);
         teardown = () => {
@@ -138,7 +138,7 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
       cancelled = true;
       teardown();
     };
-  }, [engineAttempt]);
+  }, [engineAttempt, loading]);
 
   // Taille réelle de la scène, suivie dès l'ouverture (le panneau de conduite se dispose pendant le chargement) ; le
   // moteur, une fois arrivé, se recadre à chaque mesure.
@@ -162,22 +162,20 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     };
   }, []);
 
-  // Tout est prêt : l'écran de chargement s'efface en fondu, puis quitte la scène.
-  useEffect(() => {
-    if (!started) return;
-    const timer = window.setTimeout(() => setLoadingGone(true), LOADING_FADE_MS);
-    return () => window.clearTimeout(timer);
-  }, [started]);
-
+  // Échec réel avant le départ (moteur introuvable, images introuvables après les reprises) : le chargeur propose
+  // Réessayer (nouvel import du moteur, ou reprise des images).
   const loadingFailed = !started && (engineFailed || snapshot.assets === "error");
-  const retryLoading = () => {
-    if (engineFailed) {
-      setEngineFailed(false);
-      setEngineAttempt((attempt) => attempt + 1);
-    } else {
-      controllerRef.current?.retryAssets();
-    }
-  };
+  useEffect(() => {
+    if (!loadingFailed) return;
+    loading.fail(() => {
+      if (engineFailed) {
+        setEngineFailed(false);
+        setEngineAttempt((attempt) => attempt + 1);
+      } else {
+        controllerRef.current?.retryAssets();
+      }
+    });
+  }, [loadingFailed, engineFailed, loading]);
 
   const releaseAll = useCallback(() => {
     for (const control of ALL_CONTROLS) controllerRef.current?.setControl(control, false);
@@ -304,16 +302,6 @@ export function LeoDrivingPlayer({ fullscreen = false, onFullscreenChange, onClo
     >
       <div ref={stageRef} className={styles.stage} style={stageStyle} data-format={layout.format}>
         <div ref={hostRef} className={styles.scene} data-zone="scene" />
-        {loadingGone ? null : (
-          <GameLoadingScreen
-            progress={started ? 1 : loadingProgress}
-            finished={started}
-            failed={loadingFailed}
-            onRetry={retryLoading}
-            theme={LEO_LOADING_THEME}
-            slowAfterMs={SLOW_LOADING_MS}
-          />
-        )}
         <LeoMissionOverlay
           mission={mission}
           snapshot={snapshot}

@@ -315,53 +315,8 @@
   flex: 1;
 }
 
-.stageCover .playerLoading {
-  max-height: none;
-  aspect-ratio: auto;
-  border-radius: 0;
-}
-
 .stage[hidden] {
   display: none;
-}
-
-/* Téléchargement du jeu : le cadre du lecteur est déjà là, à sa taille (bande du haut + scène 16/9), avec un indicateur discret. */
-.playerLoading {
-  display: flex;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 220px;
-  aspect-ratio: 16 / 10;
-  max-height: calc(min(74svh, 720px) + 60px);
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border-radius: 24px;
-  background: linear-gradient(160deg, #1b1050, #0f0a2e);
-  color: #d9d2f5;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.playerSpinner {
-  width: 22px;
-  height: 22px;
-  border: 3px solid rgb(255 255 255 / 22%);
-  border-top-color: #b9a6ff;
-  border-radius: 50%;
-  animation: playerSpin 0.8s linear infinite;
-}
-
-@keyframes playerSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .playerSpinner {
-    animation: none;
-  }
 }
 
 .otherGames {

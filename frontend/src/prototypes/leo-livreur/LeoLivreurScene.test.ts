@@ -7,7 +7,8 @@ import { DESTINATIONS, MAIN_LANE_Y, ROAD_Y, SCENE_BOTTOM, START_POSITION, WORLD_
 import { MISSION_ADDRESSES } from "./leoMission";
 import type { LeoSound } from "./leoAudio";
 import { kmhToPx, pxToMeters } from "./leoUnits";
-import { MAX_AUTO_RETRIES } from "./leoZoneAssets";
+import { TEXTURE_URLS } from "./leoTextureUrls";
+import { ALL_TEXTURE_KEYS, MAX_AUTO_RETRIES } from "./leoZoneAssets";
 import { boulevardSignals } from "./leoBoulevardLayout";
 import { WORLD_ZONE_WIDTH } from "./leoWorldZones";
 
@@ -51,11 +52,12 @@ function spySound() {
   };
 }
 
-async function mountScene(sound?: ReturnType<typeof spySound>) {
+async function mountScene(sound?: ReturnType<typeof spySound>, downloadedImages?: ReadonlyMap<string, string>) {
   const parent = document.createElement("div");
   document.body.appendChild(parent);
   const snapshots: LeoLivreurSnapshot[] = [];
   const scene = new LeoLivreurScene((snapshot) => snapshots.push(snapshot), 1, sound as unknown as LeoSound | undefined);
+  if (downloadedImages) scene.useDownloadedImages(downloadedImages);
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
@@ -484,6 +486,63 @@ describe("scène de conduite de Léo", { timeout: 20_000 }, () => {
     expect(internals.pedestrians.length).toBeGreaterThan(0);
     expect(internals.pedestrians.every((pedestrian) => !pedestrian.gone && Math.abs(pedestrian.x - pedestrian.spec.x) < 20)).toBe(true);
     expect(internals.textures.exists("leo-pedestrian-man")).toBe(true);
+  });
+
+  it("images reçues par le lecteur : lues en mémoire, sans second téléchargement, chaque adresse locale libérée une fois lue", async () => {
+    const revoked: string[] = [];
+    const nativeRevoke = URL.revokeObjectURL;
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+    };
+    try {
+      const local = new Map(ALL_TEXTURE_KEYS.map((key, index) => [TEXTURE_URLS[key], `blob:local-${index}`]));
+      const requested: string[] = [];
+      const nativeSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src") as PropertyDescriptor;
+      Object.defineProperty(HTMLImageElement.prototype, "src", {
+        configurable: true,
+        get() {
+          return nativeSrc.get?.call(this);
+        },
+        set(value: string) {
+          requested.push(value);
+          nativeSrc.set?.call(this, value);
+        },
+      });
+      try {
+        const { step, started } = await mountScene(undefined, local);
+        await stepUntil(step, started);
+      } finally {
+        Object.defineProperty(HTMLImageElement.prototype, "src", nativeSrc);
+      }
+      // Toutes les images du parcours lues depuis leurs adresses locales : aucune adresse réseau demandée.
+      expect(requested.filter((url) => url.startsWith("blob:local-"))).toHaveLength(ALL_TEXTURE_KEYS.length);
+      expect(requested.some((url) => Object.values(TEXTURE_URLS).includes(url))).toBe(false);
+      // Chaque adresse locale libérée dès son image lue (ses octets ne restent pas en double avec la texture).
+      expect(new Set(revoked)).toEqual(new Set(local.values()));
+    } finally {
+      URL.revokeObjectURL = nativeRevoke;
+    }
+  });
+
+  it("partie fermée avant la lecture de ses images : les adresses locales restantes sont libérées", async () => {
+    const revoked: string[] = [];
+    const nativeRevoke = URL.revokeObjectURL;
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+    };
+    try {
+      const scene = new LeoLivreurScene(() => undefined, 1);
+      scene.useDownloadedImages(new Map([["/a.webp", "blob:a"], ["/b.webp", "blob:b"]]));
+      scene.releaseDownloaded("/a.webp");
+      expect(revoked).toEqual(["blob:a"]);
+      scene.releaseDownloaded();
+      expect(revoked).toEqual(["blob:a", "blob:b"]);
+      // Plus rien à libérer ensuite.
+      scene.releaseDownloaded();
+      expect(revoked).toHaveLength(2);
+    } finally {
+      URL.revokeObjectURL = nativeRevoke;
+    }
   });
 
   it("partie fermée : son coupé et scène détachée de Phaser, pour que sa mémoire soit libérée", async () => {

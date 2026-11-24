@@ -16,6 +16,9 @@ function Shell({ enabled }: { enabled: boolean }) {
         <div ref={gameRef} tabIndex={-1} data-testid="game">
           <button type="button">Jouer</button>
         </div>
+        <div data-testid="loader" data-inert-exempt="">
+          <button type="button">Fermer</button>
+        </div>
       </main>
       <footer data-testid="footer">Pied de page</footer>
     </div>
@@ -30,6 +33,12 @@ describe("useInertOutside", () => {
     }
     expect(getByTestId("game").hasAttribute("inert")).toBe(false);
     expect(document.activeElement).toBe(getByTestId("game"));
+  });
+
+  it("laisse actif le chargeur commun posé par-dessus le jeu (Fermer et Réessayer répondent)", () => {
+    const { getByTestId } = render(<Shell enabled />);
+    expect(getByTestId("loader").hasAttribute("inert")).toBe(false);
+    expect(getByTestId("other").hasAttribute("inert")).toBe(true);
   });
 
   it("restaure tout quand le plein écran se termine, sans toucher ce qui était déjà inerte", () => {
