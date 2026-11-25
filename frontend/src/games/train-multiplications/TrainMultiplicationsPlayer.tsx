@@ -1,20 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { toTrainLocale, useTrainMultiplications } from "@mbuyamba/train-multiplications";
 
-import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
+import { useGameLoading } from "../loading/GameLoaderHost";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import styles from "./TrainMultiplicationsPlayer.module.css";
-
-/** Habillage de l'écran de chargement commun aux couleurs du train : ciel du matin, barre rouge et or de la locomotive. */
-const TRAIN_LOADING_THEME = {
-  "--loading-background": "radial-gradient(circle at 50% 35%, #4a8fc4 0%, #22527a 70%, #142f4a 100%)",
-  "--loading-title": "#fff3d6",
-  "--loading-track-border": "rgb(255 210 120 / 45%)",
-  "--loading-fill": "linear-gradient(90deg, #b8281c, #e04a2a 55%, #f2c94c)",
-  "--loading-glow": "rgb(255 190 90 / 60%)",
-} as CSSProperties;
 
 export interface TrainMultiplicationsPlayerProps {
   /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
@@ -32,7 +23,7 @@ export interface TrainMultiplicationsPlayerProps {
 
 // Le Train des multiplications 3D dans le lecteur standard des jeux. Le jeu est un module à part
 // (@mbuyamba/train-multiplications) : il fournit sa scène et ce que le lecteur affiche (titre, compteurs, instructions).
-// Le portail n'apporte que le lecteur, l'écran de chargement commun et la langue choisie.
+// Le portail n'apporte que le lecteur, le chargeur commun (voir loading/GameLoaderHost) et la langue choisie.
 export function TrainMultiplicationsPlayer({ fullscreen = false, onFullscreenChange, onClose, cover = false, active = true, pageHeading = false }: TrainMultiplicationsPlayerProps) {
   const { i18n } = useTranslation("games");
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -45,14 +36,27 @@ export function TrainMultiplicationsPlayer({ fullscreen = false, onFullscreenCha
   }, []);
   const game = useTrainMultiplications({ locale: toTrainLocale(i18n.language), active, showPerformance, renderer });
   const { player, loading, sound } = game;
-  // L'écran de chargement s'efface en fondu une fois le monde ferroviaire prêt, puis quitte la scène.
-  const [fadedOut, setFadedOut] = useState(false);
+  // Chargeur commun (posé par l'hôte du lecteur) : le jeu lui signale ses étapes réelles. Moteur 3D téléchargé : jalon de
+  // l'initialisation ; construction du monde ferroviaire : progression des ressources ; monde prêt : le chargeur disparaît.
+  const session = useGameLoading();
   useEffect(() => {
-    if (!loading.ready) return;
-    const timer = window.setTimeout(() => setFadedOut(true), LOADING_FADE_MS);
-    return () => window.clearTimeout(timer);
-  }, [loading.ready]);
-  const loadingGone = loading.ready && fadedOut;
+    session.milestone("mounted");
+  }, [session]);
+  useEffect(() => {
+    if (loading.engineLoaded) session.milestone("engine");
+  }, [session, loading.engineLoaded]);
+  useEffect(() => {
+    session.reportResources(loading.buildProgress);
+  }, [session, loading.buildProgress]);
+  useEffect(() => {
+    if (loading.ready) session.ready();
+  }, [session, loading.ready]);
+  // Échec réel (moteur introuvable, réseau coupé) : Réessayer, dans le chargeur. Appareil sans WebGL ni WebGPU : le chargeur
+  // s'efface pour laisser lire le message du jeu, qui explique que l'appareil n'est pas compatible.
+  useEffect(() => {
+    if (loading.unsupported) session.ready();
+    else if (loading.failed) session.fail(loading.retry);
+  }, [session, loading.failed, loading.unsupported, loading.retry]);
 
   return (
     <GamePlayer
@@ -86,15 +90,6 @@ export function TrainMultiplicationsPlayer({ fullscreen = false, onFullscreenCha
     >
       <div className={styles.stage}>
         {game.stage}
-        {loadingGone ? null : (
-          <GameLoadingScreen
-            progress={loading.ready ? 1 : loading.progress}
-            finished={loading.ready}
-            failed={loading.failed && !loading.unsupported}
-            onRetry={loading.retry}
-            theme={TRAIN_LOADING_THEME}
-          />
-        )}
       </div>
     </GamePlayer>
   );

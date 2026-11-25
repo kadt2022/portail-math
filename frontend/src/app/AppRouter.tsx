@@ -58,7 +58,7 @@ const TrainMultiplicationsGamePage = lazyRoute(
     void import("@mbuyamba/train-multiplications").then((m) => m.preloadTrainMultiplicationsEngine()).catch(() => undefined);
     return import("../games/train-multiplications/TrainMultiplicationsGamePage").then((m) => m.TrainMultiplicationsGamePage);
   },
-  { heavy: true },
+  { heavy: true, game: "train-des-multiplications" },
 );
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });

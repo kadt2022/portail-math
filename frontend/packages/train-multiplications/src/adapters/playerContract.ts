@@ -34,7 +34,12 @@ export interface StandardPlayerBinding {
 }
 
 export interface TrainLoadingState {
+  /** Progression d'ensemble, de 0 à 1 (moteur téléchargé : la moitié, puis construction du monde). */
   progress: number;
+  /** Le moteur 3D est téléchargé (le monde ferroviaire se construit ensuite). */
+  engineLoaded: boolean;
+  /** Avancement réel de la construction du monde ferroviaire, de 0 à 1 (0 tant que le moteur n'est pas là). */
+  buildProgress: number;
   ready: boolean;
   failed: boolean;
   unsupported: boolean;

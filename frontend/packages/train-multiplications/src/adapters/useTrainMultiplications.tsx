@@ -232,7 +232,15 @@ export function useTrainMultiplications(settings: TrainMultiplicationsSettings):
   return {
     stage: <TrainStage hostRef={hostRef} t={t} locale={locale} snapshot={ready ? snapshot : null} handlers={handlers} toast={toast} stats={stats} unsupported={unsupported} />,
     player,
-    loading: { progress, ready, failed, unsupported, retry: () => setAttempt((n) => n + 1) },
+    loading: {
+      progress,
+      engineLoaded: progress >= DOWNLOAD_SHARE,
+      buildProgress: progress >= DOWNLOAD_SHARE ? Math.min(1, (progress - DOWNLOAD_SHARE) / (1 - DOWNLOAD_SHARE)) : 0,
+      ready,
+      failed,
+      unsupported,
+      retry: () => setAttempt((n) => n + 1),
+    },
     sound: {
       on: soundOn,
       toggle: () => {

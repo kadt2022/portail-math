@@ -51,6 +51,8 @@ function Game({ load }: { load: () => Promise<TrainEngineModule> }) {
   return (
     <div>
       <p data-testid="ready">{String(game.loading.ready)}</p>
+      <p data-testid="engine">{String(game.loading.engineLoaded)}</p>
+      <p data-testid="build">{game.loading.buildProgress.toFixed(2)}</p>
       <p data-testid="speed">{String(game.player.stats[0].value)}</p>
       {game.stage}
     </div>
@@ -121,5 +123,37 @@ describe("tableau de bord du train", () => {
     expect(locked.querySelector("svg")).not.toBeNull();
     fireEvent.click(locked);
     expect(handle.toggleSwitch).not.toHaveBeenCalled();
+  });
+
+  it("annonce le moteur téléchargé, puis l'avancement réel de la construction du monde, que l'hôte reporte à son chargeur", async () => {
+    const { handle } = fakeEngine();
+    let finish: () => void = () => {};
+    const created = new Promise<TrainEngineHandle>((resolve) => {
+      finish = () => resolve(handle);
+    });
+    let build: (fraction: number) => void = () => {};
+    const module = {
+      createTrainEngine: vi.fn(async (options: { onBuildProgress?: (fraction: number) => void }) => {
+        build = options.onBuildProgress ?? build;
+        return created;
+      }),
+      TrainEngineUnsupportedError: Error,
+    } as unknown as TrainEngineModule;
+    render(<Game load={() => Promise.resolve(module)} />);
+    // Avant tout : rien de téléchargé, rien de construit.
+    expect(screen.getByTestId("engine")).toHaveTextContent("false");
+    expect(screen.getByTestId("build")).toHaveTextContent("0.00");
+    // Moteur téléchargé : la construction du monde commence à zéro.
+    await waitFor(() => expect(screen.getByTestId("engine")).toHaveTextContent("true"));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.00");
+    // La construction avance (valeurs réelles du moteur), sans jamais reculer.
+    act(() => build(0.5));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.50");
+    act(() => build(0.2));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.50");
+    expect(screen.getByTestId("ready")).toHaveTextContent("false");
+    await act(async () => finish());
+    await waitFor(() => expect(screen.getByTestId("ready")).toHaveTextContent("true"));
+    expect(screen.getByTestId("build")).toHaveTextContent("1.00");
   });
 });
