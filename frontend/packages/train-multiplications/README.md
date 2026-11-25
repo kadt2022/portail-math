@@ -35,7 +35,7 @@ src/engine/scene/    Babylon.js uniquement
   cameraRig.ts       cinq caméras, leurs fondus, plans de pont et de tunnel
   clearance.ts       volumes que la caméra ne traverse jamais (relief, roche, poutres, bâtiments), bras à ressort
   lighting.ts        soleil, ciel, ombres qui suivent le train, éclairage du tunnel séparé
-  steam.ts           fumée, vapeur des cylindres et du sifflet
+  steam.ts           vapeur des cylindres et du sifflet (le train ne fume pas)
 src/engine/audio/    sons synthétisés (échappement, sifflet, freins, cloche)
 src/adapters/        crochet React pour le lecteur standard de l'hôte
 src/ui/              tableau de bord (compteur, commandes, caméras, prochaine gare, aiguillage)
@@ -52,7 +52,7 @@ automatique, pour qu'aucun appareil ne soit exclu.
 | Matériaux PBR par famille | toujours | — |
 | Reflet du ciel (sonde de réflexion, `HDRFiltering`) | toujours | filtrage en temps réel par les matériaux |
 | Vraies lampes des tunnels (`ClusteredLightContainer`) | WebGPU, ou WebGL 2 avec mélange de flottants | flaques de lumière peintes sur la voûte |
-| Fumée et vapeur en particules GPU (`GPUParticleSystem`) | qualité haute et prise en charge | particules classiques, calculées par le processeur |
+| Vapeur en particules GPU (`GPUParticleSystem`) | qualité haute et prise en charge | particules classiques, calculées par le processeur |
 
 - **Familles de matériau.** Chaque couleur de la palette porte sa famille : béton et pierre, peinture, acier, laiton,
   bois, verre, mat, fruit. Le rendu regroupe les triangles par famille, en un sous-maillage et un matériau PBR chacun.
@@ -111,7 +111,7 @@ infrastructures sont modernes, et toutes leurs couleurs sont réglées dans `eng
   quart de tour. La bielle motrice et la crosse suivent la manivelle.
 - **Tunnels.** La caméra descend dans le tube. Des luminaires chauds, alternés tous les 12 m, éclairent la voûte et la
   voie ; chaque véhicule passe à son tour du jour à cette lumière, et le projecteur éclaire la voie devant la
-  locomotive. Sous la voûte, la fumée ne monte plus : elle s'étale et traîne derrière le train.
+  locomotive.
 - **Caméras.** Aucune vue ne traverse le relief, la roche, les poutres des ponts ni les bâtiments : un bras à ressort
   rapproche l'œil du train. Sur les ponts, la vue latérale passe en plan large pris d'en bas, depuis la vallée.
 - **Gares.** L'arrêt est réussi si l'avant de la locomotive est à moins de 6 m du repère STOP.

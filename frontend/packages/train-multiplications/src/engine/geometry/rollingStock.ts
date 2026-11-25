@@ -530,9 +530,8 @@ export function cratePlaces(count: number): Vec3[] {
   return places;
 }
 
-/** Points remarquables de la locomotive (repère du véhicule) : fumée, vapeur, sifflet, lanterne, regard du conducteur. */
+/** Points remarquables de la locomotive (repère du véhicule) : vapeur des cylindres, sifflet, lanterne, regard du conducteur. */
 export const LOCO_ANCHORS = {
-  chimney: [0, 4.2, LOCO.front - 0.58] as Vec3,
   cylinders: [[-1.02, CYLINDER_Y, LOCO.front - 2.05], [1.02, CYLINDER_Y, LOCO.front - 2.05]] as Vec3[],
   whistle: [0.35, 4.42, LOCO.rear + 2.6] as Vec3,
   headlamp: [0, 3.41, LOCO.front - 0.12] as Vec3,

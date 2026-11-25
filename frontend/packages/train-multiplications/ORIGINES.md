@@ -7,7 +7,7 @@ Tout le jeu a été écrit pour Yamba Academy :
 - le tracé, le réseau, la composition du train, la physique ;
 - tous les modèles procéduraux : locomotive, tender, wagons, roues, bielles, caisses, rails, ouvrages, gares, signaux,
   relief ;
-- les caméras, la fumée, les sons synthétisés, le tableau de bord.
+- les caméras, la vapeur, les sons synthétisés, le tableau de bord.
 
 ## Repris de la Rivière des fractions
 
@@ -43,7 +43,7 @@ Aucun composant de végétation n'est repris, conformément au périmètre de TR
 Aucune image, aucun modèle 3D et aucun son ne sont téléchargés :
 
 - les textes des panneaux sont dessinés à la volée dans une petite texture ;
-- la bouffée de fumée est un dégradé dessiné à la volée ;
+- la bouffée de vapeur est un dégradé dessiné à la volée ;
 - les sons sont synthétisés avec la Web Audio API.
 
 Les maquettes du Capitaine Pi ont servi d'inspiration (couleurs de la locomotive, wagons de bois, gare jaune aux toits

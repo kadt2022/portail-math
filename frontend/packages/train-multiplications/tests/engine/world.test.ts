@@ -19,6 +19,7 @@ import { createObstacles, resolveEye } from "../../src/engine/scene/clearance";
 import { decorAnchors, inRailwayClearance } from "../../src/world/anchors";
 import { createMaterialSet } from "../../src/engine/scene/materials";
 import { groupByFamily } from "../../src/engine/scene/meshes";
+import { createSteam } from "../../src/engine/scene/steam";
 import { createTrainView } from "../../src/engine/scene/trainView";
 
 const network = createNetwork();
@@ -211,5 +212,28 @@ describe("gabarit des tunnels", () => {
         expect(tunnelCeiling(half, kind) - TUNNEL_ENVELOPE.height).toBeGreaterThanOrEqual(TUNNEL_ENVELOPE.margin);
       }
     }
+  });
+});
+
+describe("vapeur : le train ne pollue pas", () => {
+  it("n'a aucune fumée de cheminée : il ne reste que la vapeur blanche des purgeurs et du sifflet", () => {
+    engine = new NullEngine();
+    const scene = new Scene(engine);
+    const steam = createSteam(scene, "low", false);
+    // Seuls deux systèmes de particules existent : les purgeurs des cylindres et le sifflet ; aucun nommé fumée.
+    expect(scene.particleSystems.map((system) => system.name).sort()).toEqual(["cylinder-steam", "whistle-steam"]);
+    // La fumée n'est plus pilotée : ni à la cheminée, ni par les coups d'échappement, ni sous la voûte.
+    expect("puff" in steam).toBe(false);
+    expect("setEnclosure" in steam).toBe(false);
+    // Plein régulateur en roulant : aucune particule n'apparaît (les purgeurs ne s'ouvrent qu'au démarrage, le sifflet à l'appel).
+    const origin = new Vector3();
+    for (let frame = 0; frame < 120; frame += 1) steam.update([origin, origin], origin, new Vector3(0, 0, 1), 1, 12);
+    expect(scene.particleSystems.every((system) => system.emitRate === 0)).toBe(true);
+    // Le sifflet souffle toujours son jet de vapeur.
+    steam.whistle();
+    steam.update([origin, origin], origin, new Vector3(0, 0, 1), 0, 0);
+    expect(scene.particleSystems.find((system) => system.name === "whistle-steam")!.emitRate).toBeGreaterThan(0);
+    steam.dispose();
+    expect(scene.particleSystems).toHaveLength(0);
   });
 });

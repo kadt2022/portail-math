@@ -40,7 +40,7 @@ Paquet autonome `frontend/packages/train-multiplications` (`@mbuyamba/train-mult
   famille de matériau** de chaque couleur (béton, peinture, acier, laiton, bois, verre, mat, fruit).
 - `src/engine/scene/` (Babylon seulement) : moteur, matériaux PBR (`materials.ts`), choix WebGPU/WebGL
   (`renderEngine.ts`), reflet du ciel (`environment.ts`), caméras (`cameraRig.ts`) et volumes à ne pas traverser
-  (`clearance.ts`), fumée (`steam.ts`), train (`trainView.ts`).
+  (`clearance.ts`), vapeur (`steam.ts`, le train ne fume pas), train (`trainView.ts`).
 - `src/world/anchors.ts` : points de placement du futur décor. `src/infrastructure.ts` : entrée réutilisable.
 - Ateliers : `dev/train-views.html` (paramètres : `head`, `camera`, `route`, `frozen`, `quality`, `renderer`,
   `noclustered`, `nogpuparticles`, `diag`), `dev/stock-showroom.html`.
@@ -58,7 +58,7 @@ Branche `feat/train-multiplications`, commit `a5eaa91` (TRAIN-MULT-01 à 05), pl
    `palette.ts`.
 3. **Rendu moderne (MULT-04)** : PBR par famille (un sous-maillage par famille), reflet du ciel préfiltré
    (`HDRFiltering`, repli `realTimeFiltering`), WebGPU d'abord avec vrai repli WebGL (canevas neuf), 64 lampes de
-   tunnel en `ClusteredLightContainer` (repli : flaques peintes), fumée en `GPUParticleSystem` (repli CPU).
+   tunnel en `ClusteredLightContainer` (repli : flaques peintes), vapeur (purgeurs, sifflet) en `GPUParticleSystem` (repli CPU) ; plus de fumée à la cheminée, décision du Capitaine : le train ne pollue pas.
 4. **Tunnels élargis (MULT-05)** : gabarit calculé (`TUNNEL`, `GALLERY`, `TUNNEL_ENVELOPE` dans `structures.ts`,
    tableau dans le README, test « gabarit des tunnels ») ; 8,8 m entre parois, clé à 6,8 m, passages de service.
 5. **Caméras** : derrière, cabine, latérale (plans de pont, plan « tube »), chargement, panorama ; bras à ressort.
@@ -72,7 +72,7 @@ Branche `feat/train-multiplications`, commit `a5eaa91` (TRAIN-MULT-01 à 05), pl
 - **Poids** : moteur du jeu 311 Ko compressés (+72 Ko de WebGPU pour les seuls appareils compatibles).
 - **Aucune mesure sur vrai téléphone.** Les mesures en rendu logiciel ne valent que pour comparer avant/après.
 - Petites retouches signalées : viaduc un peu clair en plein soleil ; couvertines des murs inclinés très blanches ;
-  vue de chargement sur la voie 2 en partie masquée par l'auvent du quai central ; fumée blanche dans les tunnels.
+  vue de chargement sur la voie 2 en partie masquée par l'auvent du quai central.
 
 ## Vérifications utiles
 

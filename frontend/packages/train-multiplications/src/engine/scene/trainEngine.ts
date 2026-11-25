@@ -40,7 +40,7 @@ import { createSteam, type Steam } from "./steam";
 import { createTrainView, type TrainView } from "./trainView";
 
 // Le moteur du Train des multiplications : il construit le monde ferroviaire (relief nécessaire, voies, ouvrages,
-// gares, signaux), le train, les caméras, la fumée et le son, puis fait tourner la boucle : physique à pas fixe,
+// gares, signaux), le train, les caméras, la vapeur et le son, puis fait tourner la boucle : physique à pas fixe,
 // pose des véhicules, animation des roues, caméra, éclairage du tunnel, gares et aiguillage.
 //
 // Le décor naturel n'est pas construit ici. `decor` est le point d'accroche de l'habillage à venir (magasin de
@@ -74,9 +74,9 @@ export interface TrainEngineOptions {
   renderer?: RendererChoice;
   /** Vraies lampes dans les tunnels (éclairage groupé), quand l'appareil le permet (par défaut oui). */
   clusteredLights?: boolean;
-  /** Fumée et vapeur calculées par la carte graphique, quand l'appareil le permet (par défaut oui en qualité haute). */
+  /** Vapeur (purgeurs, sifflet) calculée par la carte graphique, quand l'appareil le permet (par défaut oui en qualité haute). */
   gpuParticles?: boolean;
-  /** Outil de diagnostic (atelier) : familles de maillages à retirer pour mesurer leur coût. */
+  /** Outil de diagnostic (atelier) : familles de maillages à retirer pour mesurer leur coût (« smoke » : la vapeur ; le train ne fume plus). */
   diagnostics?: readonly ("shadows" | "smoke" | "terrain" | "track" | "decor" | "train")[];
 }
 
@@ -575,7 +575,7 @@ export async function createTrainEngine(options: TrainEngineOptions): Promise<Tr
   const posesFor = (head: number) => vehicleFronts(consist, head).map((front, i) => poseVehicle(trackOf(), consist.vehicles[i].spec, front));
   const locoWorld = new Matrix();
   const anchor = (local: readonly number[], out: Vector3) => Vector3.TransformCoordinatesFromFloatsToRef(local[0], local[1], local[2], locoWorld, out);
-  const tmp = { chimney: new Vector3(), whistle: new Vector3(), cylA: new Vector3(), cylB: new Vector3(), eye: new Vector3(), look: new Vector3(), lamp: new Vector3(), lampAt: new Vector3() };
+  const tmp = { whistle: new Vector3(), cylA: new Vector3(), cylB: new Vector3(), eye: new Vector3(), look: new Vector3(), lamp: new Vector3(), lampAt: new Vector3() };
 
   const stationAlongside = (): StationStop | null => {
     const tail = state.head - consist.vehicles.reduce((sum, v) => sum + v.spec.length, 0);
@@ -619,7 +619,6 @@ export async function createTrainEngine(options: TrainEngineOptions): Promise<Tr
       lastChuff = chuffs;
       const strength = Math.max(0.15, state.throttle);
       audio.chuff(strength, Math.abs(state.speed));
-      steam.puff(strength);
     }
     // Arrêt en gare : à l'arrêt, l'avant de la locomotive à 6 m du repère.
     const station = stationsOn(network, route).find((st) => Math.abs(state.head - st.stop) <= 6);
@@ -660,14 +659,11 @@ export async function createTrainEngine(options: TrainEngineOptions): Promise<Tr
     train.update(poses, state.distance, light);
     train.locomotive.computeWorldMatrix(true);
     locoWorld.copyFrom(train.locomotive.getWorldMatrix());
-    anchor(LOCO_ANCHORS.chimney, tmp.chimney);
     anchor(LOCO_ANCHORS.whistle, tmp.whistle);
     anchor(LOCO_ANCHORS.cylinders[0], tmp.cylA);
     anchor(LOCO_ANCHORS.cylinders[1], tmp.cylB);
     const forward = new Vector3(poses[0].forward[0], poses[0].forward[1], poses[0].forward[2]);
-    // La cheminée sous la voûte : la fumée s'étale au lieu de monter.
-    steam.setEnclosure(Math.min(1, Math.max(0, (depthInside(network, state.head - 2) + 1) / 4)));
-    if (!options.diagnostics?.includes("smoke")) steam.update(tmp.chimney, [tmp.cylA, tmp.cylB], tmp.whistle, forward.scale(Math.sign(state.speed || 1)), state.throttle, state.speed);
+    if (!options.diagnostics?.includes("smoke")) steam.update([tmp.cylA, tmp.cylB], tmp.whistle, forward.scale(Math.sign(state.speed || 1)), state.throttle, state.speed);
     audio.setBrake(Math.max(state.brake, state.emergency ? 1 : 0), Math.abs(state.speed));
     // Projecteur : depuis la lanterne, vers l'avant de la locomotive.
     anchor(LOCO_ANCHORS.headlamp, tmp.lamp);

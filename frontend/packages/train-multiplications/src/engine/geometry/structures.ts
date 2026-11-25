@@ -425,7 +425,7 @@ function lat(f: Frame & { forward: V }, along: number, x: number): V {
  * - de chaque côté, un passage de service de 1,3 m, dalle à 0,3 m au-dessus du rail, bordure jaune, main courante ;
  *   d'où des piédroits à ±4,4 m (8,8 m entre parois, au lieu de 5,9 m) ;
  * - voûte surbaissée : naissances à 3,2 m, flèche de 3,6 m, clé à 6,8 m au-dessus du rail (au lieu de 5,25 m), qui
- *   laisse la fumée s'étaler et la caméra circuler au-dessus du train.
+ *   laisse la caméra circuler au-dessus du train.
  */
 export const TUNNEL = { halfWidth: 4.4, springing: 3.2, rise: 3.6, walkway: 1.3, walkwayHeight: 0.3 } as const;
 /** Hauteur de la clé de voûte au-dessus du rail. */
