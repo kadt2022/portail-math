@@ -1,6 +1,6 @@
 # Passation — La Rivière des Fractions 3D
 
-Note pour l'agent qui reprend ce chantier (Claude Code ou autre). À lire en premier.
+Note pour l'agent qui reprend ce chantier (quel qu'il soit). À lire en premier.
 
 ## Qui et comment
 
