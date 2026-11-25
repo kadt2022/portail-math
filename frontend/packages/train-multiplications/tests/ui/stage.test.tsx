@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TrainEngineModule } from "../../src/adapters/engineLoader";
@@ -8,7 +8,7 @@ import type { TrainEngineHandle, TrainSnapshot } from "../../src/engine/scene/tr
 // Le tableau de bord et l'adaptateur, avec un faux moteur : les commandes arrivent bien au train, les caméras
 // changent, et le moteur est entièrement libéré à la fermeture du jeu.
 
-function fakeEngine() {
+function fakeEngine(overrides: Partial<TrainSnapshot> = {}) {
   let snapshot: TrainSnapshot = {
     speedKmh: 0,
     direction: 1,
@@ -22,6 +22,7 @@ function fakeEngine() {
     underground: false,
     switchFree: true,
     structure: null,
+    ...overrides,
   };
   const handle = {
     setInput: vi.fn(),
@@ -91,5 +92,34 @@ describe("tableau de bord du train", () => {
 
     view.unmount();
     expect(handle.dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("regroupe le côté droit dans l'ordre de la disposition cible : caméras avec leur libellé, aiguillage, puis tableau de bord", async () => {
+    const { module } = fakeEngine();
+    render(<Game load={() => Promise.resolve(module)} />);
+    const cameras = await screen.findByRole("group", { name: "Caméras" });
+    expect(cameras).toHaveTextContent("Caméra :");
+    expect(within(cameras).getAllByRole("button").map((button) => button.textContent)).toEqual(["Derrière", "Cabine", "Latérale", "Chargement", "Panorama"]);
+    const side = cameras.parentElement as HTMLElement;
+    const switchBox = screen.getByRole("button", { name: /Aiguillage du village/ }).parentElement as HTMLElement;
+    const dashboard = screen.getByRole("button", { name: "Accélérer" }).closest("[class*=dashboard]") as HTMLElement;
+    expect(switchBox.parentElement).toBe(side);
+    expect(dashboard.parentElement).toBe(side);
+    const order = Array.from(side.children);
+    expect(order.indexOf(cameras)).toBeLessThan(order.indexOf(switchBox));
+    expect(order.indexOf(switchBox)).toBeLessThan(order.indexOf(dashboard));
+    // Le tableau de bord garde ses cinq commandes, dans l'ordre : Accélérer, Freiner, Reculer, Arrêter le train, Siffler.
+    expect(within(dashboard).getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual(["Accélérer", "Freiner", "Reculer", "Arrêter le train", "Siffler"]);
+  });
+
+  it("aiguillage franchi : une pastille avec sa coche, qui ne se manœuvre plus", async () => {
+    const { handle, module } = fakeEngine({ switchFree: false });
+    render(<Game load={() => Promise.resolve(module)} />);
+    const locked = await screen.findByRole("button", { name: /Aiguillage du village/ });
+    expect(locked).toBeDisabled();
+    expect(locked).toHaveTextContent("Aiguillage franchi");
+    expect(locked.querySelector("svg")).not.toBeNull();
+    fireEvent.click(locked);
+    expect(handle.toggleSwitch).not.toHaveBeenCalled();
   });
 });

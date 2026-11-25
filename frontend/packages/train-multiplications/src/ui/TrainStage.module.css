@@ -4,6 +4,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* Les tailles de la grande disposition suivent la place réelle de la scène (cqh, cqw), pas la fenêtre. */
+  container: train / size;
   background: #c8def0;
   font-family: "Trebuchet MS", system-ui, sans-serif;
   user-select: none;
@@ -107,9 +109,25 @@
   cursor: pointer;
 }
 
+/* Aiguillage franchi : une pastille pleine, avec sa coche, qui ne se manœuvre plus. */
 .switchButton:disabled {
-  opacity: 0.6;
   cursor: default;
+}
+
+.switchCheck {
+  margin-right: 6px;
+  color: #3ecf6e;
+  vertical-align: -3px;
+}
+
+/* Côté droit : caméras, aiguillage et tableau de bord. Disposition compacte : chaque bloc garde sa place propre (le
+   regroupement est transparent) ; grande disposition : voir plus bas. */
+.side {
+  display: contents;
+}
+
+.cameraLabel {
+  display: none;
 }
 
 .toast {
@@ -360,6 +378,113 @@
     bottom: auto;
     top: 84px;
     flex-direction: column;
+  }
+}
+
+/* Grande scène (ordinateur, tablette) : colonne à droite. Les caméras en haut avec leur libellé, l'aiguillage dessous, puis
+   le tableau de bord en colonne : compteur, et les cinq commandes pleine largeur, icône à gauche. Les tailles suivent la
+   hauteur de la scène pour que tout reste entier, jusqu'à la scène d'un ordinateur portable ouvert dans le lecteur du
+   catalogue (environ 860 × 430 px). Les petits écrans gardent la disposition compacte ci-dessus. */
+@container train (min-width: 760px) and (min-height: 420px) {
+  .side {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: clamp(6px, 1.2cqh, 8px);
+    pointer-events: none;
+  }
+
+  .side > * {
+    pointer-events: auto;
+  }
+
+  .cameras,
+  .switchBox,
+  .dashboard {
+    position: static;
+  }
+
+  .cameras {
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: rgb(18 24 38 / 88%);
+  }
+
+  .cameraLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px 0 8px;
+    color: #fff;
+    font-size: clamp(0.8rem, 2.4cqh, 1.05rem);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .camera {
+    min-width: clamp(54px, 8cqh, 80px);
+    min-height: clamp(44px, 8.5cqh, 70px);
+  }
+
+  .dashboard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: clamp(4px, 1.2cqh, 8px);
+    width: clamp(190px, 16cqw, 250px);
+    padding: clamp(8px, 1.6cqh, 12px);
+  }
+
+  .gauge {
+    width: 100%;
+    height: clamp(48px, 11cqh, 120px);
+  }
+
+  .gaugeValue {
+    font-size: clamp(1.2rem, 3.4cqh, 1.8rem);
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: clamp(4px, 1cqh, 6px);
+  }
+
+  .control {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: clamp(34px, 8.5cqh, 70px);
+    padding: 4px 14px;
+    font-size: clamp(0.78rem, 2.3cqh, 1.05rem);
+  }
+
+  /* Le message de la gare grandit avec la scène (il reste de la place à gauche de la barre des caméras). */
+  .info {
+    max-width: clamp(240px, 26cqw, 460px);
+  }
+
+  .infoTitle {
+    font-size: clamp(1rem, 1.7cqw, 1.7rem);
+  }
+}
+
+/* Grande scène (au moins 600 px de haut) : commandes, compteur et caméras plus grands, comme sur la disposition cible. */
+@container train (min-width: 760px) and (min-height: 600px) {
+  .gauge {
+    height: clamp(70px, 14cqh, 130px);
+  }
+
+  .control {
+    min-height: clamp(48px, 9.6cqh, 76px);
+  }
+
+  .camera {
+    min-height: clamp(52px, 9cqh, 76px);
   }
 }
 
