@@ -15,6 +15,11 @@ vi.mock("@mbuyamba/pdf-reader", () => ({
   PdfReader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
+// La Rivière embarque Babylon.js : sa page et son moteur sont remplacés, on ne vérifie ici que le routage et la demande du moteur.
+vi.mock("../games/riviere-fractions/RiviereFractionsGamePage", () => ({ RiviereFractionsGamePage: () => <p>Page autonome de la Rivière</p> }));
+const preloadRiverEngine = vi.fn(async () => undefined);
+vi.mock("@mbuyamba/riviere-fractions", () => ({ preloadRiverFractionsEngine: () => preloadRiverEngine() }));
+
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
   return render(<AppRouter />);
@@ -31,6 +36,12 @@ describe("Routeur du portail React", () => {
   // doivent pas hériter d'un `fetch` détourné.
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("ouvre la page autonome de La Rivière des Fractions, et demande son moteur 3D en même temps que la page", async () => {
+    renderAt("/app/jeux/riviere-des-fractions");
+    expect(await screen.findByText("Page autonome de la Rivière")).toBeInTheDocument();
+    expect(preloadRiverEngine).toHaveBeenCalled();
   });
 
   it("affiche le tableau de bord sur /app", () => {

@@ -20,6 +20,32 @@ vi.mock("./turbo-pulse/TurboPulseGame", () => ({
   }),
 }));
 
+// Le jeu 3D de la Rivière est remplacé par un faux, déjà prêt : on vérifie ici l'ouverture dans le lecteur de la page.
+vi.mock("@mbuyamba/riviere-fractions", () => ({
+  toRiverLocale: () => "fr",
+  preloadRiverFractionsEngine: () => Promise.resolve(),
+  useRiverFractions: () => ({
+    stage: <div data-testid="scene-riviere" />,
+    player: {
+      label: "Jeu La Rivière des Fractions",
+      title: "La Rivière des Fractions",
+      headerCenter: "Niveau 1",
+      stats: [{ label: "Défi", value: "1/7" }],
+      paused: false,
+      onPlay: () => undefined,
+      onPause: () => undefined,
+      ended: false,
+      onRestart: () => undefined,
+      restartLabel: "Recommencer",
+      onHint: () => undefined,
+      hintDisabled: false,
+      howTo: [],
+    },
+    sound: { on: true, toggle: () => undefined, label: "Son activé" },
+    loading: { progress: 1, engineLoaded: true, buildProgress: 1, ready: true, failed: false, unsupported: false, retry: () => undefined },
+  }),
+}));
+
 vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => ({
   mountLeoLivreurGame: () => ({
     destroy: () => undefined,
@@ -509,5 +535,17 @@ describe("Conduire avec Léo dans la page Jeux", () => {
     await gameRegion();
     // Tuiles magiques est prêt dès son montage : plus aucun chargeur affiché, pas même celui de Léo, masqué.
     expect(document.querySelectorAll("[data-phase]")).toHaveLength(0);
+  });
+
+  it("la carte de La Rivière des Fractions l'ouvre dans le lecteur de la page ; le chargeur commun a disparu quand le jeu est prêt ; Fermer ramène aux autres jeux", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: "Jouer à La Rivière des Fractions" });
+    await user.click(links[links.length - 1]);
+    const region = await screen.findByRole("region", { name: "Jeu La Rivière des Fractions" }, { timeout: 8000 });
+    expect(within(region).getByTestId("scene-riviere")).toBeInTheDocument();
+    expect(document.querySelector("[data-phase]")).toBeNull();
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
   });
 });
