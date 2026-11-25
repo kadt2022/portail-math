@@ -9,6 +9,7 @@
 
 import fluxForgeThumb from "./assets/thumb-flux-forge.webp";
 import fractionRiverThumb from "./assets/thumb-fraction-river.webp";
+import riviereFractionsThumb from "./assets/thumb-riviere-fractions.webp";
 import leoCar from "./assets/leo-car-front-banner.webp";
 import leoCountryside from "./assets/leo-countryside-1280.webp";
 import multiplicationTrainThumb from "./assets/thumb-multiplication-train.webp";
@@ -111,6 +112,21 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     subjectKey: "meta.subject.maths",
     levelKey: "meta.level.primary",
     thumbnail: multiplicationTrainThumb,
+  },
+  {
+    id: "riviere-des-fractions",
+    nameKey: "riviereFractions.name",
+    taglineKey: "riviereFractions.tagline",
+    descriptionKey: "riviereFractions.description",
+    // Se joue dans le lecteur standard de la page Jeux (l'adresse reste aussi une page autonome). L'ancienne version
+    // (« fraction-river », ci-dessous) reste en place jusqu'à la validation de celle-ci.
+    href: "/jeux/riviere-des-fractions",
+    availability: "react",
+    categoryId: "discovery",
+    embed: true,
+    subjectKey: "meta.subject.maths",
+    levelKey: "meta.level.primary",
+    thumbnail: riviereFractionsThumb,
   },
   {
     id: "fraction-river",

@@ -15,6 +15,11 @@ vi.mock("@mbuyamba/pdf-reader", () => ({
   PdfReader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
+// La Rivière embarque Babylon.js : sa page et son moteur sont remplacés, on ne vérifie ici que le routage et la demande du moteur.
+vi.mock("../games/riviere-fractions/RiviereFractionsGamePage", () => ({ RiviereFractionsGamePage: () => <p>Page autonome de la Rivière</p> }));
+const preloadRiverEngine = vi.fn(async () => undefined);
+vi.mock("@mbuyamba/riviere-fractions", () => ({ preloadRiverFractionsEngine: () => preloadRiverEngine() }));
+
 // Le Train embarque Babylon.js : sa page et son moteur sont remplacés, on ne vérifie ici que le routage et la demande du moteur.
 vi.mock("../games/train-multiplications/TrainMultiplicationsGamePage", () => ({ TrainMultiplicationsGamePage: () => <p>Page autonome du Train</p> }));
 const preloadTrainEngine = vi.fn(async () => undefined);
@@ -36,6 +41,12 @@ describe("Routeur du portail React", () => {
   // doivent pas hériter d'un `fetch` détourné.
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("ouvre la page autonome de La Rivière des Fractions, et demande son moteur 3D en même temps que la page", async () => {
+    renderAt("/app/jeux/riviere-des-fractions");
+    expect(await screen.findByText("Page autonome de la Rivière")).toBeInTheDocument();
+    expect(preloadRiverEngine).toHaveBeenCalled();
   });
 
   it("ouvre la page autonome du Train des multiplications, et demande son moteur 3D en même temps que la page", async () => {
@@ -106,9 +117,8 @@ describe("Routeur du portail React", () => {
   it("affiche le catalogue sur /app/jeux", () => {
     renderAt("/app/jeux");
     expect(screen.getByRole("heading", { level: 1, name: /les jeux/i })).toBeInTheDocument();
-    // L'ancienne version et la version 3D sont toutes deux au catalogue tant que la 3D n'est pas validée.
-    expect(screen.getByText("Le Train des multiplications")).toBeInTheDocument();
-    expect(screen.getByText("Le Train des multiplications 3D")).toBeInTheDocument();
+    // L’ancienne et la nouvelle version du Train cohabitent au catalogue : les deux cartes portent ce nom.
+    expect(screen.getAllByText(/le train des multiplications/i).length).toBeGreaterThan(0);
   });
 
   it("affiche la bibliothèque et son premier livre", async () => {

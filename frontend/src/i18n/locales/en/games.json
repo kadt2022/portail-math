@@ -58,6 +58,12 @@
     "cta": "Play",
     "tagline": "Cross the river"
   },
+  "riviereFractions": {
+    "name": "The Fraction River",
+    "description": "Steer your boat down a 3D river: at every fork, the right channel is the one with the right answer.",
+    "cta": "Cast off",
+    "tagline": "New: steer your boat in 3D"
+  },
   "fluxForge": {
     "name": "Flux Forge",
     "description": "Become a little engineer and build the village's cabin.",

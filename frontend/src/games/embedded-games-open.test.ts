@@ -13,6 +13,17 @@ vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => {
   return { mountLeoLivreurGame: vi.fn() };
 });
 
+vi.mock("./riviere-fractions/RiviereFractionsPlayer", () => {
+  imported.push("lecteur de la Rivière");
+  return { RiviereFractionsPlayer: () => null };
+});
+vi.mock("@mbuyamba/riviere-fractions", () => ({
+  preloadRiverFractionsEngine: () => {
+    imported.push("moteur de la Rivière");
+    return Promise.resolve();
+  },
+}));
+
 vi.mock("./train-multiplications/TrainMultiplicationsPlayer", () => {
   imported.push("lecteur du Train");
   return { TrainMultiplicationsPlayer: () => null };
@@ -24,7 +35,7 @@ vi.mock("@mbuyamba/train-multiplications", () => ({
   },
 }));
 
-import { LeoDrivingPlayer, TrainMultiplicationsPlayer } from "./embedded-games";
+import { LeoDrivingPlayer, RiviereFractionsPlayer, TrainMultiplicationsPlayer } from "./embedded-games";
 
 describe("ouverture d'un jeu depuis le catalogue", () => {
   it("sans survol préalable, Léo demande son lecteur et son moteur en même temps (pas l'un après l'autre)", async () => {
@@ -37,6 +48,17 @@ describe("ouverture d'un jeu depuis le catalogue", () => {
     }
     await vi.dynamicImportSettled();
     expect([...imported].sort()).toEqual(["lecteur de Léo", "moteur de Léo"]);
+  });
+
+  it("sans survol préalable, la Rivière demande son lecteur et son moteur 3D en même temps", async () => {
+    const lazy = RiviereFractionsPlayer as unknown as { _init: (payload: unknown) => unknown; _payload: unknown };
+    try {
+      lazy._init(lazy._payload);
+    } catch {
+      // Le chargement est en cours : React le signale en lançant sa promesse.
+    }
+    await vi.dynamicImportSettled();
+    expect(imported.filter((name) => name.includes("Rivière")).sort()).toEqual(["lecteur de la Rivière", "moteur de la Rivière"]);
   });
 
   it("sans survol préalable, le Train demande son lecteur et son moteur 3D en même temps", async () => {

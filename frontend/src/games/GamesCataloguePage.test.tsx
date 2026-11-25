@@ -20,6 +20,32 @@ vi.mock("./turbo-pulse/TurboPulseGame", () => ({
   }),
 }));
 
+// Le jeu 3D de la Rivière est remplacé par un faux, déjà prêt : on vérifie ici l'ouverture dans le lecteur de la page.
+vi.mock("@mbuyamba/riviere-fractions", () => ({
+  toRiverLocale: () => "fr",
+  preloadRiverFractionsEngine: () => Promise.resolve(),
+  useRiverFractions: () => ({
+    stage: <div data-testid="scene-riviere" />,
+    player: {
+      label: "Jeu La Rivière des Fractions",
+      title: "La Rivière des Fractions",
+      headerCenter: "Niveau 1",
+      stats: [{ label: "Défi", value: "1/7" }],
+      paused: false,
+      onPlay: () => undefined,
+      onPause: () => undefined,
+      ended: false,
+      onRestart: () => undefined,
+      restartLabel: "Recommencer",
+      onHint: () => undefined,
+      hintDisabled: false,
+      howTo: [],
+    },
+    sound: { on: true, toggle: () => undefined, label: "Son activé" },
+    loading: { progress: 1, engineLoaded: true, buildProgress: 1, ready: true, failed: false, unsupported: false, retry: () => undefined },
+  }),
+}));
+
 // Le jeu 3D du Train est remplacé par un faux, déjà prêt : on vérifie ici l'ouverture dans le lecteur de la page.
 vi.mock("@mbuyamba/train-multiplications", () => ({
   toTrainLocale: () => "fr",
@@ -128,8 +154,10 @@ describe("GamesCataloguePage", () => {
     renderPage();
     await user.type(screen.getByRole("searchbox", { name: "Chercher un jeu" }), "riviere");
     const cards = screen.getAllByRole("link", { name: /^Jouer à/ });
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des fractions");
+    // La nouvelle Rivière des Fractions 3D et l'ancienne version, gardée jusqu'à la validation de la nouvelle.
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des Fractions");
+    expect(cards[1]).toHaveAccessibleName("Jouer à La Rivière des fractions");
   });
 
   it("explique l'absence de résultat", async () => {
@@ -459,8 +487,8 @@ describe("Haut de la page Jeux : recherche dans l'en-tête et mode lecteur", () 
     );
     await user.type(screen.getByRole("searchbox", { name: "Rechercher un jeu" }), "riviere");
     const cards = screen.getAllByRole("link", { name: /^Jouer à/ });
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAccessibleName("Jouer à La Rivière des fractions");
+    expect(cards).toHaveLength(2);
+    expect(cards[1]).toHaveAccessibleName("Jouer à La Rivière des fractions");
     // La recherche de la page (téléphone) montre la même valeur.
     expect(screen.getByRole("searchbox", { name: "Chercher un jeu" })).toHaveValue("riviere");
   });
@@ -531,6 +559,18 @@ describe("Conduire avec Léo dans la page Jeux", () => {
     await gameRegion();
     // Tuiles magiques est prêt dès son montage : plus aucun chargeur affiché, pas même celui de Léo, masqué.
     expect(document.querySelectorAll("[data-phase]")).toHaveLength(0);
+  });
+
+  it("la carte de La Rivière des Fractions l'ouvre dans le lecteur de la page ; le chargeur commun a disparu quand le jeu est prêt ; Fermer ramène aux autres jeux", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: "Jouer à La Rivière des Fractions" });
+    await user.click(links[links.length - 1]);
+    const region = await screen.findByRole("region", { name: "Jeu La Rivière des Fractions" }, { timeout: 8000 });
+    expect(within(region).getByTestId("scene-riviere")).toBeInTheDocument();
+    expect(document.querySelector("[data-phase]")).toBeNull();
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
   });
 
   it("la carte du Train des multiplications l'ouvre dans le lecteur de la page ; le chargeur commun a disparu quand le jeu est prêt ; Fermer ramène aux autres jeux", async () => {
