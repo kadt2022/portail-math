@@ -1,20 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { toRiverLocale, useRiverFractions } from "@mbuyamba/riviere-fractions";
 
-import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
+import { useGameLoading } from "../loading/GameLoaderHost";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import styles from "./RiviereFractionsPlayer.module.css";
-
-/** Habillage de l'écran de chargement commun aux couleurs de la rivière : ciel du matin, barre couleur lanterne. */
-const RIVER_LOADING_THEME = {
-  "--loading-background": "radial-gradient(circle at 50% 35%, #3f86b8 0%, #1d4f74 70%, #12344f 100%)",
-  "--loading-title": "#fff3d6",
-  "--loading-track-border": "rgb(255 220 160 / 45%)",
-  "--loading-fill": "linear-gradient(90deg, #c0392b, #ff8a3d 60%, #ffd36b)",
-  "--loading-glow": "rgb(255 170 90 / 60%)",
-} as CSSProperties;
 
 export interface RiviereFractionsPlayerProps {
   /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
@@ -32,7 +23,7 @@ export interface RiviereFractionsPlayerProps {
 
 // La Rivière des Fractions dans le lecteur standard des jeux. Le jeu est un module à part (@mbuyamba/riviere-fractions) :
 // il fournit sa scène et ce que le lecteur affiche (titre, compteurs, commandes, instructions). Le portail n'apporte que
-// le lecteur, l'écran de chargement commun et la langue choisie.
+// le lecteur, le chargeur commun (voir loading/GameLoaderHost) et la langue choisie.
 export function RiviereFractionsPlayer({ fullscreen = false, onFullscreenChange, onClose, cover = false, active = true, pageHeading = false }: RiviereFractionsPlayerProps) {
   const { i18n } = useTranslation("games");
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -40,14 +31,28 @@ export function RiviereFractionsPlayer({ fullscreen = false, onFullscreenChange,
   const showPerformance = useMemo(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mesures"), []);
   const game = useRiverFractions({ locale: toRiverLocale(i18n.language), active, showPerformance });
   const { player, loading, sound } = game;
-  // L'écran de chargement s'efface en fondu une fois la rivière prête, puis quitte la scène.
-  const [fadedOut, setFadedOut] = useState(false);
+  // Chargeur commun (posé par l'hôte du lecteur) : le jeu lui signale ses étapes réelles. Moteur 3D téléchargé : jalon de
+  // l'initialisation ; construction de la rivière : progression des ressources ; rivière prête : le chargeur disparaît.
+  // La progression estimée pendant le téléchargement (loading.progress) n'est jamais utilisée.
+  const session = useGameLoading();
   useEffect(() => {
-    if (!loading.ready) return;
-    const timer = window.setTimeout(() => setFadedOut(true), LOADING_FADE_MS);
-    return () => window.clearTimeout(timer);
-  }, [loading.ready]);
-  const loadingGone = loading.ready && fadedOut;
+    session.milestone("mounted");
+  }, [session]);
+  useEffect(() => {
+    if (loading.engineLoaded) session.milestone("engine");
+  }, [session, loading.engineLoaded]);
+  useEffect(() => {
+    session.reportResources(loading.buildProgress);
+  }, [session, loading.buildProgress]);
+  useEffect(() => {
+    if (loading.ready) session.ready();
+  }, [session, loading.ready]);
+  // Échec réel (moteur introuvable, réseau coupé) : Réessayer, dans le chargeur. Appareil sans WebGL : le chargeur
+  // s'efface pour laisser lire le message du jeu, qui explique que l'appareil n'est pas compatible.
+  useEffect(() => {
+    if (loading.unsupported) session.ready();
+    else if (loading.failed) session.fail(loading.retry);
+  }, [session, loading.failed, loading.unsupported, loading.retry]);
 
   return (
     <GamePlayer
@@ -83,15 +88,6 @@ export function RiviereFractionsPlayer({ fullscreen = false, onFullscreenChange,
     >
       <div className={styles.stage}>
         {game.stage}
-        {loadingGone ? null : (
-          <GameLoadingScreen
-            progress={loading.ready ? 1 : loading.progress}
-            finished={loading.ready}
-            failed={loading.failed && !loading.unsupported}
-            onRetry={loading.retry}
-            theme={RIVER_LOADING_THEME}
-          />
-        )}
       </div>
     </GamePlayer>
   );

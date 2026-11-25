@@ -39,6 +39,8 @@ function Host(props: Partial<RiverFractionsSettings> & { loadEngine: () => Promi
       <h1>{game.player.title}</h1>
       <p data-testid="stats">{game.player.stats.map((stat) => `${stat.label}:${stat.value}`).join(" ")}</p>
       <p data-testid="loading">{game.loading.ready ? "prêt" : game.loading.failed ? (game.loading.unsupported ? "sans-webgl" : "échec") : "chargement"}</p>
+      <p data-testid="engine">{String(game.loading.engineLoaded)}</p>
+      <p data-testid="build">{game.loading.buildProgress.toFixed(2)}</p>
       <button onClick={game.player.paused ? game.player.onPlay : game.player.onPause}>{game.player.paused ? "Jouer" : "Pause"}</button>
       <button onClick={game.player.onRestart}>{game.player.restartLabel}</button>
       <button onClick={game.player.onHint} disabled={game.player.hintDisabled}>Indice</button>
@@ -131,6 +133,35 @@ describe("Le jeu dans un hôte React", () => {
     expect(fake.handle.setPaused).toHaveBeenLastCalledWith(true);
     unmount();
     expect(fake.handle.dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("annonce le moteur téléchargé, puis l'avancement réel de la construction de la scène, jamais en recul", async () => {
+    const fake = fakeEngineModule();
+    let build: (fraction: number) => void = () => {};
+    let finish: () => void = () => {};
+    const created = new Promise<typeof fake.handle>((resolve) => {
+      finish = () => resolve(fake.handle);
+    });
+    const module = {
+      createRiverEngine: vi.fn(async (options: { onBuildProgress?: (f: number) => void }) => {
+        build = options.onBuildProgress ?? build;
+        return created;
+      }),
+      RiverEngineUnsupportedError: class extends Error {},
+    } as unknown as RiverEngineModule;
+    render(<Host loadEngine={() => Promise.resolve(module)} />);
+    expect(screen.getByTestId("engine")).toHaveTextContent("false");
+    expect(screen.getByTestId("build")).toHaveTextContent("0.00");
+    await waitFor(() => expect(screen.getByTestId("engine")).toHaveTextContent("true"));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.00");
+    act(() => build(0.4));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.40");
+    act(() => build(0.1));
+    expect(screen.getByTestId("build")).toHaveTextContent("0.40");
+    expect(screen.getByTestId("loading")).toHaveTextContent("chargement");
+    await act(async () => finish());
+    await waitFor(() => expect(screen.getByTestId("loading")).toHaveTextContent("prêt"));
+    expect(screen.getByTestId("build")).toHaveTextContent("1.00");
   });
 
   it("propose de réessayer quand le moteur n'a pas pu être téléchargé", async () => {

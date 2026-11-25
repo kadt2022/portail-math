@@ -37,8 +37,12 @@ export interface StandardPlayerBinding {
 }
 
 export interface RiverLoadingState {
-  /** Avancement du chargement, de 0 à 1 (moteur 3D, puis construction de la scène). */
+  /** Avancement du chargement, de 0 à 1 (moteur 3D, puis construction de la scène). Pendant le téléchargement, c'est une estimation. */
   progress: number;
+  /** Le moteur 3D est téléchargé (la scène se construit ensuite). Étape réelle, sans estimation. */
+  engineLoaded: boolean;
+  /** Avancement réel de la construction de la scène, de 0 à 1 (0 tant que le moteur n'est pas là). */
+  buildProgress: number;
   ready: boolean;
   failed: boolean;
   /** WebGL indisponible : réessayer ne servirait à rien. */

@@ -58,7 +58,7 @@ const RiviereFractionsGamePage = lazyRoute(
     void import("@mbuyamba/riviere-fractions").then((m) => m.preloadRiverFractionsEngine()).catch(() => undefined);
     return import("../games/riviere-fractions/RiviereFractionsGamePage").then((m) => m.RiviereFractionsGamePage);
   },
-  { heavy: true },
+  { heavy: true, game: "riviere-des-fractions" },
 );
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });

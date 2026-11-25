@@ -54,6 +54,9 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
   const engineRef = useRef<RiverEngineHandle | null>(null);
   const audioRef = useRef<RiverAudio | null>(null);
   const [progress, setProgress] = useState(0);
+  // Étapes réelles du chargement, sans estimation : le moteur 3D est téléchargé, puis la scène se construit étape par étape.
+  const [engineLoaded, setEngineLoaded] = useState(false);
+  const [buildProgress, setBuildProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
@@ -98,6 +101,8 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
     setReady(false);
     setFailed(false);
     setProgress(0);
+    setEngineLoaded(false);
+    setBuildProgress(0);
     const startedAt = performance.now();
     const timer = setInterval(() => {
       if (downloading) setProgress((value) => Math.max(value, DOWNLOAD_SHARE * (1 - Math.exp(-(performance.now() - startedAt) / 2500))));
@@ -119,11 +124,15 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
       .then(async (module) => {
         downloading = false;
         if (cancelled) return;
+        setEngineLoaded(true);
         const created = await module.createRiverEngine({
           host,
           maxPixelRatio,
           onLaneCrossed: (fork, lane) => session.laneCrossed(fork, lane),
-          onBuildProgress: (fraction) => setProgress((value) => Math.max(value, DOWNLOAD_SHARE + (1 - DOWNLOAD_SHARE) * fraction)),
+          onBuildProgress: (fraction) => {
+            setProgress((value) => Math.max(value, DOWNLOAD_SHARE + (1 - DOWNLOAD_SHARE) * fraction));
+            setBuildProgress((value) => Math.max(value, Math.min(1, fraction)));
+          },
           forest: FOREST_TRIAL,
         });
         if (cancelled) {
@@ -135,6 +144,7 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
         session.attach(port(created));
         if (session.view.phase === "sailing") created.castOff();
         setProgress(1);
+        setBuildProgress(1);
         setReady(true);
       })
       .catch((error: unknown) => {
@@ -337,7 +347,7 @@ export function useRiverFractions(settings: RiverFractionsSettings): RiverFracti
   return {
     stage,
     player,
-    loading: { progress, ready, failed, unsupported, retry: () => setLoadAttempt((n) => n + 1) },
+    loading: { progress, engineLoaded, buildProgress, ready, failed, unsupported, retry: () => setLoadAttempt((n) => n + 1) },
     sound: { on: soundOn, toggle: toggleSound, label: soundOn ? t("sound.on") : t("sound.off") },
   };
 }
