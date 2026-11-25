@@ -479,4 +479,33 @@ describe("Conduire avec Léo dans la page Jeux", () => {
     await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
     expect(region.closest("[hidden]")).not.toBeNull();
   });
+
+  it("le clic sur un jeu affiche aussitôt le chargeur commun, avant même le code du jeu ; Fermer reste possible", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: "Jouer à Conduire avec Léo" });
+    await user.click(links[links.length - 1]);
+    const loader = document.querySelector("[data-phase]") as HTMLElement;
+    expect(loader).not.toBeNull();
+    expect(within(loader).getByText(/Initialisation du jeu…|Chargement des ressources…/)).toBeInTheDocument();
+    expect(within(loader).getByRole("progressbar", { name: "Chargement du jeu" })).toBeInTheDocument();
+    // Plus l'ancienne attente du catalogue.
+    expect(screen.queryByText("Chargement du jeu…")).not.toBeInTheDocument();
+    await user.click(within(loader).getByRole("button", { name: "Fermer" }));
+    // Jeu fermé : le chargeur (et son chronomètre) est retiré.
+    expect(loader.isConnected).toBe(false);
+    expect(document.querySelectorAll("[data-phase]")).toHaveLength(0);
+  });
+
+  it("changer de jeu pendant un chargement : le chargeur du jeu précédent (et son chronomètre) est retiré", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const leo = screen.getAllByRole("link", { name: "Jouer à Conduire avec Léo" });
+    await user.click(leo[leo.length - 1]);
+    expect(document.querySelectorAll("[data-phase]")).toHaveLength(1);
+    await user.click(tilesLink());
+    await gameRegion();
+    // Tuiles magiques est prêt dès son montage : plus aucun chargeur affiché, pas même celui de Léo, masqué.
+    expect(document.querySelectorAll("[data-phase]")).toHaveLength(0);
+  });
 });

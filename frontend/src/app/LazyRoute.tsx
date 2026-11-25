@@ -1,5 +1,6 @@
 import { Component, Suspense, lazy, useState, type ComponentType, type ReactNode } from "react";
 
+import { GameLoaderHost, ReachMilestone } from "../games/loading/GameLoaderHost";
 import styles from "./LazyRoute.module.css";
 
 /**
@@ -58,8 +59,10 @@ const ROUTES: RouteEntry[] = [];
  * Page chargée à la demande, avec indicateur de chargement et reprise sur erreur. Une page déjà téléchargée (par
  * `preloadRoutes` ou une visite précédente) s'affiche immédiatement, sans repasser par l'indicateur.
  * `heavy` : page qui embarque un moteur de jeu (Phaser) ; elle n'est jamais préchargée en masse.
+ * `game` : page d'un jeu du catalogue ; à la place de l'indicateur des pages, le chargeur commun des jeux s'affiche dès
+ * l'arrivée sur la page, à l'emplacement du lecteur, et le reste jusqu'au jeu prêt (même chargeur que dans le catalogue).
  */
-export function lazyRoute<P extends object>(load: () => Promise<ComponentType<P>>, options: { heavy?: boolean } = {}): ComponentType<P> {
+export function lazyRoute<P extends object>(load: () => Promise<ComponentType<P>>, options: { heavy?: boolean; game?: string } = {}): ComponentType<P> {
   let resolved: ComponentType<P> | null = null;
   const fetchPage = () => load().then((component) => {
     resolved = component;
@@ -71,14 +74,21 @@ export function lazyRoute<P extends object>(load: () => Promise<ComponentType<P>
     // Page déjà téléchargée : rendue directement, sans suspendre (aucun indicateur pour une page déjà présente).
     // Le choix est figé au montage : un nouveau rendu du parent ne remplace jamais la page par une autre instance.
     const [Ready] = useState(() => resolved);
+    const page = Ready ? <Ready {...props} /> : <Page {...props} />;
     return (
       <RouteErrorBoundary>
-        {Ready ? (
-          <Ready {...props} />
+        {options.game ? (
+          // Le jalon « code du lecteur reçu » est rendu avec la page, dans la même attente : il n'est atteint qu'à son arrivée.
+          <GameLoaderHost game={options.game} layout="page">
+            <Suspense fallback={null}>
+              <ReachMilestone id="player" />
+              {page}
+            </Suspense>
+          </GameLoaderHost>
+        ) : Ready ? (
+          page
         ) : (
-          <Suspense fallback={<RouteLoading />}>
-            <Page {...props} />
-          </Suspense>
+          <Suspense fallback={<RouteLoading />}>{page}</Suspense>
         )}
       </RouteErrorBoundary>
     );

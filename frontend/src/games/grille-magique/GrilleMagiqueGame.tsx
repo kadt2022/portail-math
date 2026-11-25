@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { useTranslation } from "react-i18next";
 
 import { useGameAudio } from "../audio/useGameAudio";
+import { useGameLoading } from "../loading/GameLoaderHost";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import {
   applyMove,
@@ -85,6 +86,13 @@ export function GrilleMagiqueGame({
   tutorial = "off",
 }: GrilleMagiqueGameProps) {
   const { t } = useTranslation("games");
+  // Chargeur commun : Tuiles magiques n'attend aucune ressource (jeu en HTML, musique qui arrive pendant la partie) ; il
+  // est prêt dès son montage.
+  const loading = useGameLoading();
+  useEffect(() => {
+    loading.milestone("mounted");
+    loading.ready();
+  }, [loading]);
 
   // Première partie : avec le tutoriel, la grille est une grille pédagogique (Facile, courte, résolution garantie).
   const [initial] = useState(() => {

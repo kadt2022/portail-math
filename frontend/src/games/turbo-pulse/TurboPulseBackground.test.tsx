@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GameAudio } from "../audio/GameAudio";
 import type { DownloadProgress } from "../loading/fetchWithProgress";
+import { GameLoaderHost } from "../loading/GameLoaderHost";
+import { startGameLoading } from "../loading/gameLoadingProfiles";
 import { backgroundFor, backgroundSizeFor, LEVEL_BACKGROUNDS, nextBackgroundFor, SMALL_BACKGROUND_MAX_WIDTH } from "./turbo-pulse-backgrounds";
 import { TurboPulsePlayer } from "./TurboPulsePlayer";
 
@@ -44,8 +46,20 @@ const flush = () =>
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
-// Lue directement : à 100 %, l'écran s'efface et se retire des lecteurs d'écran, mais sa valeur reste lisible.
 const percent = () => Number(document.querySelector("[role=progressbar][aria-label=\"Chargement du jeu\"]")?.getAttribute("aria-valuenow"));
+const loader = () => document.querySelector("[data-phase]");
+
+/** Turbo Pulse dans le chargeur commun, comme dans le catalogue (le code du lecteur est déjà là). */
+function renderInHost() {
+  const session = startGameLoading("turbo-pulse");
+  render(
+    <GameLoaderHost game="turbo-pulse" session={session}>
+      <TurboPulsePlayer />
+    </GameLoaderHost>,
+  );
+  act(() => session.milestone("player"));
+  return session;
+}
 
 describe("décors de Turbo Pulse", () => {
   it("deux versions allégées de sept décors distincts ; la version suit la largeur réelle de la scène", () => {
@@ -79,14 +93,12 @@ describe("chargement de Turbo Pulse", () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it("écran de chargement avec un vrai pourcentage ; la partie ne commence qu'avec le décor du niveau 1 et la musique", async () => {
-    render(<TurboPulsePlayer />);
+  it("chargeur commun : moteur en jalon (10 %), puis décor du niveau 1 et musique de 10 à 100 % ; jeu affiché dès qu'il est prêt", async () => {
+    renderInHost();
     await flush();
-    expect(screen.getByText("Chargement des ressources")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Chargement du jeu" })).toBeInTheDocument();
-    // Le moteur est arrivé (simulé) : il compte pour sa part, mais rien ne démarre sans le décor et la musique.
-    expect(percent()).toBeGreaterThan(0);
-    expect(percent()).toBeLessThan(100);
+    // Le moteur est arrivé (simulé) : fin de l'initialisation ; rien ne démarre sans le décor et la musique.
+    expect(screen.getByText("Chargement des ressources…")).toBeInTheDocument();
+    expect(percent()).toBe(10);
     expect(mountMock).not.toHaveBeenCalled();
     // Un seul décor téléchargé : celui du niveau 1 (jamais les sept).
     expect(downloads.map(({ url }) => url)).toEqual([LEVEL_BACKGROUNDS.small[0]]);
@@ -102,17 +114,13 @@ describe("chargement de Turbo Pulse", () => {
     act(() => music.progress?.(308_000, 308_000));
     music.resolve();
     await flush();
-    // Tout est prêt : la partie est montée, l'écran affiche 100 % et s'efface.
+    // Tout est prêt : la partie est montée et le chargeur disparaît aussitôt, sans fondu.
     expect(mountMock).toHaveBeenCalledOnce();
-    expect(percent()).toBe(100);
+    expect(loader()).toBeNull();
     const decor = document.querySelector<HTMLElement>('[style*="--level-background"]');
     expect(decor?.style.getPropertyValue("--level-background")).toContain(LEVEL_BACKGROUNDS.small[0]);
     // Puis le décor du niveau suivant se prépare pendant la partie, en priorité basse.
     expect(loads).toContainEqual({ url: LEVEL_BACKGROUNDS.small[1], priority: "low" });
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 450));
-    });
-    expect(screen.queryByText("Chargement des ressources")).not.toBeInTheDocument();
   });
 
   it("connexion lente (plus de 15 s) : rien de secondaire ne part tant que l'écran de chargement attend une ressource", async () => {
@@ -124,7 +132,7 @@ describe("chargement de Turbo Pulse", () => {
           await vi.dynamicImportSettled();
           await vi.advanceTimersByTimeAsync(0);
         });
-      render(<TurboPulsePlayer />);
+      renderInHost();
       await tick(0);
       // Décor du niveau 1 arrivé ; la musique, elle, met plus de 15 secondes.
       downloads[0].resolve();
@@ -144,13 +152,13 @@ describe("chargement de Turbo Pulse", () => {
   it("réseau coupé pour le décor ou la musique : le chargement ne reste jamais bloqué, la partie démarre", async () => {
     const unhandled = vi.fn();
     window.addEventListener("unhandledrejection", unhandled);
-    render(<TurboPulsePlayer />);
+    renderInHost();
     await flush();
     downloads[0].reject(new Error("réseau coupé"));
     music.reject(new Error("réseau coupé"));
     await flush();
     expect(mountMock).toHaveBeenCalledOnce();
-    expect(percent()).toBe(100);
+    expect(loader()).toBeNull();
     expect(screen.getByRole("toolbar", { name: "Commandes du jeu" })).toBeInTheDocument();
     expect(unhandled).not.toHaveBeenCalled();
     window.removeEventListener("unhandledrejection", unhandled);

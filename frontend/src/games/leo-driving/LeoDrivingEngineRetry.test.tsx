@@ -34,48 +34,45 @@ vi.mock("../../prototypes/leo-livreur/LeoLivreurGame", () => {
   };
 });
 
+import { GameLoaderHost } from "../loading/GameLoaderHost";
+import { startGameLoading } from "../loading/gameLoadingProfiles";
 import { LeoDrivingPlayer } from "./LeoDrivingPlayer";
-
-/** Téléchargements des images pilotés par le test. */
-let downloads: Array<{ url: string; resolve: () => void }> = [];
 
 const settle = () =>
   act(async () => {
-    for (let step = 0; step < 4; step += 1) {
+    for (let step = 0; step < 8; step += 1) {
       await vi.dynamicImportSettled();
       await new Promise((resolve) => setTimeout(resolve, 0));
     }
   });
 
 // Fichier à part : le moteur simulé n'est importé qu'une fois par fichier, et ce premier import doit échouer.
-describe("écran de chargement de Conduire avec Léo : moteur indisponible", () => {
+describe("Conduire avec Léo dans le chargeur commun : moteur indisponible", () => {
   beforeEach(() => {
-    downloads = [];
     engine.imports = 0;
     engine.listener = null;
     engine.mount.mockClear();
     engine.retryAssets.mockClear();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(
-        (url: string) =>
-          new Promise<Response>((resolve) => {
-            downloads.push({ url, resolve: () => resolve(new Response(new Uint8Array(100), { headers: { "content-length": "100" } })) });
-          }),
-      ),
-    );
+    // Images reçues aussitôt : seul le moteur manque.
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(new Uint8Array(100), { headers: { "content-length": "100" } })));
+    URL.createObjectURL = vi.fn(() => "blob:image");
+    URL.revokeObjectURL = vi.fn();
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("moteur impossible à télécharger : Réessayer le redemande, puis la partie se prépare normalement", async () => {
-    render(<LeoDrivingPlayer />);
-    for (const download of downloads) download.resolve();
+  it("moteur impossible à télécharger : le chargeur propose Réessayer, qui le redemande, puis la partie se prépare", async () => {
+    const session = startGameLoading("conduire-avec-leo");
+    render(
+      <GameLoaderHost game="conduire-avec-leo" session={session}>
+        <LeoDrivingPlayer />
+      </GameLoaderHost>,
+    );
     await settle();
     expect(engine.mount).not.toHaveBeenCalled();
+    // Le moteur manque : on reste dans l'initialisation, avec le message d'erreur et Réessayer.
+    expect(document.querySelector("[data-phase]")).toHaveAttribute("data-phase", "init");
     expect(screen.getByRole("alert")).toHaveTextContent("Le téléchargement a été interrompu.");
     await userEvent.setup().click(screen.getByRole("button", { name: "Réessayer" }));
-    await settle();
-    for (const download of downloads) download.resolve();
     await settle();
     expect(engine.imports).toBe(2);
     expect(engine.mount).toHaveBeenCalledOnce();
