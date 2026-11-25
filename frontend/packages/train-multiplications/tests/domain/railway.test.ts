@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { consistLength, consistMass, createConsist, poseVehicle, vehicleFronts, VEHICLES } from "../../src/domain/consist";
-import { createNetwork, isUnderground } from "../../src/domain/network";
+import { createNetwork, isUnderground, stationsOn } from "../../src/domain/network";
 import { brakingDistance, initialState, reverse, stepTrain, type DriverInput } from "../../src/domain/physics";
 import { buildTrack, trackFrame } from "../../src/domain/track";
 
@@ -146,5 +146,24 @@ describe("physique", () => {
       return state.head - start;
     };
     expect(run(true)).toBeLessThan(run(false));
+  });
+});
+
+describe("quais par itinéraire", () => {
+  it("le départ et la halte du col, avant l'aiguillage, sont sur les deux voies ; le village a un quai par voie", () => {
+    const ids = (route: "main" | "branch") => stationsOn(network, route).map((station) => station.id);
+    // Voie 1 : départ, col, village. Voie 2 (déviée) : les mêmes avant l'aiguillage, puis le quai de la voie 2.
+    expect(ids("main")).toEqual(["depart", "col", "village-1"]);
+    expect(ids("branch")).toEqual(["depart", "col", "village-2"]);
+  });
+
+  it("les quais communs sont tous avant l'aiguillage : un joueur qui choisit la voie 2 les dessert encore", () => {
+    for (const station of stationsOn(network, "branch").filter((st) => st.route === "both")) {
+      expect(station.stop).toBeLessThan(network.switchAt);
+    }
+    // Les trois arrêts comptés par le jeu (départ, col, village) existent donc sur chaque itinéraire.
+    for (const route of ["main", "branch"] as const) {
+      expect(new Set(stationsOn(network, route).map((st) => st.id.replace(/-\d$/, "")))).toEqual(new Set(["depart", "col", "village"]));
+    }
   });
 });

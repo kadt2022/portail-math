@@ -15,6 +15,11 @@ vi.mock("@mbuyamba/pdf-reader", () => ({
   PdfReader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
+// Le Train embarque Babylon.js : sa page et son moteur sont remplacés, on ne vérifie ici que le routage et la demande du moteur.
+vi.mock("../games/train-multiplications/TrainMultiplicationsGamePage", () => ({ TrainMultiplicationsGamePage: () => <p>Page autonome du Train</p> }));
+const preloadTrainEngine = vi.fn(async () => undefined);
+vi.mock("@mbuyamba/train-multiplications", () => ({ preloadTrainMultiplicationsEngine: () => preloadTrainEngine() }));
+
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
   return render(<AppRouter />);
@@ -31,6 +36,12 @@ describe("Routeur du portail React", () => {
   // doivent pas hériter d'un `fetch` détourné.
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("ouvre la page autonome du Train des multiplications, et demande son moteur 3D en même temps que la page", async () => {
+    renderAt("/app/jeux/train-des-multiplications");
+    expect(await screen.findByText("Page autonome du Train")).toBeInTheDocument();
+    expect(preloadTrainEngine).toHaveBeenCalled();
   });
 
   it("affiche le tableau de bord sur /app", () => {

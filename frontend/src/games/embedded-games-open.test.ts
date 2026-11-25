@@ -13,7 +13,18 @@ vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => {
   return { mountLeoLivreurGame: vi.fn() };
 });
 
-import { LeoDrivingPlayer } from "./embedded-games";
+vi.mock("./train-multiplications/TrainMultiplicationsPlayer", () => {
+  imported.push("lecteur du Train");
+  return { TrainMultiplicationsPlayer: () => null };
+});
+vi.mock("@mbuyamba/train-multiplications", () => ({
+  preloadTrainMultiplicationsEngine: () => {
+    imported.push("moteur du Train");
+    return Promise.resolve();
+  },
+}));
+
+import { LeoDrivingPlayer, TrainMultiplicationsPlayer } from "./embedded-games";
 
 describe("ouverture d'un jeu depuis le catalogue", () => {
   it("sans survol préalable, Léo demande son lecteur et son moteur en même temps (pas l'un après l'autre)", async () => {
@@ -26,5 +37,16 @@ describe("ouverture d'un jeu depuis le catalogue", () => {
     }
     await vi.dynamicImportSettled();
     expect([...imported].sort()).toEqual(["lecteur de Léo", "moteur de Léo"]);
+  });
+
+  it("sans survol préalable, le Train demande son lecteur et son moteur 3D en même temps", async () => {
+    const lazy = TrainMultiplicationsPlayer as unknown as { _init: (payload: unknown) => unknown; _payload: unknown };
+    try {
+      lazy._init(lazy._payload);
+    } catch {
+      // Le chargement est en cours : React le signale en lançant sa promesse.
+    }
+    await vi.dynamicImportSettled();
+    expect(imported.filter((name) => name.includes("Train")).sort()).toEqual(["lecteur du Train", "moteur du Train"]);
   });
 });

@@ -156,4 +156,27 @@ describe("tableau de bord du train", () => {
     await waitFor(() => expect(screen.getByTestId("ready")).toHaveTextContent("true"));
     expect(screen.getByTestId("build")).toHaveTextContent("1.00");
   });
+
+  it("Espace : arrêt d'urgence au clavier, mais pas sur un bouton déjà géré ni sur un bouton ordinaire", async () => {
+    const { handle, module } = fakeEngine();
+    render(<Game load={() => Promise.resolve(module)} />);
+    const accelerate = await screen.findByRole("button", { name: "Accélérer" });
+    // Hors bouton : arrêt d'urgence.
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "Space", key: " " }));
+    });
+    expect(handle.emergencyStop).toHaveBeenCalledTimes(1);
+    // Espace sur Accélérer : le bouton le traite (régulateur ouvert), sans arrêt d'urgence en plus.
+    fireEvent.keyDown(accelerate, { code: "Space", key: " " });
+    expect(handle.setInput).toHaveBeenLastCalledWith({ throttle: true });
+    fireEvent.keyUp(accelerate, { code: "Space", key: " " });
+    expect(handle.setInput).toHaveBeenLastCalledWith({ throttle: false });
+    // Espace sur un bouton ordinaire (caméra, aiguillage) : il le déclenche lui-même, sans être détourné ni arrêter le train.
+    const camera = screen.getByRole("button", { name: "Cabine" });
+    const notPrevented = fireEvent.keyDown(camera, { code: "Space", key: " " });
+    expect(notPrevented).toBe(true);
+    const switchButton = screen.getByRole("button", { name: /Aiguillage du village/ });
+    expect(fireEvent.keyDown(switchButton, { code: "Space", key: " " })).toBe(true);
+    expect(handle.emergencyStop).toHaveBeenCalledTimes(1);
+  });
 });

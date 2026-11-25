@@ -171,9 +171,13 @@ export function useTrainMultiplications(settings: TrainMultiplicationsSettings):
     const isTyping = (target: EventTarget | null) => target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
     const down = (event: KeyboardEvent) => {
       if (isTyping(event.target) || paused) return;
+      // Touche déjà traitée par un bouton (Accélérer ou Freiner tenus au clavier) : pas de second effet global.
+      if (event.defaultPrevented) return;
       const engine = engineRef.current;
       if (!engine) return;
       const code = event.code;
+      // Espace sur un bouton le déclenche lui-même (caméra, aiguillage...) : ce n'est pas un arrêt d'urgence.
+      if (code === "Space" && event.target instanceof HTMLButtonElement) return;
       if (code === "ArrowUp" || code === "KeyW" || code === "KeyZ") handlers.throttle(true);
       else if (code === "ArrowDown" || code === "KeyS") handlers.brake(true);
       else if (event.repeat) return;

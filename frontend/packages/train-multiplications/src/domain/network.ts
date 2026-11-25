@@ -124,8 +124,9 @@ export function createNetwork(): Network {
     trackSpacing: spacing,
     railHeight: 0.62,
     stations: [
-      { id: "depart", name: "Gare de départ", route: "main", from: 36, to: 122, side: "left", stop: 116, building: "terminal" },
-      { id: "col", name: "Halte du col", route: "main", from: 2134, to: 2214, side: "right", stop: 2208, building: "shelter" },
+      // Départ et halte du col sont avant l'aiguillage : elles sont sur les deux itinéraires.
+      { id: "depart", name: "Gare de départ", route: "both", from: 36, to: 122, side: "left", stop: 116, building: "terminal" },
+      { id: "col", name: "Halte du col", route: "both", from: 2134, to: 2214, side: "right", stop: 2208, building: "shelter" },
       { id: "village-1", name: "Gare du village", route: "main", from: 2712, to: 2800, side: "left", stop: 2794, building: "village" },
       { id: "village-2", name: "Gare du village", route: "branch", from: 2712, to: 2800, side: "left", stop: 2794, building: "none" },
     ],
