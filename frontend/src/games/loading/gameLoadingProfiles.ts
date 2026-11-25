@@ -23,12 +23,23 @@ const LEO_THEME = {
   "--loading-glow": "rgb(255 160 80 / 60%)",
 } as CSSProperties;
 
+/** Habillage aux couleurs de la rivière : ciel du matin, barre couleur lanterne. */
+const RIVER_THEME = {
+  "--loading-background": "radial-gradient(circle at 50% 35%, #3f86b8 0%, #1d4f74 70%, #12344f 100%)",
+  "--loading-title": "#fff3d6",
+  "--loading-track-border": "rgb(255 220 160 / 45%)",
+  "--loading-fill": "linear-gradient(90deg, #c0392b, #ff8a3d 60%, #ffd36b)",
+  "--loading-glow": "rgb(255 170 90 / 60%)",
+} as CSSProperties;
+
 const PHASER_GAME = { player: 3, engine: 5, mounted: 2 } as const;
 
 const PROFILES: Record<string, GameLoadingProfile> = {
   "conduire-avec-leo": { milestones: PHASER_GAME, theme: LEO_THEME },
   "turbo-pulse": { milestones: PHASER_GAME },
   "grille-magique": { milestones: { player: 7, mounted: 3 } },
+  // Moteur 3D (Babylon.js) téléchargé, puis rivière construite : même forme qu'un jeu à moteur lourd.
+  "riviere-des-fractions": { milestones: PHASER_GAME, theme: RIVER_THEME },
 };
 
 const DEFAULT_PROFILE: GameLoadingProfile = { milestones: { player: 7, mounted: 3 } };

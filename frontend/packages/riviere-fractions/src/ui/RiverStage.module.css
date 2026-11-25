@@ -1,0 +1,362 @@
+/* Scène de la Rivière des Fractions : la 3D occupe tout le cadre, l'interface reste compacte par-dessus. */
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(#b9dcf2, #e8f2f6);
+  color: #3a2210;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+.questionCard {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "counter counter"
+    "expression lanes";
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 2px;
+  max-width: calc(100% - 24px);
+  padding: 6px 16px 8px;
+  border: 3px solid #7a4a26;
+  border-radius: 16px;
+  background: rgb(255 247 228 / 94%);
+  box-shadow: 0 4px 14px rgb(30 20 10 / 25%);
+}
+
+.counter {
+  grid-area: counter;
+  display: flex;
+  flex-wrap: wrap;
+  white-space: nowrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #7a4a26;
+}
+
+.rework {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #7a4a26;
+  color: #fff7e4;
+  font-size: 11px;
+}
+
+.expression {
+  grid-area: expression;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(22px, 5.2vmin, 36px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.operator,
+.word {
+  font-weight: 700;
+}
+
+.word {
+  font-size: 0.7em;
+}
+
+.unknown {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.15em;
+  padding: 0 0.1em;
+  border: 2px dashed #7a4a26;
+  border-radius: 8px;
+}
+
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.78em;
+  line-height: 1.02;
+}
+
+.fractionBar {
+  width: 100%;
+  min-width: 1.1em;
+  height: 0.09em;
+  margin: 0.06em 0;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.lanes {
+  grid-area: lanes;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 14px;
+  border-left: 2px solid rgb(122 74 38 / 35%);
+  list-style: none;
+}
+
+.lane {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-width: 46px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.laneName {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7a4a26;
+}
+
+.progress {
+  display: inline-flex;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid #7a4a26;
+  border-radius: 50%;
+}
+
+.dot[data-state="done"] {
+  border-color: #2f8f3a;
+  background: #2f8f3a;
+}
+
+.dot[data-state="current"] {
+  background: #ffb347;
+}
+
+.toast {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #2f8f3a;
+  color: #fff;
+  font-size: clamp(15px, 3.6vmin, 22px);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 25%);
+  white-space: nowrap;
+  animation: rise 0.35s ease-out;
+}
+
+.hint {
+  position: absolute;
+  bottom: 96px;
+  left: 50%;
+  max-width: min(520px, calc(100% - 180px));
+  margin: 0;
+  padding: 8px 14px;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  background: rgb(16 44 66 / 82%);
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+
+.controls {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.steer {
+  display: grid;
+  place-items: center;
+  width: clamp(56px, 13vmin, 78px);
+  height: clamp(56px, 13vmin, 78px);
+  border: 3px solid rgb(255 255 255 / 85%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3c7fc2, #144a80);
+  color: #fff;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 30%);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.steer:active {
+  transform: scale(0.94);
+  background: radial-gradient(circle at 35% 30%, #4c94dc, #1d5a96);
+}
+
+.steer:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.steer:focus-visible,
+.action:focus-visible {
+  outline: 3px solid #ffd36b;
+  outline-offset: 3px;
+}
+
+.panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  padding: 16px 20px 18px;
+  transform: translate(-50%, -50%);
+  border: 3px solid #7a4a26;
+  border-radius: 18px;
+  background: #fff7e4;
+  box-shadow: 0 12px 34px rgb(20 12 4 / 35%);
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  animation: rise 0.3s ease-out;
+}
+
+.panel p {
+  margin: 6px 0;
+}
+
+.panelTitle {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.explanation {
+  text-align: left;
+}
+
+.answerLine {
+  font-weight: 800;
+}
+
+.reworkNote {
+  color: #7a4a26;
+  font-size: 13px;
+}
+
+.action {
+  margin-top: 8px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #c0392b;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #7f241b;
+}
+
+.action:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #7f241b;
+}
+
+.perf {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  margin: 0;
+  padding: 2px 8px;
+  transform: translateX(-50%);
+  border-radius: 6px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font: 11px/1.4 ui-monospace, monospace;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Téléphone en paysage : la question reste lisible sans masquer la rivière. */
+@media (max-height: 460px) {
+  .questionCard {
+    top: 6px;
+    padding: 4px 12px 5px;
+    column-gap: 12px;
+  }
+  .lane {
+    min-width: 40px;
+    font-size: 15px;
+  }
+  .hint {
+    bottom: 76px;
+  }
+}
+
+/* Écran étroit (téléphone en portrait) : la question passe sur plusieurs lignes. */
+@media (max-width: 560px) {
+  .questionCard {
+    top: 8px;
+    grid-template-columns: auto;
+    grid-template-areas:
+      "counter"
+      "expression"
+      "lanes";
+    justify-items: center;
+  }
+  .lanes {
+    padding: 4px 0 0;
+    border-top: 2px solid rgb(122 74 38 / 35%);
+    border-left: 0;
+  }
+  .hint {
+    max-width: calc(100% - 40px);
+    bottom: 110px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .panel {
+    animation: none;
+  }
+}

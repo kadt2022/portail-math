@@ -52,6 +52,12 @@
     "cta": "Jouer",
     "tagline": "Traverse la rivière"
   },
+  "riviereFractions": {
+    "name": "La Rivière des Fractions",
+    "description": "Pilote ton bateau sur une rivière en 3D : à chaque embranchement, la bonne voie est celle de la bonne réponse.",
+    "cta": "Larguer les amarres",
+    "tagline": "Nouveau : pilote ton bateau en 3D"
+  },
   "fluxForge": {
     "name": "Flux Forge",
     "description": "Deviens un petit ingénieur et construis la cabane du village.",
