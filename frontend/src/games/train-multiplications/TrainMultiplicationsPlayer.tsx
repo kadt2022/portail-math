@@ -1,32 +1,18 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { toTrainLocale, useTrainMultiplications } from "@mbuyamba/train-multiplications";
 
-import { useGameLoading } from "../loading/GameLoaderHost";
-import { GamePlayer, playerControlClass } from "../player/GamePlayer";
-import styles from "./TrainMultiplicationsPlayer.module.css";
+import type { EmbeddedPlayerProps } from "../player/EmbeddedPlayerProps";
+import { EngineGamePlayer } from "../player/EngineGamePlayer";
 
-export interface TrainMultiplicationsPlayerProps {
-  /** Présentation immersive : le lecteur occupe tout l'écran, barre masquée (voir GamePlayer). */
-  fullscreen?: boolean;
-  onFullscreenChange?: (next: boolean) => void;
-  /** Ferme le jeu (retour à la page des jeux). Absent : pas de bouton. */
-  onClose?: () => void;
-  /** Téléphone : le lecteur occupe tout l'écran dès l'ouverture, avec sa barre (voir GamePlayer). */
-  cover?: boolean;
-  /** Le jeu se met en pause tout seul lorsqu'il n'est plus visible. */
-  active?: boolean;
-  /** Page de jeu autonome : le titre est le titre de niveau 1 de la page. */
-  pageHeading?: boolean;
-}
+export type TrainMultiplicationsPlayerProps = EmbeddedPlayerProps;
 
 // Le Train des multiplications 3D dans le lecteur standard des jeux. Le jeu est un module à part
 // (@mbuyamba/train-multiplications) : il fournit sa scène et ce que le lecteur affiche (titre, compteurs, instructions).
 // Le portail n'apporte que le lecteur, le chargeur commun (voir loading/GameLoaderHost) et la langue choisie.
-export function TrainMultiplicationsPlayer({ fullscreen = false, onFullscreenChange, onClose, cover = false, active = true, pageHeading = false }: TrainMultiplicationsPlayerProps) {
+export function TrainMultiplicationsPlayer({ active = true, ...player }: TrainMultiplicationsPlayerProps) {
   const { i18n } = useTranslation("games");
-  const rootRef = useRef<HTMLDivElement | null>(null);
   // Panneau de mesures sur demande (adresse ...?mesures), pour relever les images par seconde sur un téléphone.
   const showPerformance = useMemo(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mesures"), []);
   // Moteur de rendu forcé sur demande (…?rendu=webgl ou …?rendu=webgpu), pour comparer sur un même appareil.
@@ -35,62 +21,5 @@ export function TrainMultiplicationsPlayer({ fullscreen = false, onFullscreenCha
     return value === "webgl" || value === "webgpu" ? value : "auto";
   }, []);
   const game = useTrainMultiplications({ locale: toTrainLocale(i18n.language), active, showPerformance, renderer });
-  const { player, loading, sound } = game;
-  // Chargeur commun (posé par l'hôte du lecteur) : le jeu lui signale ses étapes réelles. Moteur 3D téléchargé : jalon de
-  // l'initialisation ; construction du monde ferroviaire : progression des ressources ; monde prêt : le chargeur disparaît.
-  const session = useGameLoading();
-  useEffect(() => {
-    session.milestone("mounted");
-  }, [session]);
-  useEffect(() => {
-    if (loading.engineLoaded) session.milestone("engine");
-  }, [session, loading.engineLoaded]);
-  useEffect(() => {
-    session.reportResources(loading.buildProgress);
-  }, [session, loading.buildProgress]);
-  useEffect(() => {
-    if (loading.ready) session.ready();
-  }, [session, loading.ready]);
-  // Échec réel (moteur introuvable, réseau coupé) : Réessayer, dans le chargeur. Appareil sans WebGL ni WebGPU : le chargeur
-  // s'efface pour laisser lire le message du jeu, qui explique que l'appareil n'est pas compatible.
-  useEffect(() => {
-    if (loading.unsupported) session.ready();
-    else if (loading.failed) session.fail(loading.retry);
-  }, [session, loading.failed, loading.unsupported, loading.retry]);
-
-  return (
-    <GamePlayer
-      rootRef={rootRef}
-      label={player.label}
-      title={player.title}
-      titleIsHeading={pageHeading}
-      headerCenter={<span className={styles.level}>{player.headerCenter}</span>}
-      stats={player.stats}
-      paused={player.paused}
-      onPlay={player.onPlay}
-      onPause={player.onPause}
-      ended={player.ended}
-      onRestart={player.onRestart}
-      restartLabel={player.restartLabel}
-      howTo={player.howTo}
-      extraControls={
-        <button type="button" className={playerControlClass} aria-pressed={sound.on} aria-label={sound.label} onClick={sound.toggle}>
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
-            {sound.on ? <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /> : <path d="m16 9 5 6M21 9l-5 6" />}
-          </svg>
-          <span>{sound.label}</span>
-        </button>
-      }
-      fullscreen={fullscreen}
-      onFullscreenChange={onFullscreenChange}
-      onClose={onClose}
-      cover={cover}
-      initialOrientation="device"
-    >
-      <div className={styles.stage}>
-        {game.stage}
-      </div>
-    </GamePlayer>
-  );
+  return <EngineGamePlayer game={game} {...player} />;
 }
