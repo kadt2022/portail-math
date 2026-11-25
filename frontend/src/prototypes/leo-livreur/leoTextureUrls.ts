@@ -1,5 +1,6 @@
-// Adresses des textures téléchargées de Léo, sans le moteur (Phaser) : le lecteur peut ainsi lancer le téléchargement des
-// images du démarrage en même temps que celui du moteur (écran de chargement), et la scène les relit dans le cache HTTP.
+// Adresses des textures téléchargées de Léo, sans le moteur (Phaser) : le lecteur peut ainsi lancer le téléchargement de
+// toutes les images du parcours en même temps que celui du moteur (écran de chargement), et la scène les relit dans le
+// cache HTTP.
 
 import backCarUrl from "./assets/leo-car-back.webp";
 import familyTrafficUrl from "./assets/leo-traffic-family-blue-v1-384.webp";
@@ -31,7 +32,7 @@ import pedestrianChildUrl from "./assets/leo-pedestrian-child-walk-v1-815.webp";
 import pedestrianDepthFrontUrl from "./assets/leo-pedestrian-depth-front-walk-v1-815.webp";
 import pedestrianDepthBackUrl from "./assets/leo-pedestrian-depth-back-walk-v1-815.webp";
 import crossSedanTurnUrl from "./assets/leo-cross-sedan-turn-v1.webp";
-import { BUNDLE_TEXTURES } from "./leoZoneAssets";
+import { ALL_TEXTURE_KEYS } from "./leoZoneAssets";
 
 /** Adresse de chaque texture téléchargée (une seule source de vérité pour le préchargement et les lots). */
 export const TEXTURE_URLS: Record<string, string> = {
@@ -67,5 +68,5 @@ export const TEXTURE_URLS: Record<string, string> = {
   "leo-cross-sedan-turn": crossSedanTurnUrl,
 };
 
-/** Images indispensables à la première scène (lot commun) : ce qu'attend l'écran de chargement. */
-export const STARTUP_TEXTURE_URLS: readonly string[] = BUNDLE_TEXTURES.common.map((key) => TEXTURE_URLS[key]);
+/** Images de tout le parcours (commun, pont, ville), indispensables avant le départ : ce qu'attend l'écran de chargement. */
+export const STARTUP_TEXTURE_URLS: readonly string[] = ALL_TEXTURE_KEYS.map((key) => TEXTURE_URLS[key]);

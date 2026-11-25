@@ -1,9 +1,14 @@
 {
   "loadingScreen": {
-    "title": "Loading resources",
+    "titleInit": "Starting the game…",
+    "titleResources": "Loading resources…",
+    "initWait": "Please wait…",
+    "long": "Loading may take several minutes, or even longer if your Internet connection is slow. Thank you for your patience.",
+    "close": "Close",
     "label": "Loading the game",
     "failed": "The download was interrupted.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "slow": "Loading is taking a little longer. Please wait. On a slow connection, it can take up to a minute, or even longer."
   },
   "cataloguePage": {
     "title": "Games",
@@ -12,7 +17,6 @@
     "searchPlaceholder": "Search for a game",
     "filterLabel": "Filter by universe",
     "all": "All games",
-    "loading": "Loading the game…",
     "otherGames": "Other games from the portal",
     "galleryTitle": "All games",
     "noResult": "No game has this name. Try another word!",

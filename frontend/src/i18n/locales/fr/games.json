@@ -1,9 +1,14 @@
 {
   "loadingScreen": {
-    "title": "Chargement des ressources",
+    "titleInit": "Initialisation du jeu…",
+    "titleResources": "Chargement des ressources…",
+    "initWait": "Veuillez patienter…",
+    "long": "Le chargement peut prendre plusieurs minutes, voire davantage si votre connexion Internet est lente. Merci pour votre patience.",
+    "close": "Fermer",
     "label": "Chargement du jeu",
     "failed": "Le téléchargement a été interrompu.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "slow": "Le chargement prend un peu plus de temps. Merci de patienter. Sur une connexion lente, cela peut prendre jusqu'à une minute, voire davantage."
   },
   "cataloguePage": {
     "title": "Les jeux",
@@ -12,7 +17,6 @@
     "searchPlaceholder": "Chercher un jeu",
     "filterLabel": "Filtrer par univers",
     "all": "Tous les jeux",
-    "loading": "Chargement du jeu…",
     "otherGames": "Autres jeux du portail",
     "galleryTitle": "Tous les jeux",
     "noResult": "Aucun jeu ne porte ce nom. Essaie un autre mot !",

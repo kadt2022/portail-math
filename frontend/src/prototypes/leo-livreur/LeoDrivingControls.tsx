@@ -5,7 +5,7 @@ import { isControlEnabled } from "./leoControls";
 import { START_POSITION } from "./leoGeometry";
 import { MISSION_ADDRESSES } from "./leoMission";
 import { pxToMeters } from "./leoUnits";
-import { BUNDLE_TEXTURES } from "./leoZoneAssets";
+import { ALL_TEXTURE_KEYS } from "./leoZoneAssets";
 import styles from "./LeoLivreurPrototypePage.module.css";
 
 // Commandes et textes de conduite partagés par la page prototype et le lecteur des jeux. Aucun import du moteur (Phaser) :
@@ -27,7 +27,7 @@ export const INITIAL_SNAPSHOT: LeoLivreurSnapshot = {
   travelledMeters: 0,
   assets: "loading",
   assetsLoaded: 0,
-  assetsTotal: BUNDLE_TEXTURES.common.length,
+  assetsTotal: ALL_TEXTURE_KEYS.length,
 };
 
 export const ALL_CONTROLS: readonly LeoLivreurControl[] = ["left", "right", "forward", "brake", "reverse"];

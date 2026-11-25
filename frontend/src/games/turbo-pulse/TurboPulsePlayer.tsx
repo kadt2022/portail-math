@@ -11,7 +11,7 @@ import { GamePlayer, playerControlClass } from "../player/GamePlayer";
 import { rankForLevel, type TurboPulseRank } from "./turbo-pulse-ranks";
 import { CALCULATIONS_PER_LEVEL, TURBO_LEVELS } from "./turbo-pulse-engine";
 import { backgroundFor, type BackgroundSize, backgroundSizeFor, downloadImage, loadImage, nextBackgroundFor } from "./turbo-pulse-backgrounds";
-import { GameLoadingScreen, LOADING_FADE_MS } from "../loading/GameLoadingScreen";
+import { useGameLoading } from "../loading/GameLoaderHost";
 import { createLoadingProgress } from "../loading/loadingProgress";
 import themeUrl from "../../assets/turbo-pulse/turbo-pulse-theme.mp3";
 import styles from "./TurboPulsePlayer.module.css";
@@ -20,7 +20,11 @@ import styles from "./TurboPulsePlayer.module.css";
  * Poids estimés des ressources de l'écran de chargement (octets), remplacés par la taille réelle dès qu'elle est connue.
  * Le moteur (Phaser et la scène, mesurés compressés) n'annonce pas sa progression : il compte pour son poids d'un bloc.
  */
-const LOADING_ESTIMATES = { engine: 330_000, decor: 90_000, music: 308_000 };
+/**
+ * Ressources (de 10 à 100 % du chargeur commun), en octets estimés puis réels : le décor du premier niveau et la musique.
+ * Le moteur (Phaser) est un jalon de l'initialisation.
+ */
+const RESOURCE_ESTIMATES = { decor: 90_000, music: 308_000 };
 /** Promesse résolue de l'extérieur (une seule fois). */
 function deferred() {
   let resolve: () => void = () => undefined;
@@ -208,9 +212,7 @@ export function TurboPulsePlayer({
   // Chargement : la partie ne commence qu'avec le moteur, le décor du premier niveau et la musique (écran de chargement et
   // vrai pourcentage d'ici là). Le décor du niveau suivant se prépare ensuite pendant la partie, en priorité basse.
   const resourcesReady = useRef(deferred());
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [loaded, setLoaded] = useState(false);
-  const [loadingGone, setLoadingGone] = useState(false);
+  const loading = useGameLoading();
   // Version des décors (960 pour les téléphones, 1280 au-delà) d'après la largeur réelle de la scène à l'instant du
   // téléchargement : un passage en plein écran sur ordinateur fait prendre la version 1280 au niveau suivant.
   const backgroundSize = (): BackgroundSize => backgroundSizeFor((canvasFrameRef.current?.clientWidth ?? 0) * (window.devicePixelRatio || 1));
@@ -258,16 +260,17 @@ export function TurboPulsePlayer({
     audioRef.current = audio;
     let disposed = false;
     const host = gameHostRef.current;
-    const progress = createLoadingProgress(
-      LOADING_ESTIMATES,
-      (fraction) => {
-        if (!disposed) setLoadingProgress(fraction);
-      },
-      "engine",
-    );
+    // Lecteur monté : ses ressources sont connues et demandées (dernier jalon de l'initialisation).
+    loading.milestone("mounted");
+    const progress = createLoadingProgress(RESOURCE_ESTIMATES, (fraction) => {
+      if (!disposed) loading.reportResources(fraction);
+    });
     // Les trois ressources partent ensemble ; une ressource en échec (réseau coupé) ne bloque jamais le chargement : le
     // jeu démarre sans elle (fond de secours, ou partie sans musique). Seul le moteur est indispensable.
-    const engine = import("./TurboPulseGame").finally(() => progress.complete("engine"));
+    const engine = import("./TurboPulseGame").then((module) => {
+      loading.milestone("engine");
+      return module;
+    });
     const firstDecor = backgroundFor(INITIAL_SNAPSHOT.levelIndex, backgroundSize());
     const decor = downloadImage(firstDecor, (loaded, total) => progress.report("decor", loaded, total))
       .then(() => {
@@ -291,7 +294,7 @@ export function TurboPulsePlayer({
           controllerRef.current.togglePause();
         }
         setEngineReady(true);
-        setLoaded(true);
+        loading.ready();
       })
       .catch((error: unknown) => {
         // Moteur introuvable (réseau coupé) : même issue qu'avant, l'erreur remonte au cadre d'erreur de la page.
@@ -314,7 +317,7 @@ export function TurboPulsePlayer({
       audio.dispose();
       audioRef.current = null;
     };
-  }, []);
+  }, [loading]);
 
   // Phaser ne surveille nativement que le redimensionnement de la fenêtre,
   // jamais celui d'un conteneur CSS : sans cet observateur, un changement de
@@ -369,13 +372,6 @@ export function TurboPulsePlayer({
   useEffect(() => {
     controllerRef.current?.refreshLayout();
   }, [fullscreen, cover]);
-
-  // À 100 % : l'écran de chargement s'efface en fondu, puis quitte la page.
-  useEffect(() => {
-    if (!loaded) return;
-    const timer = window.setTimeout(() => setLoadingGone(true), LOADING_FADE_MS);
-    return () => window.clearTimeout(timer);
-  }, [loaded]);
 
   // Jeu masqué (fermé, onglet changé) : la partie se met en pause, sans rien perdre.
   useEffect(() => {
@@ -485,7 +481,6 @@ export function TurboPulsePlayer({
             <span>{t("turboPulse.game.solve")}</span>
             <strong>{snapshot.operation}</strong>
           </div>
-          {loadingGone ? null : <GameLoadingScreen progress={loadingProgress} finished={loaded} />}
           {snapshot.status === "failed" ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.retryLevel()} /> : null}
           {isSuccess ? <EndPanel snapshot={snapshot} onAction={() => controllerRef.current?.nextLevel()} /> : null}
         </div>

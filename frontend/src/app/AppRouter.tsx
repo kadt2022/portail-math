@@ -39,10 +39,10 @@ const ExetatResultsPage = lazyRoute(() => import("../exetat/ExetatPages").then((
 const LibraryPage = lazyRoute(() => import("../library/LibraryPage").then((m) => m.LibraryPage));
 const LibraryReaderPage = lazyRoute(() => import("../library/LibraryReaderPage").then((m) => m.LibraryReaderPage));
 const GamesCataloguePage = lazyRoute(() => import("../games/GamesCataloguePage").then((m) => m.GamesCataloguePage));
-const GrilleMagiquePage = lazyRoute(() => import("../games/grille-magique/GrilleMagiquePage").then((m) => m.GrilleMagiquePage));
+const GrilleMagiquePage = lazyRoute(() => import("../games/grille-magique/GrilleMagiquePage").then((m) => m.GrilleMagiquePage), { game: "grille-magique" });
 const NewGameComingSoonPage = lazyRoute(() => import("../games/new-game/NewGameComingSoonPage").then((m) => m.NewGameComingSoonPage));
 // Turbo Pulse et Léo embarquent Phaser (moteur de jeu lourd, avec effets de bord au chargement du module).
-const TurboPulsePage = lazyRoute(() => import("../games/turbo-pulse/TurboPulsePage").then((m) => m.TurboPulsePage), { heavy: true });
+const TurboPulsePage = lazyRoute(() => import("../games/turbo-pulse/TurboPulsePage").then((m) => m.TurboPulsePage), { heavy: true, game: "turbo-pulse" });
 // Le moteur de Léo est demandé en même temps que la page (et non une fois le lecteur affiché) : les visites suivantes ne
 // l'attendent pas.
 const LeoDrivingGamePage = lazyRoute(
@@ -50,7 +50,7 @@ const LeoDrivingGamePage = lazyRoute(
     void loadLeoEngine().catch(() => undefined);
     return import("../games/leo-driving/LeoDrivingGamePage").then((m) => m.LeoDrivingGamePage);
   },
-  { heavy: true },
+  { heavy: true, game: "conduire-avec-leo" },
 );
 // La Rivière des Fractions embarque Babylon.js : son moteur est demandé en même temps que la page.
 const RiviereFractionsGamePage = lazyRoute(

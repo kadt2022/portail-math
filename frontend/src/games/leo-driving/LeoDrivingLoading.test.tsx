@@ -4,13 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { LeoLivreurSnapshot } from "../../prototypes/leo-livreur/LeoLivreurGame";
 import { STARTUP_TEXTURE_URLS } from "../../prototypes/leo-livreur/leoTextureUrls";
+import { ALL_TEXTURE_KEYS } from "../../prototypes/leo-livreur/leoZoneAssets";
+import { DOWNLOAD_CONCURRENCY } from "../loading/fetchWithProgress";
+import { GameLoaderHost } from "../loading/GameLoaderHost";
+import { startGameLoading } from "../loading/gameLoadingProfiles";
 
 const { engine } = vi.hoisted(() => ({
   engine: {
-    /** Le premier import du moteur échoue (réseau coupé) quand ce drapeau est levé. */
-    failNextImport: false,
     imports: 0,
     listener: null as ((snapshot: LeoLivreurSnapshot) => void) | null,
+    images: null as ReadonlyMap<string, string> | null,
     mount: vi.fn(),
     retryAssets: vi.fn(),
   },
@@ -18,14 +21,11 @@ const { engine } = vi.hoisted(() => ({
 
 vi.mock("../../prototypes/leo-livreur/LeoLivreurGame", () => {
   engine.imports += 1;
-  if (engine.failNextImport) {
-    engine.failNextImport = false;
-    throw new Error("réseau coupé");
-  }
   return {
-    mountLeoLivreurGame: (_host: HTMLElement, listener: (snapshot: LeoLivreurSnapshot) => void) => {
+    mountLeoLivreurGame: (_host: HTMLElement, listener: (snapshot: LeoLivreurSnapshot) => void, options?: { downloadedImages?: ReadonlyMap<string, string> }) => {
       engine.mount();
       engine.listener = listener;
+      engine.images = options?.downloadedImages ?? null;
       return {
         destroy: vi.fn(), refreshLayout: vi.fn(), startMission: vi.fn(), setDestination: vi.fn(), lockDriving: vi.fn(),
         resumeDriving: vi.fn(), handOver: vi.fn(async () => undefined), returnToRestaurant: vi.fn(), cue: vi.fn(), reset: vi.fn(),
@@ -44,7 +44,7 @@ const SNAPSHOT: LeoLivreurSnapshot = {
 };
 
 /** Téléchargements des images pilotés par le test. */
-let downloads: Array<{ url: string; resolve: () => void }> = [];
+let downloads: Array<{ url: string; resolve: () => void; done: boolean }> = [];
 
 const settle = () =>
   act(async () => {
@@ -53,14 +53,39 @@ const settle = () =>
       await new Promise((resolve) => setTimeout(resolve, 0));
     }
   });
-const loadingScreen = () => screen.queryByText("Chargement des ressources")?.closest("[aria-hidden]") ?? null;
+/** Laisse arriver toutes les images, par vagues (les téléchargements sont limités à DOWNLOAD_CONCURRENCY à la fois). */
+async function finishDownloads() {
+  for (let wave = 0; wave < 40; wave += 1) {
+    const pending = downloads.filter((download) => !download.done);
+    if (pending.length === 0 && downloads.length >= STARTUP_TEXTURE_URLS.length) return;
+    for (const download of pending) {
+      download.done = true;
+      download.resolve();
+    }
+    await settle();
+  }
+}
 const percent = () => Number(document.querySelector('[role=progressbar][aria-label="Chargement du jeu"]')?.getAttribute("aria-valuenow"));
+const loader = () => document.querySelector("[data-phase]");
 
-describe("écran de chargement de Conduire avec Léo", () => {
+function renderInHost() {
+  const session = startGameLoading("conduire-avec-leo");
+  render(
+    <GameLoaderHost game="conduire-avec-leo" session={session}>
+      <LeoDrivingPlayer />
+    </GameLoaderHost>,
+  );
+  // Le code du lecteur est là (rendu direct, sans attente) : jalon que poserait l'hôte du catalogue.
+  act(() => session.milestone("player"));
+  return session;
+}
+
+describe("Conduire avec Léo dans le chargeur commun", () => {
   beforeEach(() => {
     downloads = [];
     engine.imports = 0;
     engine.listener = null;
+    engine.images = null;
     engine.mount.mockClear();
     engine.retryAssets.mockClear();
     vi.stubGlobal(
@@ -68,56 +93,58 @@ describe("écran de chargement de Conduire avec Léo", () => {
       vi.fn(
         (url: string) =>
           new Promise<Response>((resolve) => {
-            downloads.push({ url, resolve: () => resolve(new Response(new Uint8Array(100), { headers: { "content-length": "100" } })) });
+            downloads.push({ url, done: false, resolve: () => resolve(new Response(new Uint8Array(100), { headers: { "content-length": "100" } })) });
           }),
       ),
     );
+    let counter = 0;
+    URL.createObjectURL = vi.fn(() => `blob:image-${(counter += 1)}`);
+    URL.revokeObjectURL = vi.fn();
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("moteur et images du démarrage en même temps ; jouable seulement quand tout est prêt, puis l'écran s'efface", async () => {
-    render(<LeoDrivingPlayer />);
+  it("moteur puis ressources : 0 → 10 % par jalons, 10 → 100 % par les images, jeu affiché directement quand il est prêt", async () => {
+    renderInHost();
+    // Code du lecteur reçu et lecteur monté ; moteur pas encore arrivé : initialisation.
+    expect(loader()).toHaveAttribute("data-phase", "init");
+    expect(percent()).toBe(5);
     await settle();
-    expect(screen.getByText("Chargement des ressources")).toBeInTheDocument();
-    // L'écran ne répète pas le nom du jeu (déjà dans l'en-tête du lecteur).
-    expect(within(loadingScreen() as HTMLElement).queryByText(/Léo|Conduire/)).not.toBeInTheDocument();
-    // Les images du lot commun partent tout de suite, en priorité haute, sans attendre le moteur ; rien d'autre.
-    expect(downloads.map(({ url }) => url)).toEqual([...STARTUP_TEXTURE_URLS]);
-    expect(vi.mocked(fetch)).toHaveBeenCalledWith(STARTUP_TEXTURE_URLS[0], { priority: "high" });
-    // Moteur arrivé, images encore en route : la scène n'est pas montée.
+    // Moteur arrivé : fin de l'initialisation, exactement 10 % (aucune image encore reçue).
+    expect(loader()).toHaveAttribute("data-phase", "resources");
+    expect(percent()).toBe(10);
+    // Images de tout le parcours, en priorité haute, au plus DOWNLOAD_CONCURRENCY à la fois, sans attendre le moteur.
+    expect(STARTUP_TEXTURE_URLS).toHaveLength(ALL_TEXTURE_KEYS.length);
+    expect(downloads).toHaveLength(DOWNLOAD_CONCURRENCY);
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith(STARTUP_TEXTURE_URLS[0], expect.objectContaining({ priority: "high", signal: expect.any(AbortSignal) }));
     expect(engine.mount).not.toHaveBeenCalled();
-    const before = percent();
-    for (const download of downloads) download.resolve();
-    await settle();
-    expect(percent()).toBeGreaterThan(before);
+    await finishDownloads();
+    expect(downloads.map(({ url }) => url)).toEqual([...STARTUP_TEXTURE_URLS]);
+    // Images confiées à la scène en mémoire (un seul téléchargement), une adresse locale par image.
     expect(engine.mount).toHaveBeenCalledOnce();
-    // Scène montée, images en cours de lecture par la scène : pas encore jouable.
+    expect(engine.images?.size).toBe(STARTUP_TEXTURE_URLS.length);
+    expect([...(engine.images?.keys() ?? [])]).toEqual([...STARTUP_TEXTURE_URLS]);
+    // Scène en préparation : jamais 100 % avant que la partie puisse commencer.
+    expect(percent()).toBeGreaterThan(10);
+    expect(percent()).toBeLessThan(100);
     act(() => engine.listener?.(SNAPSHOT));
-    expect(loadingScreen()).toHaveAttribute("aria-hidden", "false");
-    expect(screen.queryByRole("button", { name: "Commencer" })).not.toBeInTheDocument();
+    expect(loader()).not.toBeNull();
     act(() => engine.listener?.({ ...SNAPSHOT, assets: "ready", assetsLoaded: null, assetsTotal: null }));
-    expect(percent()).toBe(100);
-    expect(loadingScreen()).toHaveAttribute("aria-hidden", "true");
+    // Prêt : le chargeur disparaît aussitôt, sans fondu, et l'accueil habituel du jeu est là.
+    expect(loader()).toBeNull();
     expect(screen.getByRole("button", { name: "Commencer" })).toBeInTheDocument();
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 450));
-    });
-    expect(screen.queryByText("Chargement des ressources")).not.toBeInTheDocument();
-    // Plus tard, une attente de zone (pont, ville) ne ramène pas l'écran de chargement.
+    // Une attente ultérieure (reprise exceptionnelle) ne ramène pas le chargeur.
     act(() => engine.listener?.({ ...SNAPSHOT, phase: "DRIVING", assets: "loading", assetsLoaded: null, assetsTotal: null }));
-    expect(screen.queryByText("Chargement des ressources")).not.toBeInTheDocument();
+    expect(loader()).toBeNull();
   });
 
-  it("images du démarrage introuvables après les reprises : Réessayer relance leur téléchargement", async () => {
-    render(<LeoDrivingPlayer />);
+  it("images introuvables après les reprises : le chargeur propose Réessayer, qui relance leur téléchargement", async () => {
+    renderInHost();
     await settle();
-    for (const download of downloads) download.resolve();
-    await settle();
+    await finishDownloads();
     act(() => engine.listener?.({ ...SNAPSHOT, assets: "error" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("Le téléchargement a été interrompu.");
-    const retries = screen.getAllByRole("button", { name: "Réessayer" });
-    await userEvent.setup().click(retries[0]);
+    expect(within(loader() as HTMLElement).getByRole("alert")).toHaveTextContent("Le téléchargement a été interrompu.");
+    await userEvent.setup().click(within(loader() as HTMLElement).getByRole("button", { name: "Réessayer" }));
     expect(engine.retryAssets).toHaveBeenCalledOnce();
+    expect(within(loader() as HTMLElement).queryByRole("alert")).not.toBeInTheDocument();
   });
-
 });

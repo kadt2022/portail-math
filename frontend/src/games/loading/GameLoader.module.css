@@ -1,42 +1,46 @@
-/* Écran de chargement commun aux jeux : recouvre la scène tant que le jeu n'est pas prêt, puis s'efface en fondu.
-   Chaque jeu peut l'habiller à ses couleurs par les variables --loading-* (valeurs par défaut : celles de Turbo Pulse). */
+/* Chargeur commun aux jeux : recouvre tout le cadre du lecteur dès le clic, jusqu'à ce que le jeu soit prêt, puis disparaît
+   sans transition. Chaque jeu peut l'habiller à ses couleurs par les variables --loading-* (valeurs par défaut : celles
+   de Turbo Pulse). Mêmes dimensions et mêmes positions pendant toutes les phases. */
 .loading {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 20;
   display: grid;
   place-items: center;
-  padding: 16px;
+  padding: 16px 16px 64px;
+  overflow: hidden;
+  border-radius: inherit;
   background: var(--loading-background, radial-gradient(circle at 50% 45%, #2a1c52 0%, #120b2c 70%, #0b0720 100%));
-  transition: opacity 400ms ease, visibility 400ms;
-}
-
-.finished {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  container-type: inline-size;
 }
 
 .panel {
   display: grid;
   justify-items: center;
   gap: 12px;
-  width: min(420px, 82%);
+  width: min(460px, 86%);
 }
 
 .title {
   margin: 0;
   color: var(--loading-title, #fff3c4);
-  font-size: clamp(12px, 2.2cqw, 15px);
+  font-size: clamp(12px, 3.2cqw, 15px);
   font-weight: 900;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-align: center;
   text-transform: uppercase;
 }
 
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.2em;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
 .track {
   position: relative;
-  width: 100%;
   height: 14px;
   overflow: hidden;
   border: 1px solid var(--loading-track-border, rgb(255 214 110 / 45%));
@@ -77,37 +81,75 @@
 }
 
 .percent {
-  margin: 0;
   color: var(--loading-text, #fff);
-  font-size: clamp(18px, 3.4cqw, 24px);
+  font-size: clamp(16px, 4cqw, 22px);
   font-weight: 900;
   font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
-/* Échec : un message court et le bouton Réessayer, à la place du pourcentage. */
+/* Zone réservée au message secondaire (jusqu'à quatre lignes sur téléphone) : son apparition ne déplace rien. */
+.message {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+  width: 100%;
+  min-height: 5.8em;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.secondary,
 .failed {
+  max-width: 400px;
   margin: 0;
   color: var(--loading-text, #fff);
+  font-weight: 600;
+  text-align: center;
+}
+
+.secondary {
+  opacity: 0.9;
+}
+
+.failed {
   font-size: 14px;
   font-weight: 700;
-  text-align: center;
+}
+
+.retry,
+.close {
+  min-height: 44px;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
 }
 
 .retry {
   min-width: 150px;
-  min-height: 44px;
   padding: 0 20px;
   border: 1px solid rgb(255 255 255 / 30%);
-  border-radius: 10px;
   background: var(--loading-fill, linear-gradient(180deg, #ffd46b, #f5a623));
   color: var(--loading-button-text, #2a1800);
-  cursor: pointer;
-  font: inherit;
   font-size: 15px;
-  font-weight: 800;
 }
 
-.retry:focus-visible {
+/* Fermer pendant le chargement : toujours au même endroit, en bas à droite du cadre. */
+.close {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: rgb(255 255 255 / 8%);
+  color: var(--loading-text, #fff);
+  font-size: 14px;
+}
+
+.retry:focus-visible,
+.close:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
@@ -117,8 +159,7 @@
     animation: none;
   }
 
-  .fill,
-  .loading {
+  .fill {
     transition: none;
   }
 }
