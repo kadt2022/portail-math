@@ -99,6 +99,21 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     thumbnail: multiplicationTrainThumb,
   },
   {
+    id: "train-des-multiplications",
+    nameKey: "trainMultiplications.name",
+    taglineKey: "trainMultiplications.tagline",
+    descriptionKey: "trainMultiplications.description",
+    // Version 3D (Babylon.js), jouée dans le lecteur standard de la page Jeux. L'ancienne version
+    // (« multiplication-train », ci-dessus) reste en place jusqu'à la validation de celle-ci.
+    href: "/jeux/train-des-multiplications",
+    availability: "react",
+    categoryId: "calculation",
+    embed: true,
+    subjectKey: "meta.subject.maths",
+    levelKey: "meta.level.primary",
+    thumbnail: multiplicationTrainThumb,
+  },
+  {
     id: "riviere-des-fractions",
     nameKey: "riviereFractions.name",
     taglineKey: "riviereFractions.tagline",

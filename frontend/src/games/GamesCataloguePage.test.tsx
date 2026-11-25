@@ -46,6 +46,30 @@ vi.mock("@mbuyamba/riviere-fractions", () => ({
   }),
 }));
 
+// Le jeu 3D du Train est remplacé par un faux, déjà prêt : on vérifie ici l'ouverture dans le lecteur de la page.
+vi.mock("@mbuyamba/train-multiplications", () => ({
+  toTrainLocale: () => "fr",
+  preloadTrainMultiplicationsEngine: () => Promise.resolve(),
+  useTrainMultiplications: () => ({
+    stage: <div data-testid="scene-train" />,
+    player: {
+      label: "Jeu Le Train des multiplications",
+      title: "Le Train des multiplications",
+      headerCenter: "Première ligne",
+      stats: [{ label: "Vitesse", value: "0 km/h" }],
+      paused: false,
+      onPlay: () => undefined,
+      onPause: () => undefined,
+      ended: false,
+      onRestart: () => undefined,
+      restartLabel: "Recommencer",
+      howTo: [],
+    },
+    sound: { on: true, toggle: () => undefined, label: "Couper le son" },
+    loading: { progress: 1, engineLoaded: true, buildProgress: 1, ready: true, failed: false, unsupported: false, retry: () => undefined },
+  }),
+}));
+
 vi.mock("../prototypes/leo-livreur/LeoLivreurGame", () => ({
   mountLeoLivreurGame: () => ({
     destroy: () => undefined,
@@ -544,6 +568,18 @@ describe("Conduire avec Léo dans la page Jeux", () => {
     await user.click(links[links.length - 1]);
     const region = await screen.findByRole("region", { name: "Jeu La Rivière des Fractions" }, { timeout: 8000 });
     expect(within(region).getByTestId("scene-riviere")).toBeInTheDocument();
+    expect(document.querySelector("[data-phase]")).toBeNull();
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
+  });
+
+  it("la carte du Train des multiplications l'ouvre dans le lecteur de la page ; le chargeur commun a disparu quand le jeu est prêt ; Fermer ramène aux autres jeux", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: /Jouer à Le Train des multiplications/ });
+    await user.click(links[links.length - 1]);
+    const region = await screen.findByRole("region", { name: "Jeu Le Train des multiplications" }, { timeout: 8000 });
+    expect(within(region).getByTestId("scene-train")).toBeInTheDocument();
     expect(document.querySelector("[data-phase]")).toBeNull();
     await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
     expect(region.closest("[hidden]")).not.toBeNull();

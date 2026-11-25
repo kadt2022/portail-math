@@ -1,4 +1,4 @@
-/* La Rivière des Fractions dans le lecteur standard : la scène 3D prend tout l'espace du lecteur. */
+/* Lecteur d'un jeu 3D : la scène prend tout l'espace du lecteur. */
 .stage {
   position: relative;
   width: 100%;

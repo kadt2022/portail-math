@@ -20,6 +20,11 @@ vi.mock("../games/riviere-fractions/RiviereFractionsGamePage", () => ({ RiviereF
 const preloadRiverEngine = vi.fn(async () => undefined);
 vi.mock("@mbuyamba/riviere-fractions", () => ({ preloadRiverFractionsEngine: () => preloadRiverEngine() }));
 
+// Le Train embarque Babylon.js : sa page et son moteur sont remplacés, on ne vérifie ici que le routage et la demande du moteur.
+vi.mock("../games/train-multiplications/TrainMultiplicationsGamePage", () => ({ TrainMultiplicationsGamePage: () => <p>Page autonome du Train</p> }));
+const preloadTrainEngine = vi.fn(async () => undefined);
+vi.mock("@mbuyamba/train-multiplications", () => ({ preloadTrainMultiplicationsEngine: () => preloadTrainEngine() }));
+
 function renderAt(path: string) {
   window.history.pushState({}, "", path);
   return render(<AppRouter />);
@@ -42,6 +47,12 @@ describe("Routeur du portail React", () => {
     renderAt("/app/jeux/riviere-des-fractions");
     expect(await screen.findByText("Page autonome de la Rivière")).toBeInTheDocument();
     expect(preloadRiverEngine).toHaveBeenCalled();
+  });
+
+  it("ouvre la page autonome du Train des multiplications, et demande son moteur 3D en même temps que la page", async () => {
+    renderAt("/app/jeux/train-des-multiplications");
+    expect(await screen.findByText("Page autonome du Train")).toBeInTheDocument();
+    expect(preloadTrainEngine).toHaveBeenCalled();
   });
 
   it("affiche le tableau de bord sur /app", () => {
@@ -106,7 +117,8 @@ describe("Routeur du portail React", () => {
   it("affiche le catalogue sur /app/jeux", () => {
     renderAt("/app/jeux");
     expect(screen.getByRole("heading", { level: 1, name: /les jeux/i })).toBeInTheDocument();
-    expect(screen.getByText(/le train des multiplications/i)).toBeInTheDocument();
+    // L’ancienne et la nouvelle version du Train cohabitent au catalogue : les deux cartes portent ce nom.
+    expect(screen.getAllByText(/le train des multiplications/i).length).toBeGreaterThan(0);
   });
 
   it("affiche la bibliothèque et son premier livre", async () => {

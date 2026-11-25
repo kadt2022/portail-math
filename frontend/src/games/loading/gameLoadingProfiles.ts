@@ -23,6 +23,15 @@ const LEO_THEME = {
   "--loading-glow": "rgb(255 160 80 / 60%)",
 } as CSSProperties;
 
+/** Habillage aux couleurs du train : ciel du matin, barre rouge et or de la locomotive. */
+const TRAIN_THEME = {
+  "--loading-background": "radial-gradient(circle at 50% 35%, #4a8fc4 0%, #22527a 70%, #142f4a 100%)",
+  "--loading-title": "#fff3d6",
+  "--loading-track-border": "rgb(255 210 120 / 45%)",
+  "--loading-fill": "linear-gradient(90deg, #b8281c, #e04a2a 55%, #f2c94c)",
+  "--loading-glow": "rgb(255 190 90 / 60%)",
+} as CSSProperties;
+
 /** Habillage aux couleurs de la rivière : ciel du matin, barre couleur lanterne. */
 const RIVER_THEME = {
   "--loading-background": "radial-gradient(circle at 50% 35%, #3f86b8 0%, #1d4f74 70%, #12344f 100%)",
@@ -38,6 +47,8 @@ const PROFILES: Record<string, GameLoadingProfile> = {
   "conduire-avec-leo": { milestones: PHASER_GAME, theme: LEO_THEME },
   "turbo-pulse": { milestones: PHASER_GAME },
   "grille-magique": { milestones: { player: 7, mounted: 3 } },
+  // Moteur 3D (Babylon.js) téléchargé, puis monde ferroviaire construit : même forme qu'un jeu à moteur lourd.
+  "train-des-multiplications": { milestones: PHASER_GAME, theme: TRAIN_THEME },
   // Moteur 3D (Babylon.js) téléchargé, puis rivière construite : même forme qu'un jeu à moteur lourd.
   "riviere-des-fractions": { milestones: PHASER_GAME, theme: RIVER_THEME },
 };
