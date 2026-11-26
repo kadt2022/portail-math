@@ -46,6 +46,12 @@
     "cta": "Jouer",
     "tagline": "Roule sur les tables"
   },
+  "trainMultiplications": {
+    "name": "Le Train des multiplications 3D",
+    "description": "Conduis une vraie locomotive à vapeur : viaduc, tunnel dans la montagne, passage souterrain et arrêts en gare. Les missions de multiplication arrivent bientôt.",
+    "cta": "Jouer",
+    "tagline": "Prends les commandes du train"
+  },
   "fractionRiver": {
     "name": "La Rivière des fractions",
     "description": "Traverse la rivière en reconnaissant les bonnes fractions.",

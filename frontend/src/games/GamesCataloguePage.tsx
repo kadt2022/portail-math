@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
 import { availableCategories, featuredGame, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
-import { GrilleMagiqueGame, LeoDrivingPlayer, onGameChosen, onGameIntent, onGameIntentEnd, RiviereFractionsPlayer, TurboPulsePlayer, YambaWritingGame } from "./embedded-games";
+import { GrilleMagiqueGame, LeoDrivingPlayer, onGameChosen, onGameIntent, onGameIntentEnd, RiviereFractionsPlayer, TrainMultiplicationsPlayer, TurboPulsePlayer, YambaWritingGame } from "./embedded-games";
 import { FeaturedGame } from "./FeaturedGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
@@ -212,6 +212,14 @@ export function GamesCataloguePage() {
                 <ReachMilestone id="player" />
                 {id === "conduire-avec-leo" ? (
                   <LeoDrivingPlayer
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : id === "train-des-multiplications" ? (
+                  <TrainMultiplicationsPlayer
                     fullscreen={shown && immersive}
                     active={shown}
                     onFullscreenChange={changeFullscreen}

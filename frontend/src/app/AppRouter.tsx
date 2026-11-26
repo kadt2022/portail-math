@@ -53,6 +53,14 @@ const LeoDrivingGamePage = lazyRoute(
   },
   { heavy: true, game: "conduire-avec-leo" },
 );
+// Le Train des multiplications embarque Babylon.js : son moteur est demandé en même temps que la page.
+const TrainMultiplicationsGamePage = lazyRoute(
+  () => {
+    void import("@mbuyamba/train-multiplications").then((m) => m.preloadTrainMultiplicationsEngine()).catch(() => undefined);
+    return import("../games/train-multiplications/TrainMultiplicationsGamePage").then((m) => m.TrainMultiplicationsGamePage);
+  },
+  { heavy: true, game: "train-des-multiplications" },
+);
 // La Rivière des Fractions embarque Babylon.js : son moteur est demandé en même temps que la page.
 const RiviereFractionsGamePage = lazyRoute(
   () => {
@@ -155,6 +163,7 @@ export function AppRouter() {
               <LeoDrivingGamePage />
             }
           />
+          <Route path="jeux/train-des-multiplications" element={<TrainMultiplicationsGamePage />} />
           <Route path="jeux/riviere-des-fractions" element={<RiviereFractionsGamePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />

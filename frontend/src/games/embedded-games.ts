@@ -11,6 +11,7 @@ const loaders = {
   "grille-magique": () => import("./grille-magique/GrilleMagiqueGame").then((m) => ({ default: m.GrilleMagiqueGame })),
   "turbo-pulse": () => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })),
   "conduire-avec-leo": () => import("./leo-driving/LeoDrivingPlayer").then((m) => ({ default: m.LeoDrivingPlayer })),
+  "train-des-multiplications": () => import("./train-multiplications/TrainMultiplicationsPlayer").then((m) => ({ default: m.TrainMultiplicationsPlayer })),
   "riviere-des-fractions": () => import("./riviere-fractions/RiviereFractionsPlayer").then((m) => ({ default: m.RiviereFractionsPlayer })),
   "yamba-ecrit": () => import("./yamba-writing/YambaWritingGame").then((m) => ({ default: m.YambaWritingGame })),
 } as const;
@@ -26,6 +27,8 @@ function isEmbeddedGameId(id: string): id is EmbeddedGameId {
 const warmups: Partial<Record<EmbeddedGameId, () => Promise<unknown>>> = {
   "turbo-pulse": () => import("./turbo-pulse/TurboPulseGame"),
   "conduire-avec-leo": () => loadLeoEngine(),
+  // Babylon.js et le monde ferroviaire : un morceau à part, jamais téléchargé à l'ouverture du portail ni du catalogue.
+  "train-des-multiplications": () => import("@mbuyamba/train-multiplications").then((m) => m.preloadTrainMultiplicationsEngine()),
   // Babylon.js et la scène de la rivière : un morceau à part, jamais téléchargé à l'ouverture du portail ni du catalogue.
   "riviere-des-fractions": () => import("@mbuyamba/riviere-fractions").then((m) => m.preloadRiverFractionsEngine()),
 };
@@ -66,5 +69,6 @@ function open<Id extends EmbeddedGameId>(id: Id): ReturnType<(typeof loaders)[Id
 export const GrilleMagiqueGame = lazy(() => open("grille-magique"));
 export const TurboPulsePlayer = lazy(() => open("turbo-pulse"));
 export const LeoDrivingPlayer = lazy(() => open("conduire-avec-leo"));
+export const TrainMultiplicationsPlayer = lazy(() => open("train-des-multiplications"));
 export const RiviereFractionsPlayer = lazy(() => open("riviere-des-fractions"));
 export const YambaWritingGame = lazy(() => open("yamba-ecrit"));

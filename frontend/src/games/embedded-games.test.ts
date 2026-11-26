@@ -23,6 +23,17 @@ vi.mock("@mbuyamba/riviere-fractions", () => ({
   },
 }));
 
+vi.mock("./train-multiplications/TrainMultiplicationsPlayer", () => {
+  imported.push("lecteur du Train");
+  return { TrainMultiplicationsPlayer: () => null };
+});
+vi.mock("@mbuyamba/train-multiplications", () => ({
+  preloadTrainMultiplicationsEngine: () => {
+    imported.push("moteur du Train");
+    return Promise.resolve();
+  },
+}));
+
 import { onGameIntent } from "./embedded-games";
 
 describe("préchargement du catalogue", () => {
@@ -45,5 +56,14 @@ describe("préchargement du catalogue", () => {
     await vi.advanceTimersByTimeAsync(1);
     await vi.dynamicImportSettled();
     expect(imported.filter((name) => name.includes("Rivière")).sort()).toEqual(["lecteur de la Rivière", "moteur de la Rivière"]);
+  });
+
+  it("survol stable du Train : son lecteur et son moteur 3D sont préchargés ensemble, jamais avant 250 ms", async () => {
+    onGameIntent("train-des-multiplications");
+    await vi.advanceTimersByTimeAsync(249);
+    expect(imported.filter((name) => name.includes("Train"))).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1);
+    await vi.dynamicImportSettled();
+    expect(imported.filter((name) => name.includes("Train")).sort()).toEqual(["lecteur du Train", "moteur du Train"]);
   });
 });
