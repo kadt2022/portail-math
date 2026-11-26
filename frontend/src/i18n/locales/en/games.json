@@ -64,6 +64,63 @@
     "cta": "Play",
     "tagline": "Build the village"
   },
+  "yambaWriting": {
+    "name": "Yamba spells",
+    "description": "A machine picks a picture: write its name by putting the letters in the right order.",
+    "cta": "Play",
+    "tagline": "Spell the word",
+    "game": {
+      "title": "Yamba spells",
+      "screen": {
+        "label": "Game Yamba spells"
+      },
+      "machineLabel": "The picture machine",
+      "writingLabel": "Write the word",
+      "categoriesLabel": "Category",
+      "categories": {
+        "all": "All categories",
+        "fruits": "Fruits",
+        "domestic-animals": "Pets",
+        "wild-animals": "Wild animals",
+        "objects": "Everyday objects"
+      },
+      "slotsLabel": "Word boxes",
+      "tilesLabel": "Available letters",
+      "tileLabel": "Letter {{letter}}",
+      "slotEmpty": "Box {{index}}, empty",
+      "slotFilled": "Letter {{letter}} placed, tap to remove it",
+      "pictureAlt": "Picture to name",
+      "stats": {
+        "solved": "Words done"
+      },
+      "status": {
+        "idle": "Press Launch to pick a picture.",
+        "spinning": "The machine is spinning…",
+        "writing": "Tap the letters to write the word.",
+        "won": "Well done! You wrote {{word}}."
+      },
+      "actions": {
+        "launch": "Launch",
+        "again": "New round",
+        "restartAria": "Restart the game from the beginning",
+        "backToGames": "Back to games"
+      },
+      "howTo": {
+        "step1Title": "Choose and launch",
+        "step1": "Choose a category, then press Launch: the machine picks a picture.",
+        "step2Title": "Write the word",
+        "step2": "Tap the letters to fill the boxes in the right order. Tap a box to take its letter back.",
+        "step3Title": "Need help?",
+        "step3": "The Hint button puts the right letters back in place. When the word is correct, the machine says it."
+      },
+      "guide": {
+        "launch": "Press here to start the machine",
+        "again": "Press here for a new picture",
+        "letter": "Tap a letter",
+        "remove": "Tap this box to take the letter back"
+      }
+    }
+  },
   "grilleMagique": {
     "name": "The Magic Tiles",
     "description": "Slide the tiles and place the magic card to solve the equations.",
@@ -311,7 +368,8 @@
   },
   "meta": {
     "subject": {
-      "maths": "Maths"
+      "maths": "Maths",
+      "french": "French"
     },
     "level": {
       "primary": "Primary school"

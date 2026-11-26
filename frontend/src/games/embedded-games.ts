@@ -12,6 +12,7 @@ const loaders = {
   "turbo-pulse": () => import("./turbo-pulse/TurboPulsePlayer").then((m) => ({ default: m.TurboPulsePlayer })),
   "conduire-avec-leo": () => import("./leo-driving/LeoDrivingPlayer").then((m) => ({ default: m.LeoDrivingPlayer })),
   "riviere-des-fractions": () => import("./riviere-fractions/RiviereFractionsPlayer").then((m) => ({ default: m.RiviereFractionsPlayer })),
+  "yamba-ecrit": () => import("./yamba-writing/YambaWritingGame").then((m) => ({ default: m.YambaWritingGame })),
 } as const;
 
 type EmbeddedGameId = keyof typeof loaders;
@@ -66,3 +67,4 @@ export const GrilleMagiqueGame = lazy(() => open("grille-magique"));
 export const TurboPulsePlayer = lazy(() => open("turbo-pulse"));
 export const LeoDrivingPlayer = lazy(() => open("conduire-avec-leo"));
 export const RiviereFractionsPlayer = lazy(() => open("riviere-des-fractions"));
+export const YambaWritingGame = lazy(() => open("yamba-ecrit"));
