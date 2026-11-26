@@ -123,7 +123,7 @@
         "validate": "Check"
       },
       "guide": {
-        "drag": "Drag the tiles into the grid to rebuild the picture"
+        "drag": "Drag a tile into the grid"
       },
       "howTo": {
         "step1Title": "Look at the picture",
@@ -197,8 +197,8 @@
         "step3": "The Hint button puts the right letters back in place. When the word is correct, the machine says it."
       },
       "guide": {
-        "letter": "Tap the letters to put them in the boxes",
-        "remove": "Tap this box to take the letter back"
+        "letter": "Tap a letter",
+        "remove": "Tap this box"
       }
     }
   },

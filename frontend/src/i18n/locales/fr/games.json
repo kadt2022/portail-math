@@ -123,7 +123,7 @@
         "validate": "Valider"
       },
       "guide": {
-        "drag": "Glisse les tuiles dans la grille pour reconstituer l'image"
+        "drag": "Glisse une tuile dans la grille"
       },
       "howTo": {
         "step1Title": "Regarde l'image",
@@ -197,8 +197,8 @@
         "step3": "Le bouton Indice remet les lettres justes en place. Quand le mot est correct, la machine le prononce."
       },
       "guide": {
-        "letter": "Touche les lettres pour les placer dans les cases",
-        "remove": "Touche cette case pour retirer la lettre"
+        "letter": "Touche une lettre",
+        "remove": "Touche cette case"
       }
     }
   },

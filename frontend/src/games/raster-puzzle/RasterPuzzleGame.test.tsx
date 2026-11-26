@@ -72,7 +72,7 @@ describe("Raster Puzzle : interface jouable", () => {
     expect(pieces().map((element) => Number(element.dataset.piece))).not.toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
     expect(screen.getByRole("button", { name: "Indice" })).toBeEnabled();
     expect(await screen.findByTestId("guide-hand")).toHaveAttribute("data-target", "tray");
-    expect(screen.getByText("Glisse les tuiles dans la grille pour reconstituer l'image")).toBeInTheDocument();
+    expect(screen.getByText("Glisse une tuile dans la grille")).toBeInTheDocument();
   });
 
   it("toucher une tuile puis une case la pose ; la main disparaît dès la première tuile posée", async () => {

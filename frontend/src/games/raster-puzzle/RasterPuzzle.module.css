@@ -605,6 +605,62 @@
   }
 }
 
+/* Paysage court (petit téléphone couché, scène de 340 px de haut ou moins) : tout doit rester visible. Les niveaux se resserrent, la
+   catégorie et les boutons s'étendent au-dessus et en dessous de la grille, la zone de stockage garde sa colonne. */
+@container (min-aspect-ratio: 13/10) and (max-height: 340px) {
+  .game {
+    --board: min(calc(100cqh - 108px), 38cqw);
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "levels category category"
+      "levels board tray"
+      "levels actions actions";
+    padding: 4px 8px;
+    gap: 6px;
+    column-gap: 10px;
+  }
+  .levels {
+    gap: 5px;
+    padding: 6px 8px 8px;
+    border-width: 3px;
+    border-radius: 16px;
+  }
+  .levelsTitle {
+    display: none;
+  }
+  .levelButton {
+    min-width: 78px;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 0.95rem;
+  }
+  .check {
+    width: 20px;
+    height: 20px;
+    right: -6px;
+    top: -6px;
+  }
+  .category {
+    justify-self: center;
+  }
+  .categoryName {
+    min-width: min(180px, 36cqw);
+    padding: 2px 12px;
+    font-size: 0.95rem;
+  }
+  .arrow {
+    width: 38px;
+  }
+  .actions {
+    gap: 6px;
+  }
+  .action {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.85rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cloudA,
   .cloudB,
