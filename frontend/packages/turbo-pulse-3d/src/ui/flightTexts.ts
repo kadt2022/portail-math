@@ -1,0 +1,56 @@
+// Textes de l'écran de vol, en français et en anglais.
+//
+// Écrit pour Yamba.
+
+export const FLIGHT_TEXTS = {
+  fr: {
+    label: "Turbo Pulse 3D : vol vers la station",
+    title: "Turbo Pulse 3D",
+    mission: "Pilote ton vaisseau jusqu'à la station Orion. Évite les boules !",
+    keyboard: "Flèches ou ZQSD / WASD : se déplacer · Espace : accélérer · Maj : ralentir",
+    touch: "Joystick à gauche pour te déplacer, boutons à droite pour la vitesse.",
+    go: "Décoller",
+    station: "Station Orion",
+    remaining: "Distance restante",
+    meters: "m",
+    speed: "Vitesse",
+    accelerate: "Accélérer",
+    brake: "Ralentir",
+    stick: "Joystick de pilotage",
+    sound: "Son",
+    soundOn: "Son activé",
+    soundOff: "Son coupé",
+    arrived: "Station Orion atteinte !",
+    arrivedText: "Bravo, tu as évité les boules et posé ton vaisseau à bon port.",
+    again: "Rejouer",
+    workshop: "Atelier du vaisseau",
+    close: "Fermer",
+    noWebgl: "Ton appareil ne peut pas afficher la 3D.",
+  },
+  en: {
+    label: "Turbo Pulse 3D: flight to the station",
+    title: "Turbo Pulse 3D",
+    mission: "Fly your ship to Orion station. Dodge the orbs!",
+    keyboard: "Arrow keys or WASD: move · Space: speed up · Shift: slow down",
+    touch: "Left joystick to move, right buttons for speed.",
+    go: "Take off",
+    station: "Orion station",
+    remaining: "Distance left",
+    meters: "m",
+    speed: "Speed",
+    accelerate: "Speed up",
+    brake: "Slow down",
+    stick: "Flight joystick",
+    sound: "Sound",
+    soundOn: "Sound on",
+    soundOff: "Sound off",
+    arrived: "Orion station reached!",
+    arrivedText: "Well done, you dodged the orbs and brought your ship home.",
+    again: "Play again",
+    workshop: "Ship workshop",
+    close: "Close",
+    noWebgl: "Your device cannot display 3D.",
+  },
+} as const;
+
+export type FlightTexts = (typeof FLIGHT_TEXTS)[keyof typeof FLIGHT_TEXTS];
