@@ -99,7 +99,7 @@ describe("Raster Puzzle : interface jouable", () => {
     // Reprendre la tuile posée, puis la ranger en touchant la zone de stockage.
     await user.click(cell(0));
     expect(cell(0).dataset.selected).toBe("true");
-    await user.click(document.querySelector("[data-tray]") as HTMLElement);
+    await user.click(screen.getByRole("button", { name: "Remettre la tuile dans la zone de stockage" }));
     expect(cell(0).dataset.holds).toBeUndefined();
     expect(pieces()).toHaveLength(9);
   });
@@ -275,7 +275,7 @@ describe("Raster Puzzle : interface jouable", () => {
     expect(cell(wrongCell).dataset.holds).toBe(String(second));
     // Dès que l'enfant bouge une tuile, le verdict disparaît.
     await user.click(cell(wrongCell));
-    await user.click(document.querySelector("[data-tray]") as HTMLElement);
+    await user.click(screen.getByRole("button", { name: "Remettre la tuile dans la zone de stockage" }));
     expect(document.querySelectorAll("[data-verdict]")).toHaveLength(0);
   });
 

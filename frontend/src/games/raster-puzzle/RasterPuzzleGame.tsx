@@ -272,10 +272,11 @@ export function RasterPuzzleGame({ showTitle = true, active = true, fullscreen, 
     if (selected !== null) putInCell(selected, cell);
     else if (puzzle.board[cell] !== null) setSelected(puzzle.board[cell]);
   };
-  const onTrayClick = (event: React.MouseEvent) => {
-    if (!playing || suppressClick.current || selected === null || (event.target as HTMLElement).closest("[data-piece]")) return;
-    const cell = puzzle.board.indexOf(selected);
-    if (cell >= 0) sendBack(cell);
+  // Une tuile posée est choisie : un vrai bouton (clic, toucher ou clavier) occupe le fond de la zone de stockage pour la ranger.
+  const returnCell = playing && selected !== null ? puzzle.board.indexOf(selected) : -1;
+  const onTrayReturn = () => {
+    if (suppressClick.current || returnCell < 0) return;
+    sendBack(returnCell);
   };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -471,7 +472,8 @@ export function RasterPuzzleGame({ showTitle = true, active = true, fullscreen, 
           ) : null}
         </section>
 
-        <aside ref={trayRef} className={styles.tray} data-tray data-guide={guideTarget === "tray" ? "tray" : undefined} aria-label={t("rasterPuzzle.game.trayLabel")} onClick={onTrayClick}>
+        <aside ref={trayRef} className={styles.tray} data-tray data-guide={guideTarget === "tray" ? "tray" : undefined} aria-label={t("rasterPuzzle.game.trayLabel")}>
+          {returnCell >= 0 ? <button type="button" className={styles.trayReturn} aria-label={t("rasterPuzzle.game.trayReturn")} onClick={onTrayReturn} /> : null}
           <div className={styles.trayInner} style={{ "--tray-tile": `${trayTile}px` } as CSSProperties}>
             {inTray
               ? puzzle.tray.map((piece, index) => (

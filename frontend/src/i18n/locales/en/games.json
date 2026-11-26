@@ -100,6 +100,7 @@
       },
       "boardLabel": "Rebuilding grid",
       "trayLabel": "Tiles to place",
+      "trayReturn": "Put the tile back in the storage area",
       "cellEmpty": "Row {{row}}, column {{column}}, empty",
       "cellFilled": "Row {{row}}, column {{column}}, tile placed",
       "pieceLabel": "Tile {{number}}",

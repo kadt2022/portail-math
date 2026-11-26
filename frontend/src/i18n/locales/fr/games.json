@@ -100,6 +100,7 @@
       },
       "boardLabel": "Grille de reconstruction",
       "trayLabel": "Tuiles à placer",
+      "trayReturn": "Remettre la tuile dans la zone de stockage",
       "cellEmpty": "Ligne {{row}}, colonne {{column}}, vide",
       "cellFilled": "Ligne {{row}}, colonne {{column}}, tuile posée",
       "pieceLabel": "Tuile {{number}}",

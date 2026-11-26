@@ -443,8 +443,25 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
+}
+/* Bouton de fond : il couvre toute la zone de stockage (les tuiles restent par-dessus et cliquables). */
+.trayReturn {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.trayReturn:focus-visible {
+  outline: 4px solid #fff;
+  outline-offset: -8px;
 }
 .trayInner {
+  position: relative;
+  pointer-events: none;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -463,6 +480,7 @@
   background: none;
   touch-action: none;
   cursor: grab;
+  pointer-events: auto;
   transition:
     transform 140ms,
     filter 140ms;
