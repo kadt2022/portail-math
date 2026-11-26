@@ -1,0 +1,685 @@
+/* Raster Puzzle : une savane de jeu vidéo pour enfants. Tout est dessiné en CSS et en SVG : seule l'illustration du puzzle est téléchargée,
+   à la demande. Les tailles se calculent sur la hauteur ET la largeur du cadre : jamais d'ascenseur, quel que soit l'appareil. */
+.game {
+  /* Plus il y a de tuiles à ranger, plus la zone de stockage est haute (de 2×2 à 6×6). */
+  --tray-h: clamp(84px, calc(11cqh + var(--n, 3) * 2.4cqh), 230px);
+  --board: min(calc(100cqw - 20px), calc(100cqh - 214px - var(--tray-h)));
+  --r: calc(64px / var(--n, 3));
+  --ink: #2a2150;
+  /* Main qui guide (composant commun). */
+  --guide-size: clamp(46px, 11cqmin, 76px);
+  --guide-ring: clamp(44px, 13cqmin, 84px);
+  --guide-ink: var(--ink);
+  position: relative;
+  isolation: isolate;
+  container-type: size;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto var(--tray-h) auto;
+  grid-template-areas:
+    "category"
+    "levels"
+    "board"
+    "tray"
+    "actions";
+  gap: 8px;
+  justify-items: center;
+  align-items: center;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: "Baloo 2", "Fredoka", "Nunito", "Arial Rounded MT Bold", ui-rounded, "Trebuchet MS", system-ui, sans-serif;
+  background: #8fdcff;
+}
+
+@container (min-aspect-ratio: 13/10) {
+  .game {
+    --board: min(calc(100cqh - 140px), 46cqw);
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "levels category tray"
+      "levels board tray"
+      "levels actions tray";
+    column-gap: 14px;
+    align-content: center;
+  }
+}
+
+.scenery {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+.cloudA {
+  animation: drift 38s ease-in-out infinite alternate;
+}
+.cloudB {
+  animation: drift 52s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift {
+  to {
+    transform: translateX(26px);
+  }
+}
+
+/* Boutons bombés : dégradé, reflet clair en haut, socle plein dessous, ombre portée. Couleurs réglées par --top, --bottom et --edge. */
+.levelButton,
+.action,
+.arrow {
+  --top: #6cb8ff;
+  --bottom: #2f7be0;
+  --edge: #1b4f9c;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 28%);
+  background: linear-gradient(var(--top), var(--bottom));
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 65%),
+    inset 0 -3px 0 rgb(0 0 0 / 18%),
+    0 4px 0 var(--edge),
+    0 8px 8px rgb(0 0 0 / 25%);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    transform 120ms,
+    box-shadow 120ms,
+    filter 120ms;
+}
+.levelButton:hover:not(:disabled),
+.action:hover:not(:disabled),
+.arrow:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.08);
+}
+.levelButton:active:not(:disabled),
+.action:active:not(:disabled),
+.arrow:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 50%),
+    0 1px 0 var(--edge);
+}
+.action:disabled {
+  filter: saturate(0.45) brightness(0.92);
+  cursor: default;
+}
+.violet {
+  --top: #b58cff;
+  --bottom: #6a3fd1;
+  --edge: #43268f;
+}
+.green {
+  --top: #6fe05a;
+  --bottom: #1f9f2c;
+  --edge: #13691c;
+}
+
+/* Niveaux : panneau marine cerclé d'or */
+.levels {
+  grid-area: levels;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 14px;
+  border: 5px solid #f2b24a;
+  border-radius: 22px;
+  background: linear-gradient(#2c3a8c, #1a2257);
+  box-shadow:
+    inset 0 3px 0 rgb(255 255 255 / 25%),
+    0 6px 0 #a8742a,
+    0 12px 14px rgb(0 0 0 / 30%);
+}
+.levelsTitle {
+  margin: 0 0 2px;
+  padding: 4px 18px;
+  border-radius: 12px;
+  background: linear-gradient(#3c4ab0, #25306f);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-align: center;
+}
+.levelButton {
+  position: relative;
+  min-width: 112px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 14px;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+.levelButton[aria-pressed="true"] {
+  --top: #ffe27a;
+  --bottom: #ffb627;
+  --edge: #b97a00;
+  color: #5a3200;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 60%);
+}
+.check {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 26px;
+  height: 26px;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #2fc03d;
+  color: #fff;
+  border: 2px solid #fff;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 35%));
+}
+
+/* Catégorie : pastille violette avec deux flèches orange */
+.category {
+  grid-area: category;
+  display: flex;
+  align-items: stretch;
+  border-radius: 999px;
+  background: linear-gradient(#9b5cff, #5b2fc4);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 45%),
+    0 5px 0 #3b1d86,
+    0 10px 10px rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+.categoryName {
+  min-width: min(220px, 52cqw);
+  padding: 4px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 30%);
+}
+.arrow {
+  --top: #ffc04d;
+  --bottom: #ff8a1f;
+  --edge: #b3560a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  border-radius: 0;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 55%);
+  color: #fff;
+}
+.arrow:hover:not(:disabled) {
+  transform: none;
+}
+
+/* Grille de reconstruction : grand cadre bleu en relief */
+.boardFrame {
+  grid-area: board;
+  position: relative;
+  width: var(--board);
+  height: var(--board);
+  box-sizing: border-box;
+  padding: clamp(6px, 2cqmin, 12px);
+  border-radius: 24px;
+  background: linear-gradient(#3b8cff, #1758c9);
+  box-shadow:
+    inset 0 3px 0 rgb(255 255 255 / 45%),
+    inset 0 -6px 0 rgb(0 0 0 / 18%),
+    0 0 0 4px #0d3b94,
+    0 10px 0 4px #0a2c70,
+    0 22px 24px rgb(0 0 0 / 35%);
+}
+.board {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 0;
+  border-radius: 14px;
+  background: rgb(10 40 110 / 35%);
+  box-shadow: inset 0 4px 8px rgb(0 0 40 / 40%);
+  transition: gap 600ms ease;
+}
+[data-split] .board {
+  gap: var(--gap-on, 6px);
+}
+.cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: min(var(--r), 18%);
+  background: rgb(255 255 255 / 20%);
+  touch-action: none;
+  cursor: pointer;
+}
+.cell[data-holds] {
+  background: none;
+}
+.cell[data-selected] .tileFace {
+  outline: 4px solid #ffe14d;
+  outline-offset: -2px;
+}
+.cell[data-dragging] {
+  opacity: 0.3;
+}
+
+/* Verdict : une coche verte sur une tuile juste, une croix rouge sur une tuile qui n'est pas au bon endroit. */
+.cell[data-verdict]::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  width: clamp(18px, 36%, 30px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: clamp(0.7rem, 2.6cqmin, 1.1rem);
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 40%);
+  z-index: 2;
+}
+.cell[data-verdict="right"]::after {
+  content: "✓";
+  background: #1fae3a;
+}
+.cell[data-verdict="wrong"]::after {
+  content: "✗";
+  background: #e5392b;
+}
+.cell[data-verdict="right"] .tileFace {
+  outline: 4px solid #2fd04a;
+  outline-offset: -2px;
+}
+.cell[data-verdict="wrong"] .tileFace {
+  outline: 4px solid #ff4d3d;
+  outline-offset: -2px;
+  animation: nope 0.5s;
+}
+@keyframes nope {
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+.verdict {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 20px);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 16px;
+  border-radius: 16px;
+  border: 3px solid var(--ink);
+  background: #fff1d6;
+  font-size: clamp(0.85rem, 3cqmin, 1.05rem);
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 25%);
+  animation: pop 0.3s ease-out;
+}
+.verdict[data-kind="wrong"] {
+  background: #ffd9d4;
+}
+.verdict[data-kind="right"] {
+  background: #d8f7dc;
+}
+@keyframes pop {
+  from {
+    transform: translateX(-50%) scale(0.7);
+    opacity: 0;
+  }
+}
+.validate {
+  min-height: 48px;
+  padding-left: clamp(10px, 3cqw, 22px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.validateIcon {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+/* Une tuile : un morceau de l'image, avec liseré blanc, relief et ombre ; sans séparation quand l'image est entière. */
+.tileFace {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: min(var(--r), 18%);
+  background-color: #fff;
+  background-repeat: no-repeat;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 3px 5px rgb(0 0 0 / 35%);
+  transition:
+    border-radius 600ms ease,
+    box-shadow 600ms ease;
+}
+[data-phase="reveal"] .tileFace,
+[data-phase="won"] .tileFace {
+  border-radius: 0;
+  box-shadow: none;
+}
+/* L'image entière : montrée au début, pour l'indice, puis à la réussite quand les séparations ont disparu. */
+.fullImage {
+  position: absolute;
+  inset: clamp(6px, 2cqmin, 12px);
+  width: calc(100% - 2 * clamp(6px, 2cqmin, 12px));
+  height: calc(100% - 2 * clamp(6px, 2cqmin, 12px));
+  object-fit: cover;
+  border-radius: 14px;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+.fullImage[data-visible] {
+  opacity: 1;
+}
+.fullImage[data-won] {
+  transition: opacity 700ms ease 600ms;
+}
+.banner {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: #fffbe8;
+  border: 3px solid var(--ink);
+  font-size: 1.05rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 25%);
+}
+
+/* Zone de stockage : plateau de bois clair */
+.tray {
+  grid-area: tray;
+  box-sizing: border-box;
+  align-self: stretch;
+  justify-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  margin: 4px 0;
+  border-radius: 24px;
+  background: linear-gradient(#fbe3b6, #eab978);
+  box-shadow:
+    inset 0 3px 0 rgb(255 255 255 / 55%),
+    inset 0 -6px 0 rgb(120 70 20 / 25%),
+    0 0 0 4px #c98a45,
+    0 8px 0 4px #9a6228,
+    0 18px 20px rgb(0 0 0 / 30%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+/* Bouton de fond : il couvre toute la zone de stockage (les tuiles restent par-dessus et cliquables). */
+.trayReturn {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.trayReturn:focus-visible {
+  outline: 4px solid #fff;
+  outline-offset: -8px;
+}
+.trayInner {
+  position: relative;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  width: 100%;
+}
+.piece {
+  flex: none;
+  width: var(--tray-tile, 48px);
+  height: var(--tray-tile, 48px);
+  padding: 0;
+  border: 0;
+  border-radius: min(var(--r), 18%);
+  background: none;
+  touch-action: none;
+  cursor: grab;
+  pointer-events: auto;
+  transition:
+    transform 140ms,
+    filter 140ms;
+}
+.piece:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+.piece[data-selected] {
+  transform: translateY(-6px) scale(1.1);
+  filter: drop-shadow(0 0 8px #ffe14d);
+}
+.piece[data-selected] .tileFace {
+  outline: 4px solid #ffe14d;
+  outline-offset: -2px;
+}
+.piece[data-dragging] {
+  opacity: 0.3;
+}
+.ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  pointer-events: none;
+  transform: translate(-999px, -999px);
+  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 40%));
+}
+.ghost .tileFace {
+  outline: 4px solid #ffe14d;
+  outline-offset: -2px;
+}
+
+/* Commandes */
+.actions {
+  grid-area: actions;
+  display: flex;
+  gap: clamp(5px, 1.6cqw, 10px);
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+.action {
+  min-height: 44px;
+  padding: 0 clamp(8px, 2.4cqw, 20px);
+  border-radius: 999px;
+  font-size: clamp(0.78rem, 3cqmin, 1.15rem);
+  white-space: nowrap;
+}
+
+.stars {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+}
+.stars i {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px;
+  border-radius: 4px;
+  background: hsl(var(--h) 90% 58%);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 55%),
+    0 2px 0 rgb(0 0 0 / 25%);
+  opacity: 0;
+  animation: burst 1s ease-out calc(1100ms + var(--d)) forwards;
+}
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--a) + 120deg)) translateY(calc(var(--board) * -0.55)) scale(1);
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.levelButton:focus-visible,
+.action:focus-visible,
+.arrow:focus-visible,
+.cell:focus-visible,
+.piece:focus-visible {
+  outline: 4px solid #fff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px #1f6feb;
+}
+
+/* Écran en hauteur : les niveaux passent en une rangée de pastilles au-dessus de la grille. */
+@container (max-aspect-ratio: 13/10) {
+  .levels {
+    flex-direction: row;
+    gap: 6px;
+    padding: 4px 8px 6px;
+    border-width: 3px;
+    border-radius: 16px;
+  }
+  .levelsTitle {
+    display: none;
+  }
+  .levelButton {
+    min-width: 0;
+    min-height: 30px;
+    padding: 0 clamp(8px, 2.6cqw, 16px);
+    font-size: clamp(0.85rem, 3.4cqw, 1.1rem);
+  }
+  .categoryName {
+    font-size: 1rem;
+  }
+}
+
+/* Paysage court (petit téléphone couché, scène de 340 px de haut ou moins) : tout doit rester visible. Les niveaux se resserrent, la
+   catégorie et les boutons s'étendent au-dessus et en dessous de la grille, la zone de stockage garde sa colonne. */
+@container (min-aspect-ratio: 13/10) and (max-height: 340px) {
+  .game {
+    --board: min(calc(100cqh - 108px), 38cqw);
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "levels category category"
+      "levels board tray"
+      "levels actions actions";
+    padding: 4px 8px;
+    gap: 6px;
+    column-gap: 10px;
+  }
+  .levels {
+    gap: 5px;
+    padding: 6px 8px 8px;
+    border-width: 3px;
+    border-radius: 16px;
+  }
+  .levelsTitle {
+    display: none;
+  }
+  .levelButton {
+    min-width: 78px;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 0.95rem;
+  }
+  .check {
+    width: 20px;
+    height: 20px;
+    right: -6px;
+    top: -6px;
+  }
+  .category {
+    justify-self: center;
+  }
+  .categoryName {
+    min-width: min(180px, 36cqw);
+    padding: 2px 12px;
+    font-size: 0.95rem;
+  }
+  .arrow {
+    width: 38px;
+  }
+  .actions {
+    gap: 6px;
+  }
+  .action {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloudA,
+  .cloudB,
+  .verdict,
+  .cell[data-verdict] .tileFace,
+  .stars i {
+    animation: none !important;
+  }
+  .board,
+  .tileFace,
+  .piece,
+  .fullImage,
+  .levelButton,
+  .action {
+    transition: none !important;
+  }
+}
+
+[data-frozen] .cloudA,
+[data-frozen] .cloudB {
+  animation-play-state: paused;
+}

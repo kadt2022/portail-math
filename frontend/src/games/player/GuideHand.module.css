@@ -1,0 +1,128 @@
+/* Main qui guide : clignote et « appuie » sur la cible. Le jeu règle sa taille et sa couleur d'encre avec trois variables :
+   --guide-size (la main), --guide-ring (l'anneau lumineux), --guide-ink (contour et texte de la bulle). */
+/* Couche du guide : couvre tout le jeu, ne capte jamais un toucher. */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+/* Surlignage de la zone ciblée. */
+.target {
+  position: absolute;
+  box-sizing: border-box;
+  border: 4px solid #ffe14d;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 3px rgb(255 255 255 / 80%),
+    0 0 16px 4px rgb(255 215 0 / 70%);
+  animation: glow 1.1s ease-in-out infinite;
+}
+.guide {
+  position: absolute;
+  z-index: 20;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--guide-ring, 64px);
+  height: var(--guide-ring, 64px);
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 0 14px 4px rgb(255 215 0 / 90%);
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  animation: ping 1.1s ease-out infinite;
+}
+.hand {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: var(--guide-size, 60px);
+  height: auto;
+  transform-origin: 10% 8%;
+  animation:
+    tap 1.1s ease-in-out infinite,
+    blinkHand 1.1s ease-in-out infinite;
+  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 40%));
+}
+.text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 21;
+  max-width: 100%;
+  pointer-events: none;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border: 3px solid var(--guide-ink, #3a2a1f);
+  border-radius: 14px;
+  background: #fffbe8;
+  color: var(--guide-ink, #3a2a1f);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 25%);
+}
+/* Cartouche fixe (petit écran ou aucune place libre) : une seule ligne courte, jamais de grosse bulle. */
+.text[data-kind="dock"] {
+  padding: 3px 12px;
+  border-width: 2px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes tap {
+  0%,
+  100% {
+    transform: translate(10px, 12px) scale(1);
+  }
+  45% {
+    transform: translate(0, 0) scale(0.92);
+  }
+}
+@keyframes blinkHand {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes ping {
+  0% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .hand,
+  .target {
+    animation: none !important;
+  }
+  .hand {
+    transform: translate(4px, 6px);
+  }
+}

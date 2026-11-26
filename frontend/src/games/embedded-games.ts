@@ -14,6 +14,7 @@ const loaders = {
   "train-des-multiplications": () => import("./train-multiplications/TrainMultiplicationsPlayer").then((m) => ({ default: m.TrainMultiplicationsPlayer })),
   "riviere-des-fractions": () => import("./riviere-fractions/RiviereFractionsPlayer").then((m) => ({ default: m.RiviereFractionsPlayer })),
   "yamba-ecrit": () => import("./yamba-writing/YambaWritingGame").then((m) => ({ default: m.YambaWritingGame })),
+  "raster-puzzle": () => import("./raster-puzzle/RasterPuzzleGame").then((m) => ({ default: m.RasterPuzzleGame })),
 } as const;
 
 type EmbeddedGameId = keyof typeof loaders;
@@ -72,3 +73,4 @@ export const LeoDrivingPlayer = lazy(() => open("conduire-avec-leo"));
 export const TrainMultiplicationsPlayer = lazy(() => open("train-des-multiplications"));
 export const RiviereFractionsPlayer = lazy(() => open("riviere-des-fractions"));
 export const YambaWritingGame = lazy(() => open("yamba-ecrit"));
+export const RasterPuzzleGame = lazy(() => open("raster-puzzle"));

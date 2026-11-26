@@ -150,15 +150,15 @@ describe("Yamba écrit : interface jouable", () => {
     await screen.findByRole("group", { name: "Cases du mot" }, { timeout: 12000 });
     expect(await screen.findByTestId("guide-hand")).toHaveAttribute("data-target", "tile");
     // Ici le geste a besoin d'être expliqué : la bulle dit de placer les lettres dans les cases.
-    expect(screen.getByText("Touche les lettres pour les placer dans les cases")).toBeInTheDocument();
+    expect(screen.getByText("Touche une lettre")).toBeInTheDocument();
     // Elle se pose au centre de la rangée de lettres : pas sur une lettre en particulier, encore moins sur la première.
     expect(document.querySelector("[data-guide='tile']")).toBe(screen.getByRole("group", { name: "Lettres disponibles" }));
     expect(document.querySelectorAll("button[data-guide]")).toHaveLength(1); // seul le bouton Lancer est marqué
 
     await type(user, "BANAEN");
-    expect(await screen.findByText("Touche cette case pour retirer la lettre")).toBeInTheDocument();
+    expect(await screen.findByText("Touche cette case")).toBeInTheDocument();
     expect(screen.getByTestId("guide-hand")).toHaveAttribute("data-target", "wrong");
-    expect(screen.getByText("Touche cette case pour retirer la lettre")).toBeInTheDocument();
+    expect(screen.getByText("Touche cette case")).toBeInTheDocument();
 
     await user.click(screen.getAllByRole("button", { name: /posée/ })[4]);
     await user.click(screen.getAllByRole("button", { name: /posée/ })[4]);

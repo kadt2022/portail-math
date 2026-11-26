@@ -70,6 +70,76 @@
     "cta": "Play",
     "tagline": "Build the village"
   },
+  "rasterPuzzle": {
+    "name": "Raster Puzzle",
+    "description": "A picture is cut into tiles: put them back in the right place to rebuild the picture.",
+    "cta": "Play",
+    "tagline": "Rebuild the picture",
+    "game": {
+      "title": "Raster Puzzle",
+      "screen": {
+        "label": "Game Raster Puzzle"
+      },
+      "levelTitle": "Level",
+      "levels": {
+        "beginner": "Beginner",
+        "easy": "Easy",
+        "medium": "Medium",
+        "advanced": "Advanced",
+        "expert": "Expert"
+      },
+      "categoryLabel": "Category",
+      "categoryPrevious": "Previous category",
+      "categoryNext": "Next category",
+      "categories": {
+        "all": "All categories",
+        "fruits": "Fruits",
+        "domestic-animals": "Pets",
+        "wild-animals": "Wild animals",
+        "objects": "Everyday objects"
+      },
+      "boardLabel": "Rebuilding grid",
+      "trayLabel": "Tiles to place",
+      "trayReturn": "Put the tile back in the storage area",
+      "cellEmpty": "Row {{row}}, column {{column}}, empty",
+      "cellFilled": "Row {{row}}, column {{column}}, tile placed",
+      "pieceLabel": "Tile {{number}}",
+      "banner": "Look closely at the picture!",
+      "stats": {
+        "solved": "Pictures rebuilt"
+      },
+      "status": {
+        "intro": "Look closely at the picture, it is about to be cut.",
+        "play": "Drag the tiles into the grid to rebuild the picture.",
+        "selected": "Tile chosen: tap a box of the grid to place it.",
+        "won": "Well done! The picture is rebuilt."
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this picture",
+        "hint": "Hint",
+        "next": "Next picture",
+        "backToGames": "Back to games",
+        "validate": "Check"
+      },
+      "guide": {
+        "drag": "Drag a tile into the grid"
+      },
+      "howTo": {
+        "step1Title": "Look at the picture",
+        "step1": "The picture shows for a moment, then it is cut into shuffled tiles.",
+        "step2Title": "Put the tiles back",
+        "step2": "Drag each tile into the grid, or tap a tile then a box. Tap a box to take its tile back.",
+        "step3Title": "Need help?",
+        "step3": "The Hint button shows the picture for a moment. When everything is in place, the picture rebuilds itself."
+      },
+      "verdict": {
+        "wrong": "Not yet! The crosses show the tiles that are not in the right place.",
+        "right": "Well done! Everything placed is right, keep going.",
+        "empty": "Place a few tiles first, then check."
+      }
+    }
+  },
   "yambaWriting": {
     "name": "Yamba spells",
     "description": "A machine picks a picture: write its name by putting the letters in the right order.",
@@ -127,8 +197,8 @@
         "step3": "The Hint button puts the right letters back in place. When the word is correct, the machine says it."
       },
       "guide": {
-        "letter": "Tap the letters to put them in the boxes",
-        "remove": "Tap this box to take the letter back"
+        "letter": "Tap a letter",
+        "remove": "Tap this box"
       }
     }
   },

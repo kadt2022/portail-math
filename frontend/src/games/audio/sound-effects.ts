@@ -22,7 +22,11 @@ export type SoundEffect =
   // Le jeu d’écriture Yamba : une machine mécanique, des sons de bois et de laiton, jamais agressifs.
   | "reelTick"
   | "dropThud"
-  | "letterPlace";
+  | "letterPlace"
+  // Raster Puzzle : des tuiles de bois verni qui se posent, s'échangent, puis un carillon quand l'image est reconstituée.
+  | "tilePlace"
+  | "tileSwap"
+  | "puzzleDone";
 
 export interface EffectOptions {
   /** Force de l'effet, de 0 à 1 (ex. taille du combo, fruit visé ou non). */
@@ -204,6 +208,24 @@ const effects: Record<SoundEffect, (context: Context, output: AudioNode, when: n
   letterPlace(context, output, when) {
     tone(context, output, when, "triangle", 720, 520, 0.07, 0.12, 0.002);
     burst(context, output, when, "bandpass", 1800, 1200, 0.03, 0.05);
+  },
+
+  // --- Raster Puzzle ---
+  // Tuile posée dans la grille : un « toc » de bois net, avec un léger claquement.
+  tilePlace(context, output, when) {
+    tone(context, output, when, "sine", 420, 260, 0.1, 0.22, 0.002);
+    burst(context, output, when, "bandpass", 2200, 1400, 0.04, 0.07);
+  },
+  // Tuile échangée ou rendue : deux petits « tic » qui se croisent.
+  tileSwap(context, output, when) {
+    tone(context, output, when, "triangle", 560, 440, 0.06, 0.12, 0.002);
+    tone(context, output, when + 0.07, "triangle", 440, 620, 0.07, 0.12, 0.002);
+  },
+  // Image reconstituée : un arpège clair qui monte, puis un accord de carillon.
+  puzzleDone(context, output, when) {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((note, index) => tone(context, output, when + index * 0.08, "triangle", note, note, 0.24, 0.14));
+    [659.25, 987.77, 1318.5].forEach((note) => tone(context, output, when + 0.42, "sine", note, note, 1.1, 0.1, 0.02));
+    burst(context, output, when + 0.36, "highpass", 5500, 8500, 0.8, 0.03);
   },
 };
 
