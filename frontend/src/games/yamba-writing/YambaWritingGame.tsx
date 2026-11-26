@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useGameAudio } from "../audio/useGameAudio";
 import { useGameLoading } from "../loading/GameLoaderHost";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
+import { GuideHand } from "../player/GuideHand";
 import { chooseGuide } from "./guide";
-import { GuideHand } from "./GuideHand";
 import { Picture, Reel } from "./Reel";
 import styles from "./YambaWritingGame.module.css";
 import {

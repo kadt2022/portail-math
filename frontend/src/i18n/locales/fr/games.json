@@ -70,6 +70,75 @@
     "cta": "Jouer",
     "tagline": "Construis le village"
   },
+  "rasterPuzzle": {
+    "name": "Raster Puzzle",
+    "description": "Une image se découpe en tuiles : replace-les au bon endroit pour reconstituer l'image.",
+    "cta": "Jouer",
+    "tagline": "Reconstitue l'image",
+    "game": {
+      "title": "Raster Puzzle",
+      "screen": {
+        "label": "Jeu Raster Puzzle"
+      },
+      "levelTitle": "Niveau",
+      "levels": {
+        "beginner": "Débutant",
+        "easy": "Facile",
+        "medium": "Intermédiaire",
+        "advanced": "Avancé",
+        "expert": "Expert"
+      },
+      "categoryLabel": "Catégorie",
+      "categoryPrevious": "Catégorie précédente",
+      "categoryNext": "Catégorie suivante",
+      "categories": {
+        "all": "Toutes catégories",
+        "fruits": "Fruits",
+        "domestic-animals": "Animaux domestiques",
+        "wild-animals": "Animaux sauvages",
+        "objects": "Objets du quotidien"
+      },
+      "boardLabel": "Grille de reconstruction",
+      "trayLabel": "Tuiles à placer",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, vide",
+      "cellFilled": "Ligne {{row}}, colonne {{column}}, tuile posée",
+      "pieceLabel": "Tuile {{number}}",
+      "banner": "Regarde bien l'image !",
+      "stats": {
+        "solved": "Images reconstituées"
+      },
+      "status": {
+        "intro": "Regarde bien l'image, elle va se découper.",
+        "play": "Glisse les tuiles dans la grille pour reconstituer l'image.",
+        "selected": "Tuile choisie : touche une case de la grille pour la poser.",
+        "won": "Bravo ! L'image est reconstituée."
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer cette image",
+        "hint": "Indice",
+        "next": "Image suivante",
+        "backToGames": "Retour aux jeux",
+        "validate": "Valider"
+      },
+      "guide": {
+        "drag": "Glisse les tuiles dans la grille pour reconstituer l'image"
+      },
+      "howTo": {
+        "step1Title": "Regarde l'image",
+        "step1": "L'image apparaît un instant, puis elle se découpe en tuiles mélangées.",
+        "step2Title": "Replace les tuiles",
+        "step2": "Glisse chaque tuile dans la grille, ou touche une tuile puis une case. Touche une case pour reprendre sa tuile.",
+        "step3Title": "Besoin d'aide ?",
+        "step3": "Le bouton Indice montre l'image un instant. Quand tout est bien placé, l'image se reforme toute seule."
+      },
+      "verdict": {
+        "wrong": "Pas encore ! Les croix montrent les tuiles qui ne sont pas au bon endroit.",
+        "right": "Bien ! Tout ce qui est posé est juste, continue.",
+        "empty": "Pose d'abord quelques tuiles, puis valide."
+      }
+    }
+  },
   "yambaWriting": {
     "name": "Yamba écrit",
     "description": "Une machine tire une illustration : écris son nom en plaçant les lettres dans le bon ordre.",

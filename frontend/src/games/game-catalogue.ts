@@ -10,6 +10,7 @@
 import fluxForgeThumb from "./assets/thumb-flux-forge.webp";
 import fractionRiverThumb from "./assets/thumb-fraction-river.webp";
 import riviereFractionsThumb from "./assets/thumb-riviere-fractions.webp";
+import rasterPuzzleThumb from "./assets/thumb-raster-puzzle.webp";
 import yambaWritingThumb from "./assets/thumb-yamba-ecrit.webp";
 import leoCar from "./assets/leo-car-front-banner.webp";
 import leoCountryside from "./assets/leo-countryside-1280.webp";
@@ -165,6 +166,19 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     subjectKey: "meta.subject.french",
     levelKey: "meta.level.primary",
     thumbnail: yambaWritingThumb,
+  },
+  {
+    id: "raster-puzzle",
+    nameKey: "rasterPuzzle.name",
+    taglineKey: "rasterPuzzle.tagline",
+    descriptionKey: "rasterPuzzle.description",
+    // Se joue dans le lecteur standard de la page Jeux (l’adresse reste aussi une page autonome).
+    href: "/jeux/raster-puzzle",
+    availability: "react",
+    categoryId: "logic",
+    embed: true,
+    levelKey: "meta.level.primary",
+    thumbnail: rasterPuzzleThumb,
   },
   {
     id: "flux-forge",

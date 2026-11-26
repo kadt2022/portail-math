@@ -144,8 +144,10 @@ describe("GamesCataloguePage", () => {
     renderPage();
     await user.click(screen.getByRole("button", { name: "Logique" }));
     const cards = screen.getAllByRole("link", { name: /^Jouer à/ });
-    expect(cards).toHaveLength(1);
+    // Les Tuiles magiques et Raster Puzzle, deux jeux de réflexion.
+    expect(cards).toHaveLength(2);
     expect(cards[0]).toHaveAccessibleName("Jouer à Les Tuiles magiques");
+    expect(cards[1]).toHaveAccessibleName("Jouer à Raster Puzzle");
     expect(screen.getByRole("button", { name: "Logique" })).toHaveAttribute("aria-pressed", "true");
   });
 
