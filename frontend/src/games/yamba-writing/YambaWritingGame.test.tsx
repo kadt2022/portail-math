@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -140,7 +140,8 @@ describe("Yamba écrit : interface jouable", () => {
     render(<YambaWritingGame />);
     // Départ : la main montre le bouton Lancer, avec sa bulle.
     expect(screen.getByTestId("guide-hand")).toHaveAttribute("data-target", "launch");
-    expect(screen.getByText("Appuie ici pour lancer la machine")).toBeInTheDocument();
+    // Le bouton dit déjà ce qu'il fait : la main seule suffit, sans bulle.
+    expect(screen.queryByText(/Appuie ici/)).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "Lancer" }));
     // Rouleau et chute : rien à toucher, pas de main.
@@ -148,9 +149,11 @@ describe("Yamba écrit : interface jouable", () => {
 
     await screen.findByRole("group", { name: "Cases du mot" }, { timeout: 12000 });
     expect(await screen.findByTestId("guide-hand")).toHaveAttribute("data-target", "tile");
-    expect(screen.getByText("Touche une lettre")).toBeInTheDocument();
-    // Elle désigne un emplacement à toucher, jamais la lettre qui convient.
-    expect(document.querySelector("[data-guide='tile']")).toBe(screen.getAllByRole("button", { name: /^Lettre / })[0]);
+    // Ici le geste a besoin d'être expliqué : la bulle dit de placer les lettres dans les cases.
+    expect(screen.getByText("Touche les lettres pour les placer dans les cases")).toBeInTheDocument();
+    // Elle se pose au centre de la rangée de lettres : pas sur une lettre en particulier, encore moins sur la première.
+    expect(document.querySelector("[data-guide='tile']")).toBe(screen.getByRole("group", { name: "Lettres disponibles" }));
+    expect(document.querySelectorAll("button[data-guide]")).toHaveLength(1); // seul le bouton Lancer est marqué
 
     await type(user, "BANAEN");
     expect(await screen.findByText("Touche cette case pour retirer la lettre")).toBeInTheDocument();
@@ -162,7 +165,7 @@ describe("Yamba écrit : interface jouable", () => {
     await type(user, "NE");
     expect(await screen.findByText("Bravo ! Tu as écrit banane.")).toBeInTheDocument();
     expect(await screen.findByTestId("guide-hand")).toHaveAttribute("data-target", "launch");
-    expect(screen.getByText("Appuie ici pour une nouvelle image")).toBeInTheDocument();
+    expect(screen.queryByText(/nouvelle image/)).toBeNull();
   });
 
   it("après un premier mot réussi, la main ne s'impose plus à chaque étape", async () => {
@@ -183,5 +186,67 @@ describe("Yamba écrit : interface jouable", () => {
     expect(window.localStorage.getItem("yamba.writing.guided")).toBe("1");
     await user.click(screen.getByRole("button", { name: "Nouvelle manche" }));
     expect(screen.queryByTestId("guide-hand")).toBeNull();
+  });
+
+  it("la main suit chaque geste : quand une mauvaise lettre est retirée, elle passe à la mauvaise case suivante", async () => {
+    // Positions simulées : chaque case du mot est 100 px plus loin que la précédente.
+    const rectOf = (element: Element) => {
+      const slots = [...document.querySelectorAll("[role='group'][aria-label='Cases du mot'] button")];
+      const index = Math.max(0, slots.indexOf(element));
+      return { left: index * 100, top: 0, width: 50, height: 50, right: 0, bottom: 0, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
+    };
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      return rectOf(this);
+    });
+    const user = userEvent.setup();
+    render(<YambaWritingGame />);
+    await startRound(user);
+    await type(user, "BANAEN");
+    const hand = await screen.findByTestId("guide-hand");
+    expect(hand).toHaveAttribute("data-target", "wrong");
+    const first = hand.style.left;
+    await user.click(screen.getAllByRole("button", { name: /posée/ })[4]);
+    expect(screen.getByTestId("guide-hand").style.left).not.toBe(first);
+  });
+
+  it("le nombre de cases du mot est donné à la mise en page pour que le mot reste sur une seule ligne", async () => {
+    const user = userEvent.setup();
+    render(<YambaWritingGame />);
+    (Math.random as ReturnType<typeof vi.fn>).mockReturnValue(0.999);
+    await user.click(screen.getByRole("button", { name: "Fruits" }));
+    await user.click(screen.getByRole("button", { name: "Lancer" }));
+    await screen.findByRole("group", { name: "Cases du mot" }, { timeout: 12000 });
+    // « noix de coco » : dix lettres et deux espaces.
+    expect(screen.getByRole("region", { name: "Écris le mot" }).style.getPropertyValue("--count")).toBe("12");
+  });
+
+  it("en pause pendant la chute, la partie n'avance pas ; elle reprend là où elle en était", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    try {
+      render(<YambaWritingGame />);
+      fireEvent.click(screen.getByRole("button", { name: "Lancer" }));
+      // Rouleau (700 ms en mouvement réduit) : la chute commence.
+      act(() => {
+        vi.advanceTimersByTime(760);
+      });
+      expect(screen.getByTestId("dropper")).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(60);
+      });
+      fireEvent.click(screen.getAllByRole("button", { name: "Pause" })[0]);
+      // Longtemps après : la chute est figée, l'écriture n'a pas commencé et le son du choc n'a pas retenti derrière la pause.
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(screen.getByTestId("dropper")).toBeInTheDocument();
+      expect(screen.queryByRole("group", { name: "Cases du mot" })).toBeNull();
+      fireEvent.click(screen.getAllByRole("button", { name: /^(Jouer|Reprendre|Continuer)$/ })[0]);
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+      expect(screen.getByRole("group", { name: "Cases du mot" })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

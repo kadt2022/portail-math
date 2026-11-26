@@ -90,6 +90,13 @@
         "wild-animals": "Animaux sauvages",
         "objects": "Objets du quotidien"
       },
+      "categoriesShort": {
+        "all": "Toutes",
+        "domestic-animals": "Domestiques",
+        "wild-animals": "Sauvages",
+        "fruits": "Fruits",
+        "objects": "Objets"
+      },
       "slotsLabel": "Cases du mot",
       "tilesLabel": "Lettres disponibles",
       "tileLabel": "Lettre {{letter}}",
@@ -120,9 +127,7 @@
         "step3": "Le bouton Indice remet les lettres justes en place. Quand le mot est correct, la machine le prononce."
       },
       "guide": {
-        "launch": "Appuie ici pour lancer la machine",
-        "again": "Appuie ici pour une nouvelle image",
-        "letter": "Touche une lettre",
+        "letter": "Touche les lettres pour les placer dans les cases",
         "remove": "Touche cette case pour retirer la lettre"
       }
     }

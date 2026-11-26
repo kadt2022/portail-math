@@ -20,8 +20,8 @@ export interface GuideInput {
 
 export interface Guide {
   target: GuideTarget;
-  /** Clé du texte de la bulle (namespace « games »). */
-  textKey: string;
+  /** Clé du texte de la bulle (namespace « games »), seulement quand le geste a besoin d’être expliqué ; sinon pas de bulle. */
+  textKey: string | null;
 }
 
 /** Étape à montrer, ou null (rien à toucher pendant le rouleau et la chute, ou la main n'est pas utile). */
@@ -29,9 +29,9 @@ export function chooseGuide(input: GuideInput): Guide | null {
   if (input.frozen || (!input.beginner && !input.nudged)) return null;
   switch (input.phase) {
     case "idle":
-      return { target: "launch", textKey: "yambaWriting.game.guide.launch" };
+      return { target: "launch", textKey: null };
     case "won":
-      return { target: "launch", textKey: "yambaWriting.game.guide.again" };
+      return { target: "launch", textKey: null };
     case "writing":
       if (input.hasWrongLetters) return { target: "wrong", textKey: "yambaWriting.game.guide.remove" };
       return input.hasFreeTile ? { target: "tile", textKey: "yambaWriting.game.guide.letter" } : null;

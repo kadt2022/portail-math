@@ -13,5 +13,5 @@ export function illustrationUrl(id: string): string | undefined {
 
 /** Identifiants disponibles dans la bibliothèque. */
 export function illustrationIds(): string[] {
-  return [...urls.keys()].sort();
+  return [...urls.keys()].sort((a, b) => a.localeCompare(b));
 }

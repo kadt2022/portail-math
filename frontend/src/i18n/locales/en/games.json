@@ -90,6 +90,13 @@
         "wild-animals": "Wild animals",
         "objects": "Everyday objects"
       },
+      "categoriesShort": {
+        "all": "All",
+        "domestic-animals": "Pets",
+        "wild-animals": "Wild",
+        "fruits": "Fruits",
+        "objects": "Objects"
+      },
       "slotsLabel": "Word boxes",
       "tilesLabel": "Available letters",
       "tileLabel": "Letter {{letter}}",
@@ -120,9 +127,7 @@
         "step3": "The Hint button puts the right letters back in place. When the word is correct, the machine says it."
       },
       "guide": {
-        "launch": "Press here to start the machine",
-        "again": "Press here for a new picture",
-        "letter": "Tap a letter",
+        "letter": "Tap the letters to put them in the boxes",
         "remove": "Tap this box to take the letter back"
       }
     }

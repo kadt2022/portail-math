@@ -1,8 +1,8 @@
 /* Yamba écrit : l'atelier de jouets. Une machine à rouleau, un réceptacle, des blocs-lettres. Tout est dessiné en CSS et en SVG :
    aucun décor à télécharger, seules les illustrations du mot (WebP) le sont, à la demande. */
 .game {
-  --cell: clamp(34px, min(calc((100cqh - 340px) / 5.5), 15cqw), 120px);
-  --block: clamp(40px, min(calc(var(--cell) * 1.15), 13cqw), 84px);
+  --cell: clamp(20px, min(calc((100cqh - 235px) / 6.3), 14cqw), 120px);
+  --block: clamp(22px, calc(var(--cell) * 1.15), 84px);
   --wood: #3a2a1f;
   --brass: #f2c14e;
   position: relative;
@@ -11,15 +11,16 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: clamp(22px, 7cqh, 46px) 10px 12px;
+  padding: clamp(18px, 5.5cqh, 44px) 10px 10px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto auto;
-  align-content: start;
+  /* Hauteur à revendre (téléphone tenu droit) : l’espace se répartit entre les blocs au lieu de rester en bas. */
+  align-content: space-evenly;
   gap: 8px;
   justify-items: center;
   align-items: start;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   color: var(--wood);
   font-family: "Baloo 2", "Fredoka", "Nunito", "Arial Rounded MT Bold", ui-rounded, "Trebuchet MS", system-ui, sans-serif;
   background: #a8e3ee;
@@ -62,10 +63,10 @@
 
 @container (min-aspect-ratio: 5/4) {
   .game {
-    --cell: clamp(36px, min(calc((100cqh - 100px) / 6.1), 11cqw), 130px);
-    grid-template-columns: auto 1fr;
+    --cell: clamp(20px, min(calc((100cqh - 125px) / 4.4), 8.5cqw), 130px);
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: auto 1fr;
-    --block: clamp(40px, min(calc(var(--cell) * 1.15), 6.4cqw), 84px);
+    --block: clamp(24px, calc(var(--cell) * 1.15), 84px);
     column-gap: 22px;
     align-items: center;
   }
@@ -78,14 +79,15 @@
 .categories {
   display: flex;
   max-width: 100%;
-  min-height: 46px;
   box-sizing: border-box;
-  gap: 8px;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  gap: 6px 8px;
   padding: 3px 6px 8px;
-  /* Une seule ligne, qui défile au doigt sur un petit écran : elle ne mange pas la place de la machine. */
-  justify-content: safe center;
-  scrollbar-width: none;
+  /* Toutes les catégories restent visibles, sur une ou deux lignes selon la largeur : rien à faire défiler. */
+  justify-content: center;
+}
+.categoryShort {
+  display: none;
 }
 .category {
   flex: none;
@@ -141,7 +143,7 @@
   grid-template-areas:
     "marquee marquee"
     "reel launch"
-    "tray tray";
+    "reel tray";
   justify-items: center;
   align-items: center;
   column-gap: calc(var(--cell) * 0.3);
@@ -305,8 +307,20 @@
   align-items: center;
   justify-content: center;
   z-index: 3;
-  animation: fall 1.1s forwards;
+  animation:
+    fall 1.1s forwards,
+    slide 1.1s forwards;
   filter: drop-shadow(0 8px 5px rgb(58 42 31 / 35%));
+}
+@keyframes slide {
+  0% {
+    translate: 0 0;
+    animation-timing-function: ease-in-out;
+  }
+  40%,
+  100% {
+    translate: var(--fx, 0px) 0;
+  }
 }
 @keyframes fall {
   0% {
@@ -339,9 +353,9 @@
   grid-area: launch;
   position: relative;
   width: calc(var(--cell) * 1.9);
-  height: calc(var(--cell) * 1.45);
-  min-width: 96px;
-  min-height: 74px;
+  height: calc(var(--cell) * 1.3);
+  min-width: 64px;
+  min-height: 46px;
   padding: 0;
   border: 0;
   background: none;
@@ -378,7 +392,7 @@
     inset 0 -10px 12px rgb(80 0 0 / 45%),
     0 6px 0 #8a150b;
   color: #fff;
-  font-size: clamp(1rem, calc(var(--cell) * 0.34), 1.6rem);
+  font-size: clamp(0.78rem, calc(var(--cell) * 0.3), 1.5rem);
   font-weight: 800;
   line-height: 1.02;
   text-align: center;
@@ -416,8 +430,8 @@
 .tray {
   grid-area: tray;
   position: relative;
-  width: calc(var(--cell) * 2.7);
-  height: calc(var(--cell) * 1.8);
+  width: calc(var(--cell) * 2.4);
+  height: calc(var(--cell) * 1.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,6 +525,10 @@
 
 /* Écriture : cases creusées dans une planche, blocs-lettres de jouet */
 .writing {
+  /* --count : nombre de cases du mot. Taille d'un bloc = la place disponible partagée entre les cases (voir --bw). */
+  --g: clamp(2px, 1cqw, 8px);
+  --bw: clamp(14px, min(var(--block), calc((100cqw - 26px - (var(--count, 1) - 1) * var(--g)) / var(--count, 1))), 84px);
+  container-type: inline-size;
   width: 100%;
   min-width: 0;
   display: flex;
@@ -531,14 +549,14 @@
 .slots,
 .tiles {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 10px;
+  gap: var(--g);
 }
 .slots {
   max-width: 100%;
   box-sizing: border-box;
-  padding: 8px 12px 10px;
+  padding: 5px 6px 7px;
   border-radius: 18px;
   background: linear-gradient(#a9753c, #8b5a2a);
   box-shadow:
@@ -562,11 +580,12 @@
 .slot,
 .tile {
   box-sizing: border-box;
-  width: var(--block);
-  height: calc(var(--block) * 1.08);
-  border-radius: calc(var(--block) * 0.22);
+  flex: none;
+  width: var(--bw);
+  height: calc(var(--bw) * 1.08);
+  border-radius: calc(var(--bw) * 0.22);
   font: inherit;
-  font-size: calc(var(--block) * 0.62);
+  font-size: calc(var(--bw) * 0.62);
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -602,11 +621,13 @@
   }
 }
 .gap {
-  width: calc(var(--block) * 0.45);
+  flex: none;
+  width: calc(var(--bw) * 0.45);
 }
 .fixed {
+  flex: none;
   align-self: center;
-  font-size: 1.8rem;
+  font-size: calc(var(--bw) * 0.7);
   font-weight: 800;
   color: #fff;
 }
@@ -619,14 +640,14 @@
   background: linear-gradient(var(--top), var(--bottom));
   color: #fff;
   text-shadow:
-    0 calc(var(--block) * 0.045) 0 rgb(0 0 0 / 32%),
+    0 calc(var(--bw) * 0.045) 0 rgb(0 0 0 / 32%),
     0 0 6px rgb(0 0 0 / 25%);
   box-shadow:
-    inset 0 5px 0 rgb(255 255 255 / 55%),
-    inset 0 -8px 0 rgb(0 0 0 / 20%),
-    inset 5px 0 0 rgb(255 255 255 / 18%),
-    0 8px 0 rgb(0 0 0 / 32%),
-    0 14px 12px rgb(0 0 0 / 28%);
+    inset 0 calc(var(--bw) * 0.07) 0 rgb(255 255 255 / 55%),
+    inset 0 calc(var(--bw) * -0.11) 0 rgb(0 0 0 / 20%),
+    inset calc(var(--bw) * 0.07) 0 0 rgb(255 255 255 / 18%),
+    0 calc(var(--bw) * 0.11) 0 rgb(0 0 0 / 32%),
+    0 calc(var(--bw) * 0.2) calc(var(--bw) * 0.16) rgb(0 0 0 / 28%);
   position: relative;
 }
 .tile::after,
@@ -714,6 +735,8 @@
   position: absolute;
   left: 0;
   top: 0;
+  width: clamp(44px, calc(var(--cell) * 1.4), 84px);
+  height: clamp(44px, calc(var(--cell) * 1.4), 84px);
   border-radius: 50%;
   border: 4px solid #fff;
   box-shadow: 0 0 14px 4px rgb(255 215 0 / 90%);
@@ -735,24 +758,18 @@
 }
 .guideText {
   position: absolute;
-  left: 18px;
-  top: calc(clamp(46px, calc(var(--cell) * 1), 76px) * 0.95);
-  width: max-content;
-  max-width: 13em;
+  top: 4px;
+  box-sizing: border-box;
   padding: 6px 12px;
   border: 3px solid var(--wood);
   border-radius: 14px;
   background: #fffbe8;
   color: var(--wood);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 800;
   line-height: 1.15;
   text-align: center;
   box-shadow: 0 4px 0 rgb(0 0 0 / 25%);
-}
-.guide[data-flip] .guideText {
-  left: auto;
-  right: 18px;
 }
 @keyframes tap {
   0%,
@@ -809,8 +826,36 @@
   }
 }
 
-[data-paused] .gear,
-[data-paused] .lamp,
-[data-paused] .dropper {
+[data-frozen] .gear,
+[data-frozen] .lamp,
+[data-frozen] .dropper {
   animation-play-state: paused;
+}
+
+/* Écran étroit : des noms courts, pour que les cinq pastilles tiennent sur une seule ligne. */
+@container (max-width: 860px) {
+  .categoryLong {
+    display: none;
+  }
+  .categoryShort {
+    display: inline;
+  }
+}
+@container (max-width: 520px) {
+  .categories {
+    flex-wrap: nowrap;
+    gap: 3px;
+    padding: 2px 2px 6px;
+  }
+  .category {
+    min-height: 30px;
+    padding: 0 7px;
+    font-size: 0.74rem;
+  }
+  .categoryLong {
+    display: none;
+  }
+  .categoryShort {
+    display: inline;
+  }
 }

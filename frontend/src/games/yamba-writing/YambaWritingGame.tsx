@@ -169,21 +169,39 @@ export function YambaWritingGame({ showTitle = true, active = true, fullscreen, 
     setPhase("dropping");
   }, [word, label, locale]);
 
-  // Chute : la distance à parcourir se mesure sur l'écran (de la case centrale du rouleau jusqu'au réceptacle), puis le choc fait « toc ».
+  // Chute : la distance à parcourir se mesure sur l'écran (de la case centrale du rouleau jusqu'au réceptacle).
   useEffect(() => {
     if (phase !== "dropping") return;
     const dropper = dropperRef.current;
     const from = windowSlot.current?.getBoundingClientRect();
     const to = trayRef.current?.getBoundingClientRect();
-    if (dropper && from && to) dropper.style.setProperty("--fall", `${Math.round(to.top + to.height / 2 - (from.top + from.height / 2))}px`);
+    if (dropper && from && to) {
+      dropper.style.setProperty("--fall", `${Math.round(to.top + to.height / 2 - (from.top + from.height / 2))}px`);
+      dropper.style.setProperty("--fx", `${Math.round(to.left + to.width / 2 - (from.left + from.width / 2))}px`);
+    }
+  }, [phase]);
+
+  // Le choc fait « toc », puis l'écriture commence. Pause ou jeu masqué : les délais s'arrêtent avec l'animation (CSS) et reprennent
+  // là où ils en étaient, au lieu de faire avancer la partie pendant que tout est figé.
+  const playSound = sound.play;
+  const dropElapsed = useRef(0);
+  useEffect(() => {
+    if (phase !== "dropping") {
+      dropElapsed.current = 0;
+      return;
+    }
+    if (frozen) return;
     const duration = reduced ? 150 : DROP_MS;
-    const impact = window.setTimeout(() => sound.play("dropThud"), duration * IMPACT_RATIO);
-    const end = window.setTimeout(() => setPhase("writing"), duration);
+    const impactAt = duration * IMPACT_RATIO;
+    const before = dropElapsed.current;
+    const startedAt = performance.now();
+    const timers = [window.setTimeout(() => setPhase("writing"), duration - before)];
+    if (before < impactAt) timers.push(window.setTimeout(() => playSound("dropThud"), impactAt - before));
     return () => {
-      window.clearTimeout(impact);
-      window.clearTimeout(end);
+      timers.forEach((timer) => window.clearTimeout(timer));
+      dropElapsed.current = before + (performance.now() - startedAt);
     };
-  }, [phase, reduced, sound]);
+  }, [phase, frozen, reduced, playSound]);
 
   // Chaque changement de la manche passe par ici : le son qui convient, la secousse d'une tentative fausse, puis la réussite.
   const applyRound = useCallback(
@@ -303,12 +321,13 @@ export function YambaWritingGame({ showTitle = true, active = true, fullscreen, 
       cover={cover}
       initialOrientation="device"
     >
-      <div ref={stageRef} className={styles.game} inert={frozen} data-phase={phase} data-paused={paused || undefined}>
+      <div ref={stageRef} className={styles.game} inert={frozen} data-phase={phase} data-frozen={frozen || undefined}>
         <Bunting />
         <div className={styles.categories} role="group" aria-label={t("yambaWriting.game.categoriesLabel")}>
           {(["all", ...WRITING_CATEGORY_ORDER] as WritingCategoryChoice[]).map((choice) => (
-            <button key={choice} type="button" className={styles.category} aria-pressed={category === choice} disabled={busy} onClick={() => chooseCategory(choice)}>
-              {t(`yambaWriting.game.categories.${choice}`)}
+            <button key={choice} type="button" className={styles.category} aria-pressed={category === choice} aria-label={t(`yambaWriting.game.categories.${choice}`)} disabled={busy} onClick={() => chooseCategory(choice)}>
+              <span className={styles.categoryLong}>{t(`yambaWriting.game.categories.${choice}`)}</span>
+              <span className={styles.categoryShort} aria-hidden="true">{t(`yambaWriting.game.categoriesShort.${choice}`)}</span>
             </button>
           ))}
         </div>
@@ -349,7 +368,7 @@ export function YambaWritingGame({ showTitle = true, active = true, fullscreen, 
           </div>
         </section>
 
-        <section className={styles.writing} aria-label={t("yambaWriting.game.writingLabel")}>
+        <section className={styles.writing} style={{ "--count": round?.slots.length ?? 1 } as React.CSSProperties} aria-label={t("yambaWriting.game.writingLabel")}>
           <p className={styles.status} role="status" aria-live="polite">
             {status}
           </p>
@@ -378,11 +397,11 @@ export function YambaWritingGame({ showTitle = true, active = true, fullscreen, 
                   );
                 })}
               </div>
-              <div className={styles.tiles} role="group" aria-label={t("yambaWriting.game.tilesLabel")}>
+              <div className={styles.tiles} data-guide={guide?.target === "tile" ? "tile" : undefined} role="group" aria-label={t("yambaWriting.game.tilesLabel")}>
                 {round.tiles.map((tile) => {
                   const placed = round.placed.includes(tile.id);
                   return (
-                    <button key={tile.id} type="button" className={styles.tile} data-tone={tile.id % 6} data-guide={tile.id === firstFreeTile ? "tile" : undefined} data-placed={placed || undefined} tabIndex={placed ? -1 : 0} aria-hidden={placed || undefined} aria-label={t("yambaWriting.game.tileLabel", { letter: tile.letter })} onClick={() => onTile(tile.id)}>
+                    <button key={tile.id} type="button" className={styles.tile} data-tone={tile.id % 6} data-placed={placed || undefined} tabIndex={placed ? -1 : 0} aria-hidden={placed || undefined} aria-label={t("yambaWriting.game.tileLabel", { letter: tile.letter })} onClick={() => onTile(tile.id)}>
                       {tile.letter}
                     </button>
                   );
@@ -391,7 +410,7 @@ export function YambaWritingGame({ showTitle = true, active = true, fullscreen, 
             </>
           ) : null}
         </section>
-        {guide ? <GuideHand rootRef={stageRef} target={guide.target} text={t(guide.textKey)} /> : null}
+        {guide ? <GuideHand rootRef={stageRef} target={guide.target} stepKey={activity} text={guide.textKey ? t(guide.textKey) : undefined} /> : null}
       </div>
     </GamePlayer>
   );

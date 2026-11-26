@@ -6,8 +6,9 @@ const base: GuideInput = { phase: "idle", hasWrongLetters: false, hasFreeTile: t
 
 describe("main qui guide l'enfant", () => {
   it("montre le bouton Lancer au départ, puis Nouvelle manche après une réussite", () => {
-    expect(chooseGuide(base)).toEqual({ target: "launch", textKey: "yambaWriting.game.guide.launch" });
-    expect(chooseGuide({ ...base, phase: "won" })).toEqual({ target: "launch", textKey: "yambaWriting.game.guide.again" });
+    // Le bouton dit déjà ce qu’il fait : la main suffit, pas de bulle.
+    expect(chooseGuide(base)).toEqual({ target: "launch", textKey: null });
+    expect(chooseGuide({ ...base, phase: "won" })).toEqual({ target: "launch", textKey: null });
   });
 
   it("ne montre rien pendant que le rouleau tourne ou que l'image tombe", () => {
