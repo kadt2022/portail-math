@@ -70,6 +70,68 @@
     "cta": "Jouer",
     "tagline": "Construis le village"
   },
+  "yambaWriting": {
+    "name": "Yamba écrit",
+    "description": "Une machine tire une illustration : écris son nom en plaçant les lettres dans le bon ordre.",
+    "cta": "Jouer",
+    "tagline": "Écris le mot de l'image",
+    "game": {
+      "title": "Yamba écrit",
+      "screen": {
+        "label": "Jeu Yamba écrit"
+      },
+      "machineLabel": "La machine à images",
+      "writingLabel": "Écris le mot",
+      "categoriesLabel": "Catégorie",
+      "categories": {
+        "all": "Toutes catégories",
+        "fruits": "Fruits",
+        "domestic-animals": "Animaux domestiques",
+        "wild-animals": "Animaux sauvages",
+        "objects": "Objets du quotidien"
+      },
+      "categoriesShort": {
+        "all": "Toutes",
+        "domestic-animals": "Domestiques",
+        "wild-animals": "Sauvages",
+        "fruits": "Fruits",
+        "objects": "Objets"
+      },
+      "slotsLabel": "Cases du mot",
+      "tilesLabel": "Lettres disponibles",
+      "tileLabel": "Lettre {{letter}}",
+      "slotEmpty": "Case {{index}}, vide",
+      "slotFilled": "Lettre {{letter}} posée, toucher pour la retirer",
+      "pictureAlt": "Illustration à nommer",
+      "stats": {
+        "solved": "Mots réussis"
+      },
+      "status": {
+        "idle": "Appuie sur Lancer pour tirer une image.",
+        "spinning": "La machine tourne…",
+        "writing": "Touche les lettres pour écrire le mot de l'image.",
+        "won": "Bravo ! Tu as écrit {{word}}."
+      },
+      "actions": {
+        "launch": "Lancer",
+        "again": "Nouvelle manche",
+        "restartAria": "Recommencer le jeu depuis le début",
+        "backToGames": "Retour aux jeux"
+      },
+      "howTo": {
+        "step1Title": "Choisis et lance",
+        "step1": "Choisis une catégorie, puis appuie sur Lancer : la machine tire une image.",
+        "step2Title": "Écris le mot",
+        "step2": "Touche les lettres pour remplir les cases dans le bon ordre. Touche une case pour retirer sa lettre.",
+        "step3Title": "Besoin d'aide ?",
+        "step3": "Le bouton Indice remet les lettres justes en place. Quand le mot est correct, la machine le prononce."
+      },
+      "guide": {
+        "letter": "Touche les lettres pour les placer dans les cases",
+        "remove": "Touche cette case pour retirer la lettre"
+      }
+    }
+  },
   "grilleMagique": {
     "name": "Les Tuiles magiques",
     "description": "Fais glisser les tuiles et pose la carte magique pour résoudre les égalités.",
@@ -317,7 +379,8 @@
   },
   "meta": {
     "subject": {
-      "maths": "Maths"
+      "maths": "Maths",
+      "french": "Français"
     },
     "level": {
       "primary": "Primaire"

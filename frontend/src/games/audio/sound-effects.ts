@@ -18,7 +18,11 @@ export type SoundEffect =
   | "cardReveal"
   | "hint"
   | "placeWrong"
-  | "gridWin";
+  | "gridWin"
+  // Le jeu d’écriture Yamba : une machine mécanique, des sons de bois et de laiton, jamais agressifs.
+  | "reelTick"
+  | "dropThud"
+  | "letterPlace";
 
 export interface EffectOptions {
   /** Force de l'effet, de 0 à 1 (ex. taille du combo, fruit visé ou non). */
@@ -182,6 +186,24 @@ const effects: Record<SoundEffect, (context: Context, output: AudioNode, when: n
       tone(context, output, when + 0.46, "sine", note * 2, note * 2, 0.8, 0.03, 0.02);
     });
     burst(context, output, when + 0.4, "highpass", 5000, 8000, 0.9, 0.03);
+  },
+
+  // --- Jeu d’écriture Yamba ---
+  // Cran du rouleau qui passe : un petit « tic » de rochet, bref et mat.
+  reelTick(context, output, when) {
+    tone(context, output, when, "square", 1500, 900, 0.025, 0.07, 0.002);
+    burst(context, output, when, "bandpass", 2400, 1800, 0.02, 0.05);
+  },
+  // Illustration qui touche le réceptacle : un « toc » rond et grave, avec un léger tintement de métal.
+  dropThud(context, output, when) {
+    tone(context, output, when, "sine", 190, 70, 0.22, 0.3, 0.003);
+    burst(context, output, when, "lowpass", 1400, 250, 0.12, 0.12);
+    tone(context, output, when + 0.02, "triangle", 1320, 1180, 0.18, 0.05, 0.003);
+  },
+  // Lettre posée dans sa case : un « clic » de bois, clair.
+  letterPlace(context, output, when) {
+    tone(context, output, when, "triangle", 720, 520, 0.07, 0.12, 0.002);
+    burst(context, output, when, "bandpass", 1800, 1200, 0.03, 0.05);
   },
 };
 
