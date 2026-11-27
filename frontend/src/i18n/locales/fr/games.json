@@ -140,6 +140,79 @@
       }
     }
   },
+  "multipliFlow": {
+    "name": "Multipli'Flow",
+    "description": "Aligne des tuiles de même couleur pour ouvrir le chemin des nombres : ils traversent le tuyau et forment des multiplications.",
+    "cta": "Jouer",
+    "tagline": "Ouvre le chemin des nombres",
+    "game": {
+      "title": "Multipli'Flow",
+      "screen": {
+        "label": "Jeu Multipli'Flow"
+      },
+      "boardLabel": "Plateau des tuiles",
+      "resultsLabel": "Second tableau : les multiplications",
+      "pipeLabel": "Tuyau de transport des nombres",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, case libre",
+      "cellImage": "Ligne {{row}}, colonne {{column}}, {{color}}",
+      "cellImageSelected": "Ligne {{row}}, colonne {{column}}, {{color}}, tuile choisie",
+      "cellNumber": "Ligne {{row}}, colonne {{column}}, nombre {{value}}",
+      "colors": {
+        "red": "rouge",
+        "yellow": "jaune",
+        "orange": "orange",
+        "green": "vert",
+        "purple": "violet",
+        "brown": "marron",
+        "grey": "gris"
+      },
+      "expressionLabel": "{{a}} fois {{b}}",
+      "expressionDone": "{{a}} fois {{b}} égale {{result}}",
+      "stats": {
+        "level": "Niveau",
+        "moves": "Coups"
+      },
+      "status": {
+        "play": "Aligne 3 tuiles de la même couleur pour libérer le chemin des nombres.",
+        "selected": "Tuile choisie : touche une tuile voisine pour échanger.",
+        "flowing": "Les nombres avancent tout seuls vers le tuyau.",
+        "won": "Bravo ! Toutes les multiplications sont construites."
+      },
+      "messages": {
+        "deadEnd": "Essaie un autre alignement !",
+        "noAlignment": "Il faut aligner au moins 3 tuiles de la même couleur.",
+        "shuffled": "Les tuiles ont été remélangées.",
+        "shuffleFailed": "Impossible de remélanger, recommence le niveau."
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer ce niveau avec un nouveau plateau",
+        "hint": "Indice",
+        "shuffle": "Mélanger",
+        "next": "Niveau suivant",
+        "again": "Rejouer",
+        "backToGames": "Retour aux jeux"
+      },
+      "stuck": "Plus de coup possible : mélange les tuiles.",
+      "rotate": {
+        "title": "Tourne ton téléphone",
+        "text": "Multipli'Flow se joue en mode paysage, avec deux tableaux côte à côte."
+      },
+      "won": {
+        "title": "Bravo !",
+        "text": "Tous les nombres ont traversé le tuyau.",
+        "finished": "Tu as terminé tous les niveaux !"
+      },
+      "howTo": {
+        "step1Title": "Échange deux tuiles",
+        "step1": "Touche une tuile puis sa voisine, ou fais-la glisser. L'échange est accepté seulement s'il forme un alignement de 3 tuiles de la même couleur ou plus.",
+        "step2Title": "Ouvre le chemin",
+        "step2": "Les alignements disparaissent et libèrent des cases. Les nombres avancent tout seuls, case par case, jusqu'au tuyau.",
+        "step3Title": "Regarde les multiplications",
+        "step3": "Les nombres traversent le tuyau un par un et se rangent dans le second tableau : le résultat s'écrit tout seul."
+      }
+    }
+  },
   "yambaWriting": {
     "name": "Yamba écrit",
     "description": "Une machine tire une illustration : écris son nom en plaçant les lettres dans le bon ordre.",

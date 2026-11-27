@@ -1,0 +1,19 @@
+{
+  "name": "@mbuyamba/math-flow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Math Flow : moteur commun de la famille de jeux Addi'Flow, Soustra'Flow, Multipli'Flow et Divi'Flow (seul Multipli'Flow est développé).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --config vitest.config.ts",
+    "verify:isolation": "node scripts/verify-isolation.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}

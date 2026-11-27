@@ -140,6 +140,79 @@
       }
     }
   },
+  "multipliFlow": {
+    "name": "Multipli'Flow",
+    "description": "Line up tiles of the same colour to open the way for the numbers: they cross the pipe and build multiplications.",
+    "cta": "Play",
+    "tagline": "Open the way for the numbers",
+    "game": {
+      "title": "Multipli'Flow",
+      "screen": {
+        "label": "Multipli'Flow game"
+      },
+      "boardLabel": "Tile board",
+      "resultsLabel": "Second board: the multiplications",
+      "pipeLabel": "Pipe carrying the numbers",
+      "cellEmpty": "Row {{row}}, column {{column}}, free cell",
+      "cellImage": "Row {{row}}, column {{column}}, {{color}}",
+      "cellImageSelected": "Row {{row}}, column {{column}}, {{color}}, selected tile",
+      "cellNumber": "Row {{row}}, column {{column}}, number {{value}}",
+      "colors": {
+        "red": "red",
+        "yellow": "yellow",
+        "orange": "orange",
+        "green": "green",
+        "purple": "purple",
+        "brown": "brown",
+        "grey": "grey"
+      },
+      "expressionLabel": "{{a}} times {{b}}",
+      "expressionDone": "{{a}} times {{b}} equals {{result}}",
+      "stats": {
+        "level": "Level",
+        "moves": "Moves"
+      },
+      "status": {
+        "play": "Line up 3 tiles of the same colour to clear the way for the numbers.",
+        "selected": "Tile selected: touch a neighbouring tile to swap.",
+        "flowing": "The numbers move on their own towards the pipe.",
+        "won": "Well done! All the multiplications are built."
+      },
+      "messages": {
+        "deadEnd": "Try another line-up!",
+        "noAlignment": "You need a line of at least 3 tiles of the same colour.",
+        "shuffled": "The tiles have been reshuffled.",
+        "shuffleFailed": "Could not reshuffle, restart the level."
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this level with a new board",
+        "hint": "Hint",
+        "shuffle": "Shuffle",
+        "next": "Next level",
+        "again": "Play again",
+        "backToGames": "Back to games"
+      },
+      "stuck": "No move left: shuffle the tiles.",
+      "rotate": {
+        "title": "Turn your phone",
+        "text": "Multipli'Flow is played in landscape, with two boards side by side."
+      },
+      "won": {
+        "title": "Well done!",
+        "text": "Every number has crossed the pipe.",
+        "finished": "You finished every level!"
+      },
+      "howTo": {
+        "step1Title": "Swap two tiles",
+        "step1": "Touch a tile then its neighbour, or drag it. A swap is accepted only if it forms a line of 3 or more tiles of the same colour.",
+        "step2Title": "Open the way",
+        "step2": "Lines disappear and free some cells. The numbers move on their own, cell by cell, towards the pipe.",
+        "step3Title": "Watch the multiplications",
+        "step3": "Numbers cross the pipe one at a time and settle in the second board: the result writes itself."
+      }
+    }
+  },
   "yambaWriting": {
     "name": "Yamba spells",
     "description": "A machine picks a picture: write its name by putting the letters in the right order.",

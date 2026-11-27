@@ -40,6 +40,7 @@ const LibraryPage = lazyRoute(() => import("../library/LibraryPage").then((m) =>
 const LibraryReaderPage = lazyRoute(() => import("../library/LibraryReaderPage").then((m) => m.LibraryReaderPage));
 const GamesCataloguePage = lazyRoute(() => import("../games/GamesCataloguePage").then((m) => m.GamesCataloguePage));
 const RasterPuzzlePage = lazyRoute(() => import("../games/raster-puzzle/RasterPuzzlePage").then((m) => m.RasterPuzzlePage), { game: "raster-puzzle" });
+const MultipliFlowPage = lazyRoute(() => import("../games/math-flow/MultipliFlowPage").then((m) => m.MultipliFlowPage), { game: "multipli-flow" });
 const YambaWritingPage = lazyRoute(() => import("../games/yamba-writing/YambaWritingPage").then((m) => m.YambaWritingPage), { game: "yamba-ecrit" });
 const GrilleMagiquePage = lazyRoute(() => import("../games/grille-magique/GrilleMagiquePage").then((m) => m.GrilleMagiquePage), { game: "grille-magique" });
 const NewGameComingSoonPage = lazyRoute(() => import("../games/new-game/NewGameComingSoonPage").then((m) => m.NewGameComingSoonPage));
@@ -153,6 +154,7 @@ export function AppRouter() {
           <Route path="jeux/grille-magique" element={<GrilleMagiquePage />} />
           <Route path="jeux/yamba-ecrit" element={<YambaWritingPage />} />
           <Route path="jeux/raster-puzzle" element={<RasterPuzzlePage />} />
+          <Route path="jeux/multipli-flow" element={<MultipliFlowPage />} />
           <Route
             path="jeux/turbo-pulse"
             element={
