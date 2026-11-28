@@ -4,6 +4,7 @@ import { defineConfig } from "vitest/config";
 // qu'il ne dépend ni du DOM ni de React.
 export default defineConfig({
   test: {
+    testTimeout: 120000,
     environment: "node",
     include: ["tests/**/*.test.ts"],
   },

@@ -15,6 +15,10 @@ const loaders = {
   "riviere-des-fractions": () => import("./riviere-fractions/RiviereFractionsPlayer").then((m) => ({ default: m.RiviereFractionsPlayer })),
   "yamba-ecrit": () => import("./yamba-writing/YambaWritingGame").then((m) => ({ default: m.YambaWritingGame })),
   "raster-puzzle": () => import("./raster-puzzle/RasterPuzzleGame").then((m) => ({ default: m.RasterPuzzleGame })),
+  "addi-flow": () => import("./math-flow/MathFlowGame").then((m) => ({ default: m.AddiFlowGame })),
+  "soustra-flow": () => import("./math-flow/MathFlowGame").then((m) => ({ default: m.SoustraFlowGame })),
+  "multipli-flow": () => import("./math-flow/MathFlowGame").then((m) => ({ default: m.MultipliFlowGame })),
+  "divi-flow": () => import("./math-flow/MathFlowGame").then((m) => ({ default: m.DiviFlowGame })),
 } as const;
 
 type EmbeddedGameId = keyof typeof loaders;
@@ -74,3 +78,7 @@ export const TrainMultiplicationsPlayer = lazy(() => open("train-des-multiplicat
 export const RiviereFractionsPlayer = lazy(() => open("riviere-des-fractions"));
 export const YambaWritingGame = lazy(() => open("yamba-ecrit"));
 export const RasterPuzzleGame = lazy(() => open("raster-puzzle"));
+export const AddiFlowGame = lazy(() => open("addi-flow"));
+export const SoustraFlowGame = lazy(() => open("soustra-flow"));
+export const MultipliFlowGame = lazy(() => open("multipli-flow"));
+export const DiviFlowGame = lazy(() => open("divi-flow"));

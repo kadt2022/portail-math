@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { levelColors, levelConfig, LEVELS, nextLevel } from "../src/engine/levels";
-import { TILE_COLORS } from "../src/engine/types";
+import { levelPictures, levelConfig, LEVELS, nextLevel } from "../src/engine/levels";
+import { LEVEL_PICTURES } from "../src/engine/pictures";
 
 describe("progression des niveaux", () => {
   it("commence par une grille 5 × 5 et les tables de 1 à 5", () => {
@@ -14,8 +14,8 @@ describe("progression des niveaux", () => {
     for (const level of LEVELS) {
       expect(Math.max(level.rows, level.cols)).toBeLessThanOrEqual(7);
       expect(level.numberCount % 2).toBe(0);
-      expect(level.colorCount).toBeLessThanOrEqual(TILE_COLORS.length);
-      expect(levelColors(level)).toHaveLength(level.colorCount);
+      expect(level.pictureCount).toBeLessThanOrEqual(LEVEL_PICTURES.length);
+      expect(levelPictures(level)).toHaveLength(level.pictureCount);
     }
   });
 

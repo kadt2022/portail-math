@@ -5,7 +5,7 @@ import { unreachableNumbers } from "./paths";
 import { createRng, shuffled, type Rng } from "./rng";
 import type { Move } from "./solver";
 import { trySwap } from "./swap";
-import { TILE_COLORS, type Board, type Cell, type ImageTile, type TileColor } from "./types";
+import type { Board, Cell, ImageTile } from "./types";
 
 export type RescueResult =
   | { readonly ok: true; readonly board: Board; /** Séquence complète qui résout la nouvelle disposition (le premier coup est l'indice). Vide si rien n'était bloqué. */ readonly moves: readonly Move[] }
@@ -30,12 +30,12 @@ function occupiedWindows(board: Board): number[][] {
 
 /** Construction à l'envers d'un coup, avec des tuiles imposées (celles qui existent déjà) : voir generator.ts pour le principe. */
 function placeWindow(board: Board, cells: readonly number[], supply: readonly ImageTile[], rng: Rng): { board: Board; move: Move } | null {
-  const color = supply[0]!.color;
+  const picture = supply[0]!.picture;
   for (const pivot of shuffled(cells, rng)) {
     for (const partner of shuffled(neighborsOf(board, pivot), rng)) {
       if (cells.includes(partner)) continue;
       const moved = cellAt(board, partner);
-      if (!isImageTile(moved) || moved.color === color) continue;
+      if (!isImageTile(moved) || moved.picture === picture) continue;
       const others = cells.filter((cell) => cell !== pivot);
       const changes: Array<readonly [number, Cell]> = [[pivot, moved], [others[0]!, supply[0]!], [others[1]!, supply[1]!], [partner, supply[2]!]];
       const candidate = withCells(board, changes);
@@ -62,10 +62,10 @@ export function rescueShuffle(board: Board, entrance: number, rng: Rng = createR
   if (unreachableNumbers(board, entrance).length === 0) return { ok: true, board, moves: [] };
   const { attempts = 300 } = options;
   const spots = board.cells.flatMap((cell, index) => (isImageTile(cell) ? [index] : []));
-  const tilesByColor = new Map<TileColor, ImageTile[]>(TILE_COLORS.map((color) => [color, []]));
+  const tilesByColor = new Map<string, ImageTile[]>();
   for (const spot of spots) {
     const tile = board.cells[spot] as ImageTile;
-    tilesByColor.get(tile.color)!.push(tile);
+    tilesByColor.set(tile.picture, [...(tilesByColor.get(tile.picture) ?? []), tile]);
   }
   const triples = [...tilesByColor.values()].reduce((sum, tiles) => sum + Math.floor(tiles.length / 3), 0);
   const windows = occupiedWindows(board);
@@ -92,17 +92,17 @@ export function rescueShuffle(board: Board, entrance: number, rng: Rng = createR
     sawCut = true;
 
     // 2. Une couleur par ligne, parmi celles dont il reste au moins trois tuiles.
-    const pool = new Map<TileColor, ImageTile[]>([...tilesByColor].map(([color, tiles]) => [color, shuffled(tiles, rng)]));
+    const pool = new Map<string, ImageTile[]>([...tilesByColor].map(([color, tiles]) => [color, shuffled(tiles, rng)]));
     const supplies: ImageTile[][] = [];
     let enough = true;
     for (let line = 0; line < chosen.length; line += 1) {
-      const colors = shuffled(TILE_COLORS.filter((color) => (pool.get(color)?.length ?? 0) >= 3), rng);
-      const color = colors[0];
-      if (!color) {
+      const kinds = shuffled([...pool.keys()].filter((kind) => (pool.get(kind)?.length ?? 0) >= 3), rng);
+      const kind = kinds[0];
+      if (!kind) {
         enough = false;
         break;
       }
-      supplies.push(pool.get(color)!.splice(0, 3));
+      supplies.push(pool.get(kind)!.splice(0, 3));
     }
     if (!enough) continue;
 

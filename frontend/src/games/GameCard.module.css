@@ -1,7 +1,9 @@
 .card {
   position: relative;
   display: block;
-  aspect-ratio: 4 / 3;
+  /* Grande vignette immersive, même rectangle pour toutes les cartes ; le titre grandit avec la carte. */
+  aspect-ratio: 3 / 2;
+  container-type: inline-size;
   overflow: hidden;
   border-radius: 14px;
   background: transparent;
@@ -50,18 +52,6 @@
   transform: translateY(0) scale(0.98);
 }
 
-.category {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgb(8 11 40 / 72%);
-  font-size: 12px;
-  font-weight: 800;
-}
-
 .bar {
   position: absolute;
   right: 0;
@@ -70,35 +60,28 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 12px 14px 12px;
+  gap: 2px;
+  padding: clamp(8px, 5cqw, 16px) clamp(9px, 5.5cqw, 16px) clamp(8px, 4.5cqw, 14px);
 }
 
+/* Titre entier, jamais tronqué : il passe à la ligne et se répartit sur les lignes. */
 .name {
-  font-size: 18px;
+  font-size: clamp(14px, 7cqw, 20px);
   font-weight: 850;
   line-height: 1.15;
   text-shadow: 0 2px 6px rgb(0 0 0 / 60%);
-  display: -webkit-box;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 
-.tagline {
-  color: #dfe6ff;
-  font-size: 13px;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-@media (max-width: 639px) {
-  .name {
-    font-size: 20px;
-  }
+/* Repères : âge recommandé et nombre de niveaux, rien d'autre. */
+.meta {
+  margin: 0;
+  color: #e6ecff;
+  font-size: clamp(11px, 5cqw, 14px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 60%);
 }
 
 @media (prefers-reduced-motion: reduce) {

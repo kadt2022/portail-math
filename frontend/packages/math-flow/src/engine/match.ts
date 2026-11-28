@@ -1,5 +1,5 @@
 import { isImageTile } from "./board";
-import type { Board, TileColor } from "./types";
+import type { Board } from "./types";
 
 /** Longueur minimale d'un alignement. */
 export const MIN_ALIGNMENT = 3;
@@ -7,12 +7,13 @@ export const MIN_ALIGNMENT = 3;
 export interface Match {
   /** Cases de l'alignement, dans l'ordre de lecture. */
   readonly cells: readonly number[];
-  readonly color: TileColor;
+  /** L'image de l'alignement : trois tuiles identiques, pas seulement de la même couleur. */
+  readonly picture: string;
   readonly direction: "horizontal" | "vertical";
 }
 
 /**
- * Tous les alignements du plateau : au moins trois tuiles imagées de même couleur, côte à côte ou l'une au-dessus de l'autre.
+ * Tous les alignements du plateau : au moins trois tuiles imagées identiques (la même image), côte à côte ou l'une au-dessus de l'autre.
  * Un nombre ou une case vide interrompt un alignement ; un alignement ne passe jamais d'une ligne ou d'une colonne à l'autre.
  */
 export function findMatches(board: Board, minLength: number = MIN_ALIGNMENT): Match[] {
@@ -29,13 +30,13 @@ export function findMatches(board: Board, minLength: number = MIN_ALIGNMENT): Ma
         let end = start + 1;
         while (end < length) {
           const next = board.cells[at(line, end)];
-          if (!isImageTile(next) || next.color !== first.color) break;
+          if (!isImageTile(next) || next.picture !== first.picture) break;
           end += 1;
         }
         if (end - start >= minLength) {
           const cells: number[] = [];
           for (let step = start; step < end; step += 1) cells.push(at(line, step));
-          matches.push({ cells, color: first.color, direction });
+          matches.push({ cells, picture: first.picture, direction });
         }
         start = end;
       }

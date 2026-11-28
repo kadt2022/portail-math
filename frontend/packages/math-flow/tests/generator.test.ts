@@ -41,12 +41,12 @@ describe("générateur de plateaux", () => {
           for (const number of numbers) expect(number.value).toBeLessThanOrEqual(level.numberRange[1]);
           // Jamais de nombre dans la colonne de l'entrée.
           for (const [index, cell] of board.cells.entries()) if (cell?.kind === "number") expect(index % board.cols).toBeLessThan(board.cols - 1);
-          expect(entranceRow).toBe(Math.floor(level.rows / 2));
+          expect(entranceRow).toBe(level.rows - 2);
           const ids = board.cells.flatMap((cell) => (cell ? [cell.id] : []));
           expect(new Set(ids).size).toBe(ids.length);
           for (const cell of board.cells) if (cell?.kind === "image") expect(colorOfPicture(cell.picture)).toBe(cell.color);
-          const colors = new Set(board.cells.flatMap((cell) => (cell?.kind === "image" ? [cell.color] : [])));
-          expect(colors.size).toBeLessThanOrEqual(level.colorCount);
+          const pictures = new Set(board.cells.flatMap((cell) => (cell?.kind === "image" ? [cell.picture] : [])));
+          expect(pictures.size).toBeLessThanOrEqual(level.pictureCount);
         }
       });
 
@@ -108,7 +108,7 @@ describe("générateur de plateaux", () => {
     expect(state.totalNumbers).toBe(4);
     expect(state.builder.expressions).toEqual([]);
     expect(state.status).toBe("playing");
-    expect(startGame(generateLevel(levelConfig(1), 3)).deadEndGuard).toBe(true);
-    expect(startGame(generateLevel(levelConfig(1), 3), { deadEndGuard: false }).deadEndGuard).toBe(false);
+    expect(startGame(generateLevel(levelConfig(1), 3)).deadEndGuard).toBe(false);
+    expect(startGame(generateLevel(levelConfig(1), 3), { deadEndGuard: true }).deadEndGuard).toBe(true);
   });
 });

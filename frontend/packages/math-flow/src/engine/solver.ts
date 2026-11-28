@@ -1,7 +1,7 @@
 import { isImageTile } from "./board";
 import { unreachableNumbers } from "./paths";
 import { listValidSwaps, trySwap } from "./swap";
-import { TILE_COLORS, type Board } from "./types";
+import type { Board } from "./types";
 
 /** Un coup du joueur : la permutation de deux cases voisines. */
 export type Move = readonly [number, number];
@@ -18,7 +18,7 @@ export type SolveResult =
 
 export const DEFAULT_SOLVER_BUDGET = 60_000;
 
-const key = (board: Board): string => board.cells.map((cell) => (isImageTile(cell) ? String(TILE_COLORS.indexOf(cell.color)) : ".")).join("");
+const key = (board: Board): string => board.cells.map((cell) => (isImageTile(cell) ? cell.picture : ".")).join("|");
 
 /**
  * Recherche exhaustive d'une suite de coups qui libère un chemin vers l'entrée pour tous les nombres. Les nombres ne se

@@ -22,7 +22,7 @@ describe("garde-fou contre les impasses (activé par défaut)", () => {
     let unknown = 0;
     for (const levelId of [1, 2, 3, 4, 5]) {
       for (const seed of SEEDS) {
-        let state: GameState = newGame(levelId, seed).state;
+        let state: GameState = newGame(levelId, seed, { deadEndGuard: true }).state;
         const rng = createRng(seed * 17);
         for (let i = 0; i < 60; i += 1) {
           if (unreachableNumbers(state.flow.board, state.flow.entrance).length === 0) break;
@@ -51,7 +51,7 @@ describe("garde-fou contre les impasses (activé par défaut)", () => {
 
   it("refuse seulement les coups qui bloqueraient : ceux de la solution restent toujours acceptés", () => {
     for (const levelId of [1, 3, 5]) {
-      const { state, solution } = newGame(levelId, 3);
+      const { state, solution } = newGame(levelId, 3, { deadEndGuard: true });
       let current = state;
       for (const [a, b] of solution) {
         const played = swapGame(current, a, b);

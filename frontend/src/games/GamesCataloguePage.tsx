@@ -1,10 +1,10 @@
-import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
 import { MobileTabBar, type MobilePanel } from "../components/MobileTabBar";
-import { availableCategories, featuredGame, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
-import { GrilleMagiqueGame, LeoDrivingPlayer, onGameChosen, onGameIntent, onGameIntentEnd, RiviereFractionsPlayer, TrainMultiplicationsPlayer, RasterPuzzleGame, TurboPulsePlayer, YambaWritingGame } from "./embedded-games";
+import { availableCategories, featuredGame, gamesBelowPlayer, playableGames, recommendedGames, type GameCatalogueEntry, type GameCategoryId } from "./game-catalogue";
+import { GrilleMagiqueGame, LeoDrivingPlayer, AddiFlowGame, DiviFlowGame, MultipliFlowGame, SoustraFlowGame, onGameChosen, onGameIntent, onGameIntentEnd, RiviereFractionsPlayer, TrainMultiplicationsPlayer, RasterPuzzleGame, TurboPulsePlayer, YambaWritingGame } from "./embedded-games";
 import { FeaturedGame } from "./FeaturedGame";
 import { enterNativeFullscreen, exitNativeFullscreen, fullscreenElement } from "./fullscreen";
 import { GameCard } from "./GameCard";
@@ -15,7 +15,6 @@ import type { LoadingSession } from "./loading/loadingSession";
 import { GamePlayerFrame } from "./player/GamePlayerFrame";
 import { GameWatchLayout } from "./player/GameWatchLayout";
 import { RecommendedGameCard } from "./RecommendedGameCard";
-import { galleryPlacements, maxCardsPerRow } from "./gallery-layout";
 import { useGamesQuery } from "./useGamesQuery";
 import { useImmersiveDevice } from "./useImmersiveDevice";
 import styles from "./GamesCataloguePage.module.css";
@@ -102,10 +101,7 @@ export function GamesCataloguePage() {
   // Téléphone : le lecteur ouvert occupe tout l'écran (barre comprise) ; la page derrière est inerte.
   const covered = open && immersiveDevice;
   const openGame = open ? playableGames.find((game) => game.id === openGameId) : undefined;
-  const recommended = useMemo(() => (openGame ? recommendedGames(openGame, 3) : []), [openGame]);
-
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [maxPerRow, setMaxPerRow] = useState(3);
+  const recommended = useMemo(() => (openGame ? recommendedGames(openGame) : []), [openGame]);
 
   const filtering = category !== "all" || query.trim() !== "";
 
@@ -115,28 +111,14 @@ export function GamesCataloguePage() {
     const others = playableGames.filter((game) => !game.featured);
     const lead = playableGames.filter((game) => game.featured);
     const ordered = [...others.slice(0, -1), ...lead, ...others.slice(-1)];
-    return ordered.filter(
+    // Jeu ouvert : les quatre recommandations de la colonne de droite viennent d'abord, puis le reste du catalogue ; jamais le jeu ouvert.
+    const listed = open ? gamesBelowPlayer(openGame, recommended, ordered) : ordered;
+    return listed.filter(
       (game) =>
-        // Le jeu ouvert et les jeux recommandés ne sont pas répétés en dessous.
-        !(open && (game.id === openGameId || recommended.some((item) => item.id === game.id))) &&
         (category === "all" || game.categoryId === category) &&
         normalize(t(game.nameKey)).includes(needle),
     );
-  }, [category, query, t, open, openGameId, recommended]);
-
-  // La composition suit la largeur réelle de la galerie (et non celle de la fenêtre : le menu vertical
-  // en retire une partie). Sans ResizeObserver, la valeur par défaut reste utilisable.
-  const hasGrid = visibleGames.length > 0;
-  useLayoutEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const update = () => setMaxPerRow(maxCardsPerRow(grid.getBoundingClientRect().width || window.innerWidth));
-    update();
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(update);
-    observer.observe(grid);
-    return () => observer.disconnect();
-  }, [hasGrid]);
+  }, [category, query, t, open, openGame, recommended]);
 
   useEffect(() => {
     if (panel === "search") searchInputRef.current?.focus();
@@ -160,8 +142,6 @@ export function GamesCataloguePage() {
     // Le défilement se fait dans le conteneur de la page (pas dans la fenêtre) : on ramène le haut de la page à l’écran.
     pageRef.current?.scrollIntoView?.({ block: "start" });
   }
-
-  const placements = galleryPlacements(visibleGames.length, maxPerRow);
 
   return (
     <div ref={pageRef} className={`${styles.page}${open ? ` ${styles.pagePlaying}` : ""}`}>
@@ -242,6 +222,38 @@ export function GamesCataloguePage() {
                     onClose={closeEmbedded}
                     cover={shown && covered}
                   />
+                ) : id === "addi-flow" ? (
+                  <AddiFlowGame
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : id === "soustra-flow" ? (
+                  <SoustraFlowGame
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : id === "multipli-flow" ? (
+                  <MultipliFlowGame
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
+                ) : id === "divi-flow" ? (
+                  <DiviFlowGame
+                    fullscreen={shown && immersive}
+                    active={shown}
+                    onFullscreenChange={changeFullscreen}
+                    onClose={closeEmbedded}
+                    cover={shown && covered}
+                  />
                 ) : id === "raster-puzzle" ? (
                   <RasterPuzzleGame
                     fullscreen={shown && immersive}
@@ -275,7 +287,7 @@ export function GamesCataloguePage() {
         })}
         {openGame ? (
           <div className={styles.contents} inert={immersive || covered}>
-            <GameInfo game={openGame} />
+            <GameInfo key={openGame.id} game={openGame} />
           </div>
         ) : null}
       </GameWatchLayout>
@@ -311,10 +323,12 @@ export function GamesCataloguePage() {
 
       <p className={styles.count} role="status">{t("cataloguePage.resultCount", { count: visibleGames.length })}</p>
       {visibleGames.length > 0 ? (
-        <div ref={gridRef} className={styles.grid}>
-          {visibleGames.map((game, index) => (
-            <GameCard key={game.id} game={game} placement={placements[index]} onOpen={openEmbedded} onIntent={game.embed ? onGameIntent : undefined} onIntentEnd={game.embed ? onGameIntentEnd : undefined} />
-          ))}
+        <div className={styles.gallery}>
+          <div className={styles.grid}>
+            {visibleGames.map((game) => (
+              <GameCard key={game.id} game={game} onOpen={openEmbedded} onIntent={game.embed ? onGameIntent : undefined} onIntentEnd={game.embed ? onGameIntentEnd : undefined} />
+            ))}
+          </div>
         </div>
       ) : (
         <p className={styles.empty}>{t("cataloguePage.noResult")}</p>

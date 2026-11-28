@@ -1,19 +1,28 @@
 import { describe, expect, it } from "vitest";
 
+import { createBoard, withCells } from "../src/engine/board";
 import { findMatches, matchedCells } from "../src/engine/match";
+import { colorOfPicture } from "../src/engine/pictures";
 import { layout } from "./helpers";
 
 describe("alignements", () => {
-  it("détecte trois tuiles de même couleur à l'horizontale", () => {
-    const matches = findMatches(layout(["R R R", "Y G P", "B S O"]));
-    expect(matches).toHaveLength(1);
-    expect(matches[0]).toMatchObject({ cells: [0, 1, 2], color: "red", direction: "horizontal" });
+  it("n'aligne pas des fruits différents de la même couleur : une pastèque, une poire, une pastèque", () => {
+    const pictures = ["pasteque", "poire", "pasteque"];
+    const board = withCells(createBoard(1, 3), pictures.map((picture, index) => [index, { kind: "image", id: index + 1, picture, color: colorOfPicture(picture) }] as const));
+    expect(board.cells.every((cell) => cell?.kind === "image" && cell.color === "green")).toBe(true);
+    expect(findMatches(board)).toHaveLength(0);
   });
 
-  it("détecte trois tuiles de même couleur à la verticale", () => {
+  it("détecte trois tuiles identiques à l'horizontale", () => {
+    const matches = findMatches(layout(["R R R", "Y G P", "B S O"]));
+    expect(matches).toHaveLength(1);
+    expect(matches[0]).toMatchObject({ cells: [0, 1, 2], picture: "pomme", direction: "horizontal" });
+  });
+
+  it("détecte trois tuiles identiques à la verticale", () => {
     const matches = findMatches(layout(["R Y P", "R G O", "R B S"]));
     expect(matches).toHaveLength(1);
-    expect(matches[0]).toMatchObject({ cells: [0, 3, 6], color: "red", direction: "vertical" });
+    expect(matches[0]).toMatchObject({ cells: [0, 3, 6], picture: "pomme", direction: "vertical" });
   });
 
   it("ne détecte rien avec seulement deux tuiles", () => {

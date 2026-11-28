@@ -1,12 +1,12 @@
 import { areAdjacent, cellAt, createBoard, isImageTile, neighborsOf, positionOf, withCells } from "./board";
-import { levelColors, type LevelConfig } from "./levels";
+import { levelPictures, type LevelConfig } from "./levels";
 import { findMatches } from "./match";
 import { entranceCell, findPath, unreachableNumbers } from "./paths";
-import { colorOfPicture, picturesOfColor } from "./pictures";
+import { colorOfPicture } from "./pictures";
 import { createRng, randomInt, shuffled, type Rng } from "./rng";
 import type { Move } from "./solver";
 import { trySwap } from "./swap";
-import type { Board, Cell, ImageTile, TileColor } from "./types";
+import type { Board, Cell, ImageTile } from "./types";
 
 export interface GeneratedLevel {
   readonly level: LevelConfig;
@@ -19,9 +19,7 @@ export interface GeneratedLevel {
 
 export const sameBoard = (a: Board, b: Board): boolean => a.cells.length === b.cells.length && a.cells.every((cell, index) => (cell?.id ?? -1) === (b.cells[index]?.id ?? -1) && cell?.kind === b.cells[index]?.kind);
 
-function makeImage(id: number, color: TileColor, rng: Rng): ImageTile {
-  const pictures = picturesOfColor(color);
-  const picture = pictures[Math.floor(rng() * pictures.length)] as string;
+function makeImage(id: number, picture: string): ImageTile {
   return { kind: "image", id, picture, color: colorOfPicture(picture) };
 }
 
@@ -39,12 +37,12 @@ function freeWindows(board: Board): number[][] {
 }
 
 /**
- * Un pas de construction à l'envers. À partir d'un plateau P, on remplit trois cases libres alignées avec une couleur c, sauf
- * une case pivot qui reçoit une tuile voisine d (de couleur différente), et la voisine reçoit une tuile c : le plateau Q obtenu
+ * Un pas de construction à l'envers. À partir d'un plateau P, on remplit trois cases libres alignées avec une image c, sauf
+ * une case pivot qui reçoit une tuile voisine d (d'une autre image), et la voisine reçoit une tuile c : le plateau Q obtenu
  * est stable, et permuter pivot et voisine produit exactement l'alignement qui, une fois détruit, redonne P. Le pas n'est
  * gardé que si le moteur réel (trySwap) confirme que Q → P exactement.
  */
-function reverseStep(board: Board, entrance: number, colors: readonly TileColor[], rng: Rng, nextId: { value: number }): { board: Board; move: Move } | null {
+function reverseStep(board: Board, entrance: number, pictures: readonly string[], rng: Rng, nextId: { value: number }): { board: Board; move: Move } | null {
   const windows = shuffled(freeWindows(board), rng);
   const scored = windows
     .map((cells) => {
@@ -58,10 +56,10 @@ function reverseStep(board: Board, entrance: number, colors: readonly TileColor[
         if (cells.includes(partner)) continue;
         const moved = cellAt(board, partner);
         if (!isImageTile(moved)) continue;
-        for (const color of shuffled(colors, rng)) {
-          if (color === moved.color) continue;
-          const created = makeImage(nextId.value, color, rng);
-          const changes: Array<readonly [number, Cell]> = cells.map((cell) => [cell, cell === pivot ? moved : makeImage(nextId.value + 1 + cells.indexOf(cell), color, rng)] as const);
+        for (const picture of shuffled(pictures, rng)) {
+          if (picture === moved.picture) continue;
+          const created = makeImage(nextId.value, picture);
+          const changes: Array<readonly [number, Cell]> = cells.map((cell) => [cell, cell === pivot ? moved : makeImage(nextId.value + 1 + cells.indexOf(cell), picture)] as const);
           changes.push([partner, created]);
           const candidate = withCells(board, changes);
           if (findMatches(candidate).length > 0) continue;
@@ -77,10 +75,11 @@ function reverseStep(board: Board, entrance: number, colors: readonly TileColor[
 }
 
 function build(level: LevelConfig, rng: Rng): { board: Board; solution: Move[]; entranceRow: number } | null {
-  const entranceRow = Math.floor(level.rows / 2);
+  // Le tuyau part un peu en bas du tableau, pas au milieu : à l'avant-dernière ligne.
+  const entranceRow = level.rows - 2;
   let board = createBoard(level.rows, level.cols);
   const entrance = entranceCell(board, entranceRow);
-  const colors = levelColors(level);
+  const pictures = levelPictures(level);
   const nextId = { value: 1 };
 
   // Nombres : loin de l'entrée, jamais dans sa colonne.
@@ -109,8 +108,8 @@ function build(level: LevelConfig, rng: Rng): { board: Board; solution: Move[]; 
     rng,
   );
   for (const index of free.slice(0, level.leftover)) {
-    for (const color of shuffled(colors, rng)) {
-      const candidate = withCells(board, [[index, makeImage(nextId.value, color, rng)]]);
+    for (const picture of shuffled(pictures, rng)) {
+      const candidate = withCells(board, [[index, makeImage(nextId.value, picture)]]);
       if (findMatches(candidate).length === 0) {
         board = candidate;
         nextId.value += 1;
@@ -122,7 +121,7 @@ function build(level: LevelConfig, rng: Rng): { board: Board; solution: Move[]; 
   // Construction à l'envers : chaque pas ajoute un mur qu'un coup précis démolira.
   const backwards: Move[] = [];
   for (let step = 0; step < level.steps; step += 1) {
-    const made = reverseStep(board, entrance, colors, rng, nextId);
+    const made = reverseStep(board, entrance, pictures, rng, nextId);
     if (!made) return null;
     board = made.board;
     backwards.push(made.move);

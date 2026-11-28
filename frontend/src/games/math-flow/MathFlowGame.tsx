@@ -14,7 +14,9 @@ import {
   hint as engineHint,
   LEVELS,
   newGame,
+  placeResult,
   rescueGame,
+  resultHint,
   swapGame,
   tickGame,
   unreachableNumbers,
@@ -23,6 +25,7 @@ import {
   type GameState,
   type ImageTile,
   type NumberTile,
+  type ResultTile,
 } from "@mbuyamba/math-flow";
 
 import { illustrationUrl } from "../../illustrations/illustrations";
@@ -30,10 +33,13 @@ import type { SoundEffect } from "../audio/sound-effects";
 import { useGameAudio } from "../audio/useGameAudio";
 import { useGameLoading } from "../loading/GameLoaderHost";
 import { GamePlayer, playerControlClass } from "../player/GamePlayer";
-import { dragDirection, expressionOffset, KEY_DIRECTION, neighbour, scanFrom, EXPRESSION_WIDTH, type Direction } from "./geometry";
+import { dragDirection, expressionOffset, KEY_DIRECTION, neighbour, reservoirLayout, scanFrom, EXPRESSION_WIDTH, type Direction } from "./geometry";
+import { FLOW_VARIANTS, type FlowVariantId } from "./flow-variants";
 import styles from "./MultipliFlow.module.css";
 
-export interface MultipliFlowGameProps {
+export interface MathFlowGameProps {
+  /** Le jeu de la famille Flow : l'opération et les textes changent, le reste est identique. Multiplication par défaut. */
+  variant?: FlowVariantId;
   /** Titre visible dans l'en-tête du lecteur (faux sur la page autonome, qui a déjà son titre). */
   showTitle?: boolean;
   /** Le jeu se met en pause tout seul lorsqu'il n'est plus visible. */
@@ -54,6 +60,9 @@ const HINT_MS = 2800;
 const MESSAGE_MS = 2600;
 const BOUNCE_MS = 420;
 const GHOST_MS = 900;
+// Un résultat descend dans le tuyau jusqu'à la multiplication ; un mauvais remonte (même durée de départ, retour compris).
+const FLY_PLACE_MS = 1100;
+const FLY_REJECT_MS = 1800;
 // Un glissement compte à partir de 40 % de la taille d'une case.
 const DRAG_FRACTION = 0.4;
 
@@ -66,12 +75,33 @@ interface Ghost {
   index: number;
   /** Case d'où la tuile est venue juste avant de disparaître (animation d'échange). */
   origin: number;
+  /** Nettoyage automatique : la tuile se désintègre sur place au lieu de glisser vers l'alignement. */
+  dust?: boolean;
 }
 
 interface Bounce {
   key: number;
   a: number;
   b: number;
+}
+
+/** Une tuile de résultat en train de descendre dans le tuyau vers une multiplication (et de remonter si elle n'y va pas). */
+interface Flyer {
+  key: number;
+  tile: number;
+  value: number;
+  /** Position de départ (centre de la tuile) et taille, en pixels dans la fenêtre de jeu. */
+  x: number;
+  y: number;
+  size: number;
+  /** Étapes du trajet, depuis la tuile : haut du tuyau, bas du tuyau, puis la multiplication. */
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  dx: number;
+  dy: number;
+  mode: "place" | "reject";
 }
 
 function SoundIcon({ muted }: { muted: boolean }) {
@@ -103,12 +133,15 @@ function PhoneTurnIcon() {
   );
 }
 
-// Multipli'Flow : deux tableaux reliés par un tuyau. À gauche, des tuiles imagées colorées : en alignant 3 tuiles de la même couleur
+// Les quatre jeux Flow (Addi'Flow, Soustra'Flow, Multipli'Flow, Divi'Flow) : deux tableaux reliés par un tuyau. À gauche, des tuiles imagées colorées : en alignant 3 fruits identiques
 // ou plus, le joueur les détruit et ouvre des chemins aux nombres. Ceux-ci avancent seuls jusqu'au tuyau, le traversent un par un et
 // forment des multiplications dans le second tableau. La logique est tout entière dans @mbuyamba/math-flow (pure, testée) ; ici : le
 // dessin, les gestes (toucher, glisser, clavier), les animations et les sons.
-export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, onFullscreenChange, onClose, cover, initialLevel = 1, initialSeed }: MultipliFlowGameProps) {
-  const { t } = useTranslation("games");
+export function MathFlowGame({ variant: variantId = "multiplication", showTitle = true, active = true, fullscreen, onFullscreenChange, onClose, cover, initialLevel = 1, initialSeed }: MathFlowGameProps) {
+  const variant = FLOW_VARIANTS[variantId];
+  const { t: translate } = useTranslation("games");
+  // Les clés du jeu sont écrites sans racine (« game.title ») : la racine est celle du jeu joué.
+  const t = useCallback((key: string, options?: Record<string, unknown>): string => translate(`${variant.i18n}.${key}`, options) as string, [translate, variant.i18n]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -120,13 +153,16 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
   }, [loading]);
 
   const [level, setLevel] = useState(() => clampLevel(initialLevel));
-  const [game, setGame] = useState<GameState>(() => newGame(clampLevel(initialLevel), initialSeed ?? freshSeed()).state);
+  const [game, setGame] = useState<GameState>(() => newGame(clampLevel(initialLevel), initialSeed ?? freshSeed(), { operation: variant.operation }).state);
   const gameRef = useRef(game);
   const [round, setRound] = useState(1);
   const [selected, setSelected] = useState<number | null>(null);
   const [bounce, setBounce] = useState<Bounce | null>(null);
   const [ghosts, setGhosts] = useState<Ghost[]>([]);
   const [hintCells, setHintCells] = useState<readonly [number, number] | null>(null);
+  const [selectedResult, setSelectedResult] = useState<number | null>(null);
+  const [flyer, setFlyer] = useState<Flyer | null>(null);
+  const [hintResult, setHintResult] = useState<{ tile: number; expression: number } | null>(null);
   const [message, setMessage] = useState<{ key: number; text: string } | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [stuck, setStuck] = useState(false);
@@ -194,22 +230,38 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
       for (const event of events) {
         if (event.type === "entered-pipe") play("tileSlide");
         else if (event.type === "delivered") play("tilePlace");
-        else if (event.type === "expression-result") {
+        else if (event.type === "reservoir-add") play("hint");
+        else if (event.type === "board-cleaned") {
+          // Les fruits restants se désintègrent ensemble ; le tableau d'entrée a fini sa mission (le coup n'est pas compté).
+          play("combo", { count: event.removed.length, intensity: 1 });
+          counter.current += 1;
+          const batch = counter.current;
+          const previous = gameRef.current.flow.board;
+          const dust: Ghost[] = event.removed.flatMap((index) => {
+            const tile = previous.cells[index];
+            return tile?.kind === "image" ? [{ key: batch * 1000 + index, tile, index, origin: index, dust: true }] : [];
+          });
+          setGhosts((current) => [...current, ...dust]);
+          later(() => setGhosts((current) => current.filter((ghost) => Math.floor(ghost.key / 1000) !== batch)), GHOST_MS);
+          setAnnouncement(t("game.boardCleaned"));
+        }
+        else if (event.type === "result-placed") {
           play("cardReveal");
           const expression = gameRef.current.builder.expressions[event.expression];
-          if (expression?.operands) setAnnouncement(t("multipliFlow.game.expressionDone", { a: expression.operands[0], b: expression.operands[1], result: event.value }));
+          if (expression?.operands) setAnnouncement(t("game.expressionDone", { a: expression.operands[0], b: expression.operands[1], result: event.value }));
         } else if (event.type === "won") play("levelComplete");
       }
     },
-    [play, t],
+    [later, play, t],
   );
   useEffect(() => {
     if (frozen || game.status !== "playing") return;
     const timer = window.setInterval(() => {
       const step = tickGame(gameRef.current);
       if (step.events.length === 0) return;
-      commit(step.state);
+      // Les fruits qui vont disparaître sont lus sur l'ancien plateau : on annonce avant de valider le nouveau.
       announce(step.events);
+      commit(step.state);
     }, TICK_MS);
     return () => window.clearInterval(timer);
   }, [frozen, game.status, commit, announce]);
@@ -217,10 +269,13 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
   const startLevel = useCallback(
     (levelId: number) => {
       const id = clampLevel(levelId);
-      commit(newGame(id, freshSeed()).state);
+      commit(newGame(id, freshSeed(), { operation: variant.operation }).state);
       setLevel(id);
       setRound((current) => current + 1);
       setSelected(null);
+      setSelectedResult(null);
+      setFlyer(null);
+      setHintResult(null);
       setBounce(null);
       setGhosts([]);
       setHintCells(null);
@@ -228,7 +283,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
       setStuck(false);
       setPaused(false);
     },
-    [commit],
+    [commit, variant.operation],
   );
 
   const attemptSwap = useCallback(
@@ -245,8 +300,8 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
         setBounce({ key, a, b });
         later(() => setBounce((value) => (value?.key === key ? null : value)), BOUNCE_MS);
         play("tileBlocked");
-        if (outcome.reason === "dead-end") showMessage(t("multipliFlow.game.messages.deadEnd"));
-        else if (outcome.reason === "no-alignment") showMessage(t("multipliFlow.game.messages.noAlignment"));
+        if (outcome.reason === "dead-end") showMessage(t("game.messages.deadEnd"));
+        else if (outcome.reason === "no-alignment") showMessage(t("game.messages.noAlignment"));
         return;
       }
       counter.current += 1;
@@ -273,16 +328,107 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
     setSelected(null);
     setHintCells(null);
     if (!rescued.result.ok) {
-      showMessage(t("multipliFlow.game.messages.shuffleFailed"));
+      showMessage(t("game.messages.shuffleFailed"));
       return;
     }
     commit(rescued.state);
     setStuck(false);
     play("tileSwap");
-    showMessage(t("multipliFlow.game.messages.shuffled"));
+    showMessage(t("game.messages.shuffled"));
   }, [commit, play, showMessage, t]);
 
+  // --- Résultats : l'enfant choisit une tuile du réservoir, elle descend dans le tuyau jusqu'à la multiplication -----------------
+
+  const placeOnExpression = useCallback(
+    (tileId: number, expressionId: number) => {
+      const current = gameRef.current;
+      const stage = stageRef.current;
+      if (current.status !== "playing" || !stage) return;
+      const tileElement = stage.querySelector<HTMLElement>(`[data-result-tile="${tileId}"]`);
+      const slotElement = stage.querySelector<HTMLElement>(`[data-question="${expressionId}"]`);
+      const tile = current.builder.reservoir.find((candidate) => candidate.id === tileId);
+      setSelectedResult(null);
+      setHintResult(null);
+      if (!tileElement || !slotElement || !tile) return;
+      const area = stage.getBoundingClientRect();
+      const from = tileElement.getBoundingClientRect();
+      const to = slotElement.getBoundingClientRect();
+      const pipe = stage.querySelector<HTMLElement>("[data-vpipe]")?.getBoundingClientRect();
+      const startX = from.left + from.width / 2;
+      const startY = from.top + from.height / 2;
+      // Le résultat passe par le tuyau : il y entre par le haut, en ressort par le bas, puis rejoint la multiplication.
+      const pipeX = pipe ? pipe.left + pipe.width / 2 : startX;
+      const pipeTop = pipe ? pipe.top + pipe.height * 0.12 : startY;
+      const pipeBottom = pipe ? pipe.top + pipe.height * 0.88 : startY;
+      const accepted = placeResult(current, tileId, expressionId).outcome.accepted;
+      counter.current += 1;
+      const key = counter.current;
+      setFlyer({
+        key,
+        tile: tileId,
+        value: tile.value,
+        x: from.left - area.left + from.width / 2,
+        y: from.top - area.top + from.height / 2,
+        size: from.width,
+        x1: pipeX - startX,
+        y1: pipeTop - startY,
+        x2: pipeX - startX,
+        y2: pipeBottom - startY,
+        dx: to.left + to.width / 2 - startX,
+        dy: to.top + to.height / 2 - startY,
+        mode: accepted ? "place" : "reject",
+      });
+      if (!accepted) {
+        play("placeWrong");
+        showMessage(t("game.messages.wrongResult"));
+      }
+      later(
+        () => {
+          // La partie a pu avancer pendant la descente : le placement se refait sur l'état courant.
+          if (accepted) {
+            const latest = placeResult(gameRef.current, tileId, expressionId);
+            if (latest.outcome.accepted) {
+              commit(latest.state);
+              announce(latest.events);
+            }
+          }
+          setFlyer((value) => (value?.key === key ? null : value));
+        },
+        accepted ? FLY_PLACE_MS : FLY_REJECT_MS,
+      );
+    },
+    [announce, commit, later, play, showMessage, t],
+  );
+
+  const pendingExpressions = game.builder.expressions.filter((expression) => expression.stage === "equals");
+
+  const onResultTile = (tile: ResultTile) => {
+    if (frozen || won || flyer) return;
+    const pending = gameRef.current.builder.expressions.filter((expression) => expression.stage === "equals");
+    if (pending.length === 0) return;
+    play("tileSwap");
+    // Une seule multiplication attend : la tuile y descend directement. Sinon, l'enfant touche ensuite celle qu'il veut.
+    if (pending.length === 1) placeOnExpression(tile.id, (pending[0] as Expression).id);
+    else setSelectedResult((current) => (current === tile.id ? null : tile.id));
+  };
+
+  const onQuestion = (expressionId: number) => {
+    if (frozen || won || flyer) return;
+    if (selectedResult === null) showMessage(t("game.status.chooseResult"));
+    else placeOnExpression(selectedResult, expressionId);
+  };
+
   const showHint = useCallback(() => {
+    // Des résultats attendent : l'indice montre la tuile et la multiplication où elle va.
+    const resultAdvice = resultHint(gameRef.current);
+    if (resultAdvice) {
+      setHintResult(resultAdvice);
+      play("hint");
+      counter.current += 1;
+      const key = counter.current;
+      later(() => setHintResult((value) => (value === resultAdvice && key === counter.current ? null : value)), HINT_MS);
+      return;
+    }
     const advice = engineHint(gameRef.current);
     if (advice.kind === "move") {
       setHintCells(advice.move);
@@ -291,9 +437,9 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
       const key = counter.current;
       later(() => setHintCells((value) => (value === advice.move && key === counter.current ? null : value)), HINT_MS);
     } else if (advice.kind === "none-needed") {
-      showMessage(t("multipliFlow.game.status.flowing"));
+      showMessage(t("game.status.flowing"));
     } else {
-      showMessage(t("multipliFlow.game.stuck"));
+      showMessage(t("game.stuck"));
     }
   }, [later, play, showMessage, t]);
 
@@ -393,15 +539,21 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
   const pipeSlots = game.flow.pipe.slots;
   const pipeBusy = pipeSlots.some((slot) => slot !== null);
 
+  const reservoir = game.builder.reservoir;
+  const layout = reservoirLayout(cols, game.totalNumbers);
   const status = won
-    ? t("multipliFlow.game.status.won")
-    : selected !== null
-      ? t("multipliFlow.game.status.selected")
+    ? t("game.status.won")
+    : selectedResult !== null
+      ? t("game.status.placeResult")
+      : pendingExpressions.length > 0
+        ? t("game.status.chooseResult")
+        : selected !== null
+      ? t("game.status.selected")
       : blocked === 0
-        ? t("multipliFlow.game.status.flowing")
-        : t("multipliFlow.game.status.play");
-  const colorName = (color: ImageTile["color"]) => t(`multipliFlow.game.colors.${color}`);
-  const howTo = [1, 2, 3].map((number) => ({ title: t(`multipliFlow.game.howTo.step${number}Title`), text: t(`multipliFlow.game.howTo.step${number}`) }));
+        ? t("game.status.flowing")
+        : t("game.status.play");
+  const colorName = (color: ImageTile["color"]) => t(`game.colors.${color}`);
+  const howTo = [1, 2, 3].map((number) => ({ title: t(`game.howTo.step${number}Title`), text: t(`game.howTo.step${number}`) }));
   const lastLevel = level >= LEVELS.length;
 
   const bounceStyle = (index: number): CSSProperties | undefined => {
@@ -416,7 +568,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
     const column = offset + (slot === "a" ? 0 : 2);
     return (
       <div key={`e${expression.id}-${slot}`} className={styles.slot} style={{ "--r": expression.id, "--c": column } as CSSProperties}>
-        <div className={`${styles.face} ${styles.number} ${styles.arrive}`} style={{ "--fx": -(column + 0.5), "--fy": entranceRow - expression.id } as CSSProperties}>
+        <div className={`${styles.face} ${styles.number} ${styles.arrive}`} style={{ "--fx": -(column + 0.5), "--fy": entranceRow - expression.id - layout.start } as CSSProperties}>
           {value}
         </div>
       </div>
@@ -426,18 +578,18 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
   return (
     <GamePlayer
       rootRef={rootRef}
-      label={t("multipliFlow.game.screen.label")}
-      title={showTitle ? t("multipliFlow.game.title") : undefined}
+      label={t("game.screen.label")}
+      title={showTitle ? t("game.title") : undefined}
       stats={[
-        { label: t("multipliFlow.game.stats.level"), value: `${level}/${LEVELS.length}` },
-        { label: t("multipliFlow.game.stats.moves"), value: game.moves },
+        { label: t("game.stats.level"), value: `${level}/${LEVELS.length}` },
+        { label: t("game.stats.moves"), value: game.moves },
       ]}
       paused={paused}
       onPlay={() => setPaused(false)}
       onPause={() => setPaused(true)}
       ended={won}
       onRestart={() => startLevel(level)}
-      restartLabel={t("multipliFlow.game.actions.restartAria")}
+      restartLabel={t("game.actions.restartAria")}
       onHint={showHint}
       hintDisabled={frozen || won}
       extraControls={
@@ -456,19 +608,21 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
       <div
         ref={stageRef}
         className={styles.game}
-        style={{ "--rows": rows, "--cols": cols, "--entrance": entranceRow, "--pipe-slots": pipeSlots.length } as CSSProperties}
+        style={{ "--rows": Math.max(rows, layout.start + expressionRows), "--rims": layout.start + expressionRows > rows ? 4 : 2, "--board-rows": rows, "--cols": cols, "--entrance": entranceRow, "--pipe-slots": pipeSlots.length } as CSSProperties}
         data-frozen={frozen || undefined}
-        data-testid="multipli-flow"
+        data-testid={variant.gameId}
       >
         <div className={styles.field} inert={frozen}>
-          <div className={styles.machine} data-side="in">
+          <div className={styles.machine} data-side="in" data-cleaned={game.cleaned || undefined}>
             <Leds active={!won} />
           <div
             ref={boardRef}
             key={`board-${round}`}
             className={`${styles.panel} ${styles.board}`}
             role="group"
-            aria-label={t("multipliFlow.game.boardLabel")}
+            aria-label={t("game.boardLabel")}
+            aria-disabled={game.cleaned || undefined}
+            data-cleaned={game.cleaned || undefined}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
@@ -479,7 +633,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
               const position = { "--r": Math.floor(index / cols), "--c": index % cols } as CSSProperties;
               if (tile.kind === "number") {
                 return (
-                  <div key={tile.id} className={styles.slot} style={position} data-index={index} role="img" aria-label={t("multipliFlow.game.cellNumber", { row: Math.floor(index / cols) + 1, column: (index % cols) + 1, value: tile.value })}>
+                  <div key={tile.id} className={styles.slot} style={position} data-index={index} role="img" aria-label={t("game.cellNumber", { row: Math.floor(index / cols) + 1, column: (index % cols) + 1, value: tile.value })}>
                     <div className={`${styles.face} ${styles.number}`}>{tile.value}</div>
                   </div>
                 );
@@ -499,7 +653,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
                   data-hinted={isHinted || undefined}
                   aria-pressed={isSelected}
                   tabIndex={index === (selected ?? -1) || selected === null ? 0 : -1}
-                  aria-label={t(isSelected ? "multipliFlow.game.cellImageSelected" : "multipliFlow.game.cellImage", { row: Math.floor(index / cols) + 1, column: (index % cols) + 1, color: colorName(tile.color) })}
+                  aria-label={t(isSelected ? "game.cellImageSelected" : "game.cellImage", { row: Math.floor(index / cols) + 1, column: (index % cols) + 1, color: colorName(tile.color) })}
                 >
                   <span className={styles.face} data-bounce={bounce && (bounce.a === index || bounce.b === index) ? bounce.key : undefined} style={bounceStyle(index)}>
                     <span className={styles.plate}>{url ? <img src={url} alt="" draggable={false} /> : null}</span>
@@ -512,7 +666,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
               return (
                 <div
                   key={ghost.key}
-                  className={`${styles.slot} ${styles.ghost}`}
+                  className={`${styles.slot} ${styles.ghost}${ghost.dust ? ` ${styles.dust}` : ""}`}
                   aria-hidden="true"
                   data-color={ghost.tile.color}
                   style={
@@ -534,7 +688,7 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
           </div>
 
           <div className={styles.pipeZone}>
-            <div className={styles.pipe} role="img" aria-label={t("multipliFlow.game.pipeLabel")} data-busy={pipeBusy || undefined}>
+            <div className={styles.pipe} role="img" aria-label={t("game.pipeLabel")} data-busy={pipeBusy || undefined}>
               <span className={styles.collar} data-end="in" aria-hidden="true" />
               <span className={styles.collar} data-end="out" aria-hidden="true" />
               {pipeSlots.map((tile: NumberTile | null, slot) =>
@@ -547,9 +701,41 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
             </div>
           </div>
 
+          <div className={styles.column} style={{ "--tile": layout.tile, "--zone": layout.zone, "--vpipe": layout.start - layout.zone, "--offset-col": offset } as CSSProperties}>
+          <div className={styles.machine} data-side="tank">
+          <Leds active={reservoir.length > 0} />
+          <div key={`tank-${round}`} className={`${styles.panel} ${styles.tankPanel}`}>
+            <div className={styles.tank} role="group" aria-label={t("game.reservoirLabel")} data-busy={reservoir.length > 0 || undefined}>
+              {reservoir.map((tile) => {
+                const isSelected = selectedResult === tile.id;
+                const hidden = flyer?.tile === tile.id;
+                return (
+                  <button
+                    key={tile.id}
+                    type="button"
+                    className={styles.resultButton}
+                    data-result-tile={tile.id}
+                    data-selected={isSelected || undefined}
+                    data-hinted={hintResult?.tile === tile.id || undefined}
+                    data-flying={hidden || undefined}
+                    aria-pressed={isSelected}
+                    aria-label={t(isSelected ? "game.resultTileSelected" : "game.resultTile", { value: tile.value })}
+                    onClick={() => onResultTile(tile)}
+                  >
+                    <span className={`${styles.face} ${styles.number} ${styles.resultTile}`}>{tile.value}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          </div>
+          <div className={styles.vpipe} data-vpipe="" role="img" aria-label={t("game.vpipeLabel")} data-busy={flyer !== null || undefined}>
+            <span className={styles.collar} data-end="top" aria-hidden="true" />
+            <span className={styles.collar} data-end="bottom" aria-hidden="true" />
+          </div>
           <div className={styles.machine} data-side="out" data-won={won || undefined}>
           <Leds active={pipeBusy || won} />
-          <div key={`results-${round}`} className={`${styles.panel} ${styles.results}`} role="group" aria-label={t("multipliFlow.game.resultsLabel")}>
+          <div key={`results-${round}`} className={`${styles.panel} ${styles.results}`} role="group" aria-label={t("game.resultsLabel")} style={{ "--panel-rows": expressionRows } as CSSProperties}>
             {Array.from({ length: expressionRows }, (_, row) => (
               <div key={`placeholder-${row}`} className={styles.placeholder} style={{ "--r": row, "--c": offset, "--w": EXPRESSION_WIDTH } as CSSProperties} aria-hidden="true" />
             ))}
@@ -557,23 +743,40 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
               const showOperator = expression.stage !== "first" && expression.stage !== "second";
               const showEquals = expression.stage === "equals" || expression.stage === "result";
               const complete = expression.stage === "result" && expression.operands !== null && expression.result !== null;
+              const waiting = expression.stage === "equals";
+              const row = expression.id;
               return (
-                <div key={expression.id} className={styles.expression} role="group" aria-label={complete ? t("multipliFlow.game.expressionDone", { a: expression.operands?.[0], b: expression.operands?.[1], result: expression.result }) : t("multipliFlow.game.expressionLabel", { a: expression.a.value, b: expression.b?.value ?? "?" })}>
+                <div key={expression.id} className={styles.expression} role="group" aria-label={complete ? t("game.expressionDone", { a: expression.operands?.[0], b: expression.operands?.[1], result: expression.result }) : t("game.expressionLabel", { a: expression.a.value, b: expression.b?.value ?? "?" })}>
                   {renderOperand(expression, "a")}
                   {showOperator ? (
-                    <div className={styles.slot} style={{ "--r": expression.id, "--c": offset + 1 } as CSSProperties}>
+                    <div className={styles.slot} style={{ "--r": row, "--c": offset + 1 } as CSSProperties}>
                       <div className={`${styles.sign} ${styles.pop}`}>{game.operation.symbol}</div>
                     </div>
                   ) : null}
                   {renderOperand(expression, "b")}
                   {showEquals ? (
-                    <div className={styles.slot} style={{ "--r": expression.id, "--c": offset + 3 } as CSSProperties}>
+                    <div className={styles.slot} style={{ "--r": row, "--c": offset + 3 } as CSSProperties}>
                       <div className={`${styles.sign} ${styles.pop}`}>=</div>
                     </div>
                   ) : null}
+                  {waiting ? (
+                    <div className={styles.slot} style={{ "--r": row, "--c": offset + 4 } as CSSProperties}>
+                      <button
+                        type="button"
+                        className={styles.question}
+                        data-question={expression.id}
+                        data-target={selectedResult !== null || undefined}
+                        data-hinted={hintResult?.expression === expression.id || undefined}
+                        aria-label={t("game.questionSlot", { a: expression.operands?.[0], b: expression.operands?.[1] })}
+                        onClick={() => onQuestion(expression.id)}
+                      >
+                        ?
+                      </button>
+                    </div>
+                  ) : null}
                   {complete ? (
-                    <div className={styles.slot} style={{ "--r": expression.id, "--c": offset + 4 } as CSSProperties}>
-                      <div className={`${styles.face} ${styles.number} ${styles.resultTile} ${styles.pop}`}>{expression.result}</div>
+                    <div className={styles.slot} style={{ "--r": row, "--c": offset + 4 } as CSSProperties}>
+                      <div className={`${styles.face} ${styles.number} ${styles.resultTile} ${styles.lock}`}>{expression.result}</div>
                     </div>
                   ) : null}
                 </div>
@@ -581,19 +784,32 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
             })}
           </div>
           </div>
+          </div>
         </div>
 
         {won ? (
           <div className={styles.winBar} role="status" data-kind="won">
-            <strong>{t("multipliFlow.game.won.title")}</strong>
-            <span>{lastLevel ? t("multipliFlow.game.won.finished") : t("multipliFlow.game.won.text")}</span>
+            <strong>{t("game.won.title")}</strong>
+            <span>{lastLevel ? t("game.won.finished") : t("game.won.text")}</span>
             <button type="button" className={styles.action} autoFocus onClick={() => startLevel(lastLevel ? 1 : level + 1)}>
-              {lastLevel ? t("multipliFlow.game.actions.again") : t("multipliFlow.game.actions.next")}
+              {lastLevel ? t("game.actions.again") : t("game.actions.next")}
             </button>
           </div>
         ) : (
           <p className={styles.caption}>{status}</p>
         )}
+
+        {flyer ? (
+          <div
+            key={flyer.key}
+            className={styles.flyer}
+            data-mode={flyer.mode}
+            aria-hidden="true"
+            style={{ left: flyer.x - flyer.size / 2, top: flyer.y - flyer.size / 2, width: flyer.size, height: flyer.size, "--x1": `${flyer.x1}px`, "--y1": `${flyer.y1}px`, "--x2": `${flyer.x2}px`, "--y2": `${flyer.y2}px`, "--dx": `${flyer.dx}px`, "--dy": `${flyer.dy}px` } as CSSProperties}
+          >
+            <span className={`${styles.face} ${styles.number} ${styles.resultTile}`}>{flyer.value}</span>
+          </div>
+        ) : null}
 
         <div className={styles.toast} role="status" aria-live="polite">
           {message ? (
@@ -608,9 +824,9 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
 
         {stuck && !won ? (
           <div className={styles.stuck} role="alert">
-            <span>{t("multipliFlow.game.stuck")}</span>
+            <span>{t("game.stuck")}</span>
             <button type="button" className={styles.action} onClick={shuffle}>
-              {t("multipliFlow.game.actions.shuffle")}
+              {t("game.actions.shuffle")}
             </button>
           </div>
         ) : null}
@@ -618,8 +834,8 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
         {portrait ? (
           <div className={styles.overlay} role="alert" data-kind="rotate">
             <PhoneTurnIcon />
-            <h2 className={styles.overlayTitle}>{t("multipliFlow.game.rotate.title")}</h2>
-            <p className={styles.overlayText}>{t("multipliFlow.game.rotate.text")}</p>
+            <h2 className={styles.overlayTitle}>{t("game.rotate.title")}</h2>
+            <p className={styles.overlayText}>{t("game.rotate.text")}</p>
           </div>
         ) : null}
 
@@ -627,3 +843,10 @@ export function MultipliFlowGame({ showTitle = true, active = true, fullscreen, 
     </GamePlayer>
   );
 }
+
+// Un composant par jeu : le catalogue charge chacun à part (une adresse, une carte, un lecteur par jeu).
+type VariantGameProps = Omit<MathFlowGameProps, "variant">;
+export const AddiFlowGame = (props: VariantGameProps) => <MathFlowGame variant="addition" {...props} />;
+export const SoustraFlowGame = (props: VariantGameProps) => <MathFlowGame variant="subtraction" {...props} />;
+export const MultipliFlowGame = (props: VariantGameProps) => <MathFlowGame variant="multiplication" {...props} />;
+export const DiviFlowGame = (props: VariantGameProps) => <MathFlowGame variant="division" {...props} />;

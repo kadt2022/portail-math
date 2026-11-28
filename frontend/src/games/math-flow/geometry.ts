@@ -29,6 +29,30 @@ export function expressionOffset(cols: number): number {
   return Math.max(0, Math.floor((cols - EXPRESSION_WIDTH) / 2));
 }
 
+/**
+ * Second tableau, de haut en bas : le réservoir de résultats (une rangée de tuiles), un petit tuyau vertical, puis les opérations.
+ * Toutes les longueurs sont en cases. Les tuiles du réservoir rétrécissent avec leur nombre pour tenir sur une seule rangée.
+ */
+export interface ReservoirLayout {
+  /** Côté d'une tuile de résultat. */
+  readonly tile: number;
+  /** Hauteur de la zone du réservoir. */
+  readonly zone: number;
+  /** Ligne (en cases, fractionnaire) où commence la première opération. */
+  readonly start: number;
+}
+
+export const RESERVOIR_MAX_TILE = 0.7;
+const RESERVOIR_PADDING = 0.34;
+const VERTICAL_PIPE = 0.95;
+
+/** `total` : nombre de tuiles du réservoir au plus (un bon résultat et un leurre par opération). */
+export function reservoirLayout(cols: number, total: number): ReservoirLayout {
+  const tile = Math.min(RESERVOIR_MAX_TILE, (cols - 0.3) / (Math.max(1, total) * 1.12));
+  const zone = tile + RESERVOIR_PADDING;
+  return { tile, zone, start: zone + VERTICAL_PIPE };
+}
+
 /** Première tuile imagée rencontrée en partant d'une case dans une direction (navigation au clavier), ou null. */
 export function scanFrom(rows: number, cols: number, index: number, direction: Direction, accepts: (candidate: number) => boolean): number | null {
   let current = neighbour(rows, cols, index, direction);

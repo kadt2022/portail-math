@@ -18,6 +18,9 @@ export const PICTURE_COLOR: Readonly<Record<string, TileColor>> = {
   "noix-de-coco": "brown",
 };
 
+/** Ordre d'apparition des images : une image de plus à chaque palier, de couleurs bien distinctes d'abord. */
+export const LEVEL_PICTURES: readonly string[] = ["pomme", "banane", "orange", "pasteque", "raisin", "noix-de-coco", "fraise", "ananas", "mangue", "poire"];
+
 export function colorOfPicture(picture: string): TileColor {
   const color = PICTURE_COLOR[picture];
   if (!color) throw new Error(`Illustration sans couleur de jeu : ${picture}`);

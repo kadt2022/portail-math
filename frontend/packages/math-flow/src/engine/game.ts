@@ -1,5 +1,7 @@
-import { allExpressionsComplete, createBuilder, receiveNumber, stepBuilder, type BuilderState, type ExpressionEvent } from "./expression";
-import { createFlow, playerSwap, tick, type FlowEvent, type FlowState } from "./flow";
+import { allExpressionsComplete, createBuilder, placeResultOnExpression, receiveNumber, stepBuilder, type BuilderState, type ExpressionEvent, type PlaceResultOutcome } from "./expression";
+import { isImageTile, withCells } from "./board";
+import type { Board } from "./types";
+import { createFlow, numbersInTransit, playerSwap, tick, type FlowEvent, type FlowState } from "./flow";
 import { generateLevel, type GeneratedLevel } from "./generator";
 import { levelConfig, type LevelConfig } from "./levels";
 import { MULTIPLICATION, type Operation } from "./operations";
@@ -9,7 +11,7 @@ import { rescueShuffle, type RescueResult } from "./rescue";
 import { createRng, type Rng } from "./rng";
 import { listValidSwaps, trySwap, type SwapOutcome } from "./swap";
 
-/** Une partie : le plateau et le transport des nombres, les opérations construites, et l'état de la partie. */
+/** Une partie : le plateau et le transport des nombres, les opérations construites, les résultats à placer, et l'état de la partie. */
 export interface GameState {
   readonly level: LevelConfig;
   readonly operation: Operation;
@@ -21,11 +23,16 @@ export interface GameState {
   readonly moves: number;
   readonly status: "playing" | "won";
   /**
-   * Garde-fou contre les impasses (activé par défaut) : une permutation qui rendrait la partie sans issue est refusée, avec la
+   * Garde-fou contre les impasses (désactivé par défaut : un alignement valide n'est jamais refusé, l'impasse se règle par le mélange de secours) : une permutation qui rendrait la partie sans issue est refusée, avec la
    * raison « dead-end », avant d'être appliquée (les tuiles reviennent, sans pénalité). Tant que la partie est résoluble au
    * départ, elle le reste : jamais de blocage.
    */
   readonly deadEndGuard: boolean;
+  /**
+   * Nettoyage automatique du tableau d'entrée : vrai dès que le dernier nombre a traversé le tuyau et que les fruits restants ont
+   * disparu. Cela n'arrive qu'une fois par partie, ne compte pas comme un coup et ne gagne pas la partie.
+   */
+  readonly cleaned: boolean;
 }
 
 export interface GameOptions {
@@ -36,13 +43,32 @@ export interface GameOptions {
 /** Budget de recherche du garde-fou : largement au-dessus de ce que demandent les niveaux prévus (voir les tests). */
 const GUARD_BUDGET = 200_000;
 
-export type GameEvent = FlowEvent | ExpressionEvent | { readonly type: "swap"; readonly a: number; readonly b: number; readonly removed: readonly number[] } | { readonly type: "won" };
+export type GameEvent = FlowEvent | ExpressionEvent | { readonly type: "swap"; readonly a: number; readonly b: number; readonly removed: readonly number[] } | { readonly type: "board-cleaned"; readonly removed: readonly number[] } | { readonly type: "won" };
+
+/**
+ * Division : les nombres arrivent dans un ordre que l'enfant détermine, donc n'importe quelle paire doit se diviser exactement.
+ * Le plateau ne porte alors que des puissances de 2 (1, 2, 4, 8, puis 16 aux niveaux plus grands) : le plus grand nombre est
+ * toujours un multiple du plus petit, quel que soit l'ordre d'arrivée.
+ */
+export function divisionValues(level: LevelConfig): readonly number[] {
+  return level.numberRange[1] <= 5 ? [1, 2, 4, 8] : [1, 2, 4, 8, 16];
+}
+
+function fitNumbers(board: Board, operation: Operation, level: LevelConfig): Board {
+  if (operation.id !== "division") return board;
+  const values = divisionValues(level);
+  return withCells(
+    board,
+    board.cells.flatMap((cell, index) => (cell?.kind === "number" ? [[index, { ...cell, value: values[(cell.value - 1) % values.length] as number }] as const] : [])),
+  );
+}
 
 export function startGame(generated: GeneratedLevel, options: GameOptions = {}): GameState {
   const operation = options.operation ?? MULTIPLICATION;
-  const flow = createFlow(generated.board, { entranceRow: generated.entranceRow, pipeLength: generated.level.pipeLength });
-  const totalNumbers = generated.board.cells.filter((cell) => cell?.kind === "number").length;
-  return { level: generated.level, operation, seed: generated.seed, flow, builder: createBuilder(operation), totalNumbers, moves: 0, status: "playing", deadEndGuard: options.deadEndGuard ?? true };
+  const board = fitNumbers(generated.board, operation, generated.level);
+  const flow = createFlow(board, { entranceRow: generated.entranceRow, pipeLength: generated.level.pipeLength });
+  const totalNumbers = board.cells.filter((cell) => cell?.kind === "number").length;
+  return { level: generated.level, operation, seed: generated.seed, flow, builder: createBuilder(operation, generated.seed), totalNumbers, moves: 0, status: "playing", deadEndGuard: options.deadEndGuard ?? false, cleaned: false };
 }
 
 /** Nouvelle partie d'un niveau : le plateau est vérifié par un rejeu complet avant d'être proposé (voir verifyGenerated). */
@@ -56,7 +82,7 @@ export function newGame(levelId: number, seed: number, options: GameOptions = {}
   throw new Error(`Aucun plateau vérifié pour le niveau ${levelId} (graine ${seed})`);
 }
 
-/** Un pas de temps : transport des nombres, arrivée dans le second tableau, construction des opérations. */
+/** Un pas de temps : transport des nombres, arrivée dans le second tableau, construction des opérations (le résultat attend l'enfant). */
 export function tickGame(state: GameState): { state: GameState; events: GameEvent[] } {
   const flowStep = tick(state.flow);
   const events: GameEvent[] = [...flowStep.events];
@@ -72,18 +98,66 @@ export function tickGame(state: GameState): { state: GameState; events: GameEven
   const built = stepBuilder(builder);
   builder = built.state;
   events.push(...built.events);
+  // Dernier nombre arrivé (plus aucun sur le plateau ni dans le tuyau) : les fruits restants se désintègrent, une seule fois.
+  let flow = flowStep.state;
+  let cleaned = state.cleaned;
+  if (!cleaned && state.status === "playing" && numbersInTransit(flow) === 0 && flow.delivered.length === state.totalNumbers) {
+    const removed = flow.board.cells.flatMap((cell, index) => (isImageTile(cell) ? [index] : []));
+    flow = { ...flow, board: withCells(flow.board, removed.map((index) => [index, null] as const)) };
+    cleaned = true;
+    if (removed.length > 0) events.push({ type: "board-cleaned", removed });
+  }
+  // La victoire n'est pas déclenchée ici : les résultats sont posés par l'enfant (voir placeResult).
+  return { state: { ...state, flow, builder, cleaned }, events };
+}
+
+/**
+ * L'enfant place une tuile du réservoir sur une opération. Bon résultat : la tuile se verrouille (et la partie est gagnée quand
+ * tous les nombres ont traversé le tuyau et que toutes les opérations ont leur résultat). Mauvais résultat : rien ne change, la
+ * tuile revient dans le réservoir, sans pénalité.
+ */
+export function placeResult(state: GameState, tileId: number, expressionId: number): { state: GameState; outcome: PlaceResultOutcome; events: GameEvent[] } {
+  const placed = placeResultOnExpression(state.builder, tileId, expressionId);
+  if (!placed.outcome.accepted) return { state, outcome: placed.outcome, events: [] };
+  const events: GameEvent[] = [...placed.events];
+  let builder = placed.state;
   let status = state.status;
   if (status === "playing" && allExpressionsComplete(builder, state.totalNumbers)) {
     status = "won";
+    // Les leurres qui restent disparaissent avec la victoire.
+    builder = { ...builder, reservoir: [] };
     events.push({ type: "won" });
   }
-  return { state: { ...state, flow: flowStep.state, builder, status }, events };
+  return { state: { ...state, builder, status }, outcome: placed.outcome, events };
 }
 
-export type GameSwapOutcome = SwapOutcome | { readonly accepted: false; readonly reason: "dead-end" };
+/** Indice pour un résultat : une tuile du réservoir et l'opération où elle va, ou null s'il n'y a rien à placer pour l'instant. */
+export function resultHint(state: GameState): { readonly tile: number; readonly expression: number } | null {
+  for (const expression of state.builder.expressions) {
+    if (expression.stage !== "equals") continue;
+    const tile = state.builder.reservoir.find((candidate) => candidate.value === expression.expected);
+    if (tile) return { tile: tile.id, expression: expression.id };
+  }
+  return null;
+}
+
+/** Pose tous les résultats justes à la place de l'enfant (vérification et tests : le jeu, lui, ne le fait jamais). */
+export function resolveResults(state: GameState): GameState {
+  let current = state;
+  for (let guard = 0; guard < 1000; guard += 1) {
+    const advice = resultHint(current);
+    if (!advice) break;
+    current = placeResult(current, advice.tile, advice.expression).state;
+  }
+  return current;
+}
+
+export type GameSwapOutcome = SwapOutcome | { readonly accepted: false; readonly reason: "dead-end" | "cleaned" };
 
 /** Permutation du joueur, possible à tout moment. Avec le garde-fou, un coup qui bloquerait la partie est refusé (« dead-end »). */
 export function swapGame(state: GameState, a: number, b: number): { state: GameState; outcome: GameSwapOutcome; events: GameEvent[] } {
+  // Le tableau d'entrée a terminé sa mission : plus aucune interaction.
+  if (state.cleaned) return { state, outcome: { accepted: false, reason: "cleaned" }, events: [] };
   if (state.deadEndGuard) {
     const preview = trySwap(state.flow.board, a, b);
     if (preview.accepted && solve(preview.board, state.flow.entrance, GUARD_BUDGET).status === "unsolvable") return { state, outcome: { accepted: false, reason: "dead-end" }, events: [] };
@@ -155,8 +229,8 @@ function runUntilQuiet(state: GameState): GameState {
 
 /**
  * Rejeu complet d'une séquence de coups dans le vrai moteur (permutations, déplacements, tuyau, opérations). La séquence est
- * valide si chaque coup est accepté et si, à la fin, tous les nombres ont été livrés, appariés dans leur ordre d'arrivée, et
- * toutes les opérations affichées avec le bon résultat, recalculé ici indépendamment.
+ * valide si chaque coup est accepté et si, à la fin, tous les nombres ont été livrés, appariés dans leur ordre d'arrivée, toutes
+ * les opérations affichées avec le bon résultat attendu (recalculé ici indépendamment) et si poser ces résultats gagne la partie.
  */
 export function verifySolution(start: GameState, moves: readonly Move[], schedule: ReplaySchedule = "interleaved"): ReplayReport {
   let state = start;
@@ -164,6 +238,8 @@ export function verifySolution(start: GameState, moves: readonly Move[], schedul
   const fail = (reason: string): ReplayReport => ({ ok: false, reason, ticks, arrivals: state.flow.delivered.map((tile) => tile.value), expressions: describe(state) });
   for (const [index, [a, b]] of moves.entries()) {
     const played = swapGame(state, a, b);
+    // Tous les nombres sont déjà arrivés et le tableau est nettoyé : les coups qui restent n'étaient plus nécessaires.
+    if (!played.outcome.accepted && played.outcome.reason === "cleaned") break;
     if (!played.outcome.accepted) return fail(`coup ${index + 1} refusé (${played.outcome.reason})`);
     state = played.state;
     if (schedule === "interleaved") {
@@ -183,18 +259,20 @@ export function verifySolution(start: GameState, moves: readonly Move[], schedul
 
   if (unreachableNumbers(state.flow.board, state.flow.entrance).length > 0) return fail("des nombres restent enfermés");
   if (state.flow.delivered.length !== state.totalNumbers) return fail(`${state.flow.delivered.length} nombres livrés sur ${state.totalNumbers}`);
-  if (state.status !== "won") return fail("opérations incomplètes");
+  if (state.builder.expressions.length !== state.totalNumbers / 2 || !state.builder.expressions.every((expression) => expression.stage === "equals")) return fail("opérations incomplètes");
   const arrivals = state.flow.delivered.map((tile) => tile.value);
   for (const [index, expression] of state.builder.expressions.entries()) {
     const first = arrivals[2 * index] as number;
     const second = arrivals[2 * index + 1] as number;
     const [x, y] = state.operation.arrange(first, second);
     if (expression.operands?.[0] !== x || expression.operands?.[1] !== y) return fail(`opération ${index + 1} : opérandes hors ordre d'arrivée`);
-    if (expression.result !== state.operation.compute(x, y)) return fail(`opération ${index + 1} : résultat incorrect`);
+    if (expression.expected !== state.operation.compute(x, y)) return fail(`opération ${index + 1} : résultat attendu incorrect`);
+    if (!state.builder.reservoir.some((tile) => tile.value === expression.expected)) return fail(`opération ${index + 1} : le bon résultat manque au réservoir`);
   }
+  if (resolveResults(state).status !== "won") return fail("poser les bons résultats ne gagne pas la partie");
   return { ok: true, ticks, arrivals, expressions: describe(state) };
 }
 
 function describe(state: GameState): string[] {
-  return state.builder.expressions.map((expression) => (expression.operands ? `${expression.operands[0]} ${state.operation.symbol} ${expression.operands[1]}${expression.result === null ? "" : ` = ${expression.result}`}` : `${expression.a.value}`));
+  return state.builder.expressions.map((expression) => (expression.operands ? `${expression.operands[0]} ${state.operation.symbol} ${expression.operands[1]} = ${expression.result ?? expression.expected ?? "?"}` : `${expression.a.value}`));
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dragDirection, expressionOffset, neighbour, scanFrom } from "./geometry";
+import { dragDirection, expressionOffset, neighbour, reservoirLayout, scanFrom } from "./geometry";
 
 describe("geometry", () => {
   it("donne la case voisine, et rien au bord", () => {
@@ -34,5 +34,16 @@ describe("geometry", () => {
     expect(scanFrom(3, 5, 9, "right", (c) => accepted.has(c))).toBeNull();
     expect(scanFrom(3, 5, 6, "right", (c) => accepted.has(c))).toBe(8);
     expect(scanFrom(3, 5, 9, "left", (c) => accepted.has(c))).toBe(8);
+  });
+});
+
+describe("réservoir de résultats", () => {
+  it("garde toutes les tuiles sur une rangée et laisse la place du tuyau vertical", () => {
+    for (const [cols, total] of [[5, 4], [5, 8], [6, 12], [7, 16]] as const) {
+      const layout = reservoirLayout(cols, total);
+      expect(layout.tile).toBeLessThanOrEqual(0.7);
+      expect(layout.tile * total * 1.12).toBeLessThanOrEqual(cols);
+      expect(layout.start).toBeGreaterThan(layout.zone);
+    }
   });
 });

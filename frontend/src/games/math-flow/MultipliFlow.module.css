@@ -37,12 +37,12 @@
 
 .field {
   /* Taille d'une case : limitée par la hauteur (lignes + cadres + barre de messages) et par la largeur (deux compartiments + tuyau). */
-  --cell: min(calc((100cqh - var(--bar) - 2 * var(--rim) - 18px) / var(--rows)), calc((100cqw - 10rem - 20px - 4 * var(--rim)) / (2 * var(--cols))), 6.5rem);
+  --cell: min(calc((100cqh - var(--bar) - var(--rims, 2) * var(--rim) - 18px) / var(--rows)), calc((100cqw - 10rem - 20px - 4 * var(--rim)) / (2 * var(--cols))), 6.5rem);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   width: 100%;
-  height: calc(var(--cell) * var(--rows) + 2 * var(--rim));
+  height: calc(var(--cell) * var(--rows) + var(--rims, 2) * var(--rim));
 }
 
 /* ---- Compartiments mécaniques --------------------------------------------------------------------------------------------- */
@@ -79,6 +79,7 @@
 /* Bande colorée sur l'arête haute : cyan pour l'entrée des tuiles, or pour la sortie des multiplications. */
 .machine[data-side="in"] { --accent: #38bdf8; }
 .machine[data-side="out"] { --accent: #fbbf24; }
+.machine[data-side="tank"] { --accent: #f472b6; }
 
 .machine::after {
   content: "";
@@ -128,7 +129,7 @@
 .panel {
   position: relative;
   width: calc(var(--cell) * var(--cols));
-  height: calc(var(--cell) * var(--rows));
+  height: calc(var(--cell) * var(--panel-rows, var(--rows)));
   overflow: hidden;
   border-radius: calc(var(--cell) * 0.16);
   background-color: #061230;
@@ -155,6 +156,7 @@
 }
 
 .board {
+  --panel-rows: var(--board-rows);
   touch-action: none;
 }
 
@@ -319,6 +321,30 @@
   z-index: 2;
   pointer-events: none;
   transition: none;
+}
+
+.dust .face {
+  animation: disintegrate 800ms ease-out both;
+}
+
+/* Tableau d'entrée terminé : plus d'interaction, bordure illuminée. */
+.board[data-cleaned] {
+  pointer-events: none;
+}
+
+.machine[data-cleaned] {
+  animation: doneGlow 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes disintegrate {
+  0% { opacity: 1; transform: scale(1); filter: none; }
+  30% { opacity: 1; transform: scale(1.08) rotate(-4deg); filter: brightness(1.6); }
+  100% { opacity: 0; transform: translateY(calc(var(--cell) * -0.25)) scale(1.5) rotate(14deg); filter: blur(6px) brightness(2); }
+}
+
+@keyframes doneGlow {
+  from { box-shadow: 0 0 0 2px #243049, 0 10px 22px rgba(0, 0, 0, 0.55), 0 0 10px 2px rgba(74, 222, 128, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.7), inset 0 -3px 0 rgba(20, 28, 48, 0.55); }
+  to { box-shadow: 0 0 0 2px #4ade80, 0 10px 22px rgba(0, 0, 0, 0.55), 0 0 28px 6px rgba(74, 222, 128, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.7), inset 0 -3px 0 rgba(20, 28, 48, 0.55); }
 }
 
 .ghost .face {
@@ -586,6 +612,190 @@
 
 /* ---- Animations ------------------------------------------------------------------------------------------------------------- */
 
+/* ---- Réservoir de résultats, tuyau vertical, question « ? » ---------------------------------------------------------------- */
+
+/* Colonne de droite : le réservoir de résultats, son tuyau vertical, puis les opérations — trois pièces séparées. */
+.column {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tankPanel {
+  --panel-rows: var(--zone);
+}
+
+.tank {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--cell) * var(--tile) * 0.12);
+  border-radius: calc(var(--cell) * 0.16) calc(var(--cell) * 0.16) 0 0;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.04));
+  box-shadow: inset 0 calc(var(--cell) * -0.04) 0 rgba(251, 191, 36, 0.35);
+}
+
+.resultButton {
+  flex: none;
+  position: relative;
+  width: calc(var(--cell) * var(--tile));
+  height: calc(var(--cell) * var(--tile));
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  animation: resultBlink 1.4s ease-in-out infinite alternate;
+}
+
+.resultButton .face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-size: calc(var(--cell) * var(--tile) * 0.5);
+}
+
+.resultButton[data-selected] {
+  animation: none;
+  transform: translateY(calc(var(--cell) * 0.08)) scale(1.1);
+  filter: drop-shadow(0 0 calc(var(--cell) * 0.14) rgba(255, 255, 255, 0.9));
+}
+
+.resultButton[data-hinted] {
+  animation: hintPulse 0.5s ease-in-out infinite alternate;
+  border-radius: calc(var(--cell) * 0.2);
+}
+
+.resultButton[data-flying] {
+  visibility: hidden;
+}
+
+.resultButton:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  border-radius: calc(var(--cell) * 0.2);
+}
+
+/* Tuyau vertical : du réservoir à la première opération, dans la colonne du « ? ». */
+.vpipe {
+  position: relative;
+  flex: none;
+  /* Au milieu des deux machines, au-dessus et au-dessous. */
+  align-self: center;
+  width: calc(var(--cell) * 1.05);
+  height: calc(var(--cell) * var(--vpipe));
+  z-index: 3;
+  border-radius: calc(var(--cell) * 0.1);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.7) 0 8%, rgba(255, 255, 255, 0.05) 18%, transparent 45%, rgba(0, 20, 60, 0.28) 80%, rgba(255, 255, 255, 0.45) 100%),
+    linear-gradient(90deg, rgba(140, 210, 255, 0.3), rgba(60, 130, 220, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(200, 235, 255, 0.55), 0 0 10px rgba(125, 211, 252, 0.25);
+  transition: box-shadow 220ms ease;
+}
+
+.vpipe[data-busy] {
+  box-shadow: inset 0 0 0 1px rgba(220, 245, 255, 0.85), inset 0 0 18px rgba(125, 211, 252, 0.75), 0 0 18px 3px rgba(56, 189, 248, 0.6);
+}
+
+.vpipe .collar {
+  left: calc(var(--cell) * -0.06);
+  right: calc(var(--cell) * -0.06);
+  width: auto;
+  top: auto;
+  bottom: auto;
+  height: calc(var(--cell) * 0.12);
+}
+
+.vpipe .collar[data-end="top"] { top: calc(var(--cell) * -0.04); }
+.vpipe .collar[data-end="bottom"] { bottom: calc(var(--cell) * -0.04); }
+
+.question {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: calc(var(--cell) * 0.04) dashed rgba(251, 191, 36, 0.8);
+  border-radius: calc(var(--cell) * 0.24);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fde68a;
+  font: inherit;
+  font-weight: 900;
+  font-size: calc(var(--cell) * 0.5);
+  cursor: pointer;
+}
+
+.question[data-target] {
+  animation: hintPulse 0.7s ease-in-out infinite alternate;
+}
+
+.question[data-hinted] {
+  animation: hintPulse 0.5s ease-in-out infinite alternate;
+}
+
+.question:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Résultat verrouillé : halo doré qui s'apaise. */
+.lock {
+  animation: lock 700ms ease-out both;
+}
+
+/* Tuile en vol entre le réservoir et l'opération : posée dans la fenêtre de jeu, au-dessus de tout. */
+.flyer {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.flyer .face {
+  width: 100%;
+  height: 100%;
+  font-size: calc(var(--cell) * 0.34);
+}
+
+.flyer[data-mode="place"] {
+  animation: flyPlace 1100ms ease-in-out both;
+}
+
+.flyer[data-mode="reject"] {
+  animation: flyReject 1800ms ease-in-out both;
+}
+
+@keyframes resultBlink {
+  from { filter: brightness(1); transform: scale(1); }
+  to { filter: brightness(1.25) drop-shadow(0 0 calc(var(--cell) * 0.1) rgba(255, 236, 160, 0.9)); transform: scale(1.05); }
+}
+
+@keyframes flyPlace {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(var(--x1), var(--y1)) scale(1); }
+  70% { transform: translate(var(--x2), var(--y2)) scale(1); }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.05); }
+}
+
+@keyframes flyReject {
+  0% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(var(--x1), var(--y1)) scale(1); }
+  38% { transform: translate(var(--x2), var(--y2)) scale(1); }
+  48% { transform: translate(var(--dx), var(--dy)) scale(1); filter: none; }
+  54% { transform: translate(calc(var(--dx) + 6px), var(--dy)) scale(1); filter: hue-rotate(-40deg) brightness(0.9); }
+  60% { transform: translate(calc(var(--dx) - 6px), var(--dy)) scale(1); }
+  70% { transform: translate(var(--x2), var(--y2)) scale(1); filter: none; }
+  88% { transform: translate(var(--x1), var(--y1)) scale(1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes lock {
+  0% { box-shadow: 0 0 0 0 rgba(255, 214, 80, 0.95); transform: scale(1.18); }
+  100% { box-shadow: 0 0 0 calc(var(--cell) * 0.18) rgba(255, 214, 80, 0); transform: scale(1); }
+}
+
 @keyframes bounce {
   0%, 100% { transform: translate(0, 0); }
   30% { transform: translate(calc(var(--bx, 0) * 28%), calc(var(--by, 0) * 28%)); }
@@ -652,6 +862,10 @@
 
   .arrive,
   .pop,
+  .machine[data-cleaned],
+  .resultButton,
+  .lock,
+  .question,
   .pipeIn,
   .turnIcon,
   .winBar,
@@ -664,5 +878,13 @@
 
   .ghost .face {
     animation-duration: 200ms;
+  }
+
+  .dust .face {
+    animation-duration: 200ms;
+  }
+
+  .flyer[data-mode] {
+    animation-duration: 1ms;
   }
 }
