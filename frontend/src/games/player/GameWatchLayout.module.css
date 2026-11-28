@@ -29,6 +29,41 @@
     gap: clamp(14px, 1.6vw, 22px);
   }
 
+  /* Le lecteur et ses informations s'empilent dans la colonne de gauche ; la colonne de droite prend exactement la hauteur du
+     lecteur (première rangée) : ses quatre cartes se partagent cet espace à parts égales, sans changer la taille du lecteur. */
+  .withAside .main {
+    display: contents;
+  }
+
+  .withAside .main > * {
+    grid-column: 1;
+    align-self: start;
+    min-width: 0;
+  }
+
+  .withAside .aside {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    grid-template-rows: auto repeat(4, minmax(0, 1fr));
+    contain: size;
+    min-height: 0;
+  }
+
+  .withAside .aside > a {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .withAside .aside img,
+  .withAside .aside span[aria-hidden] {
+    height: 100%;
+    width: auto;
+    max-width: 46%;
+    flex: none;
+  }
+
   .withAside[hidden] {
     display: none;
   }

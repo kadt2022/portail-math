@@ -18,7 +18,25 @@ Sous Windows :
 .\gradlew.bat bootRun
 ```
 
-Le portail est alors disponible sur `http://localhost:8080`.
+Le portail est alors disponible sur `http://localhost:8080` (le portail React sous `/app/`).
+
+Le premier lancement installe les dépendances du frontend (`npm ci`), ce qui peut
+être long, surtout si un antivirus analyse `frontend\node_modules` : excluez ce
+dossier, `.gradle`, `%USERPROFILE%\.gradle` et le cache npm de l'analyse en temps
+réel. Les lancements suivants ne refont l'installation que si `package.json` ou
+`package-lock.json` changent, ou si `node_modules` est supprimé.
+
+### Développer le frontend sans reconstruire le portail
+
+```powershell
+.\gradlew.bat bootRun -PskipFrontend      # le backend seul, sur le port 8080
+cd frontend; npm run dev                  # Vite, sur http://localhost:5173/app/
+```
+
+Vite relaie `/api` et `/actuator` vers Spring Boot (port 8080). Avec
+`-PskipFrontend`, le JAR n'embarque que le dernier `frontend/dist` déjà construit :
+la page servie sur 8080 peut donc être périmée, utilisez le port 5173. Le
+déploiement OpenShift et la CI construisent toujours le frontend.
 
 ## Vérifier et construire
 

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { availableCategories, featuredGame, gameCatalogue, playableGames, recommendedGames } from "./game-catalogue";
+import { availableCategories, featuredGame, gameCatalogue, gamesBelowPlayer, playableGames, recommendedGames, RECOMMENDED_COUNT } from "./game-catalogue";
 import { GamesCataloguePage } from "./GamesCataloguePage";
 import { GamesHeaderSearch } from "./GamesHeaderSearch";
 
@@ -174,6 +174,59 @@ describe("GamesCataloguePage", () => {
     expect(gameCatalogue.filter((game) => game.featured)).toHaveLength(1);
     expect(featuredGame?.availability).not.toBe("coming-soon");
   });
+
+  it.each([
+    ["Addi'Flow", "addi-flow"],
+    ["Soustra'Flow", "soustra-flow"],
+    ["Multipli'Flow", "multipli-flow"],
+    ["Divi'Flow", "divi-flow"],
+  ])("la carte de %s l'ouvre dans le lecteur de la page, sans changer de page ; Fermer ramène aux autres jeux", async (name, id) => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: `Jouer à ${name}` });
+    expect(links[0]).toHaveAttribute("href", `/jeux/${id}`);
+    await user.click(links[links.length - 1]);
+    const region = await screen.findByRole("region", { name: `Jeu ${name}` }, { timeout: 8000 });
+    await user.click(within(region).getByRole("button", { name: "Fermer le jeu et retrouver les autres jeux" }));
+    expect(region.closest("[hidden]")).not.toBeNull();
+  }, 30000);
+
+  it("les quatre jeux Flow sont au catalogue, publiés, dans la catégorie Calcul, chacun avec sa carte et son lecteur", () => {
+    const flows = playableGames.filter((game) => game.id.endsWith("-flow"));
+    expect(flows.map((game) => game.id).sort()).toEqual(["addi-flow", "divi-flow", "multipli-flow", "soustra-flow"]);
+    for (const game of flows) {
+      expect(game.embed).toBe(true);
+      expect(game.categoryId).toBe("calculation");
+      expect(game.href).toBe(`/jeux/${game.id}`);
+    }
+    // Chaque jeu de la famille a son affiche : quatre vignettes distinctes.
+    expect(flows.every((game) => Boolean(game.thumbnail))).toBe(true);
+    expect(new Set(flows.map((game) => game.thumbnail)).size).toBe(4);
+  });
+
+  it("sous le lecteur d'un jeu Flow : la signature de Yamba Studio, des repères, et une fiche ouverte que « Voir moins » replie", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const links = screen.getAllByRole("link", { name: "Jouer à Divi'Flow" });
+    await user.click(links[links.length - 1]);
+    const info = await screen.findByRole("region", { name: "À propos de Divi'Flow" }, { timeout: 8000 });
+    expect(within(info).getByText("Yamba Studio")).toBeInTheDocument();
+    expect(within(info).getByText("Yamba Academy · Jeux éducatifs")).toBeInTheDocument();
+    for (const tag of ["7–11 ans", "Maths", "Primaire", "5 niveaux", "Solo"]) expect(within(info).getByText(tag)).toBeInTheDocument();
+    // Ouverte par défaut : toutes les sections sont visibles, le bouton propose de les replier.
+    const toggle = within(info).getByRole("button", { name: "Voir moins" });
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    for (const title of ["Objectifs pédagogiques", "Comment jouer ?", "Progression pédagogique", "Prérequis", "Informations techniques"]) {
+      expect(within(info).getByRole("heading", { name: title })).toBeInTheDocument();
+    }
+    expect(within(info).getAllByRole("listitem").filter((item) => item.closest("ol"))).toHaveLength(5);
+    expect(within(info).getByText("Une création Yamba Studio.")).toBeInTheDocument();
+    await user.click(toggle);
+    expect(within(info).getByRole("button", { name: "Voir plus" })).toHaveAttribute("aria-expanded", "false");
+    expect(within(info).queryByRole("heading", { name: "Objectifs pédagogiques" })).toBeNull();
+    await user.click(within(info).getByRole("button", { name: "Voir plus" }));
+    expect(within(info).getByRole("heading", { name: "Objectifs pédagogiques" })).toBeInTheDocument();
+  }, 30000);
 
   it("n'écrit aucun cache persistant", async () => {
     const user = userEvent.setup();
@@ -362,6 +415,16 @@ describe("Disposition lecteur, recommandations et autres jeux", () => {
     const turbo = playableGames.find((game) => game.id === "turbo-pulse");
     const picks = recommendedGames(turbo, 3);
     expect(picks).toHaveLength(3);
+    // Par défaut : quatre cartes, sans doublon, sans le jeu ouvert, et seulement des jeux publiés.
+    const four = recommendedGames(turbo);
+    expect(four).toHaveLength(RECOMMENDED_COUNT);
+    expect(RECOMMENDED_COUNT).toBe(4);
+    expect(four.map((game) => game.id)).not.toContain("turbo-pulse");
+    expect(new Set(four.map((game) => game.id)).size).toBe(4);
+    for (const game of four) expect(game.availability).not.toBe("coming-soon");
+    for (const game of playableGames) {
+      expect(recommendedGames(game).map((item) => item.id)).not.toContain(game.id);
+    }
     expect(picks.map((game) => game.id)).not.toContain("turbo-pulse");
     // Le seul autre jeu de calcul passe en premier.
     expect(picks[0].categoryId).toBe("calculation");
@@ -369,7 +432,20 @@ describe("Disposition lecteur, recommandations et autres jeux", () => {
     expect(recommendedGames(undefined, 2)).toHaveLength(2);
   });
 
-  it("ordinateur : le lecteur est accompagné de ses informations et de trois recommandations, sans doublon avec « Autres jeux du portail »", async () => {
+  it("sous le lecteur : les quatre recommandations d'abord, puis le reste du catalogue publié, sans doublon ni jeu ouvert", () => {
+    const tuiles = playableGames.find((game) => game.id === "turbo-pulse");
+    const recommended = recommendedGames(tuiles);
+    const below = gamesBelowPlayer(tuiles, recommended);
+    expect(below.slice(0, 4).map((game) => game.id)).toEqual(recommended.map((game) => game.id));
+    expect(new Set(below.map((game) => game.id)).size).toBe(below.length);
+    expect(below.map((game) => game.id)).not.toContain("turbo-pulse");
+    expect(below).toHaveLength(playableGames.length - 1);
+    // Un jeu non publié que l'on tenterait d'ajouter est écarté.
+    const unpublished = gameCatalogue.filter((game) => game.availability === "coming-soon");
+    expect(gamesBelowPlayer(tuiles, [...recommended, ...unpublished]).some((game) => unpublished.includes(game))).toBe(false);
+  });
+
+  it("ordinateur : le lecteur est accompagné de ses informations et de quatre recommandations, reprises en tête de « Autres jeux du portail »", async () => {
     stubDevice(false);
     const user = userEvent.setup();
     renderPage();
@@ -387,18 +463,18 @@ describe("Disposition lecteur, recommandations et autres jeux", () => {
     // À droite : trois jeux recommandés, cliquables.
     const aside = screen.getByRole("complementary", { name: "À voir aussi" });
     const recommended = within(aside).getAllByRole("link", { name: /^Jouer à/ });
-    expect(recommended).toHaveLength(3);
+    expect(recommended).toHaveLength(4);
     const recommendedNames = recommended.map((link) => link.getAttribute("aria-label"));
     expect(recommendedNames).not.toContain("Jouer à Les Tuiles magiques");
 
-    // En dessous : « Autres jeux du portail » ne répète ni le jeu ouvert ni les recommandations.
+    // En dessous : « Autres jeux du portail » reprend les quatre recommandations en tête, puis le reste ; jamais le jeu ouvert.
     expect(screen.getByRole("heading", { level: 2, name: "Autres jeux du portail" })).toBeInTheDocument();
     const below = screen.getAllByRole("link", { name: /^Jouer à/ }).filter((link) => !aside.contains(link));
     const belowNames = below.map((link) => link.getAttribute("aria-label"));
-    for (const name of [...recommendedNames, "Jouer à Les Tuiles magiques"]) {
-      expect(belowNames).not.toContain(name);
-    }
-    expect(below.length + recommended.length + 1).toBeGreaterThanOrEqual(playableGames.length);
+    expect(belowNames.slice(0, 4)).toEqual(recommendedNames);
+    expect(belowNames).not.toContain("Jouer à Les Tuiles magiques");
+    expect(new Set(belowNames).size).toBe(belowNames.length);
+    expect(below).toHaveLength(playableGames.length - 1);
   });
 
   it("une recommandation qui est un jeu intégré s'ouvre dans le lecteur principal, sans changer de page", async () => {

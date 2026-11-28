@@ -140,6 +140,398 @@
       }
     }
   },
+  "multipliFlow": {
+    "name": "Multipli'Flow",
+    "description": "Line up identical fruits to open the way for the numbers: they cross the pipe and build multiplications.",
+    "cta": "Play",
+    "tagline": "Open the way for the numbers",
+    "game": {
+      "title": "Multipli'Flow",
+      "screen": {
+        "label": "Multipli'Flow game"
+      },
+      "boardLabel": "Tile board",
+      "resultsLabel": "Second board: the multiplications",
+      "pipeLabel": "Pipe carrying the numbers",
+      "cellEmpty": "Row {{row}}, column {{column}}, free cell",
+      "cellImage": "Row {{row}}, column {{column}}, {{color}}",
+      "cellImageSelected": "Row {{row}}, column {{column}}, {{color}}, selected tile",
+      "cellNumber": "Row {{row}}, column {{column}}, number {{value}}",
+      "colors": {
+        "red": "red",
+        "yellow": "yellow",
+        "orange": "orange",
+        "green": "green",
+        "purple": "purple",
+        "brown": "brown",
+        "grey": "grey"
+      },
+      "expressionLabel": "{{a}} times {{b}}",
+      "expressionDone": "{{a}} times {{b}} equals {{result}}",
+      "stats": {
+        "level": "Level",
+        "moves": "Moves"
+      },
+      "status": {
+        "play": "Line up 3 identical fruits to clear the way for the numbers.",
+        "selected": "Tile selected: touch a neighbouring tile to swap.",
+        "flowing": "The numbers move on their own towards the pipe.",
+        "won": "Well done! All the multiplications are solved.",
+        "chooseResult": "Choose a result in the reservoir, then place it on the multiplication.",
+        "placeResult": "Result chosen: tap the multiplication it belongs to."
+      },
+      "messages": {
+        "deadEnd": "Try another line-up!",
+        "noAlignment": "You need a line of at least 3 identical fruits.",
+        "shuffled": "The tiles have been reshuffled.",
+        "shuffleFailed": "Could not reshuffle, restart the level.",
+        "wrongResult": "That is not the result of this multiplication: try again!"
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this level with a new board",
+        "hint": "Hint",
+        "shuffle": "Shuffle",
+        "next": "Next level",
+        "again": "Play again",
+        "backToGames": "Back to games"
+      },
+      "stuck": "No move left: shuffle the tiles.",
+      "rotate": {
+        "title": "Turn your phone",
+        "text": "Multipli'Flow is played in landscape, with its panels side by side."
+      },
+      "won": {
+        "title": "Well done!",
+        "text": "All the numbers went through the pipe and all the multiplications are solved.",
+        "finished": "You finished every level!"
+      },
+      "howTo": {
+        "step1Title": "Swap two tiles",
+        "step1": "Touch a tile then its neighbour, or drag it. A swap is accepted only if it forms a line of 3 or more identical fruits.",
+        "step2Title": "Open the way",
+        "step2": "Lines disappear and free some cells. The numbers move on their own, cell by cell, towards the pipe.",
+        "step3Title": "Solve the multiplications",
+        "step3": "The numbers go through the pipe and form multiplications. Choose the right result in the reservoir: it goes down the pipe and locks onto the multiplication. A wrong result goes back up, with no penalty."
+      },
+      "reservoirLabel": "Results reservoir",
+      "vpipeLabel": "Results pipe",
+      "resultTile": "Result {{value}}",
+      "resultTileSelected": "Result {{value}}, chosen",
+      "questionSlot": "Place a result on {{a}} times {{b}}",
+      "boardCleaned": "The remaining fruits have vanished: the input board has finished its job."
+    },
+    "details": {
+      "age": "Ages 7–11",
+      "levels": "5 levels",
+      "mode": "Solo",
+      "summary": "Free the numbers by lining up identical fruits and run a maths machine by picking the right results. Build your mental maths, logic and strategy.",
+      "objectives": "Learn and consolidate the multiplication tables, build mental maths, plan moves ahead and solve problems.",
+      "steps": [
+        "Line up at least three identical fruits.",
+        "Clear the way for the numbers to reach the pipe.",
+        "Watch the multiplications take shape.",
+        "Pick the right result in the upper reservoir.",
+        "Solve every operation to finish the level."
+      ],
+      "progression": "Five levels of increasing difficulty. Boards are renewed to vary the game situations.",
+      "prerequisites": "Recognise numbers and understand the idea of multiplication."
+    }
+  },
+  "addiFlow": {
+    "name": "Addi'Flow",
+    "description": "Line up identical fruits to open the way for the numbers: they cross the pipe and build additions.",
+    "cta": "Play",
+    "tagline": "Open the way for the numbers",
+    "game": {
+      "title": "Addi'Flow",
+      "screen": {
+        "label": "Addi'Flow game"
+      },
+      "boardLabel": "Tile board",
+      "resultsLabel": "Second board: the additions",
+      "pipeLabel": "Pipe carrying the numbers",
+      "cellEmpty": "Row {{row}}, column {{column}}, free cell",
+      "cellImage": "Row {{row}}, column {{column}}, {{color}}",
+      "cellImageSelected": "Row {{row}}, column {{column}}, {{color}}, selected tile",
+      "cellNumber": "Row {{row}}, column {{column}}, number {{value}}",
+      "colors": {
+        "red": "red",
+        "yellow": "yellow",
+        "orange": "orange",
+        "green": "green",
+        "purple": "purple",
+        "brown": "brown",
+        "grey": "grey"
+      },
+      "expressionLabel": "{{a}} plus {{b}}",
+      "expressionDone": "{{a}} plus {{b}} equals {{result}}",
+      "stats": {
+        "level": "Level",
+        "moves": "Moves"
+      },
+      "status": {
+        "play": "Line up 3 identical fruits to clear the way for the numbers.",
+        "selected": "Tile selected: touch a neighbouring tile to swap.",
+        "flowing": "The numbers move on their own towards the pipe.",
+        "won": "Well done! All the additions are solved.",
+        "chooseResult": "Choose a result in the reservoir, then place it on the addition.",
+        "placeResult": "Result chosen: tap the addition it belongs to."
+      },
+      "messages": {
+        "deadEnd": "Try another line-up!",
+        "noAlignment": "You need a line of at least 3 identical fruits.",
+        "shuffled": "The tiles have been reshuffled.",
+        "shuffleFailed": "Could not reshuffle, restart the level.",
+        "wrongResult": "That is not the result of this addition: try again!"
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this level with a new board",
+        "hint": "Hint",
+        "shuffle": "Shuffle",
+        "next": "Next level",
+        "again": "Play again",
+        "backToGames": "Back to games"
+      },
+      "stuck": "No move left: shuffle the tiles.",
+      "rotate": {
+        "title": "Turn your phone",
+        "text": "Addi'Flow is played in landscape, with its panels side by side."
+      },
+      "won": {
+        "title": "Well done!",
+        "text": "All the numbers went through the pipe and all the additions are solved.",
+        "finished": "You finished every level!"
+      },
+      "howTo": {
+        "step1Title": "Swap two tiles",
+        "step1": "Touch a tile then its neighbour, or drag it. A swap is accepted only if it forms a line of 3 or more identical fruits.",
+        "step2Title": "Open the way",
+        "step2": "Lines disappear and free some cells. The numbers move on their own, cell by cell, towards the pipe.",
+        "step3Title": "Solve the additions",
+        "step3": "The numbers go through the pipe and form additions. Choose the right result in the reservoir: it goes down the pipe and locks onto the addition. A wrong result goes back up, with no penalty."
+      },
+      "reservoirLabel": "Results reservoir",
+      "vpipeLabel": "Results pipe",
+      "resultTile": "Result {{value}}",
+      "resultTileSelected": "Result {{value}}, chosen",
+      "questionSlot": "Place a result on {{a}} plus {{b}}",
+      "boardCleaned": "The remaining fruits have vanished: the input board has finished its job."
+    },
+    "details": {
+      "age": "Ages 7–11",
+      "levels": "5 levels",
+      "mode": "Solo",
+      "summary": "Free the numbers by lining up identical fruits and run a maths machine by picking the right results. Build your mental maths, logic and strategy.",
+      "objectives": "Learn and consolidate additions, build mental maths, plan moves ahead and solve problems.",
+      "steps": [
+        "Line up at least three identical fruits.",
+        "Clear the way for the numbers to reach the pipe.",
+        "Watch the additions take shape.",
+        "Pick the right result in the upper reservoir.",
+        "Solve every operation to finish the level."
+      ],
+      "progression": "Five levels of increasing difficulty. Boards are renewed to vary the game situations.",
+      "prerequisites": "Recognise numbers and understand the idea of addition."
+    }
+  },
+  "soustraFlow": {
+    "name": "Soustra'Flow",
+    "description": "Line up identical fruits to open the way for the numbers: they cross the pipe and build subtractions.",
+    "cta": "Play",
+    "tagline": "Open the way for the numbers",
+    "game": {
+      "title": "Soustra'Flow",
+      "screen": {
+        "label": "Soustra'Flow game"
+      },
+      "boardLabel": "Tile board",
+      "resultsLabel": "Second board: the subtractions",
+      "pipeLabel": "Pipe carrying the numbers",
+      "cellEmpty": "Row {{row}}, column {{column}}, free cell",
+      "cellImage": "Row {{row}}, column {{column}}, {{color}}",
+      "cellImageSelected": "Row {{row}}, column {{column}}, {{color}}, selected tile",
+      "cellNumber": "Row {{row}}, column {{column}}, number {{value}}",
+      "colors": {
+        "red": "red",
+        "yellow": "yellow",
+        "orange": "orange",
+        "green": "green",
+        "purple": "purple",
+        "brown": "brown",
+        "grey": "grey"
+      },
+      "expressionLabel": "{{a}} minus {{b}}",
+      "expressionDone": "{{a}} minus {{b}} equals {{result}}",
+      "stats": {
+        "level": "Level",
+        "moves": "Moves"
+      },
+      "status": {
+        "play": "Line up 3 identical fruits to clear the way for the numbers.",
+        "selected": "Tile selected: touch a neighbouring tile to swap.",
+        "flowing": "The numbers move on their own towards the pipe.",
+        "won": "Well done! All the subtractions are solved.",
+        "chooseResult": "Choose a result in the reservoir, then place it on the subtraction.",
+        "placeResult": "Result chosen: tap the subtraction it belongs to."
+      },
+      "messages": {
+        "deadEnd": "Try another line-up!",
+        "noAlignment": "You need a line of at least 3 identical fruits.",
+        "shuffled": "The tiles have been reshuffled.",
+        "shuffleFailed": "Could not reshuffle, restart the level.",
+        "wrongResult": "That is not the result of this subtraction: try again!"
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this level with a new board",
+        "hint": "Hint",
+        "shuffle": "Shuffle",
+        "next": "Next level",
+        "again": "Play again",
+        "backToGames": "Back to games"
+      },
+      "stuck": "No move left: shuffle the tiles.",
+      "rotate": {
+        "title": "Turn your phone",
+        "text": "Soustra'Flow is played in landscape, with its panels side by side."
+      },
+      "won": {
+        "title": "Well done!",
+        "text": "All the numbers went through the pipe and all the subtractions are solved.",
+        "finished": "You finished every level!"
+      },
+      "howTo": {
+        "step1Title": "Swap two tiles",
+        "step1": "Touch a tile then its neighbour, or drag it. A swap is accepted only if it forms a line of 3 or more identical fruits.",
+        "step2Title": "Open the way",
+        "step2": "Lines disappear and free some cells. The numbers move on their own, cell by cell, towards the pipe.",
+        "step3Title": "Solve the subtractions",
+        "step3": "The numbers go through the pipe and form subtractions. Choose the right result in the reservoir: it goes down the pipe and locks onto the subtraction. A wrong result goes back up, with no penalty."
+      },
+      "reservoirLabel": "Results reservoir",
+      "vpipeLabel": "Results pipe",
+      "resultTile": "Result {{value}}",
+      "resultTileSelected": "Result {{value}}, chosen",
+      "questionSlot": "Place a result on {{a}} minus {{b}}",
+      "boardCleaned": "The remaining fruits have vanished: the input board has finished its job."
+    },
+    "details": {
+      "age": "Ages 7–11",
+      "levels": "5 levels",
+      "mode": "Solo",
+      "summary": "Free the numbers by lining up identical fruits and run a maths machine by picking the right results. Build your mental maths, logic and strategy.",
+      "objectives": "Learn and consolidate subtractions, build mental maths, plan moves ahead and solve problems.",
+      "steps": [
+        "Line up at least three identical fruits.",
+        "Clear the way for the numbers to reach the pipe.",
+        "Watch the subtractions take shape.",
+        "Pick the right result in the upper reservoir.",
+        "Solve every operation to finish the level."
+      ],
+      "progression": "Five levels of increasing difficulty. Boards are renewed to vary the game situations.",
+      "prerequisites": "Recognise numbers and understand the idea of subtraction."
+    }
+  },
+  "diviFlow": {
+    "name": "Divi'Flow",
+    "description": "Line up identical fruits to open the way for the numbers: they cross the pipe and build divisions.",
+    "cta": "Play",
+    "tagline": "Open the way for the numbers",
+    "game": {
+      "title": "Divi'Flow",
+      "screen": {
+        "label": "Divi'Flow game"
+      },
+      "boardLabel": "Tile board",
+      "resultsLabel": "Second board: the divisions",
+      "pipeLabel": "Pipe carrying the numbers",
+      "cellEmpty": "Row {{row}}, column {{column}}, free cell",
+      "cellImage": "Row {{row}}, column {{column}}, {{color}}",
+      "cellImageSelected": "Row {{row}}, column {{column}}, {{color}}, selected tile",
+      "cellNumber": "Row {{row}}, column {{column}}, number {{value}}",
+      "colors": {
+        "red": "red",
+        "yellow": "yellow",
+        "orange": "orange",
+        "green": "green",
+        "purple": "purple",
+        "brown": "brown",
+        "grey": "grey"
+      },
+      "expressionLabel": "{{a}} divided by {{b}}",
+      "expressionDone": "{{a}} divided by {{b}} equals {{result}}",
+      "stats": {
+        "level": "Level",
+        "moves": "Moves"
+      },
+      "status": {
+        "play": "Line up 3 identical fruits to clear the way for the numbers.",
+        "selected": "Tile selected: touch a neighbouring tile to swap.",
+        "flowing": "The numbers move on their own towards the pipe.",
+        "won": "Well done! All the divisions are solved.",
+        "chooseResult": "Choose a result in the reservoir, then place it on the division.",
+        "placeResult": "Result chosen: tap the division it belongs to."
+      },
+      "messages": {
+        "deadEnd": "Try another line-up!",
+        "noAlignment": "You need a line of at least 3 identical fruits.",
+        "shuffled": "The tiles have been reshuffled.",
+        "shuffleFailed": "Could not reshuffle, restart the level.",
+        "wrongResult": "That is not the result of this division: try again!"
+      },
+      "actions": {
+        "restart": "Restart",
+        "restartAria": "Restart this level with a new board",
+        "hint": "Hint",
+        "shuffle": "Shuffle",
+        "next": "Next level",
+        "again": "Play again",
+        "backToGames": "Back to games"
+      },
+      "stuck": "No move left: shuffle the tiles.",
+      "rotate": {
+        "title": "Turn your phone",
+        "text": "Divi'Flow is played in landscape, with its panels side by side."
+      },
+      "won": {
+        "title": "Well done!",
+        "text": "All the numbers went through the pipe and all the divisions are solved.",
+        "finished": "You finished every level!"
+      },
+      "howTo": {
+        "step1Title": "Swap two tiles",
+        "step1": "Touch a tile then its neighbour, or drag it. A swap is accepted only if it forms a line of 3 or more identical fruits.",
+        "step2Title": "Open the way",
+        "step2": "Lines disappear and free some cells. The numbers move on their own, cell by cell, towards the pipe.",
+        "step3Title": "Solve the divisions",
+        "step3": "The numbers go through the pipe and form divisions. Choose the right result in the reservoir: it goes down the pipe and locks onto the division. A wrong result goes back up, with no penalty."
+      },
+      "reservoirLabel": "Results reservoir",
+      "vpipeLabel": "Results pipe",
+      "resultTile": "Result {{value}}",
+      "resultTileSelected": "Result {{value}}, chosen",
+      "questionSlot": "Place a result on {{a}} divided by {{b}}",
+      "boardCleaned": "The remaining fruits have vanished: the input board has finished its job."
+    },
+    "details": {
+      "age": "Ages 7–11",
+      "levels": "5 levels",
+      "mode": "Solo",
+      "summary": "Free the numbers by lining up identical fruits and run a maths machine by picking the right results. Build your mental maths, logic and strategy.",
+      "objectives": "Learn and consolidate exact divisions, build mental maths, plan moves ahead and solve problems.",
+      "steps": [
+        "Line up at least three identical fruits.",
+        "Clear the way for the numbers to reach the pipe.",
+        "Watch the divisions take shape.",
+        "Pick the right result in the upper reservoir.",
+        "Solve every operation to finish the level."
+      ],
+      "progression": "Five levels of increasing difficulty. Boards are renewed to vary the game situations.",
+      "prerequisites": "Recognise numbers and understand the idea of division."
+    }
+  },
   "yambaWriting": {
     "name": "Yamba spells",
     "description": "A machine picks a picture: write its name by putting the letters in the right order.",
@@ -409,7 +801,10 @@
   },
   "card": {
     "playAria": "Play {{name}}",
-    "soonAria": "{{name}}: coming soon"
+    "soonAria": "{{name}}: coming soon",
+    "age": "{{age}}+",
+    "levels_one": "{{count}} level",
+    "levels_other": "{{count}} levels"
   },
   "player": {
     "controls": "Game controls",
@@ -455,5 +850,35 @@
     "level": {
       "primary": "Primary school"
     }
+  },
+  "gameInfo": {
+    "studio": "Yamba Studio",
+    "studioLine": "Yamba Academy · Educational games",
+    "seeMore": "Show more",
+    "seeLess": "Show less",
+    "objectives": "Learning goals",
+    "howToPlay": "How to play",
+    "progression": "Progression",
+    "prerequisites": "Prerequisites",
+    "technical": "Technical information",
+    "labels": {
+      "devices": "Devices",
+      "controls": "Controls",
+      "install": "Installation",
+      "internet": "Internet connection",
+      "languages": "Languages",
+      "mode": "Mode"
+    },
+    "values": {
+      "devices": "Computer, tablet, phone",
+      "controls": "Mouse, touch screen and keyboard",
+      "install": "Not required",
+      "internet": "Required",
+      "languages": "French · English",
+      "mode": "Single player"
+    },
+    "academyTitle": "About Yamba Academy",
+    "academyText": "Games designed to learn, experiment and discover the knowledge around us.",
+    "createdBy": "A Yamba Studio creation."
   }
 }

@@ -36,16 +36,40 @@ def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
 def npmExecutable = isWindows ? 'npm.cmd' : 'npm'
 def npxExecutable = isWindows ? 'npx.cmd' : 'npx'
 def frontendDir = file('frontend')
+// Développement du portail : ./gradlew bootRun -PskipFrontend ne reconstruit pas le
+// frontend (Vite le sert, voir README). Le JAR n'embarque alors que le dernier
+// frontend/dist déjà construit, s'il existe. Jamais utilisé par la CI ni par le
+// déploiement OpenShift, qui construisent toujours le frontend.
+def skipFrontend = project.hasProperty('skipFrontend')
+def frontendInstallStamp = layout.buildDirectory.file('frontend-install.stamp')
+def frontendInstalledMarker = new File(frontendDir, 'node_modules/.package-lock.json')
 
 tasks.register('frontendInstall', Exec) {
     description = 'Installe les dépendances du portail React à partir du verrou.'
     workingDir frontendDir
     // npm ci et non npm install : l'installation doit être reproductible et
-    // refuser toute dérive par rapport à package-lock.json.
-    commandLine npmExecutable, 'ci'
+    // refuser toute dérive par rapport à package-lock.json. Pas d'audit ni
+    // d'appel de financement : ils ajoutent des allers-retours réseau sans
+    // rien vérifier d'utile ici (le verrou est la référence).
+    commandLine npmExecutable, 'ci', '--no-audit', '--no-fund', '--prefer-offline'
     inputs.file(new File(frontendDir, 'package.json'))
     inputs.file(new File(frontendDir, 'package-lock.json'))
-    outputs.dir(new File(frontendDir, 'node_modules'))
+    inputs.files(fileTree(new File(frontendDir, 'packages')) { include '*/package.json' })
+    // La sortie n'est PAS node_modules : ce dossier (environ 500 Mo, 23 000
+    // fichiers, avec des liens vers les paquets du portail) est lourd à
+    // empreinter à chaque build et fragile (un lien orphelin fait échouer
+    // l'instantané de sortie), et npm ci le supprime puis le réécrit en entier
+    // (une dizaine de minutes avec un antivirus actif). Un petit fichier
+    // témoin suffit : la tâche est à jour tant que les verrous n'ont pas changé
+    // ET que node_modules existe encore (npm y écrit .package-lock.json à la
+    // fin d'une installation réussie).
+    outputs.file(frontendInstallStamp)
+    outputs.upToDateWhen { frontendInstalledMarker.exists() }
+    doLast {
+        def stamp = frontendInstallStamp.get().asFile
+        stamp.parentFile.mkdirs()
+        stamp.text = "node_modules installé à partir de package-lock.json" + System.lineSeparator()
+    }
 }
 
 tasks.register('frontendLint', Exec) {
@@ -84,7 +108,13 @@ tasks.register('frontendBuild', Exec) {
     workingDir frontendDir
     commandLine npmExecutable, 'run', 'build'
     inputs.dir(new File(frontendDir, 'src'))
-    inputs.dir(new File(frontendDir, 'packages'))
+    // Seuls les sources et les manifestes des paquets du portail comptent pour le
+    // build : leurs tests, scripts, bancs d'essai et node_modules n'y entrent pas.
+    inputs.files(fileTree(new File(frontendDir, 'packages')) {
+        exclude '**/node_modules/**', '**/tests/**', '**/dev/**', '**/scripts/**', '**/*.md'
+    })
+    inputs.file(new File(frontendDir, 'package.json'))
+    inputs.file(new File(frontendDir, 'package-lock.json'))
     inputs.file(new File(frontendDir, 'index.html'))
     inputs.file(new File(frontendDir, 'vite.config.ts'))
     inputs.file(new File(frontendDir, 'tsconfig.json'))
@@ -92,7 +122,11 @@ tasks.register('frontendBuild', Exec) {
 }
 
 tasks.named('processResources') {
-    dependsOn 'frontendBuild'
+    // -PskipFrontend : on ne reconstruit pas le frontend, on empaquette seulement
+    // le dernier frontend/dist déjà là (absent, il n'y a simplement rien à copier).
+    if (!skipFrontend) {
+        dependsOn 'frontendBuild'
+    }
     // Les fichiers produits par Vite deviennent des ressources statiques du JAR.
     from(new File(frontendDir, 'dist')) {
         into 'static/app'

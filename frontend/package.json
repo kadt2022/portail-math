@@ -17,6 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mbuyamba/math-flow": "file:packages/math-flow",
     "@mbuyamba/pdf-reader": "file:packages/pdf-reader",
     "@mbuyamba/riviere-fractions": "file:packages/riviere-fractions",
     "@mbuyamba/train-multiplications": "file:packages/train-multiplications",

@@ -135,25 +135,20 @@
   text-align: center;
 }
 
+/* Galerie : le conteneur mesure sa propre largeur (le menu latéral en retire une partie) ; la grille en déduit le nombre de colonnes
+   sans point de rupture ni appareil nommé. Valeurs identiques à catalogue-grid.ts. */
+.gallery {
+  container-type: inline-size;
+  width: 100%;
+}
+
 .grid {
+  --gap: 16px;
+  --card-min: min(92px + 21cqw, 250px + 6cqw);
   display: grid;
-  /* 12 colonnes : divisible par 1, 2, 3, 4 et 6, chaque carte en occupe une part entière (voir gallery-layout.ts). */
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  /* Écart vertical constant ; l'écart horizontal s'adapte : 11 écarts de 40 px dépasseraient un écran de téléphone. */
-  row-gap: 40px;
-  column-gap: 0;
-}
-
-@media (min-width: 560px) {
-  .grid {
-    column-gap: 20px;
-  }
-}
-
-@media (min-width: 900px) {
-  .grid {
-    column-gap: 40px;
-  }
+  /* auto-fill : les colonnes vides restent réservées, une dernière rangée incomplète garde la taille des autres cartes. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min)), 1fr));
+  gap: var(--gap);
 }
 
 @media (max-width: 899px) {

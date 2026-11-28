@@ -140,6 +140,398 @@
       }
     }
   },
+  "multipliFlow": {
+    "name": "Multipli'Flow",
+    "description": "Aligne des fruits identiques pour ouvrir le chemin des nombres : ils traversent le tuyau et forment des multiplications.",
+    "cta": "Jouer",
+    "tagline": "Ouvre le chemin des nombres",
+    "game": {
+      "title": "Multipli'Flow",
+      "screen": {
+        "label": "Jeu Multipli'Flow"
+      },
+      "boardLabel": "Plateau des tuiles",
+      "resultsLabel": "Second tableau : les multiplications",
+      "pipeLabel": "Tuyau de transport des nombres",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, case libre",
+      "cellImage": "Ligne {{row}}, colonne {{column}}, {{color}}",
+      "cellImageSelected": "Ligne {{row}}, colonne {{column}}, {{color}}, tuile choisie",
+      "cellNumber": "Ligne {{row}}, colonne {{column}}, nombre {{value}}",
+      "colors": {
+        "red": "rouge",
+        "yellow": "jaune",
+        "orange": "orange",
+        "green": "vert",
+        "purple": "violet",
+        "brown": "marron",
+        "grey": "gris"
+      },
+      "expressionLabel": "{{a}} fois {{b}}",
+      "expressionDone": "{{a}} fois {{b}} égale {{result}}",
+      "stats": {
+        "level": "Niveau",
+        "moves": "Coups"
+      },
+      "status": {
+        "play": "Aligne 3 fruits identiques pour libérer le chemin des nombres.",
+        "selected": "Tuile choisie : touche une tuile voisine pour échanger.",
+        "flowing": "Les nombres avancent tout seuls vers le tuyau.",
+        "won": "Bravo ! Toutes les multiplications sont résolues.",
+        "chooseResult": "Choisis un résultat dans le réservoir, puis pose-le sur la multiplication.",
+        "placeResult": "Résultat choisi : touche la multiplication où il va."
+      },
+      "messages": {
+        "deadEnd": "Essaie un autre alignement !",
+        "noAlignment": "Il faut aligner au moins 3 fruits identiques.",
+        "shuffled": "Les tuiles ont été remélangées.",
+        "shuffleFailed": "Impossible de remélanger, recommence le niveau.",
+        "wrongResult": "Ce n'est pas le résultat de cette multiplication : réessaie !"
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer ce niveau avec un nouveau plateau",
+        "hint": "Indice",
+        "shuffle": "Mélanger",
+        "next": "Niveau suivant",
+        "again": "Rejouer",
+        "backToGames": "Retour aux jeux"
+      },
+      "stuck": "Plus de coup possible : mélange les tuiles.",
+      "rotate": {
+        "title": "Tourne ton téléphone",
+        "text": "Multipli'Flow se joue en mode paysage, avec ses tableaux côte à côte."
+      },
+      "won": {
+        "title": "Bravo !",
+        "text": "Tous les nombres ont traversé le tuyau et toutes les multiplications sont résolues.",
+        "finished": "Tu as terminé tous les niveaux !"
+      },
+      "howTo": {
+        "step1Title": "Échange deux tuiles",
+        "step1": "Touche une tuile puis sa voisine, ou fais-la glisser. L'échange est accepté seulement s'il forme un alignement de 3 fruits identiques ou plus.",
+        "step2Title": "Ouvre le chemin",
+        "step2": "Les alignements disparaissent et libèrent des cases. Les nombres avancent tout seuls, case par case, jusqu'au tuyau.",
+        "step3Title": "Résous les multiplications",
+        "step3": "Les nombres traversent le tuyau et forment des multiplications. Choisis le bon résultat dans le réservoir : il descend dans le tuyau et se verrouille sur la multiplication. Un mauvais résultat remonte, sans pénalité."
+      },
+      "reservoirLabel": "Réservoir de résultats",
+      "vpipeLabel": "Tuyau des résultats",
+      "resultTile": "Résultat {{value}}",
+      "resultTileSelected": "Résultat {{value}}, choisi",
+      "questionSlot": "Poser un résultat sur {{a}} fois {{b}}",
+      "boardCleaned": "Les fruits restants se sont désintégrés : le tableau d'entrée a terminé sa mission."
+    },
+    "details": {
+      "age": "7–11 ans",
+      "levels": "5 niveaux",
+      "mode": "Solo",
+      "summary": "Libère les nombres en alignant des fruits identiques et fais fonctionner une machine mathématique en sélectionnant les bons résultats. Développe ton calcul mental, ta logique et ton esprit stratégique.",
+      "objectives": "Apprendre et consolider les tables de multiplication, développer le calcul mental, anticiper les déplacements et résoudre des problèmes.",
+      "steps": [
+        "Aligne au moins trois fruits identiques.",
+        "Libère le chemin des nombres vers le tuyau.",
+        "Observe les multiplications se former.",
+        "Choisis le bon résultat dans le réservoir supérieur.",
+        "Résous toutes les opérations pour terminer le niveau."
+      ],
+      "progression": "Cinq niveaux de difficulté progressive. Les plateaux sont renouvelés pour varier les situations de jeu.",
+      "prerequisites": "Reconnaître les nombres et comprendre le principe de la multiplication."
+    }
+  },
+  "addiFlow": {
+    "name": "Addi'Flow",
+    "description": "Aligne des fruits identiques pour ouvrir le chemin des nombres : ils traversent le tuyau et forment des additions.",
+    "cta": "Jouer",
+    "tagline": "Ouvre le chemin des nombres",
+    "game": {
+      "title": "Addi'Flow",
+      "screen": {
+        "label": "Jeu Addi'Flow"
+      },
+      "boardLabel": "Plateau des tuiles",
+      "resultsLabel": "Second tableau : les additions",
+      "pipeLabel": "Tuyau de transport des nombres",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, case libre",
+      "cellImage": "Ligne {{row}}, colonne {{column}}, {{color}}",
+      "cellImageSelected": "Ligne {{row}}, colonne {{column}}, {{color}}, tuile choisie",
+      "cellNumber": "Ligne {{row}}, colonne {{column}}, nombre {{value}}",
+      "colors": {
+        "red": "rouge",
+        "yellow": "jaune",
+        "orange": "orange",
+        "green": "vert",
+        "purple": "violet",
+        "brown": "marron",
+        "grey": "gris"
+      },
+      "expressionLabel": "{{a}} plus {{b}}",
+      "expressionDone": "{{a}} plus {{b}} égale {{result}}",
+      "stats": {
+        "level": "Niveau",
+        "moves": "Coups"
+      },
+      "status": {
+        "play": "Aligne 3 fruits identiques pour libérer le chemin des nombres.",
+        "selected": "Tuile choisie : touche une tuile voisine pour échanger.",
+        "flowing": "Les nombres avancent tout seuls vers le tuyau.",
+        "won": "Bravo ! Toutes les additions sont résolues.",
+        "chooseResult": "Choisis un résultat dans le réservoir, puis pose-le sur la addition.",
+        "placeResult": "Résultat choisi : touche la addition où il va."
+      },
+      "messages": {
+        "deadEnd": "Essaie un autre alignement !",
+        "noAlignment": "Il faut aligner au moins 3 fruits identiques.",
+        "shuffled": "Les tuiles ont été remélangées.",
+        "shuffleFailed": "Impossible de remélanger, recommence le niveau.",
+        "wrongResult": "Ce n'est pas le résultat de cette addition : réessaie !"
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer ce niveau avec un nouveau plateau",
+        "hint": "Indice",
+        "shuffle": "Mélanger",
+        "next": "Niveau suivant",
+        "again": "Rejouer",
+        "backToGames": "Retour aux jeux"
+      },
+      "stuck": "Plus de coup possible : mélange les tuiles.",
+      "rotate": {
+        "title": "Tourne ton téléphone",
+        "text": "Addi'Flow se joue en mode paysage, avec ses tableaux côte à côte."
+      },
+      "won": {
+        "title": "Bravo !",
+        "text": "Tous les nombres ont traversé le tuyau et toutes les additions sont résolues.",
+        "finished": "Tu as terminé tous les niveaux !"
+      },
+      "howTo": {
+        "step1Title": "Échange deux tuiles",
+        "step1": "Touche une tuile puis sa voisine, ou fais-la glisser. L'échange est accepté seulement s'il forme un alignement de 3 fruits identiques ou plus.",
+        "step2Title": "Ouvre le chemin",
+        "step2": "Les alignements disparaissent et libèrent des cases. Les nombres avancent tout seuls, case par case, jusqu'au tuyau.",
+        "step3Title": "Résous les additions",
+        "step3": "Les nombres traversent le tuyau et forment des additions. Choisis le bon résultat dans le réservoir : il descend dans le tuyau et se verrouille sur la addition. Un mauvais résultat remonte, sans pénalité."
+      },
+      "reservoirLabel": "Réservoir de résultats",
+      "vpipeLabel": "Tuyau des résultats",
+      "resultTile": "Résultat {{value}}",
+      "resultTileSelected": "Résultat {{value}}, choisi",
+      "questionSlot": "Poser un résultat sur {{a}} plus {{b}}",
+      "boardCleaned": "Les fruits restants se sont désintégrés : le tableau d'entrée a terminé sa mission."
+    },
+    "details": {
+      "age": "7–11 ans",
+      "levels": "5 niveaux",
+      "mode": "Solo",
+      "summary": "Libère les nombres en alignant des fruits identiques et fais fonctionner une machine mathématique en sélectionnant les bons résultats. Développe ton calcul mental, ta logique et ton esprit stratégique.",
+      "objectives": "Apprendre et consolider les additions, développer le calcul mental, anticiper les déplacements et résoudre des problèmes.",
+      "steps": [
+        "Aligne au moins trois fruits identiques.",
+        "Libère le chemin des nombres vers le tuyau.",
+        "Observe les additions se former.",
+        "Choisis le bon résultat dans le réservoir supérieur.",
+        "Résous toutes les opérations pour terminer le niveau."
+      ],
+      "progression": "Cinq niveaux de difficulté progressive. Les plateaux sont renouvelés pour varier les situations de jeu.",
+      "prerequisites": "Reconnaître les nombres et comprendre le principe de l'addition."
+    }
+  },
+  "soustraFlow": {
+    "name": "Soustra'Flow",
+    "description": "Aligne des fruits identiques pour ouvrir le chemin des nombres : ils traversent le tuyau et forment des soustractions.",
+    "cta": "Jouer",
+    "tagline": "Ouvre le chemin des nombres",
+    "game": {
+      "title": "Soustra'Flow",
+      "screen": {
+        "label": "Jeu Soustra'Flow"
+      },
+      "boardLabel": "Plateau des tuiles",
+      "resultsLabel": "Second tableau : les soustractions",
+      "pipeLabel": "Tuyau de transport des nombres",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, case libre",
+      "cellImage": "Ligne {{row}}, colonne {{column}}, {{color}}",
+      "cellImageSelected": "Ligne {{row}}, colonne {{column}}, {{color}}, tuile choisie",
+      "cellNumber": "Ligne {{row}}, colonne {{column}}, nombre {{value}}",
+      "colors": {
+        "red": "rouge",
+        "yellow": "jaune",
+        "orange": "orange",
+        "green": "vert",
+        "purple": "violet",
+        "brown": "marron",
+        "grey": "gris"
+      },
+      "expressionLabel": "{{a}} moins {{b}}",
+      "expressionDone": "{{a}} moins {{b}} égale {{result}}",
+      "stats": {
+        "level": "Niveau",
+        "moves": "Coups"
+      },
+      "status": {
+        "play": "Aligne 3 fruits identiques pour libérer le chemin des nombres.",
+        "selected": "Tuile choisie : touche une tuile voisine pour échanger.",
+        "flowing": "Les nombres avancent tout seuls vers le tuyau.",
+        "won": "Bravo ! Toutes les soustractions sont résolues.",
+        "chooseResult": "Choisis un résultat dans le réservoir, puis pose-le sur la soustraction.",
+        "placeResult": "Résultat choisi : touche la soustraction où il va."
+      },
+      "messages": {
+        "deadEnd": "Essaie un autre alignement !",
+        "noAlignment": "Il faut aligner au moins 3 fruits identiques.",
+        "shuffled": "Les tuiles ont été remélangées.",
+        "shuffleFailed": "Impossible de remélanger, recommence le niveau.",
+        "wrongResult": "Ce n'est pas le résultat de cette soustraction : réessaie !"
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer ce niveau avec un nouveau plateau",
+        "hint": "Indice",
+        "shuffle": "Mélanger",
+        "next": "Niveau suivant",
+        "again": "Rejouer",
+        "backToGames": "Retour aux jeux"
+      },
+      "stuck": "Plus de coup possible : mélange les tuiles.",
+      "rotate": {
+        "title": "Tourne ton téléphone",
+        "text": "Soustra'Flow se joue en mode paysage, avec ses tableaux côte à côte."
+      },
+      "won": {
+        "title": "Bravo !",
+        "text": "Tous les nombres ont traversé le tuyau et toutes les soustractions sont résolues.",
+        "finished": "Tu as terminé tous les niveaux !"
+      },
+      "howTo": {
+        "step1Title": "Échange deux tuiles",
+        "step1": "Touche une tuile puis sa voisine, ou fais-la glisser. L'échange est accepté seulement s'il forme un alignement de 3 fruits identiques ou plus.",
+        "step2Title": "Ouvre le chemin",
+        "step2": "Les alignements disparaissent et libèrent des cases. Les nombres avancent tout seuls, case par case, jusqu'au tuyau.",
+        "step3Title": "Résous les soustractions",
+        "step3": "Les nombres traversent le tuyau et forment des soustractions. Choisis le bon résultat dans le réservoir : il descend dans le tuyau et se verrouille sur la soustraction. Un mauvais résultat remonte, sans pénalité."
+      },
+      "reservoirLabel": "Réservoir de résultats",
+      "vpipeLabel": "Tuyau des résultats",
+      "resultTile": "Résultat {{value}}",
+      "resultTileSelected": "Résultat {{value}}, choisi",
+      "questionSlot": "Poser un résultat sur {{a}} moins {{b}}",
+      "boardCleaned": "Les fruits restants se sont désintégrés : le tableau d'entrée a terminé sa mission."
+    },
+    "details": {
+      "age": "7–11 ans",
+      "levels": "5 niveaux",
+      "mode": "Solo",
+      "summary": "Libère les nombres en alignant des fruits identiques et fais fonctionner une machine mathématique en sélectionnant les bons résultats. Développe ton calcul mental, ta logique et ton esprit stratégique.",
+      "objectives": "Apprendre et consolider les soustractions, développer le calcul mental, anticiper les déplacements et résoudre des problèmes.",
+      "steps": [
+        "Aligne au moins trois fruits identiques.",
+        "Libère le chemin des nombres vers le tuyau.",
+        "Observe les soustractions se former.",
+        "Choisis le bon résultat dans le réservoir supérieur.",
+        "Résous toutes les opérations pour terminer le niveau."
+      ],
+      "progression": "Cinq niveaux de difficulté progressive. Les plateaux sont renouvelés pour varier les situations de jeu.",
+      "prerequisites": "Reconnaître les nombres et comprendre le principe de la soustraction."
+    }
+  },
+  "diviFlow": {
+    "name": "Divi'Flow",
+    "description": "Aligne des fruits identiques pour ouvrir le chemin des nombres : ils traversent le tuyau et forment des divisions.",
+    "cta": "Jouer",
+    "tagline": "Ouvre le chemin des nombres",
+    "game": {
+      "title": "Divi'Flow",
+      "screen": {
+        "label": "Jeu Divi'Flow"
+      },
+      "boardLabel": "Plateau des tuiles",
+      "resultsLabel": "Second tableau : les divisions",
+      "pipeLabel": "Tuyau de transport des nombres",
+      "cellEmpty": "Ligne {{row}}, colonne {{column}}, case libre",
+      "cellImage": "Ligne {{row}}, colonne {{column}}, {{color}}",
+      "cellImageSelected": "Ligne {{row}}, colonne {{column}}, {{color}}, tuile choisie",
+      "cellNumber": "Ligne {{row}}, colonne {{column}}, nombre {{value}}",
+      "colors": {
+        "red": "rouge",
+        "yellow": "jaune",
+        "orange": "orange",
+        "green": "vert",
+        "purple": "violet",
+        "brown": "marron",
+        "grey": "gris"
+      },
+      "expressionLabel": "{{a}} divisé par {{b}}",
+      "expressionDone": "{{a}} divisé par {{b}} égale {{result}}",
+      "stats": {
+        "level": "Niveau",
+        "moves": "Coups"
+      },
+      "status": {
+        "play": "Aligne 3 fruits identiques pour libérer le chemin des nombres.",
+        "selected": "Tuile choisie : touche une tuile voisine pour échanger.",
+        "flowing": "Les nombres avancent tout seuls vers le tuyau.",
+        "won": "Bravo ! Toutes les divisions sont résolues.",
+        "chooseResult": "Choisis un résultat dans le réservoir, puis pose-le sur la division.",
+        "placeResult": "Résultat choisi : touche la division où il va."
+      },
+      "messages": {
+        "deadEnd": "Essaie un autre alignement !",
+        "noAlignment": "Il faut aligner au moins 3 fruits identiques.",
+        "shuffled": "Les tuiles ont été remélangées.",
+        "shuffleFailed": "Impossible de remélanger, recommence le niveau.",
+        "wrongResult": "Ce n'est pas le résultat de cette division : réessaie !"
+      },
+      "actions": {
+        "restart": "Recommencer",
+        "restartAria": "Recommencer ce niveau avec un nouveau plateau",
+        "hint": "Indice",
+        "shuffle": "Mélanger",
+        "next": "Niveau suivant",
+        "again": "Rejouer",
+        "backToGames": "Retour aux jeux"
+      },
+      "stuck": "Plus de coup possible : mélange les tuiles.",
+      "rotate": {
+        "title": "Tourne ton téléphone",
+        "text": "Divi'Flow se joue en mode paysage, avec ses tableaux côte à côte."
+      },
+      "won": {
+        "title": "Bravo !",
+        "text": "Tous les nombres ont traversé le tuyau et toutes les divisions sont résolues.",
+        "finished": "Tu as terminé tous les niveaux !"
+      },
+      "howTo": {
+        "step1Title": "Échange deux tuiles",
+        "step1": "Touche une tuile puis sa voisine, ou fais-la glisser. L'échange est accepté seulement s'il forme un alignement de 3 fruits identiques ou plus.",
+        "step2Title": "Ouvre le chemin",
+        "step2": "Les alignements disparaissent et libèrent des cases. Les nombres avancent tout seuls, case par case, jusqu'au tuyau.",
+        "step3Title": "Résous les divisions",
+        "step3": "Les nombres traversent le tuyau et forment des divisions. Choisis le bon résultat dans le réservoir : il descend dans le tuyau et se verrouille sur la division. Un mauvais résultat remonte, sans pénalité."
+      },
+      "reservoirLabel": "Réservoir de résultats",
+      "vpipeLabel": "Tuyau des résultats",
+      "resultTile": "Résultat {{value}}",
+      "resultTileSelected": "Résultat {{value}}, choisi",
+      "questionSlot": "Poser un résultat sur {{a}} divisé par {{b}}",
+      "boardCleaned": "Les fruits restants se sont désintégrés : le tableau d'entrée a terminé sa mission."
+    },
+    "details": {
+      "age": "7–11 ans",
+      "levels": "5 niveaux",
+      "mode": "Solo",
+      "summary": "Libère les nombres en alignant des fruits identiques et fais fonctionner une machine mathématique en sélectionnant les bons résultats. Développe ton calcul mental, ta logique et ton esprit stratégique.",
+      "objectives": "Apprendre et consolider les divisions exactes, développer le calcul mental, anticiper les déplacements et résoudre des problèmes.",
+      "steps": [
+        "Aligne au moins trois fruits identiques.",
+        "Libère le chemin des nombres vers le tuyau.",
+        "Observe les divisions se former.",
+        "Choisis le bon résultat dans le réservoir supérieur.",
+        "Résous toutes les opérations pour terminer le niveau."
+      ],
+      "progression": "Cinq niveaux de difficulté progressive. Les plateaux sont renouvelés pour varier les situations de jeu.",
+      "prerequisites": "Reconnaître les nombres et comprendre le principe de la division."
+    }
+  },
   "yambaWriting": {
     "name": "Yamba écrit",
     "description": "Une machine tire une illustration : écris son nom en plaçant les lettres dans le bon ordre.",
@@ -409,7 +801,10 @@
   },
   "card": {
     "playAria": "Jouer à {{name}}",
-    "soonAria": "{{name}} : bientôt disponible"
+    "soonAria": "{{name}} : bientôt disponible",
+    "age": "{{age}}+",
+    "levels_one": "{{count}} niveau",
+    "levels_other": "{{count}} niveaux"
   },
   "player": {
     "controls": "Commandes du jeu",
@@ -455,5 +850,35 @@
     "level": {
       "primary": "Primaire"
     }
+  },
+  "gameInfo": {
+    "studio": "Yamba Studio",
+    "studioLine": "Yamba Academy · Jeux éducatifs",
+    "seeMore": "Voir plus",
+    "seeLess": "Voir moins",
+    "objectives": "Objectifs pédagogiques",
+    "howToPlay": "Comment jouer ?",
+    "progression": "Progression pédagogique",
+    "prerequisites": "Prérequis",
+    "technical": "Informations techniques",
+    "labels": {
+      "devices": "Appareils",
+      "controls": "Commandes",
+      "install": "Installation",
+      "internet": "Connexion Internet",
+      "languages": "Langues",
+      "mode": "Mode"
+    },
+    "values": {
+      "devices": "Ordinateur, tablette, téléphone",
+      "controls": "Souris, écran tactile et clavier",
+      "install": "Non requise",
+      "internet": "Requise",
+      "languages": "Français · Anglais",
+      "mode": "Un joueur"
+    },
+    "academyTitle": "À propos de Yamba Academy",
+    "academyText": "Des jeux conçus pour apprendre, expérimenter et découvrir les connaissances autour de soi.",
+    "createdBy": "Une création Yamba Studio."
   }
 }

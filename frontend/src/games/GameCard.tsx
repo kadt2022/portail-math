@@ -4,13 +4,10 @@ import { useTranslation } from "react-i18next";
 
 import type { GameCatalogueEntry } from "./game-catalogue";
 import { intentHandlers } from "./preload/cardIntent";
-import type { CardPlacement } from "./gallery-layout";
 import styles from "./GameCard.module.css";
 
 interface GameCardProps {
   game: GameCatalogueEntry;
-  /** Place dans la galerie (colonnes et proportions) ; sans elle, la carte prend sa taille naturelle. */
-  placement?: CardPlacement;
   /** Jeux intégrés à la page : le clic ouvre le jeu sur place au lieu de changer de page (l’adresse reste un vrai lien). */
   onOpen?: (game: GameCatalogueEntry) => void;
   /** Survol stable à la souris : le jeu peut se précharger avant le clic (voir intentPreloader). */
@@ -20,16 +17,12 @@ interface GameCardProps {
 }
 
 // Toute la carte est le lien : pas de bouton « Jouer » séparé. L'illustration occupe
-// la carte entière, le titre et l'accroche sont posés sur une bande en bas.
-export function GameCard({ game, placement, onOpen, onIntent, onIntentEnd }: GameCardProps) {
+// la carte entière, le titre et les repères (âge, niveaux) sont posés sur une bande en bas.
+export function GameCard({ game, onOpen, onIntent, onIntentEnd }: GameCardProps) {
   const { t } = useTranslation("games");
   const name = t(game.nameKey);
-  const style: React.CSSProperties | undefined = placement
-    ? {
-        gridColumn: placement.start ? `${placement.start} / span ${placement.span}` : `span ${placement.span}`,
-        aspectRatio: placement.ratio,
-      }
-    : undefined;
+  // Seulement ce qui est connu : l'âge recommandé et le nombre de niveaux ; sans donnée, aucun repère n'est affiché.
+  const meta = [game.minAge ? t("card.age", { age: game.minAge }) : null, game.levels ? t("card.levels", { count: game.levels }) : null].filter(Boolean).join(" · ");
 
   // Clic simple : le jeu s’ouvre dans la page. Clic avec modificateur (nouvel onglet) : le lien normal s’applique.
   const openInPage = useCallback(
@@ -51,15 +44,14 @@ export function GameCard({ game, placement, onOpen, onIntent, onIntentEnd }: Gam
           loading="lazy"
           decoding="async"
           width={640}
-          height={400}
+          height={360}
           style={game.focus ? { objectPosition: game.focus } : undefined}
         />
       ) : null}
       {game.overlay ? <img className={styles.overlay} src={game.overlay} alt="" loading="lazy" decoding="async" width={400} height={428} /> : null}
-      <span className={styles.category}>{t(`categories.${game.categoryId}`)}</span>
       <span className={styles.bar}>
         <span className={styles.name}>{name}</span>
-        <span className={styles.tagline}>{t(game.taglineKey)}</span>
+        {meta ? <span className={styles.meta}>{meta}</span> : null}
       </span>
     </>
   );
@@ -68,7 +60,7 @@ export function GameCard({ game, placement, onOpen, onIntent, onIntentEnd }: Gam
 
   if (game.availability === "react") {
     return (
-      <Link className={styles.card} style={style} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} {...intent}>
+      <Link className={styles.card} to={game.href} aria-label={label} onClick={game.embed ? openInPage : undefined} {...intent}>
         {content}
       </Link>
     );
@@ -76,7 +68,7 @@ export function GameCard({ game, placement, onOpen, onIntent, onIntentEnd }: Gam
 
   return (
     <a
-      className={styles.card} style={style}
+      className={styles.card}
       href={game.href}
       aria-label={label}
       data-game-direct-launch
