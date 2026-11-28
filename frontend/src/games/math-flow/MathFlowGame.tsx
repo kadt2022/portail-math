@@ -6,6 +6,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -65,6 +66,8 @@ const FLY_PLACE_MS = 1100;
 const FLY_REJECT_MS = 1800;
 // Un glissement compte à partir de 40 % de la taille d'une case.
 const DRAG_FRACTION = 0.4;
+// Fenêtre pendant laquelle un « click » qui suit un geste déjà traité (toucher, glisser, clavier) est ignoré.
+const CLICK_AFTER_GESTURE_MS = 600;
 
 const freshSeed = () => Math.floor(Math.random() * 1_000_000_000) + 1;
 const clampLevel = (level: number) => Math.min(LEVELS.length, Math.max(1, Math.round(level)));
@@ -456,6 +459,14 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
   };
 
   const drag = useRef<{ index: number; x: number; y: number; size: number; consumed: boolean } | null>(null);
+  // Un toucher, un glisser ou une touche du clavier sont déjà traités par leurs propres gestionnaires ; le navigateur peut
+  // pourtant émettre ensuite un « click » sur le même fruit. On note l'instant du dernier geste traité pour ignorer ce
+  // click redondant, et ne garder que le click « seul » : celui qu'un lecteur d'écran synthétise (double-tap VoiceOver,
+  // activation TalkBack, NVDA…).
+  const lastGesture = useRef(Number.NEGATIVE_INFINITY);
+  const markGesture = () => {
+    lastGesture.current = performance.now();
+  };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (frozen || won || (event.pointerType === "mouse" && event.button !== 0)) return;
@@ -465,6 +476,7 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
       setSelected(null);
       return;
     }
+    markGesture();
     const box = boardRef.current?.getBoundingClientRect();
     drag.current = { index, x: event.clientX, y: event.clientY, size: box ? box.width / cols : 48, consumed: false };
     try {
@@ -489,10 +501,19 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
   const onPointerUp = () => {
     const current = drag.current;
     drag.current = null;
-    if (current && !current.consumed) tap(current.index);
+    if (!current) return;
+    markGesture();
+    if (!current.consumed) tap(current.index);
   };
   const onPointerCancel = () => {
     drag.current = null;
+  };
+
+  const onClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (frozen || won || performance.now() - lastGesture.current < CLICK_AFTER_GESTURE_MS) return;
+    const target = (event.target as HTMLElement).closest<HTMLElement>("[data-index]");
+    const index = target ? Number(target.dataset.index) : -1;
+    if (index >= 0 && isImageAt(index)) tap(index);
   };
 
   const focusTile = (index: number) => boardRef.current?.querySelector<HTMLElement>(`[data-index="${index}"]`)?.focus();
@@ -516,6 +537,7 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
       if (next !== null) focusTile(next);
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
+      markGesture();
       tap(index);
     } else if (event.key === "Escape") {
       setSelected(null);
@@ -628,6 +650,7 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerCancel}
             onKeyDown={onKeyDown}
+            onClick={onClick}
           >
             {tiles.map(({ tile, index }) => {
               const position = { "--r": Math.floor(index / cols), "--c": index % cols } as CSSProperties;

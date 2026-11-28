@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { assess, newGame, rescueGame, verifySolution } from "../src/engine/game";
 import { entranceCell, unreachableNumbers } from "../src/engine/paths";
@@ -6,6 +6,11 @@ import { rescueShuffle } from "../src/engine/rescue";
 import { createRng } from "../src/engine/rng";
 import { findMatches } from "../src/engine/match";
 import { isDeadEnd, layout, randomPlay } from "./helpers";
+
+// Ces tests parcourent des centaines de parties et appellent le solveur à chaque coup : ils prennent plusieurs secondes.
+// La configuration du paquet leur accorde déjà ce temps, mais la suite du portail (lancée depuis frontend/, où vitest
+// garde ses 5 s par défaut) les exécute aussi : on fixe ici le même délai pour qu'ils ne dépendent pas de qui les lance.
+vi.setConfig({ testTimeout: 120_000 });
 
 const SEEDS = Array.from({ length: 60 }, (_, i) => i + 1);
 
