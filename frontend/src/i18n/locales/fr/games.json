@@ -373,6 +373,12 @@
     },
     "tagline": "Vise, calcule, enchaîne"
   },
+  "turboPulse3d": {
+    "name": "Turbo Pulse 3D",
+    "description": "Pilote ton vaisseau en 3D jusqu'à la station Orion et évite les boules.",
+    "cta": "Décoller",
+    "tagline": "Pilote ton vaisseau en 3D"
+  },
   "newGame": {
     "name": "Nouveau jeu éducatif",
     "description": "Une nouvelle aventure mathématique arrive bientôt.",

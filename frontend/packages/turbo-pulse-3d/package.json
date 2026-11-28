@@ -1,0 +1,35 @@
+{
+  "name": "@mbuyamba/turbo-pulse-3d",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turbo Pulse 3D : le vaisseau de Yamba Academy et son atelier de construction, sous forme de module autonome.",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^9.37.1"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10",
+    "vitest-canvas-mock": "^1.1.5"
+  }
+}

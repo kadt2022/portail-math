@@ -373,6 +373,12 @@
     },
     "tagline": "Aim, calculate, chain combos"
   },
+  "turboPulse3d": {
+    "name": "Turbo Pulse 3D",
+    "description": "Fly your ship in 3D to the Orion station and dodge the spheres.",
+    "cta": "Take off",
+    "tagline": "Fly your ship in 3D"
+  },
   "newGame": {
     "name": "New educational game",
     "description": "A new math adventure is coming soon.",

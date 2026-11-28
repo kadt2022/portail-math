@@ -16,6 +16,7 @@ import leoCar from "./assets/leo-car-front-banner.webp";
 import leoCountryside from "./assets/leo-countryside-1280.webp";
 import multiplicationTrainThumb from "./assets/thumb-multiplication-train.webp";
 import tuilesMagiquesThumb from "./assets/thumb-tuiles-magiques.webp";
+import turboPulse3dThumb from "./assets/thumb-turbo-pulse-3d.webp";
 import turboPulseThumb from "./assets/thumb-turbo-pulse.webp";
 
 export type GameAvailability = "standalone" | "react" | "coming-soon";
@@ -89,6 +90,17 @@ export const gameCatalogue: GameCatalogueEntry[] = [
     subjectKey: "meta.subject.maths",
     levelKey: "meta.level.primary",
     thumbnail: turboPulseThumb,
+  },
+  {
+    id: "turbo-pulse-3d",
+    nameKey: "turboPulse3d.name",
+    taglineKey: "turboPulse3d.tagline",
+    descriptionKey: "turboPulse3d.description",
+    // Page autonome (le jeu n'est pas encore dans le lecteur de la page Jeux) : la carte ouvre sa page.
+    href: "/jeux/turbo-pulse-3d",
+    availability: "react",
+    categoryId: "driving",
+    thumbnail: turboPulse3dThumb,
   },
   {
     id: "multiplication-train",

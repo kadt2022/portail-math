@@ -20,6 +20,7 @@
     "@mbuyamba/pdf-reader": "file:packages/pdf-reader",
     "@mbuyamba/riviere-fractions": "file:packages/riviere-fractions",
     "@mbuyamba/train-multiplications": "file:packages/train-multiplications",
+    "@mbuyamba/turbo-pulse-3d": "file:packages/turbo-pulse-3d",
     "i18next": "^26.3.6",
     "phaser": "^3.90.0",
     "react": "^19.2.8",

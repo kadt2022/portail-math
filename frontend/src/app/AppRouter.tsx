@@ -70,6 +70,15 @@ const RiviereFractionsGamePage = lazyRoute(
   },
   { heavy: true, game: "riviere-des-fractions" },
 );
+// Turbo Pulse 3D, étape 1 (le vaisseau) : pages autonomes, le jeu est dans la page des jeux (carte « Conduite »), sans lecteur commun pour l'instant.
+const TurboPulse3DGamePage = lazyRoute(
+  () => import("../games/turbo-pulse-3d/TurboPulse3DGamePage").then((m) => m.TurboPulse3DGamePage),
+  { heavy: true },
+);
+const TurboPulse3DWorkshopPage = lazyRoute(
+  () => import("../games/turbo-pulse-3d/TurboPulse3DWorkshopPage").then((m) => m.TurboPulse3DWorkshopPage),
+  { heavy: true },
+);
 const LeoLivreurPrototypePage = lazyRoute(() => import("../prototypes/leo-livreur/LeoLivreurPrototypePage").then((m) => m.LeoLivreurPrototypePage), { heavy: true });
 const MangoBasketPrototypePage = lazyRoute(() => import("../prototypes/mango-basket/MangoBasketPrototypePage").then((m) => m.MangoBasketPrototypePage), { heavy: true });
 const ProgressionPage = lazyRoute(() => import("./ProgressionPage").then((m) => m.ProgressionPage));
@@ -166,6 +175,8 @@ export function AppRouter() {
             }
           />
           <Route path="jeux/train-des-multiplications" element={<TrainMultiplicationsGamePage />} />
+          <Route path="jeux/turbo-pulse-3d" element={<TurboPulse3DGamePage />} />
+          <Route path="jeux/turbo-pulse-3d/atelier" element={<TurboPulse3DWorkshopPage />} />
           <Route path="jeux/riviere-des-fractions" element={<RiviereFractionsGamePage />} />
           <Route path="jeux/nouveau-jeu-react" element={<NewGameComingSoonPage />} />
           <Route path="progression" element={<ProgressionPage />} />
