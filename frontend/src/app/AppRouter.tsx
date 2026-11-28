@@ -70,7 +70,7 @@ const RiviereFractionsGamePage = lazyRoute(
   },
   { heavy: true, game: "riviere-des-fractions" },
 );
-// Turbo Pulse 3D, étape 1 (le vaisseau) : page cachée, hors catalogue, en attente de validation.
+// Turbo Pulse 3D, étape 1 (le vaisseau) : pages autonomes, le jeu est dans la page des jeux (carte « Conduite »), sans lecteur commun pour l'instant.
 const TurboPulse3DGamePage = lazyRoute(
   () => import("../games/turbo-pulse-3d/TurboPulse3DGamePage").then((m) => m.TurboPulse3DGamePage),
   { heavy: true },
