@@ -175,6 +175,15 @@ describe("GamesCataloguePage", () => {
     expect(featuredGame?.availability).not.toBe("coming-soon");
   });
 
+  it("la carte de Turbo Pulse 3D, rangée dans Conduite, ouvre sa page autonome", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const card = screen.getByRole("link", { name: "Jouer à Turbo Pulse 3D" });
+    expect(card).toHaveAttribute("href", "/jeux/turbo-pulse-3d");
+    await user.click(screen.getByRole("button", { name: "Conduite" }));
+    expect(screen.getByRole("link", { name: "Jouer à Turbo Pulse 3D" })).toBeInTheDocument();
+  });
+
   it("n'écrit aucun cache persistant", async () => {
     const user = userEvent.setup();
     localStorage.clear();
