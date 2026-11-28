@@ -69,11 +69,12 @@
   inset: 3px;
   border-radius: inherit;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 35% 30%, #fff3c4 0, #e0b13a 38%, #8a6414 72%, transparent 76%) left top / 0.7rem 0.7rem no-repeat,
-    radial-gradient(circle at 35% 30%, #fff3c4 0, #e0b13a 38%, #8a6414 72%, transparent 76%) right top / 0.7rem 0.7rem no-repeat,
-    radial-gradient(circle at 35% 30%, #fff3c4 0, #e0b13a 38%, #8a6414 72%, transparent 76%) left bottom / 0.7rem 0.7rem no-repeat,
-    radial-gradient(circle at 35% 30%, #fff3c4 0, #e0b13a 38%, #8a6414 72%, transparent 76%) right bottom / 0.7rem 0.7rem no-repeat;
+  /* Quatre rivets dorés, un par coin (propriétés détaillées : même rendu que le raccourci « background »). */
+  --rivet: radial-gradient(circle at 35% 30%, #fff3c4 0, #e0b13a 38%, #8a6414 72%, transparent 76%);
+  background-image: var(--rivet), var(--rivet), var(--rivet), var(--rivet);
+  background-position: left top, right top, left bottom, right bottom;
+  background-size: 0.7rem 0.7rem;
+  background-repeat: no-repeat;
 }
 
 /* Bande colorée sur l'arête haute : cyan pour l'entrée des tuiles, or pour la sortie des multiplications. */

@@ -6,7 +6,6 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
-  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -180,6 +179,12 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
   const won = game.status === "won";
   const board = game.flow.board;
   const { rows, cols } = board;
+
+  // Partie gagnée : le bouton « suivant » prend le focus, comme le faisait l'attribut autoFocus, sans cet attribut.
+  const nextRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    if (won) nextRef.current?.focus();
+  }, [won]);
 
   const commit = useCallback((next: GameState) => {
     gameRef.current = next;
@@ -509,11 +514,9 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
     drag.current = null;
   };
 
-  const onClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+  const onTileClick = (index: number) => {
     if (frozen || won || performance.now() - lastGesture.current < CLICK_AFTER_GESTURE_MS) return;
-    const target = (event.target as HTMLElement).closest<HTMLElement>("[data-index]");
-    const index = target ? Number(target.dataset.index) : -1;
-    if (index >= 0 && isImageAt(index)) tap(index);
+    if (isImageAt(index)) tap(index);
   };
 
   const focusTile = (index: number) => boardRef.current?.querySelector<HTMLElement>(`[data-index="${index}"]`)?.focus();
@@ -615,9 +618,9 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
       onHint={showHint}
       hintDisabled={frozen || won}
       extraControls={
-        <button type="button" className={playerControlClass} aria-pressed={!sound.muted} aria-label={sound.muted ? t("player.sound.off") : t("player.sound.on")} onClick={sound.toggleMuted}>
+        <button type="button" className={playerControlClass} aria-pressed={!sound.muted} aria-label={sound.muted ? translate("player.sound.off") : translate("player.sound.on")} onClick={sound.toggleMuted}>
           <SoundIcon muted={sound.muted} />
-          <span>{sound.muted ? t("player.sound.off") : t("player.sound.on")}</span>
+          <span>{sound.muted ? translate("player.sound.off") : translate("player.sound.on")}</span>
         </button>
       }
       howTo={howTo}
@@ -650,7 +653,6 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerCancel}
             onKeyDown={onKeyDown}
-            onClick={onClick}
           >
             {tiles.map(({ tile, index }) => {
               const position = { "--r": Math.floor(index / cols), "--c": index % cols } as CSSProperties;
@@ -675,6 +677,7 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
                   data-selected={isSelected || undefined}
                   data-hinted={isHinted || undefined}
                   aria-pressed={isSelected}
+                  onClick={() => onTileClick(index)}
                   tabIndex={index === (selected ?? -1) || selected === null ? 0 : -1}
                   aria-label={t(isSelected ? "game.cellImageSelected" : "game.cellImage", { row: Math.floor(index / cols) + 1, column: (index % cols) + 1, color: colorName(tile.color) })}
                 >
@@ -814,7 +817,7 @@ export function MathFlowGame({ variant: variantId = "multiplication", showTitle 
           <div className={styles.winBar} role="status" data-kind="won">
             <strong>{t("game.won.title")}</strong>
             <span>{lastLevel ? t("game.won.finished") : t("game.won.text")}</span>
-            <button type="button" className={styles.action} autoFocus onClick={() => startLevel(lastLevel ? 1 : level + 1)}>
+            <button type="button" ref={nextRef} className={styles.action} onClick={() => startLevel(lastLevel ? 1 : level + 1)}>
               {lastLevel ? t("game.actions.again") : t("game.actions.next")}
             </button>
           </div>
